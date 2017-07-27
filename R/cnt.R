@@ -113,13 +113,16 @@ ctrl_discard_past <- function(expr) {
 
   expr <- switch(nm,
     `if` = if_discard_past(expr),
+    `while` = while_discard_past(expr),
     abort("TODO ctrl")
   )
 
   as_exprs_node(expr)
 }
 as_exprs_node <- function(expr) {
-  if (is_language(expr, quote(`{`))) {
+  if (is_pairlist(expr)) {
+    expr
+  } else if (is_language(expr, quote(`{`))) {
     node_cdr(expr)
   } else {
     node(expr, NULL)
@@ -131,13 +134,24 @@ if_discard_past <- function(expr) {
 
   if (has_shift(node_cadr(branches))) {
     branch <- node_cadr(branches)
-  } else if (has_shift(node_caddr(branches))) {
-    branch <- node_caddr(branches)
+  } else if (has_shift(node_cadr(node_cdr(branches)))) {
+    branch <- node_caddr(node_cdr(branches))
   } else {
     branch <- NULL
   }
 
   discard_past(branch)
+}
+while_discard_past <- function(expr) {
+  # Extract remaining expressions within the loop
+  block <- node_cadr(node_cdr(expr))
+  block <- discard_past(block)
+
+  # Reinsert loop at the end
+  block <- as_exprs_node(block)
+  mut_node_tail_cdr(block, node(expr, NULL))
+
+  block
 }
 
 has_shift <- function(expr) {

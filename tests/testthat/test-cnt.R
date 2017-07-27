@@ -60,3 +60,28 @@ test_that("can shift within an if branch", {
   expect_identical(out, "foo BAR baz")
   expect_identical(cnt("bim"), "foo BIM baz")
 })
+
+test_that("can shift within a while loop", {
+  cnts <- list()
+
+  out <- reset({
+    out <- "foo"
+    i <- 0
+
+    while (i < 5) {
+      i <- i + 1
+      out <- SHIFT(function(k) {
+        cnts <<- c(cnts, list(k))
+        k(out)
+      })
+      out <- paste(out, i)
+    }
+
+    toupper(out)
+  })
+
+  expect_identical(out, "FOO 1 2 3 4 5")
+
+  expect_identical(cnts[[1]]("bar"), "BAR 1 2 3 4 5")
+  expect_identical(cnts[[5]]("bar"), "BAR 5")
+})
