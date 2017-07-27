@@ -81,7 +81,13 @@ curly_discard_past <- function(curly) {
 
     if (is_language(car, ctrl_syms)) {
       new_args <- ctrl_discard_past(car)
-      mut_node_tail_cdr(new_args, node_cdr(args))
+
+      # Merge remaining expressions from the control block with
+      # further expressions
+      if (!is_null(new_args)) {
+        mut_node_tail_cdr(new_args, node_cdr(args))
+      }
+
       mut_node_cdr(curly, new_args)
       break
     }

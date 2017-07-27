@@ -85,3 +85,12 @@ test_that("can shift within a while loop", {
   expect_identical(cnts[[1]]("bar"), "BAR 1 2 3 4 5")
   expect_identical(cnts[[5]]("bar"), "BAR 5")
 })
+
+test_that("can shift with empty continuations", {
+  expect_error(regex = NA,
+    reset({
+      if (FALSE) TRUE
+      SHIFT(function(k) 0)
+    })
+  )
+})
