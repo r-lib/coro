@@ -33,10 +33,15 @@ SHIFT <- function(fn) {
   info <- reset_info()
 
   cnt_body <- discard_past(info$expr)
+  cnt_body <- splice_reset(cnt_body)
   cnt <- new_function(alist(`_next` = ), cnt_body, env = info$env)
 
   result <- fn(cnt)
   cnd_signal("shift", result = result)
+}
+
+splice_reset <- function(curly) {
+  new_language(quote(reset), node(curly, NULL))
 }
 
 discard_past <- function(expr) {
