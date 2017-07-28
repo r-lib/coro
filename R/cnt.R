@@ -107,7 +107,7 @@ expr_discard_past <- function(expr) {
   }
 
   if (is_language(expr)) {
-    lang_check_yield(expr)
+    lang_check_shift(expr)
   }
 
   NULL
@@ -178,22 +178,22 @@ is_assigned_shift <- function(expr) {
   is_language(expr, quote(`<-`)) && is_shift(node_cadr(node_cdr(expr)))
 }
 
-lang_check_yield <- function(lang) {
+lang_check_shift <- function(lang) {
   if (is_assigned_shift(lang)) {
     return(NULL)
   }
 
-  check_yield(node_car(lang))
+  check_shift(node_car(lang))
 
   args <- node_cdr(lang)
   while (!is_null(args)) {
     car <- node_car(args)
     args <- node_cdr(args)
 
-    check_yield(car)
+    check_shift(car)
   }
 }
-check_yield <- function(expr) {
+check_shift <- function(expr) {
   if (!is_language(expr)) {
     return(NULL)
   }
@@ -201,7 +201,7 @@ check_yield <- function(expr) {
   if (is_shift(expr)) {
     abort("Can't shift within a function call")
   }
-  lang_check_yield(expr)
+  lang_check_shift(expr)
 }
 
 
