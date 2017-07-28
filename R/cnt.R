@@ -28,9 +28,10 @@ reset_info <- function() {
   info
 }
 
-# This version doesn't capture shift conditions so the stack doesn't
-# grow on repeated invokation of continuations
-reset2 <- function(expr, env) {
+# This is a reset operator that doesn't capture shift conditions. We
+# use it instead of reset() to wrap continuations so that the stack
+# doesn't grow on repeated invokation of continuations
+continue <- function(expr, env) {
   expr <- enexpr(expr)
   info <- list(expr = expr, env = env)
 
@@ -63,7 +64,7 @@ as_exprs_node <- function(expr) {
 }
 splice_reset <- function(args, env) {
   curly <- new_language(quote(`{`), args)
-  new_language(quote(reset2), pairlist(curly, env = env))
+  new_language(quote(continue), pairlist(curly, env = env))
 }
 
 discard_past <- function(expr) {
