@@ -33,7 +33,7 @@ test_that("can shift within an assignment", {
   })
 
   expect_identical(a, "foo")
-  expect_false(env_has(, "b"))
+  expect_identical(b, "bar")
   expect_identical(out, "foo bar baz")
   expect_identical(cnt("BAR"), "foo BAR baz")
 })
@@ -67,23 +67,38 @@ test_that("can shift within a while loop", {
   out <- reset({
     out <- "foo"
     i <- 0
-
     while (i < 5) {
       i <- i + 1
-      out <- SHIFT(function(k) {
-        cnts <<- c(cnts, list(k))
-        k(out)
+      out <- SHIFT(function(cnt) {
+        cnts <<- c(cnts, list(cnt))
+        cnt(out)
       })
       out <- paste(out, i)
     }
-
     toupper(out)
   })
 
   expect_identical(out, "FOO 1 2 3 4 5")
-
-  expect_identical(cnts[[1]]("bar"), "BAR 1 2 3 4 5")
+  expect_identical(cnts[[1]]("bar"), "BAR 5")
   expect_identical(cnts[[5]]("bar"), "BAR 5")
+})
+
+test_that("shifting within a loop does not grow the call stack", {
+  stacks <- list()
+
+  out <- reset({
+    i <- 0
+    while (i < 5) {
+      i <- i + 1
+      SHIFT(function(cnt) {
+        stacks <<- c(stacks, list(ctxt_stack()))
+        cnt(NULL)
+      })
+    }
+  })
+
+  lengths <- map(stacks, length)
+  expect_true(all(lengths[[1]] == lengths[-1]))
 })
 
 test_that("can shift with empty continuations", {

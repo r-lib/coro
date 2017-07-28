@@ -1,19 +1,19 @@
 
 reset <- function(expr) {
-  info <- list(
-    frame = ctxt_frame(),
-    env = caller_env(),
-    expr = enexpr(expr)
-  )
+  info <- list(expr = enexpr(expr), env = caller_env())
 
-  ## TODO: need safe quosures
-  ## The quosure should be evaluated in its environment, not in overscope
-  # with_handlers(!! expr,
-  #   shift = exiting(function(cnd) cnd$result),
-  #   get_reset_info = restarting("reset_info", info)
-  # )
+  value <- with_reset(expr, info)
 
-  withCallingHandlers(tryCatch(expr, shift = function(cnd) cnd$result),
+  # Looped continuations end up here
+  while (inherits(value, c("shift", "condition"))) {
+    value <- with_reset(value$fn(value$cnt), info)
+  }
+
+  value
+}
+with_reset <- function(expr, info) {
+  # FIXME: need safe quosures to use rlang::with_handlers()
+  withCallingHandlers(tryCatch(expr, shift = identity),
     get_reset_info = restarting("reset_info", info)
   )
 }
@@ -28,103 +28,30 @@ reset_info <- function() {
   info
 }
 
+# This version doesn't capture shift conditions so the stack doesn't
+# grow on repeated invokation of continuations
+reset2 <- function(expr, env) {
+  expr <- enexpr(expr)
+  info <- list(expr = expr, env = env)
+
+  withCallingHandlers(eval_bare(expr, env),
+    get_reset_info = restarting("reset_info", info)
+  )
+}
+
 
 SHIFT <- function(fn) {
   info <- reset_info()
 
-  cnt_body <- discard_past(info$expr)
-  cnt_body <- splice_reset(cnt_body)
-  cnt <- new_function(alist(`_next` = ), cnt_body, env = info$env)
+  expr <- duplicate(info$expr)
 
-  result <- fn(cnt)
-  cnd_signal("shift", result = result)
+  cnt_body <- discard_past(expr)
+  cnt_body <- splice_reset(cnt_body, info$env)
+  cnt <- new_function(alist(`_next` = ), cnt_body)
+
+  cnd_signal("shift", fn = fn, cnt = cnt)
 }
 
-splice_reset <- function(curly) {
-  new_language(quote(reset), node(curly, NULL))
-}
-
-discard_past <- function(expr) {
-  expr <- duplicate(expr)
-
-  if (!is_language(expr)) {
-    return(expr)
-  }
-
-  car <- node_car(expr)
-  if (is_language(car) || !is_symbol(car)) {
-    lang_check_yield(car)
-    return(NULL)
-  }
-
-  nm <- as_string(car)
-  switch(nm,
-    SHIFT =
-      abort("TODO"),
-    `{` =
-      curly_discard_past(expr),
-    `if` = ,
-    `for` = ,
-    `while` =
-      ctrl_discard_past(expr),
-    lang_check_yield(expr)
-  )
-
-  expr
-}
-
-curly_discard_past <- function(curly) {
-  args <- node_cdr(curly)
-
-  while(!is_null(args)) {
-    car <- node_car(args)
-
-    if (is_language(car, ctrl_syms)) {
-      new_args <- ctrl_discard_past(car)
-
-      # Merge remaining expressions from the control block with
-      # further expressions
-      if (!is_null(new_args)) {
-        mut_node_tail_cdr(new_args, node_cdr(args))
-      }
-
-      mut_node_cdr(curly, new_args)
-      break
-    }
-
-    if (is_language(car)) {
-      lang_check_yield(car)
-    }
-
-    # If we have a shift, replace it with the next value and terminate
-    if (is_shift(car)) {
-      mut_node_car(args, next_sym)
-      mut_node_cdr(curly, args)
-      break
-    }
-    if (is_assigned_shift(car)) {
-      mut_node_cadr(node_cdr(car), next_sym)
-      mut_node_cdr(curly, args)
-      break
-    }
-
-    args <- node_cdr(args)
-    mut_node_cdr(curly, args)
-  }
-}
-
-# Can discard if else branches etc
-ctrl_discard_past <- function(expr) {
-  nm <- as_string(node_car(expr))
-
-  expr <- switch(nm,
-    `if` = if_discard_past(expr),
-    `while` = while_discard_past(expr),
-    abort("TODO ctrl")
-  )
-
-  as_exprs_node(expr)
-}
 as_exprs_node <- function(expr) {
   if (is_pairlist(expr)) {
     expr
@@ -134,7 +61,67 @@ as_exprs_node <- function(expr) {
     node(expr, NULL)
   }
 }
+splice_reset <- function(args, env) {
+  curly <- new_language(quote(`{`), args)
+  new_language(quote(reset2), pairlist(curly, env = env))
+}
 
+discard_past <- function(expr) {
+  args <- head <- as_exprs_node(expr)
+
+  while(!is_null(args)) {
+    arg <- node_car(args)
+    arg <- expr_discard_past(arg)
+
+    if (is_null(arg)) {
+      head <- node_cdr(args)
+    } else {
+      head <- arg
+      args <- node_cdr(args)
+      mut_node_tail_cdr(head, args)
+      break
+    }
+
+    args <- node_cdr(args)
+  }
+
+  head
+}
+
+# Takes an expression and always returns a node
+expr_discard_past <- function(expr) {
+  if (is_language(expr, ctrl_syms)) {
+    return(ctrl_discard_past(expr))
+  }
+
+  # If we have a shift, replace it with the next value and terminate
+  if (is_shift(expr)) {
+    args <- node(bangbang(next_sym), NULL)
+    return(args)
+  }
+  if (is_assigned_shift(expr)) {
+    assignment <- duplicate(expr)
+    mut_node_cadr(node_cdr(assignment), bangbang(next_sym))
+    args <- node(assignment, NULL)
+    return(args)
+  }
+
+  if (is_language(expr)) {
+    lang_check_yield(expr)
+  }
+
+  NULL
+}
+
+ctrl_discard_past <- function(expr) {
+  nm <- as_string(node_car(expr))
+
+  switch(nm,
+    `if` = if_discard_past(expr),
+    `while` = while_discard_past(expr),
+    abort("TODO ctrl")
+  )
+}
 if_discard_past <- function(expr) {
   branches <- node_cddr(expr)
 
@@ -151,13 +138,13 @@ if_discard_past <- function(expr) {
 while_discard_past <- function(expr) {
   # Extract remaining expressions within the loop
   block <- node_cadr(node_cdr(expr))
-  block <- discard_past(block)
+  args <- discard_past(block)
 
-  # Reinsert loop at the end
-  block <- as_exprs_node(block)
-  mut_node_tail_cdr(block, node(expr, NULL))
+  # Reenter loop at the end of current block
+  loop <- duplicate(expr)
+  mut_node_tail_cdr(args, node(loop, NULL))
 
-  block
+  args
 }
 
 has_shift <- function(expr) {
@@ -217,6 +204,10 @@ check_yield <- function(expr) {
   lang_check_yield(expr)
 }
 
+
+bangbang <- function(expr) {
+  lang(quote(UQ), expr)
+}
 
 ctrl_syms <- list(
   quote(`if`),
