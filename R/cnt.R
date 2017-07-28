@@ -120,9 +120,12 @@ ctrl_discard_past <- function(expr) {
   switch(nm,
     `if` = if_discard_past(expr),
     `while` = while_discard_past(expr),
-    abort("TODO ctrl")
+    `repeat` = ,
+    `for` = abort("Can't shift within a repeat or for loop. Please use while()"),
+    abort(sprintf("Internal error: Unexpected control flow `%s`"), nm)
   )
 }
+
 if_discard_past <- function(expr) {
   branches <- node_cddr(expr)
 
