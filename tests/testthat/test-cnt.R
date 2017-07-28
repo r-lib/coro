@@ -108,4 +108,11 @@ test_that("can shift with empty continuations", {
       SHIFT(function(k) 0)
     })
   )
+
+  expect_identical(reset(SHIFT(identity))("foo"), "foo")
+})
+
+test_that("continuations inherit from flowery namespace", {
+  cnt <- reset(SHIFT(identity))
+  expect_identical(get_env(cnt), ns_env("flowery"))
 })

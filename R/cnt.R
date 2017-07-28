@@ -47,7 +47,7 @@ SHIFT <- function(fn) {
 
   cnt_body <- discard_past(expr)
   cnt_body <- splice_reset(cnt_body, info$env)
-  cnt <- new_function(alist(`_next` = ), cnt_body)
+  cnt <- new_function(alist(`_next` = ), cnt_body, ns_env("flowery"))
 
   cnd_signal("shift", fn = fn, cnt = cnt)
 }
