@@ -140,8 +140,13 @@ if_discard_past <- function(expr) {
   discard_past(branch)
 }
 while_discard_past <- function(expr) {
-  # Extract remaining expressions within the loop
   block <- node_cadr(node_cdr(expr))
+
+  if (has_shift(block) && lang_has(block, is_jump)) {
+    abort("Can't break or continue within a shifted loop")
+  }
+
+  # Extract remaining expressions within the loop
   args <- discard_past(block)
 
   # Reenter loop at the end of current block
@@ -150,6 +155,10 @@ while_discard_past <- function(expr) {
 
   args
 }
+is_jump <- function(x) {
+  is_lang(x, jump_syms)
+}
+jump_syms <- list(quote(`break`), quote(`next`))
 
 lang_has <- function(lang, is_element) {
   if (!is_language(lang)) {
