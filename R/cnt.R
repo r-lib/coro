@@ -70,24 +70,38 @@ splice_reset <- function(args, env) {
 discard_past <- function(expr) {
   args <- head <- as_exprs_node(expr)
 
-  while(!is_null(args)) {
+  while (!is_null(args)) {
     arg <- node_car(args)
     arg <- expr_discard_past(arg)
 
+    # Discarded expression
     if (is_null(arg)) {
-      head <- node_cdr(args)
-    } else {
-      head <- arg
-      args <- node_cdr(args)
-      mut_node_tail_cdr(head, args)
+      head <- args <- node_cdr(args)
+      next
+    }
+
+    # Unassigned shift
+    if (identical(arg, unassigned_shift)) {
+      # If the shift is the last expression, keep it as a return
+      # value. Otherwise, discard it
+      if (is_null(node_cdr(args))) {
+        head <- arg
+      } else {
+        head <- node_cdr(args)
+      }
       break
     }
 
+    # Assigned shift
+    head <- arg
     args <- node_cdr(args)
+    mut_node_tail_cdr(head, args)
+    break
   }
 
   head
 }
+unassigned_shift <- pairlist(quote(UQ(`_next`)))
 
 # Takes an expression and always returns a node
 expr_discard_past <- function(expr) {

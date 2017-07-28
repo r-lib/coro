@@ -116,3 +116,12 @@ test_that("continuations inherit from flowery namespace", {
   cnt <- reset(SHIFT(identity))
   expect_identical(get_env(cnt), ns_env("flowery"))
 })
+
+test_that("shift is discarded", {
+  block <- quote({
+    "bar"
+    SHIFT(identity)
+    "foo"
+  })
+  expect_identical(discard_past(block), pairlist("foo"))
+})
