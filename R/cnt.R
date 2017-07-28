@@ -151,22 +151,22 @@ while_discard_past <- function(expr) {
   args
 }
 
-has_shift <- function(expr) {
-  if (!is_language(expr)) {
+lang_has <- function(lang, is_element) {
+  if (!is_language(lang)) {
     return(FALSE)
   }
-  if (is_shift(expr) || is_assigned_shift(expr)) {
+  if (is_element(lang)) {
     return(TRUE)
   }
 
-  head <- node_car(expr)
-  if (has_shift(head)) {
+  head <- node_car(lang)
+  if (is_element(head)) {
     return(TRUE)
   }
 
-  args <- node_cdr(expr)
+  args <- node_cdr(lang)
   while (!is_null(args)) {
-    if (has_shift(node_car(args))) {
+    if (is_element(node_car(args))) {
       return(TRUE)
     }
     args <- node_cdr(args)
@@ -175,6 +175,9 @@ has_shift <- function(expr) {
   FALSE
 }
 
+has_shift <- function(expr) {
+  lang_has(expr, function(x) is_shift(x) || is_assigned_shift(x))
+}
 is_shift <- function(expr) {
   is_language(expr, shift_sym)
 }
