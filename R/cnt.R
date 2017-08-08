@@ -132,15 +132,15 @@ ctrl_discard_past <- function(expr) {
   nm <- as_string(node_car(expr))
 
   switch(nm,
-    `if` = if_discard_past(expr),
-    `while` = while_discard_past(expr),
+    `if` = op_if_discard_past(expr),
+    `while` = op_while_discard_past(expr),
     `repeat` = ,
     `for` = abort("Can't shift within a repeat or for loop. Please use while()"),
     abort(sprintf("Internal error: Unexpected control flow `%s`"), nm)
   )
 }
 
-if_discard_past <- function(expr) {
+op_if_discard_past <- function(expr) {
   branches <- node_cddr(expr)
 
   if (has_shift(node_cadr(branches))) {
@@ -153,7 +153,7 @@ if_discard_past <- function(expr) {
 
   discard_past(branch)
 }
-while_discard_past <- function(expr) {
+op_while_discard_past <- function(expr) {
   block <- node_cadr(node_cdr(expr))
 
   if (has_shift(block) && lang_has(block, is_jump)) {
