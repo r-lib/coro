@@ -185,17 +185,12 @@ lang_has <- function(lang, is_element) {
     return(TRUE)
   }
 
-  head <- node_car(lang)
-  if (is_element(head)) {
-    return(TRUE)
-  }
-
-  args <- node_cdr(lang)
-  while (!is_null(args)) {
-    if (is_element(node_car(args))) {
+  rest <- lang
+  while (!is_null(rest)) {
+    if (lang_has(node_car(rest), is_element)) {
       return(TRUE)
     }
-    args <- node_cdr(args)
+    rest <- node_cdr(rest)
   }
 
   FALSE
