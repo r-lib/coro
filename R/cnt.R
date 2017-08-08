@@ -143,10 +143,10 @@ ctrl_discard_past <- function(expr) {
 op_if_discard_past <- function(expr) {
   branches <- node_cddr(expr)
 
-  if (has_shift(node_cadr(branches))) {
+  if (has_shift(node_car(branches))) {
+    branch <- node_car(branches)
+  } else if (has_shift(node_cadr(branches))) {
     branch <- node_cadr(branches)
-  } else if (has_shift(node_cadr(node_cdr(branches)))) {
-    branch <- node_caddr(node_cdr(branches))
   } else {
     branch <- NULL
   }

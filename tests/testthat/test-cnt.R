@@ -39,26 +39,39 @@ test_that("can shift within an assignment", {
 })
 
 test_that("can shift within an if branch", {
-  cnt <- NULL
+  cnt <- reset({
+    "discarded"
 
-  out <- reset({
-    a <- "foo"
-
-    if (FALSE) {
-      abort("FALSE")
+    if (TRUE) {
+      "TRUE-before"
+      SHIFT(identity)
+      "TRUE-after"
     } else {
-      b <- SHIFT(function(k) {
-        cnt <<- k
-        k("bar")
-      })
-      b <- toupper(b)
+      "FALSE"
     }
 
-    paste(a, b, "baz")
+    "after"
   })
 
-  expect_identical(out, "foo BAR baz")
-  expect_identical(cnt("bim"), "foo BIM baz")
+  expect_equal(cnt_body(cnt), quote({"TRUE-after"; "after"}))
+})
+
+test_that("can shift within an else branch", {
+  cnt <- reset({
+    "discarded"
+
+    if (FALSE) {
+      "FALSE"
+    } else {
+      "TRUE-before"
+      SHIFT(identity)
+      "TRUE-after"
+    }
+
+    "after"
+  })
+
+  expect_equal(cnt_body(cnt), quote({"TRUE-after"; "after"}))
 })
 
 test_that("can shift within a while loop", {
