@@ -163,6 +163,9 @@ op_while_discard_past <- function(expr) {
   # Extract remaining expressions within the loop
   args <- discard_past(block)
 
+  # Duplicate because we might recurse in case of nested loops
+  args <- duplicate(args)
+
   # Reenter loop at the end of current block
   loop <- duplicate(expr)
   mut_node_tail_cdr(args, node(loop, NULL))

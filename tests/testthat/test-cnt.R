@@ -101,6 +101,93 @@ test_that("shifting within a loop does not grow the call stack", {
   expect_true(all(lengths[[1]] == lengths[-1]))
 })
 
+test_that("past discarder takes nested loops into account", {
+  discarded <- discard_past(quote({
+    "discarded"
+    while (TRUE) {
+      "inner-before"
+      SHIFT(identity)
+      "inner-after"
+    }
+  }))
+  expect_equal(discarded, pairlist(
+    "inner-after",
+    quote(while (TRUE) {
+      "inner-before"
+      SHIFT(identity)
+      "inner-after"
+    })
+  ))
+
+  discarded <- discard_past(quote({
+    "discarded"
+    while (TRUE) {
+      "outer-before"
+      while (TRUE) {
+        "inner-before"
+        SHIFT(identity)
+        "inner-after"
+      }
+      "outer-after"
+    }
+  }))
+
+  expect_equal(discarded, pairlist(
+    "inner-after",
+    quote(while (TRUE) {
+      "inner-before"
+      SHIFT(identity)
+      "inner-after"
+    }),
+    "outer-after",
+    quote(while (TRUE) {
+      "outer-before"
+      while (TRUE) {
+        "inner-before"
+        SHIFT(identity)
+        "inner-after"
+      }
+      "outer-after"
+    })
+  ))
+})
+
+test_that("can shift within a nested while loop", {
+  cnt <- reset({
+    "discarded"
+    while (TRUE) {
+      "outer-before"
+      while (TRUE) {
+        "inner-before"
+        SHIFT(identity)
+        "inner-after"
+      }
+      "outer-after"
+    }
+  })
+
+  expected_cnt <- quote({
+    "inner-after"
+    while (TRUE) {
+      "inner-before"
+      SHIFT(identity)
+      "inner-after"
+    }
+    "outer-after"
+    while (TRUE) {
+      "outer-before"
+      while (TRUE) {
+        "inner-before"
+        SHIFT(identity)
+        "inner-after"
+      }
+      "outer-after"
+    }
+  })
+
+  expect_equal(cnt_body(cnt), expected_cnt)
+})
+
 test_that("can shift with empty continuations", {
   expect_error(regex = NA,
     reset({
