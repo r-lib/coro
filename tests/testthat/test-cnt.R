@@ -63,6 +63,28 @@ test_that("can shift within an else branch", {
   expect_equal(cnt_body(cnt), quote({"TRUE-after"; "after"}))
 })
 
+test_that("can shift within nested if-else branches", {
+  cnt <- reset({
+    "before"
+    if (TRUE) {
+      "TRUE-before"
+      if (FALSE) {
+        "TRUE-FALSE"
+      } else {
+        "TRUE-TRUE-before"
+        SHIFT(identity)
+        "TRUE-TRUE-after"
+      }
+      "TRUE-after"
+    } else {
+      "FALSE"
+    }
+    "after"
+  })
+
+  expect_equal(cnt_body(cnt), quote({"TRUE-TRUE-after"; "TRUE-after"; "after"}))
+})
+
 test_that("can shift within a while loop", {
   cnts <- list()
 
