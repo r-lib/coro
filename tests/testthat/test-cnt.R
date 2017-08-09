@@ -213,7 +213,6 @@ test_that("can shift within a nested while loop", {
 })
 
 test_that("can shift within nested while / if-else operations", {
-
   cnt <- reset({
     "discarded"
     if (FALSE) {

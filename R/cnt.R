@@ -72,37 +72,33 @@ discard_past <- function(expr) {
 
   while (!is_null(node)) {
     first <- node_car(node)
-    first <- expr_discard_past(first)
+    continuation <- expr_discard_past(first)
 
-    # Discarded expression
-    if (is_null(first)) {
+    if (is_null(continuation)) {
       node <- node_cdr(node)
       next
     }
 
-    if (found_unassigned_shift(first)) {
-      # If the shift is the last expression, keep it as a return
-      # value. Otherwise, discard it
-      if (is_null(node_cdr(node))) {
-        past <- first
-      } else {
-        past <- node_cdr(node)
-      }
-      break
+    if (found_lonely_shift(continuation)) {
+      # If the shift is the last expression keep it as a return value,
+      # otherwise discard it
+      past <- node_cdr(node) %||% continuation
+    } else {
+      # Splice continuation from first node to the rest
+      mut_node_tail_cdr(continuation, node_cdr(node))
+      past <- continuation
     }
 
-    # Remaining expressions from the continuation
-    past <- first
-    mut_node_tail_cdr(past, node_cdr(node))
     break
   }
 
   past
 }
 
-found_unassigned_shift <- function(x) {
-  x <- node_car(x)
-  identical(x, shift_lang)
+found_lonely_shift <- function(x) {
+  first <- node_car(x)
+  rest <- node_cdr(x)
+  identical(first, shift_lang) && is_null(rest)
 }
 shift_lang <- quote(UQ(`_next`))
 
