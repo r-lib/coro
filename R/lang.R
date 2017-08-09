@@ -72,3 +72,4 @@ ctrl_syms <- list(
 )
 next_sym <- quote(`_next`)
 shift_sym <- quote(SHIFT)
+assignment_sym <- quote(`<-`)

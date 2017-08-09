@@ -68,40 +68,43 @@ splice_reset <- function(args, env) {
 }
 
 discard_past <- function(expr) {
-  args <- head <- as_exprs_node(expr)
+  node <- as_exprs_node(expr)
 
-  while (!is_null(args)) {
-    arg <- node_car(args)
-    arg <- expr_discard_past(arg)
+  while (!is_null(node)) {
+    first <- node_car(node)
+    first <- expr_discard_past(first)
 
     # Discarded expression
-    if (is_null(arg)) {
-      head <- args <- node_cdr(args)
+    if (is_null(first)) {
+      node <- node_cdr(node)
       next
     }
 
-    # Unassigned shift
-    if (identical(arg, unassigned_shift)) {
+    if (found_unassigned_shift(first)) {
       # If the shift is the last expression, keep it as a return
       # value. Otherwise, discard it
-      if (is_null(node_cdr(args))) {
-        head <- arg
+      if (is_null(node_cdr(node))) {
+        past <- first
       } else {
-        head <- node_cdr(args)
+        past <- node_cdr(node)
       }
       break
     }
 
-    # Assigned shift
-    head <- arg
-    args <- node_cdr(args)
-    mut_node_tail_cdr(head, args)
+    # Remaining expressions from the continuation
+    past <- first
+    mut_node_tail_cdr(past, node_cdr(node))
     break
   }
 
-  head
+  past
 }
-unassigned_shift <- pairlist(quote(UQ(`_next`)))
+
+found_unassigned_shift <- function(x) {
+  x <- node_car(x)
+  identical(x, shift_lang)
+}
+shift_lang <- quote(UQ(`_next`))
 
 # Takes an expression and always returns a node
 expr_discard_past <- function(expr) {
@@ -148,7 +151,7 @@ op_if_discard_past <- function(expr) {
   } else if (has_shift(node_cadr(branches))) {
     branch <- node_cadr(branches)
   } else {
-    branch <- NULL
+    return(NULL)
   }
 
   discard_past(branch)
@@ -156,7 +159,10 @@ op_if_discard_past <- function(expr) {
 op_while_discard_past <- function(expr) {
   block <- node_cadr(node_cdr(expr))
 
-  if (has_shift(block) && lang_has(block, is_jump)) {
+  if (!has_shift(block)) {
+    return(NULL)
+  }
+  if (lang_has(block, is_jump)) {
     abort("Can't break or continue within a shifted loop")
   }
 

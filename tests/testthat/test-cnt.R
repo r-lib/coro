@@ -212,6 +212,74 @@ test_that("can shift within a nested while loop", {
   expect_equal(cnt_body(cnt), expected_cnt)
 })
 
+test_that("can shift within nested while / if-else operations", {
+
+  cnt <- reset({
+    "discarded"
+    if (FALSE) {
+      "FALSE"
+    } else {
+      "TRUE-before"
+      while (TRUE) {
+        "outer-before"
+        while (TRUE) {
+          "inner-before"
+          if (TRUE) {
+            "TRUE-TRUE-before"
+            SHIFT(identity)
+            "TRUE-TRUE-after"
+          } else {
+            "TRUE-FALSE"
+          }
+          "inner-after"
+        }
+        "outer-after"
+      }
+      "TRUE-after"
+    }
+  })
+
+  expected_cnt <- quote({
+    "TRUE-TRUE-after"
+    "inner-after"
+    while (TRUE) {
+      "inner-before"
+      if (TRUE) {
+        "TRUE-TRUE-before"
+        SHIFT(identity)
+        "TRUE-TRUE-after"
+        "inner-after"
+      }
+      else {
+        "TRUE-FALSE"
+      }
+      "inner-after"
+    }
+    "outer-after"
+    while (TRUE) {
+      "outer-before"
+      while (TRUE) {
+        "inner-before"
+        if (TRUE) {
+          "TRUE-TRUE-before"
+          SHIFT(identity)
+          "TRUE-TRUE-after"
+          "inner-after"
+        }
+        else {
+          "TRUE-FALSE"
+        }
+        "inner-after"
+      }
+      "outer-after"
+    }
+    "TRUE-after"
+  })
+
+  expect_equal(cnt_body(cnt), expected_cnt)
+})
+
+
 test_that("can shift with empty continuations", {
   expect_error(regex = NA,
     reset({
