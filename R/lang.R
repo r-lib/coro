@@ -59,6 +59,13 @@ check_shift <- function(expr) {
   lang_check_shift(expr)
 }
 
+as_block_lang <- function(x) {
+  if (!is_language(x, block_sym)) {
+    x <- lang(block_sym, x)
+  }
+  x
+}
+
 
 bangbang <- function(expr) {
   lang(quote(UQ), expr)
@@ -73,3 +80,4 @@ ctrl_syms <- list(
 next_sym <- quote(`_next`)
 shift_sym <- quote(SHIFT)
 assignment_sym <- quote(`<-`)
+block_sym <- quote(`{`)

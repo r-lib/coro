@@ -1,4 +1,8 @@
 
+dots_node <- function(...) {
+  node_cdr(substitute(lang(...)))
+}
+
 node_tail <- function(node) {
   while(!is_null(node_cdr(node))) {
     node <- node_cdr(node)

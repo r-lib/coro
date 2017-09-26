@@ -1,7 +1,12 @@
 
 reset <- function(expr) {
-  info <- list(expr = enexpr(expr), env = caller_env())
+  expr <- enexpr(expr)
+  expr <- as_block_lang(expr)
 
+  # Inline the block instrumenter within the block call
+  mut_node_car(expr, function(...) block_eval(...))
+
+  info <- env(expr = expr, env = caller_env())
   value <- with_reset(expr, info)
 
   # Looped continuations end up here
@@ -16,6 +21,21 @@ with_reset <- function(expr, info) {
   withCallingHandlers(tryCatch(expr, shift = identity),
     get_reset_info = restarting("reset_info", info)
   )
+}
+
+block_eval <- function(...) {
+  browser()
+  dots <- dots_node(...)
+  info <- reset_info()
+
+  i <- 0
+  out <- NULL
+  while (!is_null(dots)) {
+    i <- i + 1
+    out <- eval_bare(node_car(dots), env)
+  }
+
+  out
 }
 
 reset_info <- function() {
