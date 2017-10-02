@@ -31,7 +31,7 @@ node_list_poke_cdr <- function(node, new_cdr) {
   }
 }
 
-is_reference <- rlang:::is_reference
+is_language <- is_lang
 
 node_poke_car <- mut_node_car
 node_poke_cdr <- mut_node_cdr
