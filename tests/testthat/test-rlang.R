@@ -14,3 +14,18 @@ test_that("node list pokers handle empty list", {
   expect_identical(node_list_poke_car(NULL, 1L), node_list(1L))
   expect_identical(node_list_poke_cdr(NULL, node_list(1L)), node_list(1L))
 })
+
+
+context("attrs")
+
+test_that("poke_attr() modifies attributes in place", {
+  x <- 1:3
+  poked <- poke_attr(x, "foo", 1L)
+
+  expect_true(is_reference(x, poked))
+  expect_identical(attributes(x), list(foo = 1L))
+
+  poked <- poke_attr(x, "foo", 2L)
+  expect_true(is_reference(x, poked))
+  expect_identical(attributes(x), list(foo = 2L))
+})

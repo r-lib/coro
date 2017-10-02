@@ -35,3 +35,7 @@ is_reference <- rlang:::is_reference
 
 node_poke_car <- mut_node_car
 node_poke_cdr <- mut_node_cdr
+
+poke_attr <- function(x, name, value) {
+  invisible(.Call(rlang_poke_attr, x, sym(name), value))
+}

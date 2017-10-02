@@ -1,3 +1,4 @@
 #' @import rlang
 #' @importFrom glue glue
-NULL
+#' @useDynLib flowery, .registration = TRUE
+"_PACKAGE"
