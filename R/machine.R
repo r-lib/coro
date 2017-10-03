@@ -15,13 +15,8 @@ reset_state <- function() {
 machine_parts <- function(fn) {
   reset_state()
 
-  body <- duplicate(body(fn))
-  node <- as_exprs_node(body)
-
-  parts <- node_list_parts(node)
-  poke_returns(parts)
-
-  parts
+  node <- set_returns(fn)
+  node_list_parts(node)
 }
 
 node_list_parts <- function(node) {

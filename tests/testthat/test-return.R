@@ -46,8 +46,6 @@ test_that("explicit return is added to if else branches", {
 })
 
 test_that("explicit return is added after loops", {
-  invisible_lang <- return_lang(lang("invisible", NULL))
-
   exprs <- set_returns(function() {
     "before"
     repeat "foo"
