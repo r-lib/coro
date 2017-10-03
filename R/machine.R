@@ -71,25 +71,14 @@ node_list_parts <- function(node) {
     return(NULL)
   }
 
-  # `node` maybe be NULL in case of empty continuation
-  if (!is_pairlist(node)) {
-    node <- null_node()
+  # `node` may be NULL if there is no expression after a pause
+  if (!is_null(node)) {
+    remaining <- new_block(node)
+    node_list_poke_cdr(parts, node_list(remaining))
   }
-  remaining <- new_block(node)
 
-  node_list_poke_cdr(parts, node_list(remaining))
+  parts
 }
-
-pause_lang <- function(idx, ...) {
-  lang("_pause", as.character(idx), ...)
-}
-goto_lang <- function(idx) {
-  lang("_goto", as.character(idx))
-}
-return_lang <- function(...) {
-  lang("return", ...)
-}
-
 
 expr_parts <- function(expr) {
   if (!is_language(expr)) {
@@ -110,14 +99,24 @@ expr_parts <- function(expr) {
   )
 
   # Add missing goto
-  goto_node <- node_list(goto_lang(poke_state()))
   last_block <- node_car(node_list_tail(parts))
-  node_list_poke_cdr(last_block, goto_node)
+  if (!is_exiting_block(last_block)) {
+    goto_node <- node_list(goto_lang(poke_state()))
+    node_list_poke_cdr(last_block, goto_node)
+  }
 
   parts
 }
 
-
 is_pause <- function(x) {
   is_language(x, quote(yield))
 }
+
+is_exiting_block <- function(x) {
+  if (is_null(x)) {
+    return(FALSE)
+  }
+  last <- node_car(node_list_tail(x))
+  is_language(last, exiting_syms)
+}
+exiting_syms <- list(return_sym, pause_sym, goto_sym)

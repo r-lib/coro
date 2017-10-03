@@ -28,6 +28,16 @@ as_exprs_node <- function(expr) {
   }
 }
 
+pause_lang <- function(idx, ...) {
+  lang("_pause", as.character(idx), ...)
+}
+goto_lang <- function(idx) {
+  lang("_goto", as.character(idx))
+}
+return_lang <- function(...) {
+  lang("return", ...)
+}
+
 block <- function(...) {
   lang(block_sym, ...)
 }
@@ -51,7 +61,11 @@ for_lang <- function(...) {
   lang(for_sym, ...)
 }
 
+return_sym <- quote(`return`)
+pause_sym <- quote(`_pause`)
+goto_sym <- quote(`_goto`)
 yield_sym <- quote(`yield`)
+
 if_sym <- quote(`if`)
 repeat_sym <- quote(`repeat`)
 while_sym <- quote(`while`)

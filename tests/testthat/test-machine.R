@@ -119,3 +119,19 @@ test_that("`{` blocks - nested and no past before pause", {
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
+
+test_that("`{` blocks - nested and goto after pause", {
+  parts <- machine_parts(function() {
+    {
+      "before-inner"
+      yield(1L)
+    }
+    "after1"
+    "after2"
+  })
+
+  parts1 <- block("before-inner", pause_lang("2"))
+  parts2 <- block("after1", return_lang("after2"))
+
+  expect_identical(parts, node_list(parts1, parts2))
+})
