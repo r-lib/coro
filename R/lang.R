@@ -22,7 +22,7 @@ as_exprs_node <- function(expr) {
   if (is_pairlist(expr)) {
     expr
   } else if (is_language(expr, quote(`{`))) {
-    node_cdr(expr)
+    node_cdr(expr) %||% node_list(NULL)
   } else {
     node(expr, NULL)
   }
@@ -35,11 +35,23 @@ new_block <- function(x) {
   new_language(block_sym, x)
 }
 
-ctrl_syms <- list(
-  quote(`if`),
-  quote(`for`),
-  quote(`while`),
-  quote(`repeat`)
-)
+if_lang <- function(...) {
+  lang(if_sym, ...)
+}
+repeat_lang <- function(...) {
+  lang(repeat_sym, ...)
+}
+while_lang <- function(...) {
+  lang(while_sym, ...)
+}
+for_lang <- function(...) {
+  lang(for_sym, ...)
+}
+
+if_sym <- quote(`if`)
+repeat_sym <- quote(`repeat`)
+while_sym <- quote(`while`)
+for_sym <- quote(`for`)
+ctrl_syms <- list(if_sym, repeat_sym, while_sym, for_sym)
 assignment_sym <- quote(`<-`)
 block_sym <- quote(`{`)
