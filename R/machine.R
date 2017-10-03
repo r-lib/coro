@@ -1,10 +1,10 @@
 
 state <- new_environment(list(idx = 1L))
 
-current_state <- function() {
+peek_state <- function() {
   state$idx
 }
-next_state <- function() {
+poke_state <- function() {
   state$idx <- state$idx + 1L
   state$idx
 }
@@ -29,7 +29,7 @@ node_list_parts <- function(node) {
 
     # Pausing state
     if (is_pause(expr)) {
-      pause <- pause_lang(next_state())
+      pause <- pause_lang(poke_state())
 
       if (is_null(parent)) {
         pause_block <- new_block(node_list(pause))
@@ -50,7 +50,7 @@ node_list_parts <- function(node) {
       # If any past expressions add them to pausing block
       if (!is_null(parent)) {
         pausing_block <- node_car(expr_parts)
-        pausing_exprs <- node_list(pausing_block, goto_lang(current_state()))
+        pausing_exprs <- node_list(pausing_block, goto_lang(peek_state()))
         node_poke_cdr(parent, pausing_exprs)
         node_poke_car(expr_parts, new_block(node))
       }
@@ -110,7 +110,7 @@ expr_parts <- function(expr) {
   )
 
   # Add missing goto
-  goto_node <- node_list(goto_lang(next_state()))
+  goto_node <- node_list(goto_lang(poke_state()))
   last_block <- node_car(node_list_tail(parts))
   node_list_poke_cdr(last_block, goto_node)
 
