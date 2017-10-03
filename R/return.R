@@ -17,8 +17,10 @@ poke_returns <- function(expr) {
   } else {
     head <- as_string(node_car(last))
     last <- switch(head,
+      `return` = last,
       `{` = new_block(poke_returns(last)),
       `if` = if_poke_returns(last),
+      `yield` = ,
       `repeat` = ,
       `while` = ,
       `for` = {

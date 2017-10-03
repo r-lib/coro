@@ -35,6 +35,9 @@ new_block <- function(x) {
   new_language(block_sym, x)
 }
 
+yield_lang <- function(...) {
+  lang(yield_sym, ...)
+}
 if_lang <- function(...) {
   lang(if_sym, ...)
 }
@@ -48,6 +51,7 @@ for_lang <- function(...) {
   lang(for_sym, ...)
 }
 
+yield_sym <- quote(`yield`)
 if_sym <- quote(`if`)
 repeat_sym <- quote(`repeat`)
 while_sym <- quote(`while`)

@@ -66,3 +66,20 @@ test_that("explicit return is added after loops", {
   explicit_for <- node_list(for_lang(quote(i), quote(x), "foo"), invisible_lang)
   expect_identical(exprs, explicit_for)
 })
+
+test_that("explicit returns are left alone", {
+  exprs <- set_returns(function() return("foo"))
+  expect_identical(exprs, node_list(return_lang("foo")))
+
+  exprs <- set_returns(function() { "foo"; return("bar") })
+  expect_identical(exprs, node_list("foo", return_lang("bar")))
+})
+
+test_that("invisible return is added after trailing yield()", {
+  exprs <- set_returns(function() yield())
+  expect_identical(exprs, node_list(yield_lang(), invisible_lang))
+
+  exprs <- set_returns(function() if (TRUE) yield())
+  block <- block(yield_lang(), invisible_lang)
+  expect_identical(exprs, node_list(if_lang(TRUE, block)))
+})
