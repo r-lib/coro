@@ -76,7 +76,6 @@ node_list_parts <- function(node) {
     node <- null_node()
   }
   remaining <- new_block(node)
-  poke_attr(remaining, "tail", TRUE)
 
   node_list_poke_cdr(parts, node_list(remaining))
 }
@@ -119,26 +118,6 @@ expr_parts <- function(expr) {
 }
 
 
-poke_returns <- function(parts) {
-  last_part <- node_car(node_list_tail(parts))
-  if (!is_tail(last_part)) {
-    return(NULL)
-  }
-
-  last_node <- node_list_tail(last_part)
-  if (is_null_node(last_node)) {
-    last_expr <- return_lang(NULL)
-  } else {
-    last_expr <- return_lang(node_car(last_node))
-  }
-  node_poke_car(last_node, last_expr)
-}
-
-
-
 is_pause <- function(x) {
   is_language(x, quote(yield))
-}
-is_tail <- function(x) {
-  is_true(attr(x, "tail"))
 }

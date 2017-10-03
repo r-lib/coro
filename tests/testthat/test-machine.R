@@ -10,7 +10,7 @@ test_that("`{` blocks - one pause", {
   })
 
   parts1 <- block("before1", "before2", pause_lang("2"))
-  parts2 <- final("after1", return_lang("after2"))
+  parts2 <- block("after1", return_lang("after2"))
 
   expect_identical(parts, node_list(parts1, parts2))
 })
@@ -22,7 +22,7 @@ test_that("`{` blocks - no preamble", {
   })
 
   parts1 <- block(pause_lang(2))
-  parts2 <- final(return_lang("after"))
+  parts2 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2))
 })
@@ -38,7 +38,7 @@ test_that("`{` blocks - multiple pauses", {
 
   parts1 <- block("before", pause_lang("2"))
   parts2 <- block("during", pause_lang("3"))
-  parts3 <- final(return_lang("after"))
+  parts3 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
@@ -53,7 +53,7 @@ test_that("`{` blocks - consecutive pauses", {
 
   parts1 <- block("before", pause_lang("2"))
   parts2 <- block(pause_lang("3"))
-  parts3 <- final(return_lang("after"))
+  parts3 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
@@ -64,7 +64,7 @@ test_that("`{` blocks - no return value", {
   })
 
   parts1 <- block(pause_lang("2"))
-  parts2 <- final(invisible_lang)
+  parts2 <- block(invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2))
 
@@ -76,7 +76,7 @@ test_that("`{` blocks - no return value", {
 
   parts1 <- block(pause_lang("2"))
   parts2 <- block(pause_lang("3"))
-  parts3 <- final(invisible_lang)
+  parts3 <- block(invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
@@ -96,8 +96,8 @@ test_that("`{` blocks - nested", {
 
   parts1_block <- block("before-inner", pause_lang("2"))
   parts1 <- block("before1", "before2", parts1_block, goto_lang("3"))
-  parts2 <- final("after-inner", goto_lang("3"))
-  parts3 <- final("after1", return_lang("after2"))
+  parts2 <- block("after-inner", goto_lang("3"))
+  parts3 <- block("after1", return_lang("after2"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
@@ -114,8 +114,8 @@ test_that("`{` blocks - nested and no past before pause", {
   })
 
   parts1 <- block("before-inner", pause_lang("2"))
-  parts2 <- final("after-inner", goto_lang("3"))
-  parts3 <- final("after1", return_lang("after2"))
+  parts2 <- block("after-inner", goto_lang("3"))
+  parts3 <- block("after1", return_lang("after2"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
