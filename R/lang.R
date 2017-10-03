@@ -44,6 +44,9 @@ block <- function(...) {
 new_block <- function(x) {
   new_language(block_sym, x)
 }
+is_block <- function(x) {
+  is_language(x, block_sym)
+}
 
 yield_lang <- function(...) {
   lang(yield_sym, ...)

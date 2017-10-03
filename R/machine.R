@@ -47,10 +47,21 @@ node_list_parts <- function(node) {
     # Nested states
     expr_parts <- expr_parts(expr)
     if (!is_null(expr_parts)) {
+      first <- node_car(expr_parts)
+
       # If any past expressions add them to pausing block
       if (!is_null(parent)) {
-        pausing_block <- node_car(expr_parts)
-        pausing_exprs <- node_list(pausing_block, goto_lang(peek_state()))
+        pausing_block <- first
+
+        # Only add a goto if there might be code reaching the
+        # continuation from a non-yielding branch
+        if (is_language(first, if_sym)) {
+          pausing_exprs <- node_list(goto_lang(peek_state()))
+        } else {
+          pausing_exprs <- NULL
+        }
+        pausing_exprs <- node(pausing_block, pausing_exprs)
+
         node_poke_cdr(parent, pausing_exprs)
         node_poke_car(expr_parts, new_block(node))
       }
@@ -97,6 +108,10 @@ expr_parts <- function(expr) {
     `while` = stop("todo while"),
     NULL
   )
+
+  if (is_null(parts)) {
+    return(parts)
+  }
 
   # Add missing goto
   last_block <- node_car(node_list_tail(parts))
