@@ -1,15 +1,15 @@
 
-state_idx <- 1L
+state <- new_environment(list(idx = 1L))
 
 current_state <- function() {
-  state_idx
+  state$idx
 }
 next_state <- function() {
-  state_idx <<- state_idx + 1L
-  state_idx
+  state$idx <- state$idx + 1L
+  state$idx
 }
 reset_state <- function() {
-  state_idx <<- 1L
+  state$idx <- 1L
 }
 
 machine_parts <- function(fn) {
