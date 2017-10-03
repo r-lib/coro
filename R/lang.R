@@ -28,11 +28,11 @@ as_exprs_node <- function(expr) {
   }
 }
 
-as_block_lang <- function(x) {
-  if (!is_language(x, block_sym)) {
-    x <- lang(block_sym, x)
-  }
-  x
+block <- function(...) {
+  lang(block_sym, ...)
+}
+new_block <- function(x) {
+  new_language(block_sym, x)
 }
 
 ctrl_syms <- list(

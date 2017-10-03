@@ -37,11 +37,12 @@ node_list_parts <- function(node) {
       pause <- pause_lang(next_state())
 
       if (is_null(parent)) {
-        parts <- node_list_poke_cdr(parts, node_list(node_list(pause)))
+        pause_block <- new_block(node_list(pause))
       } else {
         node_poke_cdr(parent, node_list(pause))
-        parts <- node_list_poke_cdr(parts, node_list(node))
+        pause_block <- new_block(node)
       }
+      parts <- node_list_poke_cdr(parts, node_list(pause_block))
 
       rest <- node <- node_cdr(rest)
       parent <- NULL
@@ -51,10 +52,13 @@ node_list_parts <- function(node) {
     # Nested states
     expr_parts <- expr_parts(expr)
     if (!is_null(expr_parts)) {
-      # Add missing goto
-      goto <- goto_lang(next_state())
-      last <- node_car(node_list_tail(expr_parts))
-      node_list_poke_cdr(last, node_list(goto))
+      # If any past expressions add them to pausing block
+      if (!is_null(parent)) {
+        pausing_block <- node_car(expr_parts)
+        pausing_exprs <- node_list(pausing_block, goto_lang(current_state()))
+        node_poke_cdr(parent, pausing_exprs)
+        node_poke_car(expr_parts, new_block(node))
+      }
 
       # Merge nested states
       parts <- node_list_poke_cdr(parts, expr_parts)
@@ -76,10 +80,10 @@ node_list_parts <- function(node) {
   if (!is_pairlist(node)) {
     node <- null_node()
   }
-  poke_attr(node, "tail", TRUE)
-  remaining <- node_list(node)
+  remaining <- new_block(node)
+  poke_attr(remaining, "tail", TRUE)
 
-  node_list_poke_cdr(parts, remaining)
+  node_list_poke_cdr(parts, node_list(remaining))
 }
 
 pause_lang <- function(idx, ...) {
@@ -104,12 +108,19 @@ expr_parts <- function(expr) {
   }
 
   head <- as_string(head)
-  switch(head,
+  parts <- switch(head,
     `{` = node_list_parts(node_cdr(expr)),
     `if` = stop("todo if"),
     `while` = stop("todo while"),
     NULL
   )
+
+  # Add missing goto
+  goto_node <- node_list(goto_lang(next_state()))
+  last_block <- node_car(node_list_tail(parts))
+  node_list_poke_cdr(last_block, goto_node)
+
+  parts
 }
 
 

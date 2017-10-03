@@ -9,8 +9,8 @@ test_that("`{` blocks - one pause", {
     "after2"
   })
 
-  parts1 <- node_list("before1", "before2", pause_lang("2"))
-  parts2 <- tail_list("after1", return_lang("after2"))
+  parts1 <- block("before1", "before2", pause_lang("2"))
+  parts2 <- final("after1", return_lang("after2"))
 
   expect_identical(parts, node_list(parts1, parts2))
 })
@@ -21,8 +21,8 @@ test_that("`{` blocks - no preamble", {
     "after"
   })
 
-  parts1 <- node_list(pause_lang(2))
-  parts2 <- tail_list(return_lang("after"))
+  parts1 <- block(pause_lang(2))
+  parts2 <- final(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2))
 })
@@ -36,9 +36,9 @@ test_that("`{` blocks - multiple pauses", {
     "after"
   })
 
-  parts1 <- node_list("before", pause_lang("2"))
-  parts2 <- node_list("during", pause_lang("3"))
-  parts3 <- tail_list(return_lang("after"))
+  parts1 <- block("before", pause_lang("2"))
+  parts2 <- block("during", pause_lang("3"))
+  parts3 <- final(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
@@ -51,9 +51,9 @@ test_that("`{` blocks - consecutive pauses", {
     "after"
   })
 
-  parts1 <- node_list("before", pause_lang("2"))
-  parts2 <- node_list(pause_lang("3"))
-  parts3 <- tail_list(return_lang("after"))
+  parts1 <- block("before", pause_lang("2"))
+  parts2 <- block(pause_lang("3"))
+  parts3 <- final(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
@@ -63,8 +63,8 @@ test_that("`{` blocks - no return value", {
     yield()
   })
 
-  parts1 <- node_list(pause_lang("2"))
-  parts2 <- tail_list(return_lang(NULL))
+  parts1 <- block(pause_lang("2"))
+  parts2 <- final(return_lang(NULL))
 
   expect_identical(parts, node_list(parts1, parts2))
 
@@ -74,9 +74,48 @@ test_that("`{` blocks - no return value", {
     yield()
   })
 
-  parts1 <- node_list(pause_lang("2"))
-  parts2 <- node_list(pause_lang("3"))
-  parts3 <- tail_list(return_lang(NULL))
+  parts1 <- block(pause_lang("2"))
+  parts2 <- block(pause_lang("3"))
+  parts3 <- final(return_lang(NULL))
+
+  expect_identical(parts, node_list(parts1, parts2, parts3))
+})
+
+test_that("`{` blocks - nested", {
+  parts <- machine_parts(function() {
+    "before1"
+    "before2"
+    {
+      "before-inner"
+      yield(1L)
+      "after-inner"
+    }
+    "after1"
+    "after2"
+  })
+
+  parts1_block <- block("before-inner", pause_lang("2"))
+  parts1 <- block("before1", "before2", parts1_block, goto_lang("3"))
+  parts2 <- final("after-inner", goto_lang("3"))
+  parts3 <- final("after1", return_lang("after2"))
+
+  expect_identical(parts, node_list(parts1, parts2, parts3))
+})
+
+test_that("`{` blocks - nested and no past before pause", {
+  parts <- machine_parts(function() {
+    {
+      "before-inner"
+      yield(1L)
+      "after-inner"
+    }
+    "after1"
+    "after2"
+  })
+
+  parts1 <- block("before-inner", pause_lang("2"))
+  parts2 <- final("after-inner", goto_lang("3"))
+  parts3 <- final("after1", return_lang("after2"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
