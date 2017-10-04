@@ -42,7 +42,10 @@ if_poke_returns <- function(expr) {
   if_branch <- new_block(poke_returns(node_car(branches)))
   node_poke_car(branches, if_branch)
 
-  if (!is_null(node_cadr(branches))) {
+  if (is_null(node_cadr(branches))) {
+    explicit_else <- node_list(block(return_lang(lang("invisible", NULL))))
+    node_poke_cdr(branches, explicit_else)
+  } else {
     else_branch <- new_block(poke_returns(node_cadr(branches)))
     node_poke_cadr(branches, else_branch)
   }

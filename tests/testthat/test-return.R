@@ -24,7 +24,7 @@ test_that("explicit return is added to blocks", {
 
 test_that("explicit return is added to if else branches", {
   exprs <- set_returns(function() if (TRUE) "foo")
-  expect_identical(exprs, node_list(if_lang(TRUE, block(return_lang("foo")))))
+  expect_identical(exprs, node_list(if_lang(TRUE, block(return_lang("foo")), block(invisible_lang))))
 
   exprs <- set_returns(function() { if (TRUE) "foo" else "bar" })
   explicit <- if_lang(TRUE, block(return_lang("foo")), block(return_lang("bar")))
@@ -79,5 +79,5 @@ test_that("invisible return is added after trailing yield()", {
 
   exprs <- set_returns(function() if (TRUE) yield())
   block <- block(yield_lang(), invisible_lang)
-  expect_identical(exprs, node_list(if_lang(TRUE, block)))
+  expect_identical(exprs, node_list(if_lang(TRUE, block, block(invisible_lang))))
 })
