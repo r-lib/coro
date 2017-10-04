@@ -48,20 +48,16 @@ node_list_parts <- function(node) {
     expr_parts <- expr_parts(expr)
     if (!is_null(expr_parts)) {
 
-      # If any past expressions add them to pausing block
+      # If any past expressions add them before pausing block
       if (!is_null(parent)) {
         pausing_part <- node_car(expr_parts)
 
-        # Only add a goto if there might be code reaching the
-        # continuation from a non-yielding branch
-        if (!is_exiting_block(pausing_part)) {
-          pausing_part <- node_list(pausing_part)
-          push_goto(pausing_part, peek_state())
+        if (is_spliceable(pausing_part)) {
+          pausing_part <- node_cdr(pausing_part)
         } else {
           pausing_part <- node_list(pausing_part)
         }
 
-        # Merge past expressions in pausing block
         node_poke_cdr(parent, pausing_part)
         node_poke_car(expr_parts, new_block(node))
       }
@@ -144,29 +140,37 @@ if_parts <- function(expr) {
 
   # Extract first state and merge it in the if-else expression
   if (!is_null(if_parts)) {
-    node_poke_car(branches, node_car(if_parts))
+    node_poke_car(branches, as_block(node_car(if_parts)))
     if_parts <- node_cdr(if_parts)
   }
   if (!is_null(else_parts)) {
-    node_poke_cadr(branches, node_cadr(else_parts))
+    node_poke_cadr(branches, as_block(node_cadr(else_parts)))
     else_parts <- node_cdr(else_parts)
   }
 
   # Assign state lazily so we don't poke it if no goto is added
   env_bind_exprs(get_environment(), state = poke_state())
 
+  # Add gotos to continuation states
   if (!is_null(else_parts)) {
-    else_parts <- if_branch_parts(else_parts, branches, state)
+    else_parts <- branch_continuation(else_parts, branches, state)
     parts <- node_list_poke_cdr(else_parts, parts)
   }
   if (!is_null(if_parts)) {
-    if_parts <- if_branch_parts(if_parts, branches, state)
+    if_parts <- branch_continuation(if_parts, branches, state)
     parts <- node_list_poke_cdr(if_parts, parts)
+  }
+
+  # Add a goto to the continuation after the if-else block if there
+  # are non-exiting branches
+  if (!is_exiting_block(expr)) {
+    expr <- spliceable_block(expr)
+    push_goto(expr, peek_state())
   }
 
   node(expr, parts)
 }
-if_branch_parts <- function(parts, branches, state) {
+branch_continuation <- function(parts, branches, state) {
   tail <- node_list_tail(parts)
   push_goto(node_car(tail), state)
   parts

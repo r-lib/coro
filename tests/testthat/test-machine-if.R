@@ -88,3 +88,83 @@ test_that("`if` blocks - nested and trailing pause", {
 
   expect_equal(parts, node_list(parts1, parts2))
 })
+
+test_that("`if` blocks - multiply nested and all trailing", {
+  parts <- machine_parts(function() {
+    "before"
+    if (TRUE) {
+      "if-before"
+      if (FALSE) {
+        if (FALSE) {
+          yield(2L)
+          "if-3-after"
+        }
+        "if-2-after"
+      }
+    } else {
+      FALSE
+    }
+  })
+
+  parts1 <- expr({
+    "before"
+    if (TRUE) {
+      "if-before"
+      if (FALSE) {
+        if (FALSE) {
+          !! pause_lang("2")
+        }
+        !! goto_lang("3")
+      } else {
+        !! invisible_lang
+      }
+    } else {
+      return(FALSE)
+    }
+  })
+  parts2 <- block("if-3-after", goto_lang("3"))
+  parts3 <- block(return_lang("if-2-after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3))
+})
+
+test_that("`if` blocks - multiply nested and not trailing", {
+  parts <- machine_parts(function() {
+    "before"
+    if (TRUE) {
+      "if-before"
+      if (TRUE) {
+        if (TRUE) {
+          yield(2L)
+          "if-3-after"
+        }
+        "if-2-after"
+      }
+    } else {
+      FALSE
+    }
+    "after"
+  })
+
+  parts1 <- expr({
+    "before"
+    if (TRUE) {
+      "if-before"
+      if (TRUE) {
+        if (TRUE) {
+          !! pause_lang("2")
+        }
+        !! goto_lang("3")
+      }
+      !! goto_lang("4")
+    } else {
+      FALSE
+    }
+    !! goto_lang("4")
+  })
+  parts2 <- block("if-3-after", goto_lang("3"))
+  parts3 <- block("if-2-after", goto_lang("4"))
+  parts4 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
+})

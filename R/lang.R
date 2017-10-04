@@ -51,6 +51,22 @@ new_block <- function(x) {
 is_block <- function(x) {
   is_language(x, block_sym)
 }
+as_block <- function(x) {
+  if (is_block(x)) {
+    x
+  } else {
+    block(x)
+  }
+}
+
+spliceable_block <- function(...) {
+  block <- block(...)
+  poke_attr(block, "spliceable", TRUE)
+  block
+}
+is_spliceable <- function(x) {
+  is_true(attr(x, "spliceable"))
+}
 
 yield_lang <- function(...) {
   lang(yield_sym, ...)
