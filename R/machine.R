@@ -142,7 +142,9 @@ if_parts <- function(expr) {
   }
 
   parts <- NULL
-  state <- poke_state()
+
+  # Assign state lazily so we don't poke it if no goto is added
+  env_bind_exprs(get_environment(), state = poke_state())
 
   if (!is_null(else_parts)) {
     else_parts <- if_branch_parts(else_parts, branches, state)
