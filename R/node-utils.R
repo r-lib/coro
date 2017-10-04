@@ -36,6 +36,12 @@ node_list_tail <- function(node) {
   }
   node
 }
+node_list_tail_car <- function(node) {
+  node_car(node_list_tail(node))
+}
+node_list_tail_cdr <- function(node) {
+  node_car(node_list_tail(node))
+}
 
 node_list_poke_car <- function(node, new_car) {
   if (is_null(node)) {

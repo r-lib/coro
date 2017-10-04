@@ -18,6 +18,10 @@ lang_has <- function(lang, is_element) {
   FALSE
 }
 
+is_named_language <- function(x) {
+  is_language(x) && is_symbol(node_car(x))
+}
+
 as_exprs_node <- function(expr) {
   if (is_pairlist(expr)) {
     expr
@@ -62,6 +66,13 @@ while_lang <- function(...) {
 }
 for_lang <- function(...) {
   lang(for_sym, ...)
+}
+
+if_branch_true <- function(expr) {
+  node_car(node_cddr(expr))
+}
+if_branch_else <- function(expr) {
+  node_cadr(node_cddr(expr))
 }
 
 return_sym <- quote(`return`)

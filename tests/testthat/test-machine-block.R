@@ -1,4 +1,4 @@
-context("machine")
+context("machine-block")
 
 test_that("`{` blocks - one pause", {
   parts <- machine_parts(function() {
