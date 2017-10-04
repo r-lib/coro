@@ -54,9 +54,8 @@ node_list_parts <- function(node) {
 
         # Only add a goto if there might be code reaching the
         # continuation from a non-yielding branch
-        if (is_language(pausing_part, if_sym)) {
+        if (!is_exiting_block(pausing_part)) {
           pausing_part <- node_list(pausing_part)
-          is_exiting_block(pausing_part)
           push_goto(pausing_part, peek_state())
         } else {
           pausing_part <- node_list(pausing_part)
@@ -143,6 +142,16 @@ if_parts <- function(expr) {
 
   parts <- NULL
 
+  # Extract first state and merge it in the if-else expression
+  if (!is_null(if_parts)) {
+    node_poke_car(branches, node_car(if_parts))
+    if_parts <- node_cdr(if_parts)
+  }
+  if (!is_null(else_parts)) {
+    node_poke_cadr(branches, node_cadr(else_parts))
+    else_parts <- node_cdr(else_parts)
+  }
+
   # Assign state lazily so we don't poke it if no goto is added
   env_bind_exprs(get_environment(), state = poke_state())
 
@@ -158,16 +167,8 @@ if_parts <- function(expr) {
   node(expr, parts)
 }
 if_branch_parts <- function(parts, branches, state) {
-  # The first state is merged in an actual if-else expression
-  branch <- node_car(parts)
-  node_poke_car(branches, branch)
-
-  # Discard that first state since it'll be handled elsewhere
-  parts <- node_cdr(parts)
-
   tail <- node_list_tail(parts)
   push_goto(node_car(tail), state)
-
   parts
 }
 
