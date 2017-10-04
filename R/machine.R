@@ -103,14 +103,24 @@ expr_parts <- function(expr) {
 
   head <- as_string(head)
   parts <- switch(head,
-    `{` = node_list_parts(node_cdr(expr)),
-    `if` = stop("todo if"),
-    `while` = stop("todo while"),
+    `{` = block_parts(expr),
+    `if` = if_parts(expr),
+    `repeat` = stop("todo loops"),
     NULL
   )
 
   if (is_null(parts)) {
-    return(parts)
+    return(NULL)
+  }
+
+  parts
+}
+
+block_parts <- function(expr) {
+  parts <- node_list_parts(node_cdr(expr))
+
+  if (is_null(parts)) {
+    return(NULL)
   }
 
   # Add missing goto
