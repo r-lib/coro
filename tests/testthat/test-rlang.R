@@ -29,3 +29,17 @@ test_that("poke_attr() modifies attributes in place", {
   expect_true(is_reference(x, poked))
   expect_identical(attributes(x), list(foo = 2L))
 })
+
+test_that("poke_attr() removes attributes in place", {
+  x <- 1:3
+  poked <- poke_attr(x, "foo", NULL)
+
+  expect_null(attributes(poked))
+  expect_true(is_reference(poked, x))
+
+  x <- poke_attr(x, "foo", 1L)
+  poked <- poke_attr(x, "foo", NULL)
+
+  expect_null(attr(poked, "foo"))
+  expect_true(is_reference(poked, x))
+})
