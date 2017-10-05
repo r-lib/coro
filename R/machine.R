@@ -11,21 +11,24 @@ node_list_parts <- function(node) {
   parts <- NULL
   parent <- NULL
 
-  is_trailing <- function() {
-    is_null(node_cdr(rest))
+  has_future <- function() {
+    !is_null(node_cdr(rest))
+  }
+  has_past <- function() {
+    is_null(parent)
   }
 
   while (!is_null(rest)) {
     expr <- node_car(rest)
 
     if (is_pause(expr)) {
-      if (is_trailing()) {
-        pause_node <- peek_pause_node()
-      } else {
+      if (has_future()) {
         pause_node <- node_list(pause_lang(poke_state()))
+      } else {
+        pause_node <- peek_pause_node()
       }
 
-      if (is_null(parent)) {
+      if (has_past()) {
         pause_block <- new_block(pause_node)
       } else {
         node_poke_cdr(parent, pause_node)
@@ -41,49 +44,50 @@ node_list_parts <- function(node) {
     # Extract nested states. If there is a continuation, pass on the
     # relevant goto and pause nodes. Fill those nodes only when we
     # extracted the parts so they get the right state index.
-    if (is_null(node_cdr(rest))) {
-      expr_parts <- expr_parts(expr)
-    } else {
+    if (has_future()) {
       next_goto <- node(goto_lang(-1L), NULL)
       next_pause <- node(pause_lang(-1L), NULL)
 
       with_jump_nodes(next_goto, next_pause, {
-        expr_parts <- expr_parts(expr)
+        nested_parts <- expr_parts(expr)
       })
-      if (!is_null(expr_parts)) {
+      if (!is_null(nested_parts)) {
         poke_state()
         node_poke_car(next_goto, goto_lang(peek_state()))
         node_poke_car(next_pause, pause_lang(peek_state()))
       }
+    } else {
+      nested_parts <- expr_parts(expr)
     }
 
-    if (is_null(expr_parts)) {
+    if (is_null(nested_parts)) {
       parent <- rest
       rest <- node_cdr(rest)
-    } else {
-      # If we found nested states, check if there are any past
-      # expressions to add them before the pausing block.
-      pausing_part <- node_car(expr_parts)
-      if (is_null(parent)) {
-        poke_attr(pausing_part, "spliceable", NULL)
-      } else {
-        if (is_spliceable(pausing_part)) {
-          pausing_part <- node_cdr(pausing_part)
-        } else {
-          pausing_part <- node_list(pausing_part)
-        }
-
-        node_poke_cdr(parent, pausing_part)
-        node_poke_car(expr_parts, new_block(node))
-      }
-
-      # Merge nested states
-      parts <- node_list_poke_cdr(parts, expr_parts)
-
-      rest <- node <- node_cdr(rest)
-      parent <- NULL
+      next
     }
 
+    # If we found nested states, check if there are any past
+    # expressions to add them before the pausing block.
+    pausing_part <- node_car(nested_parts)
+
+    if (has_past()) {
+      poke_attr(pausing_part, "spliceable", NULL)
+    } else {
+      if (is_spliceable(pausing_part)) {
+        pausing_part <- node_cdr(pausing_part)
+      } else {
+        pausing_part <- node_list(pausing_part)
+      }
+
+      node_poke_cdr(parent, pausing_part)
+      node_poke_car(nested_parts, new_block(node))
+    }
+
+    # Merge nested states
+    parts <- node_list_poke_cdr(parts, nested_parts)
+
+    rest <- node <- node_cdr(rest)
+    parent <- NULL
     next
   }
 
