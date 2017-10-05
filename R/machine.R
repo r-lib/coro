@@ -118,7 +118,7 @@ expr_parts <- function(expr) {
   switch(head,
     `{` = block_parts(expr),
     `if` = if_parts(expr),
-    `repeat` = stop("todo loops"),
+    `repeat` = loop_parts(expr),
     NULL
   )
 }
