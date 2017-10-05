@@ -21,6 +21,27 @@ test_that("`if` blocks - one pause", {
   expect_equal(parts, node_list(parts1, parts2, parts3))
 })
 
+test_that("`else` blocks - one pause", {
+  parts <- machine_parts(function() {
+    "before"
+    if (FALSE) {
+      FALSE
+    } else {
+      "else-before"
+      yield(1L)
+      "else-after"
+    }
+    "after"
+  })
+
+  inner1 <- if_lang(FALSE, block(FALSE), block("else-before", pause_lang("2")))
+  parts1 <- block("before", inner1, goto_lang("3"))
+  parts2 <- block("else-after", goto_lang("3"))
+  parts3 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3))
+})
+
 test_that("`if` blocks - inner block", {
   parts <- machine_parts(function() {
     "before"
@@ -129,6 +150,139 @@ test_that("`if` blocks - multiply nested and all trailing", {
 })
 
 test_that("`if` blocks - multiply nested and not trailing", {
+test_that("`if`-`else` blocks - trailing", {
+  parts <- machine_parts(function() {
+    "before"
+    if (TRUE) {
+      "if-before"
+      yield(1L)
+      "if-after"
+    } else {
+      "else-before"
+      yield(1L)
+      "else-after"
+    }
+  })
+
+  parts1 <- expr({
+    "before"
+    if (TRUE) {
+      "if-before"
+      !! pause_lang("2")
+    } else {
+      "else-before"
+      !! pause_lang("3")
+    }
+  })
+  parts2 <- block(return_lang("if-after"))
+  parts3 <- block(return_lang("else-after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3))
+})
+
+test_that("`if`-`else` blocks - non trailing", {
+  parts <- machine_parts(function() {
+    "before"
+    if (TRUE) {
+      "if-before"
+      yield(1L)
+      "if-after"
+    } else {
+      "else-before"
+      yield(2L)
+      "else-after"
+    }
+    "after"
+  })
+
+  inner1 <- if_lang(TRUE, block("if-before", pause_lang("2")), block("else-before", pause_lang("3")))
+  parts1 <- block("before", inner1)
+  parts2 <- block("if-after", goto_lang("4"))
+  parts3 <- block("else-after", goto_lang("4"))
+  parts4 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
+})
+
+test_that("`if`-`else` blocks - same continuation", {
+  parts <- machine_parts(function() {
+    "before"
+    if (TRUE) {
+      yield(1L)
+    } else {
+      yield(2L)
+    }
+    "after"
+  })
+
+  parts1 <- expr({
+    "before"
+    if (TRUE) {
+      !! pause_lang("2")
+    } else {
+      !! pause_lang("2")
+    }
+    !! goto_lang("2")
+  })
+  parts2 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2))
+})
+
+test_that("`if`-`else` blocks - continuation in `if`", {
+  parts <- machine_parts(function() {
+    "before"
+    if (TRUE) {
+      yield(1L)
+      "if-after"
+    } else {
+      yield(2L)
+    }
+    "after"
+  })
+
+  parts1 <- expr({
+    "before"
+    if (TRUE) {
+      !! pause_lang("2")
+    } else {
+      !! pause_lang("3")
+    }
+    !! goto_lang("3")
+  })
+  parts2 <- block("if-after", goto_lang("3"))
+  parts3 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3))
+})
+
+test_that("`if`-`else` blocks - continuation in `if`", {
+  parts <- machine_parts(function() {
+    "before"
+    if (TRUE) {
+      yield(1L)
+    } else {
+      yield(2L)
+      "else-after"
+    }
+    "after"
+  })
+
+  parts1 <- expr({
+    "before"
+    if (TRUE) {
+      !! pause_lang("3")
+    } else {
+      !! pause_lang("2")
+    }
+    !! goto_lang("3")
+  })
+  parts2 <- block("else-after", goto_lang("3"))
+  parts3 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3))
+})
+
   parts <- machine_parts(function() {
     "before"
     if (TRUE) {

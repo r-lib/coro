@@ -1,17 +1,4 @@
 
-state <- new_environment(list(idx = 1L))
-
-peek_state <- function() {
-  state$idx
-}
-poke_state <- function() {
-  state$idx <- state$idx + 1L
-  state$idx
-}
-reset_state <- function() {
-  state$idx <- 1L
-}
-
 machine_parts <- function(fn) {
   reset_state()
 
@@ -24,17 +11,24 @@ node_list_parts <- function(node) {
   parts <- NULL
   parent <- NULL
 
+  is_trailing <- function() {
+    is_null(node_cdr(rest))
+  }
+
   while (!is_null(rest)) {
     expr <- node_car(rest)
 
-    # Pausing state
     if (is_pause(expr)) {
-      pause <- pause_lang(poke_state())
+      if (is_trailing()) {
+        pause_node <- peek_pause_node()
+      } else {
+        pause_node <- node_list(pause_lang(poke_state()))
+      }
 
       if (is_null(parent)) {
-        pause_block <- new_block(node_list(pause))
+        pause_block <- new_block(pause_node)
       } else {
-        node_poke_cdr(parent, node_list(pause))
+        node_poke_cdr(parent, pause_node)
         pause_block <- new_block(node)
       }
       parts <- node_list_poke_cdr(parts, node_list(pause_block))
@@ -44,11 +38,32 @@ node_list_parts <- function(node) {
       next
     }
 
-    # Nested states
-    expr_parts <- expr_parts(expr)
-    if (!is_null(expr_parts)) {
+    # Extract nested states. If there is a continuation, pass on the
+    # relevant goto and pause nodes. Fill those nodes only when we
+    # extracted the parts so they get the right state index.
+    if (is_null(node_cdr(rest))) {
+      expr_parts <- expr_parts(expr)
+    } else {
+      next_goto <- node(NULL, NULL)
+      next_pause <- node(NULL, NULL)
+      with_jump_nodes(next_goto, next_pause, {
+        expr_parts <- expr_parts(expr)
+      })
+      if (!is_null(expr_parts)) {
+        poke_state()
+        node_poke_cdr(next_goto, NULL) # FIXME: Prevents infloop
+        node_poke_cdr(next_pause, NULL)
+        node_poke_car(next_goto, goto_lang(peek_state()))
+        node_poke_car(next_pause, pause_lang(peek_state()))
+      }
+    }
 
-      # If any past expressions add them before pausing block
+    if (is_null(expr_parts)) {
+      parent <- rest
+      rest <- node_cdr(rest)
+    } else {
+      # If we found nested states, check if there are any past
+      # expressions to add them before the pausing block
       if (!is_null(parent)) {
         pausing_part <- node_car(expr_parts)
 
@@ -67,11 +82,9 @@ node_list_parts <- function(node) {
 
       rest <- node <- node_cdr(rest)
       parent <- NULL
-      next
     }
 
-    parent <- rest
-    rest <- node_cdr(rest)
+    next
   }
 
   if (is_null(parts)) {
@@ -113,7 +126,7 @@ block_parts <- function(expr) {
     return(NULL)
   }
 
-  push_goto(node_list_tail_car(parts), poke_state())
+  push_goto(node_list_tail_car(parts))
   parts
 }
 
@@ -144,20 +157,17 @@ if_parts <- function(expr) {
     if_parts <- node_cdr(if_parts)
   }
   if (!is_null(else_parts)) {
-    node_poke_cadr(branches, as_block(node_cadr(else_parts)))
+    node_poke_cadr(branches, as_block(node_car(else_parts)))
     else_parts <- node_cdr(else_parts)
   }
 
-  # Assign state lazily so we don't poke it if no goto is added
-  env_bind_exprs(get_environment(), state = poke_state())
-
   # Add gotos to continuation states
   if (!is_null(else_parts)) {
-    else_parts <- branch_continuation(else_parts, branches, state)
+    else_parts <- branch_continuation(else_parts, branches)
     parts <- node_list_poke_cdr(else_parts, parts)
   }
   if (!is_null(if_parts)) {
-    if_parts <- branch_continuation(if_parts, branches, state)
+    if_parts <- branch_continuation(if_parts, branches)
     parts <- node_list_poke_cdr(if_parts, parts)
   }
 
@@ -165,24 +175,23 @@ if_parts <- function(expr) {
   # are non-exiting branches
   if (!is_exiting_block(expr)) {
     expr <- spliceable_block(expr)
-    push_goto(expr, peek_state())
+    push_goto(expr)
   }
 
   node(expr, parts)
 }
-branch_continuation <- function(parts, branches, state) {
+branch_continuation <- function(parts, branches) {
   tail <- node_list_tail(parts)
-  push_goto(node_car(tail), state)
+  push_goto(node_car(tail))
   parts
 }
 
-push_goto <- function(block, state) {
-  if (!is_exiting_block(block)) {
-    goto_node <- node_list(goto_lang(state))
-    node_list_poke_cdr(block, goto_node)
+push_goto <- function(block, goto_node = NULL) {
+  if (is_exiting_block(block)) {
+    block
+  } else {
+    node_list_poke_cdr(block, goto_node %||% peek_goto_node())
   }
-
-  block
 }
 
 is_pause <- function(x) {

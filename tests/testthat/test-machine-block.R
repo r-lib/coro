@@ -160,3 +160,38 @@ test_that("`{` blocks - complex nesting", {
 
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
 })
+
+test_that("`{` blocks - simple nesting with various continuation states", {
+  parts <- machine_parts(function() {
+    {
+      {
+        yield(1L)
+        "after-inner-inner"
+      }
+    }
+    "after"
+  })
+
+  parts1 <- block(pause_lang("2"))
+  parts2 <- block("after-inner-inner", goto_lang("3"))
+  parts3 <- block(return_lang("after"))
+
+  expect_identical(parts, node_list(parts1, parts2, parts3))
+
+
+  parts <- machine_parts(function() {
+    {
+      {
+        yield(1L)
+      }
+      "after-inner"
+    }
+    "after"
+  })
+
+  parts1 <- block(pause_lang("2"))
+  parts2 <- block("after-inner", goto_lang("3"))
+  parts3 <- block(return_lang("after"))
+
+  expect_identical(parts, node_list(parts1, parts2, parts3))
+})
