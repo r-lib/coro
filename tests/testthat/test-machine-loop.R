@@ -77,3 +77,17 @@ test_that("`repeat` - nested loop", {
 
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
 })
+
+test_that("`repeat` - non-yielding", {
+  parts <- machine_parts(function() {
+    "before"
+    repeat NULL
+    yield(1L)
+    "after"
+  })
+
+  parts1 <- block("before", repeat_lang(NULL), pause_lang("2"))
+  parts2 <- block(return_lang("after"))
+
+  expect_identical(parts, node_list(parts1, parts2))
+})

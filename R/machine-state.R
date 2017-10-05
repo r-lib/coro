@@ -8,8 +8,9 @@ state <- new_environment(list(
 peek_state <- function() {
   state$idx
 }
-poke_state <- function() {
-  state$idx <- state$idx + 1L
+poke_state <- function(idx = NULL) {
+  idx <- idx %||% (state$idx + 1L)
+  state$idx <- idx
   state$idx
 }
 reset_state <- function() {

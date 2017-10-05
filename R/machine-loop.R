@@ -9,6 +9,7 @@ loop_parts <- function(expr) {
   })
 
   if (is_null(parts)) {
+    poke_state(loop_state - 1L)
     return(NULL)
   }
 
