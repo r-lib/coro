@@ -149,7 +149,6 @@ test_that("`if` blocks - multiply nested and all trailing", {
   expect_equal(parts, node_list(parts1, parts2, parts3))
 })
 
-test_that("`if` blocks - multiply nested and not trailing", {
 test_that("`if`-`else` blocks - trailing", {
   parts <- machine_parts(function() {
     "before"
@@ -222,7 +221,6 @@ test_that("`if`-`else` blocks - same continuation", {
     } else {
       !! pause_lang("2")
     }
-    !! goto_lang("2")
   })
   parts2 <- block(return_lang("after"))
 
@@ -248,7 +246,6 @@ test_that("`if`-`else` blocks - continuation in `if`", {
     } else {
       !! pause_lang("3")
     }
-    !! goto_lang("3")
   })
   parts2 <- block("if-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
@@ -256,7 +253,7 @@ test_that("`if`-`else` blocks - continuation in `if`", {
   expect_equal(parts, node_list(parts1, parts2, parts3))
 })
 
-test_that("`if`-`else` blocks - continuation in `if`", {
+test_that("`if`-`else` blocks - continuation in `else`", {
   parts <- machine_parts(function() {
     "before"
     if (TRUE) {
@@ -275,7 +272,6 @@ test_that("`if`-`else` blocks - continuation in `if`", {
     } else {
       !! pause_lang("2")
     }
-    !! goto_lang("3")
   })
   parts2 <- block("else-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
@@ -283,16 +279,49 @@ test_that("`if`-`else` blocks - continuation in `if`", {
   expect_equal(parts, node_list(parts1, parts2, parts3))
 })
 
+test_that("`if` blocks - doubly nested with continuation", {
+  parts <- machine_parts(function() {
+    if (TRUE) {
+      if (TRUE) {
+        yield(1L)
+        "if-3-after"
+      }
+    }
+    "after"
+  })
+
+  parts1 <- expr({
+    if (TRUE) {
+      if (TRUE) {
+        !! pause_lang("2")
+      }
+      !! goto_lang("3")
+    }
+    !! goto_lang("3")
+  })
+  parts2 <- block("if-3-after", goto_lang("3"))
+  parts3 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3))
+})
+
+test_that("`if`-`else` blocks - multiply nested and not trailing", {
   parts <- machine_parts(function() {
     "before"
     if (TRUE) {
       "if-before"
       if (TRUE) {
         if (TRUE) {
-          yield(2L)
+          yield(1L)
           "if-3-after"
         }
         "if-2-after"
+      } else {
+        if (FALSE) {
+          FALSE
+        } else {
+          yield(2L)
+        }
       }
     } else {
       FALSE
@@ -309,8 +338,14 @@ test_that("`if`-`else` blocks - continuation in `if`", {
           !! pause_lang("2")
         }
         !! goto_lang("3")
+      } else {
+        if (FALSE) {
+          FALSE
+        } else {
+          !! pause_lang("4")
+        }
+        !! goto_lang("4")
       }
-      !! goto_lang("4")
     } else {
       FALSE
     }

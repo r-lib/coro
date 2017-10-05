@@ -44,15 +44,14 @@ node_list_parts <- function(node) {
     if (is_null(node_cdr(rest))) {
       expr_parts <- expr_parts(expr)
     } else {
-      next_goto <- node(NULL, NULL)
-      next_pause <- node(NULL, NULL)
+      next_goto <- node(goto_lang(-1L), NULL)
+      next_pause <- node(pause_lang(-1L), NULL)
+
       with_jump_nodes(next_goto, next_pause, {
         expr_parts <- expr_parts(expr)
       })
       if (!is_null(expr_parts)) {
         poke_state()
-        node_poke_cdr(next_goto, NULL) # FIXME: Prevents infloop
-        node_poke_cdr(next_pause, NULL)
         node_poke_car(next_goto, goto_lang(peek_state()))
         node_poke_car(next_pause, pause_lang(peek_state()))
       }
@@ -63,10 +62,11 @@ node_list_parts <- function(node) {
       rest <- node_cdr(rest)
     } else {
       # If we found nested states, check if there are any past
-      # expressions to add them before the pausing block
-      if (!is_null(parent)) {
-        pausing_part <- node_car(expr_parts)
-
+      # expressions to add them before the pausing block.
+      pausing_part <- node_car(expr_parts)
+      if (is_null(parent)) {
+        poke_attr(pausing_part, "spliceable", NULL)
+      } else {
         if (is_spliceable(pausing_part)) {
           pausing_part <- node_cdr(pausing_part)
         } else {
