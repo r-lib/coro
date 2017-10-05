@@ -163,11 +163,11 @@ if_parts <- function(expr) {
 
   # Add gotos to continuation states
   if (!is_null(else_parts)) {
-    else_parts <- branch_continuation(else_parts, branches)
+    push_goto(node_list_tail_car(else_parts))
     parts <- node_list_poke_cdr(else_parts, parts)
   }
   if (!is_null(if_parts)) {
-    if_parts <- branch_continuation(if_parts, branches)
+    push_goto(node_list_tail_car(if_parts))
     parts <- node_list_poke_cdr(if_parts, parts)
   }
 
@@ -179,11 +179,6 @@ if_parts <- function(expr) {
   }
 
   node(expr, parts)
-}
-branch_continuation <- function(parts, branches) {
-  tail <- node_list_tail(parts)
-  push_goto(node_car(tail))
-  parts
 }
 
 push_goto <- function(block, goto_node = NULL) {
