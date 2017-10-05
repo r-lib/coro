@@ -38,6 +38,10 @@ with_jump_nodes <- function(goto, pause, expr) {
   scoped_state_elt("pause", pause)
   expr
 }
+with_pause_node <- function(pause, expr) {
+  scoped_state_elt("pause", pause)
+  expr
+}
 peek_goto_node <- function() {
   state$goto
 }
