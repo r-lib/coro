@@ -52,4 +52,22 @@ repeat_parts <- function(expr) {
   loop_block <- spliceable(block(goto_lang(loop_state)))
   node(loop_block, parts)
 }
+
+while_parts <- function(expr) {
+  loop_state <- poke_state()
+
+  cond <- node_cadr(expr)
+  loop <- node_car(node_cddr(expr))
+
+  loop_parts <- loop_parts(loop)
+
+  if (is_null(loop_parts)) {
+    return(NULL)
+  }
+
+  goto_loop_end <- goto_lang(poke_state())
+  cond_lang <- if_lang(cond, block(goto_lang(loop_state)), block(goto_loop_end))
+  cond_state <- spliceable(block(cond_lang))
+
+  node(cond_state, loop_parts)
 }
