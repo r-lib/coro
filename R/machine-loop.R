@@ -17,7 +17,6 @@ loop_parts <- function(expr) {
   })
 
   if (is_null(parts)) {
-    poke_state(loop_state - 1L)
     return(NULL)
   }
 
@@ -46,6 +45,7 @@ repeat_parts <- function(expr) {
   parts <- loop_parts(node_cadr(expr))
 
   if (is_null(parts)) {
+    poke_state(loop_state - 1L)
     return(NULL)
   }
 
@@ -62,6 +62,7 @@ while_parts <- function(expr) {
   loop_parts <- loop_parts(loop)
 
   if (is_null(loop_parts)) {
+    poke_state(loop_state - 1L)
     return(NULL)
   }
 
