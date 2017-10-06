@@ -43,6 +43,7 @@ with_jump_nodes <- function(goto, pause, expr) {
 }
 with_loop_nodes <- function(pause, loop_next, loop_break, expr) {
   scoped_state_elt("pause", pause)
+  scoped_state_elt("goto", loop_next)
   scoped_state_elt("loop_next", loop_next)
   scoped_state_elt("loop_break", loop_break)
   expr

@@ -191,3 +191,25 @@ test_that("loops - `break` and `next` with past and future", {
 
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5, parts6, parts7))
 })
+
+test_that("loops - goto loop start after `if` or `else`", {
+  parts <- machine_parts(function() {
+    repeat if (TRUE) yield()
+  })
+
+  parts1 <- block(goto_lang("2"))
+  parts2 <- block(if_lang(TRUE, block(pause_lang("2"))), goto_lang("2"))
+  parts3 <- block(return_invisible_lang)
+
+  expect_identical(parts, node_list(parts1, parts2, parts3))
+
+
+  parts <- machine_parts(function() {
+    repeat if (TRUE) yield() else FALSE
+  })
+
+  parts2 <- block(if_lang(TRUE, block(pause_lang("2")), FALSE), goto_lang("2"))
+
+  expect_identical(parts, node_list(parts1, parts2, parts3))
+})
+
