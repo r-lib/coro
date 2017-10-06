@@ -20,7 +20,7 @@ expr_parts <- function(expr) {
   switch(head,
     `{` = block_parts(expr),
     `if` = if_parts(expr),
-    `repeat` = loop_parts(expr),
+    `repeat` = repeat_parts(expr),
     `break` = break_parts(expr),
     `next` = next_parts(expr),
     NULL

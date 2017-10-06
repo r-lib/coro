@@ -1,6 +1,6 @@
 
 loop_parts <- function(expr) {
-  loop_state <- poke_state()
+  loop_state <- peek_state()
 
   # This pausing node is used only when there is no continuation after
   # the pause. It ensures we restart at the start of the loop.
@@ -11,7 +11,7 @@ loop_parts <- function(expr) {
   # nested within the loop
   break_node <- node(goto_lang(-1L), NULL)
 
-  body <- as_exprs_node(node_cadr(expr))
+  body <- as_exprs_node(expr)
   with_loop_nodes(pause_node, next_node, break_node, {
     parts <- node_list_parts(body)
   })
@@ -29,8 +29,7 @@ loop_parts <- function(expr) {
   tail <- node_list_tail_car(parts)
   push_goto(tail, goto_node)
 
-  loop_block <- spliceable(block(goto_lang(loop_state)))
-  node(loop_block, parts)
+  parts
 }
 
 next_parts <- function(expr) {
@@ -40,4 +39,17 @@ next_parts <- function(expr) {
 break_parts <- function(expr) {
   break_block <- spliceable(new_block(peek_loop_break_node()))
   node_list(break_block)
+}
+
+repeat_parts <- function(expr) {
+  loop_state <- poke_state()
+  parts <- loop_parts(node_cadr(expr))
+
+  if (is_null(parts)) {
+    return(NULL)
+  }
+
+  loop_block <- spliceable(block(goto_lang(loop_state)))
+  node(loop_block, parts)
+}
 }
