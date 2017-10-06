@@ -101,11 +101,11 @@ test_that("`if` blocks - nested and trailing pause", {
     }
   })
 
-  inner1 <- if_lang(FALSE, block(pause_lang("2")), block(invisible_lang))
+  inner1 <- if_lang(FALSE, block(pause_lang("2")), block(return_invisible_lang))
   inner1 <- block("if-before", inner1)
   inner1 <- if_lang(TRUE, inner1, block(return_lang("foo")))
   parts1 <- block("before", inner1)
-  parts2 <- block(invisible_lang)
+  parts2 <- block(return_invisible_lang)
 
   expect_equal(parts, node_list(parts1, parts2))
 })
@@ -137,7 +137,7 @@ test_that("`if` blocks - multiply nested and all trailing", {
         }
         !! goto_lang("3")
       } else {
-        !! invisible_lang
+        !! return_invisible_lang
       }
     } else {
       return(FALSE)

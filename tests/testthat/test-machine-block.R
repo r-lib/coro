@@ -64,7 +64,7 @@ test_that("`{` blocks - no return value", {
   })
 
   parts1 <- block(pause_lang("2"))
-  parts2 <- block(invisible_lang)
+  parts2 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2))
 
@@ -76,7 +76,7 @@ test_that("`{` blocks - no return value", {
 
   parts1 <- block(pause_lang("2"))
   parts2 <- block(pause_lang("3"))
-  parts3 <- block(invisible_lang)
+  parts3 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })

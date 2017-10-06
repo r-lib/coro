@@ -24,7 +24,7 @@ test_that("explicit return is added to blocks", {
 
 test_that("explicit return is added to if else branches", {
   exprs <- set_returns(function() if (TRUE) "foo")
-  expect_identical(exprs, node_list(if_lang(TRUE, block(return_lang("foo")), block(invisible_lang))))
+  expect_identical(exprs, node_list(if_lang(TRUE, block(return_lang("foo")), block(return_invisible_lang))))
 
   exprs <- set_returns(function() { if (TRUE) "foo" else "bar" })
   explicit <- if_lang(TRUE, block(return_lang("foo")), block(return_lang("bar")))
@@ -50,18 +50,18 @@ test_that("explicit return is added after loops", {
     "before"
     repeat "foo"
   })
-  explicit_repeat <- node_list("before", repeat_lang("foo"), invisible_lang)
+  explicit_repeat <- node_list("before", repeat_lang("foo"), return_invisible_lang)
   expect_identical(exprs, explicit_repeat)
 
   exprs <- set_returns(function() {
     "before"
     while (TRUE) "foo"
   })
-  explicit_while <- node_list("before", while_lang(TRUE, "foo"), invisible_lang)
+  explicit_while <- node_list("before", while_lang(TRUE, "foo"), return_invisible_lang)
   expect_identical(exprs, explicit_while)
 
   exprs <- set_returns(function() for (i in x) "foo")
-  explicit_for <- node_list(for_lang(quote(i), quote(x), "foo"), invisible_lang)
+  explicit_for <- node_list(for_lang(quote(i), quote(x), "foo"), return_invisible_lang)
   expect_identical(exprs, explicit_for)
 })
 
@@ -75,9 +75,9 @@ test_that("explicit returns are left alone", {
 
 test_that("invisible return is added after trailing yield()", {
   exprs <- set_returns(function() yield())
-  expect_identical(exprs, node_list(yield_lang(), invisible_lang))
+  expect_identical(exprs, node_list(yield_lang(), return_invisible_lang))
 
   exprs <- set_returns(function() if (TRUE) yield())
-  block <- block(yield_lang(), invisible_lang)
-  expect_identical(exprs, node_list(if_lang(TRUE, block, block(invisible_lang))))
+  block <- block(yield_lang(), return_invisible_lang)
+  expect_identical(exprs, node_list(if_lang(TRUE, block, block(return_invisible_lang))))
 })
