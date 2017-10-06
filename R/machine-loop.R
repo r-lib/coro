@@ -42,33 +42,36 @@ break_parts <- function(expr) {
 
 repeat_parts <- function(expr) {
   loop_state <- poke_state()
-  parts <- loop_parts(node_cadr(expr))
+
+  body <- node_cadr(expr)
+  parts <- loop_parts(body)
 
   if (is_null(parts)) {
     poke_state(loop_state - 1L)
     return(NULL)
   }
 
-  loop_block <- spliceable(block(goto_lang(loop_state)))
-  node(loop_block, parts)
+  loop_state <- spliceable(block(goto_lang(loop_state)))
+  node(loop_state, parts)
 }
 
 while_parts <- function(expr) {
   loop_state <- poke_state()
 
-  cond <- node_cadr(expr)
-  loop <- node_car(node_cddr(expr))
+  body <- node_car(node_cddr(expr))
+  parts <- loop_parts(body)
 
-  loop_parts <- loop_parts(loop)
-
-  if (is_null(loop_parts)) {
+  if (is_null(parts)) {
     poke_state(loop_state - 1L)
     return(NULL)
   }
 
-  goto_loop_end <- goto_lang(poke_state())
-  cond_lang <- if_lang(cond, block(goto_lang(loop_state)), block(goto_loop_end))
-  cond_state <- spliceable(block(cond_lang))
+  goto_loop_end <- block(goto_lang(poke_state()))
+  goto_loop_start <- block(goto_lang(loop_state))
 
-  node(cond_state, loop_parts)
+  cond <- node_cadr(expr)
+  cond_lang <- if_lang(cond, goto_loop_start, goto_loop_end)
+
+  cond_state <- spliceable(block(cond_lang))
+  node(cond_state, parts)
 }
