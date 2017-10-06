@@ -3,7 +3,8 @@ state <- new_environment(list(
   idx = 1L,
   goto = NULL,
   pause = NULL,
-  loop_next = NULL
+  loop_next = NULL,
+  loop_break = NULL
 ))
 
 peek_state <- function() {
@@ -40,9 +41,10 @@ with_jump_nodes <- function(goto, pause, expr) {
   scoped_state_elt("pause", pause)
   expr
 }
-with_loop_nodes <- function(pause, loop_next, expr) {
+with_loop_nodes <- function(pause, loop_next, loop_break, expr) {
   scoped_state_elt("pause", pause)
   scoped_state_elt("loop_next", loop_next)
+  scoped_state_elt("loop_break", loop_break)
   expr
 }
 peek_goto_node <- function() {
@@ -53,4 +55,7 @@ peek_pause_node <- function() {
 }
 peek_loop_next_node <- function() {
   state$loop_next
+}
+peek_loop_break_node <- function() {
+  state$loop_break
 }

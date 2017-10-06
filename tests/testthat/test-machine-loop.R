@@ -148,3 +148,46 @@ test_that("loops - single `break`", {
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })
 
+test_that("loops - `next` and `break` within `if`-`else`", {
+  parts <- machine_parts(function() {
+    repeat {
+      "loop-after"
+      if (TRUE) break
+      else next
+      "next-after"
+    }
+  })
+
+  parts1 <- block(goto_lang("2"))
+  parts2 <- block("loop-after", if_lang(TRUE, block(goto_lang("4")), block(goto_lang("2"))))
+  parts3 <- block("next-after", goto_lang("2"))
+  parts4 <- block(return_invisible_lang)
+
+  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
+})
+
+test_that("loops - `break` and `next` with past and future", {
+  parts <- machine_parts(function() {
+    repeat {
+      "loop-before"
+      yield(1L)
+      "loop-after"
+      break
+      "break-after"
+      next
+      "next-after"
+      yield(2L)
+      "loop-final"
+    }
+  })
+
+  parts1 <- block(goto_lang("2"))
+  parts2 <- block("loop-before", pause_lang("3"))
+  parts3 <- block("loop-after", goto_lang("7"))
+  parts4 <- block("break-after", goto_lang("2"))
+  parts5 <- block("next-after", pause_lang("6"))
+  parts6 <- block("loop-final", goto_lang("2"))
+  parts7 <- block(return_invisible_lang)
+
+  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5, parts6, parts7))
+})

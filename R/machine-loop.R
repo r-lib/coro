@@ -12,7 +12,7 @@ loop_parts <- function(expr) {
   break_node <- node(goto_lang(-1L), NULL)
 
   body <- as_exprs_node(node_cadr(expr))
-  with_loop_nodes(pause_node, next_node, {
+  with_loop_nodes(pause_node, next_node, break_node, {
     parts <- node_list_parts(body)
   })
 
@@ -21,6 +21,10 @@ loop_parts <- function(expr) {
     return(NULL)
   }
 
+  # Update the `break` gotos to point to the next state
+  node_poke_car(break_node, goto_lang(peek_state() + 1L))
+
+  # Add a looping goto at the end
   goto_node <- node_list(goto_lang(loop_state))
   tail <- node_list_tail_car(parts)
   push_goto(tail, goto_node)
@@ -34,6 +38,6 @@ next_parts <- function(expr) {
   node_list(next_block)
 }
 break_parts <- function(expr) {
-  break_block <- spliceable(new_block(peek_goto_node()))
+  break_block <- spliceable(new_block(peek_loop_break_node()))
   node_list(break_block)
 }
