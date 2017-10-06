@@ -21,6 +21,8 @@ expr_parts <- function(expr) {
     `{` = block_parts(expr),
     `if` = if_parts(expr),
     `repeat` = loop_parts(expr),
+    `break` = break_parts(expr),
+    `next` = next_parts(expr),
     NULL
   )
 }
