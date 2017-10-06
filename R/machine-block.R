@@ -3,11 +3,11 @@ block_parts <- function(expr) {
   parts <- node_list_parts(node_cdr(expr))
 
   if (is_null(parts)) {
-    return(NULL)
+    NULL
+  } else {
+    push_goto(node_list_tail_car(parts))
+    parts
   }
-
-  push_goto(node_list_tail_car(parts))
-  parts
 }
 
 node_list_parts <- function(node) {
