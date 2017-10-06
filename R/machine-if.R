@@ -43,7 +43,7 @@ if_parts <- function(expr) {
   # Add a goto to the continuation after the if-else block if there
   # are non-exiting branches
   if (!is_exiting_block(expr)) {
-    expr <- spliceable_block(expr)
+    expr <- spliceable(block(expr))
     push_goto(expr)
   }
 

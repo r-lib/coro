@@ -59,10 +59,9 @@ as_block <- function(x) {
   }
 }
 
-spliceable_block <- function(...) {
-  block <- block(...)
-  poke_attr(block, "spliceable", TRUE)
-  block
+spliceable <- function(x) {
+  poke_attr(x, "spliceable", TRUE)
+  x
 }
 is_spliceable <- function(x) {
   is_true(attr(x, "spliceable"))
