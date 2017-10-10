@@ -19,6 +19,20 @@ reset_state <- function() {
   state$idx <- 1L
 }
 
+scoped_state <- function(idx, frame = caller_env()) {
+  old <- peek_state()
+  poke_state(idx)
+
+  restore_state_lang <- lang(poke_state, old)
+  scoped_exit(!! restore_state_lang, frame = frame)
+
+  invisible(old)
+}
+with_state <- function(idx, expr) {
+  scoped_state(idx)
+  expr
+}
+
 peek_state_elt <- function(elt) {
   state[[elt]]
 }
