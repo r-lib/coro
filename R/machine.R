@@ -33,7 +33,8 @@ push_goto <- function(block, goto_node = NULL) {
   if (is_exiting_block(block)) {
     block
   } else {
-    node_list_poke_cdr(block, goto_node %||% peek_goto_node())
+    goto_node <- goto_node %||% peek_goto_node()
+    node_list_poke_cdr(block, goto_node)
   }
 }
 

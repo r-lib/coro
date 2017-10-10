@@ -27,7 +27,7 @@ test_that("`repeat` - no continuation", {
   })
 
   parts1 <- block("before", goto_lang("2"))
-  parts2 <- block(pause_lang("2"))
+  parts2 <- block(pause_lang("2", 1L))
   parts3 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
@@ -56,7 +56,7 @@ test_that("`repeat` - pause within `if`", {
   parts2 <- expr({
     "loop-before"
     if (TRUE) {
-      !! pause_lang("3")
+      !! pause_lang("3", 1L)
     }
     !! goto_lang("3")
   })
@@ -79,7 +79,7 @@ test_that("`repeat` - nested loop", {
 
   parts1 <- block("before", goto_lang("2"))
   parts2 <- block("loop-before", goto_lang("3"))
-  parts3 <- block(pause_lang("3"))
+  parts3 <- block(pause_lang("3", 1L))
   parts4 <- block("loop-after", goto_lang("2"))
   parts5 <- block(return_lang("after"))
 
@@ -219,7 +219,7 @@ test_that("`while` - single pause no past or future", {
   })
 
   parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("3"))))
-  parts2 <- block(pause_lang("1"))
+  parts2 <- block(pause_lang("1", 1L))
   parts3 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
@@ -233,7 +233,7 @@ test_that("`while` - pause within `if`", {
   })
 
   parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("3"))))
-  parts2 <- block(if_lang(FALSE, block(pause_lang("1"))), goto_lang("1"))
+  parts2 <- block(if_lang(FALSE, block(pause_lang("1", 1L))), goto_lang("1"))
   parts3 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
@@ -284,7 +284,7 @@ test_that("`for` - one pause with no past or future", {
   for_parts <- new_for_parts(1L, quote(i), quote(x))
   parts1 <- node_car(for_parts)
   parts2 <- node_cadr(for_parts)
-  parts3 <- block(pause_lang("2"))
+  parts3 <- block(pause_lang("2", 1L))
   parts4 <- block(return_invisible_lang)
 
   expect_identical(node_list_tail_car(parts1), goto_lang("2"))
@@ -330,7 +330,7 @@ test_that("`for` - one pause within `if` and one `break` within `else`", {
   for_parts <- new_for_parts(1L, quote(i), quote(x))
   parts1 <- node_car(for_parts)
   parts2 <- node_cadr(for_parts)
-  parts3 <- block("for-before", if_lang(TRUE, block(pause_lang("4")), block(goto_lang("6"))))
+  parts3 <- block("for-before", if_lang(TRUE, block(pause_lang("4", 1L)), block(goto_lang("6"))))
   parts4 <- block("if-after", goto_lang("2"))
   parts5 <- block("for-after", goto_lang("2"))
   parts6 <- block(return_invisible_lang)

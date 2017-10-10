@@ -26,11 +26,15 @@ node_list_parts <- function(node) {
     expr <- node_car(rest)
 
     if (is_pause(expr)) {
+      # If pause has no future we don't know which state it should
+      # resume to. We register it so the state can be adjusted later.
       if (has_future()) {
         pause_lang <- new_pause(poke_state(), node_cdr(expr))
         pause_node <- node_list(pause_lang)
       } else {
-        pause_node <- peek_pause_node()
+        pause_lang <- new_pause(peek_state(), node_cdr(expr))
+        pause_node <- node_list(pause_lang)
+        push_pause_node(pause_node)
       }
 
       if (has_past()) {
@@ -51,9 +55,9 @@ node_list_parts <- function(node) {
     # extracted the parts so they get the right state index.
     if (has_future()) {
       next_goto <- node(goto_lang(-1L), NULL)
-      next_pause <- node(pause_lang(-1L), NULL)
+      pauses <- null_node()
 
-      with_jump_nodes(next_goto, next_pause, has_past(), {
+      with_jump_nodes(next_goto, pauses, has_past(), {
         nested_parts <- expr_parts(expr)
       })
 
@@ -66,7 +70,7 @@ node_list_parts <- function(node) {
           state <- poke_state()
         }
         node_poke_car(next_goto, goto_lang(state))
-        node_poke_car(next_pause, pause_lang(state))
+        pauses_push_state(pauses, state)
       }
     } else {
       nested_parts <- expr_parts(expr)

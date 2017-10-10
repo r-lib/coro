@@ -2,7 +2,7 @@
 state <- new_environment(list(
   idx = 1L,
   goto = NULL,
-  pause = NULL,
+  pauses = NULL,
   loop_next = NULL,
   loop_break = NULL,
   has_past = NULL
@@ -71,20 +71,20 @@ scoped_state_elts <- function(elts, frame = caller_env()) {
   invisible(old)
 }
 
-scoped_jump_nodes <- function(goto, pause, has_past, frame = caller_env()) {
+scoped_jump_nodes <- function(goto, pauses, has_past, frame = caller_env()) {
   scoped_state_elts(frame = frame, list(
     goto = goto,
-    pause = pause,
+    pauses = pauses,
     has_past = has_past
   ))
 }
-with_jump_nodes <- function(goto, pause, has_past, expr) {
-  scoped_jump_nodes(goto, pause, has_past)
+with_jump_nodes <- function(goto, pauses, has_past, expr) {
+  scoped_jump_nodes(goto, pauses, has_past)
   expr
 }
-with_loop_nodes <- function(pause, loop_next, loop_break, expr) {
+with_loop_nodes <- function(pauses, loop_next, loop_break, expr) {
   scoped_state_elts(list(
-    pause = pause,
+    pauses = pauses,
     goto = loop_next,
     loop_next = loop_next,
     loop_break = loop_break
@@ -93,9 +93,6 @@ with_loop_nodes <- function(pause, loop_next, loop_break, expr) {
 }
 peek_goto_node <- function() {
   state$goto
-}
-peek_pause_node <- function() {
-  state$pause
 }
 peek_loop_next_node <- function() {
   state$loop_next
@@ -106,4 +103,31 @@ peek_loop_break_node <- function() {
 
 peek_has_past <- function() {
   peek_state_elt("has_past")
+}
+
+push_pause_node <- function(node) {
+  pauses <- state$pauses
+  stopifnot(!is_null(pauses))
+
+  if (is_null_node(pauses)) {
+    node_poke_car(pauses, node)
+  } else {
+    node_list_poke_cdr(pauses, node_list(node))
+  }
+
+  invisible(pauses)
+}
+
+pauses_push_state <- function(pauses, state) {
+  if (is_null_node(pauses)) {
+    return(invisible(pauses))
+  }
+
+  node_list_walk_car(pauses, pause_poke_state, state)
+  invisible(pauses)
+}
+pause_poke_state <- function(pause, state) {
+  pause_lang <- node_car(pause)
+  node_poke_cadr(pause_lang, as.character(state))
+  invisible(pause)
 }

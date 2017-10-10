@@ -1,8 +1,8 @@
 
 loop_parts <- function(expr, loop_state = peek_state()) {
-  # This pausing node is used only when there is no continuation after
+  # These pausing nodes are used only when there is no continuation after
   # the pause. It ensures we restart at the start of the loop.
-  pause_node <- node(pause_lang(loop_state), NULL)
+  pauses <- null_node()
   next_node <- node(goto_lang(loop_state), NULL)
 
   # We don't know the finishing state until we've obtained all states
@@ -10,7 +10,7 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   break_node <- node(goto_lang(-1L), NULL)
 
   body <- as_exprs_node(expr)
-  with_loop_nodes(pause_node, next_node, break_node, {
+  with_loop_nodes(pauses, next_node, break_node, {
     parts <- node_list_parts(body)
   })
 
@@ -18,8 +18,9 @@ loop_parts <- function(expr, loop_state = peek_state()) {
     return(NULL)
   }
 
-  # Update the `break` gotos to point to the next state
+  # Update the `break` gotos and `pause nodes` to point to the next state
   node_poke_car(break_node, goto_lang(peek_state() + 1L))
+  pauses_push_state(pauses, loop_state)
 
   # Add a looping goto at the end
   goto_node <- node_list(goto_lang(loop_state))
@@ -56,6 +57,9 @@ repeat_parts <- function(expr) {
 while_parts <- function(expr) {
   if (peek_has_past()) {
     poke_state()
+    n_poke <- 2L
+  } else {
+    n_poke <- 1L
   }
   loop_state <- peek_state()
   poke_state()
@@ -64,7 +68,7 @@ while_parts <- function(expr) {
   parts <- loop_parts(body, loop_state)
 
   if (is_null(parts)) {
-    poke_state(loop_state - 1L)
+    poke_state(loop_state - n_poke)
     return(NULL)
   }
 

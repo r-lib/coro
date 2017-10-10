@@ -141,7 +141,7 @@ test_that("`{` blocks - nested and goto after pause", {
     "after2"
   })
 
-  parts1 <- block("before-inner", pause_lang("2"))
+  parts1 <- block("before-inner", pause_lang("2", 1L))
   parts2 <- block("after1", return_lang("after2"))
 
   expect_identical(parts, node_list(parts1, parts2))
@@ -165,7 +165,7 @@ test_that("`{` blocks - complex nesting", {
   inner1 <- block("before-inner", pause_lang("2", 1L))
   parts1 <- block("before", inner1)
   parts2 <- block(pause_lang("3", 2L))
-  parts3 <- block(pause_lang("4"))
+  parts3 <- block(pause_lang("4", 3L))
   parts4 <- block("after-inner", goto_lang("5"))
   parts5 <- block(return_lang("after"))
 
@@ -200,7 +200,7 @@ test_that("`{` blocks - simple nesting with various continuation states", {
     "after"
   })
 
-  parts1 <- block(pause_lang("2"))
+  parts1 <- block(pause_lang("2", 1L))
   parts2 <- block("after-inner", goto_lang("3"))
   parts3 <- block(return_lang("after"))
 
