@@ -52,13 +52,20 @@ node_list_parts <- function(node) {
       next_goto <- node(goto_lang(-1L), NULL)
       next_pause <- node(pause_lang(-1L), NULL)
 
-      with_jump_nodes(next_goto, next_pause, {
+      with_jump_nodes(next_goto, next_pause, has_past(), {
         nested_parts <- expr_parts(expr)
       })
+
       if (!is_null(nested_parts)) {
-        poke_state()
-        node_poke_car(next_goto, goto_lang(peek_state()))
-        node_poke_car(next_pause, pause_lang(peek_state()))
+        # Empty blocks occur when a translator returns a separate
+        # state that shouldn't be appended to the current past.
+        # In this case, poke state one more time.
+        state <- poke_state()
+        if (is_separate_state(nested_parts)) {
+          state <- poke_state()
+        }
+        node_poke_car(next_goto, goto_lang(state))
+        node_poke_car(next_pause, pause_lang(state))
       }
     } else {
       nested_parts <- expr_parts(expr)

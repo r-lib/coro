@@ -54,6 +54,9 @@ repeat_parts <- function(expr) {
 }
 
 while_parts <- function(expr) {
+  if (peek_has_past()) {
+    poke_state()
+  }
   loop_state <- peek_state()
   poke_state()
 
@@ -69,10 +72,15 @@ while_parts <- function(expr) {
   goto_loop_start <- block(goto_lang(loop_state + 1L))
 
   cond <- node_cadr(expr)
-  cond_lang <- if_lang(cond, goto_loop_start, goto_loop_end)
+  cond_state <- block(if_lang(cond, goto_loop_start, goto_loop_end))
+  loop_parts <- node(cond_state, parts)
 
-  cond_state <- block(cond_lang)
-  node(cond_state, parts)
+  if (peek_has_past()) {
+    empty_block <- spliceable(block())
+    loop_parts <- node(empty_block, loop_parts)
+  }
+
+  loop_parts
 }
 
 for_parts <- function(expr) {

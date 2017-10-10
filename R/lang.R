@@ -67,6 +67,11 @@ is_spliceable <- function(x) {
   is_true(attr(x, "spliceable"))
 }
 
+is_separate_state <- function(x) {
+  head <- node_car(x)
+  is_block(head) && is_spliceable(head) && is_null(node_cdr(head))
+}
+
 yield_lang <- function(...) {
   lang(yield_sym, ...)
 }

@@ -4,7 +4,8 @@ state <- new_environment(list(
   goto = NULL,
   pause = NULL,
   loop_next = NULL,
-  loop_break = NULL
+  loop_break = NULL,
+  has_past = NULL
 ))
 
 peek_state <- function() {
@@ -69,11 +70,16 @@ scoped_state_elts <- function(elts, frame = caller_env()) {
 
   invisible(old)
 }
-with_jump_nodes <- function(goto, pause, expr) {
-  scoped_state_elts(list(
+
+scoped_jump_nodes <- function(goto, pause, has_past, frame = caller_env()) {
+  scoped_state_elts(frame = frame, list(
     goto = goto,
-    pause = pause
+    pause = pause,
+    has_past = has_past
   ))
+}
+with_jump_nodes <- function(goto, pause, has_past, expr) {
+  scoped_jump_nodes(goto, pause, has_past)
   expr
 }
 with_loop_nodes <- function(pause, loop_next, loop_break, expr) {
@@ -96,4 +102,8 @@ peek_loop_next_node <- function() {
 }
 peek_loop_break_node <- function() {
   state$loop_break
+}
+
+peek_has_past <- function() {
+  peek_state_elt("has_past")
 }
