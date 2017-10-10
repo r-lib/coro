@@ -22,6 +22,7 @@ expr_parts <- function(expr) {
     `if` = if_parts(expr),
     `repeat` = repeat_parts(expr),
     `while` = while_parts(expr),
+    `for` = for_parts(expr),
     `break` = break_parts(expr),
     `next` = next_parts(expr),
     NULL

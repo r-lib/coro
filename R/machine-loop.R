@@ -75,3 +75,49 @@ while_parts <- function(expr) {
   cond_state <- spliceable(block(cond_lang))
   node(cond_state, parts)
 }
+
+for_parts <- function(expr) {
+  loop_state <- poke_state()
+
+  body <- node_cadr(node_cddr(expr))
+  parts <- loop_parts(body)
+
+  if (is_null(parts)) {
+    poke_state(loop_state - 1L)
+    return(NULL)
+  }
+
+  # Guaranteed to be a symbol by the parser
+  idx_user_sym <- node_cadr(expr)
+  idx_loop_sym <- for_idx_sym(loop_state)
+
+  vec_user_expr <- node_cadr(node_cdr(expr))
+  vec_loop_sym <- for_vec_sym(loop_state)
+
+  init_part <- for_init_part(vec_loop_sym, vec_user_expr, idx_loop_sym)
+  next_part <- for_next_part(vec_loop_sym, idx_loop_sym, idx_user_sym)
+
+  node(init_part, node(next_part, parts))
+}
+
+for_init_part <- function(vec_loop_sym, vec_user_expr, idx_loop_sym,
+                          state = peek_state()) {
+  expr({
+    !! idx_loop_sym <- 0L
+    !! vec_loop_sym <- !! vec_user_expr
+
+    # `for` internally converts factors to character vectors
+    if (base::is.factor(!! vec_loop_sym)) {
+      !! vec_loop_sym <- base::as.character(!! vec_loop_sym)
+    }
+    !! goto_lang(state)
+  })
+}
+for_next_part <- function(vec_loop_sym, idx_loop_sym, idx_user_sym,
+                          state = peek_state() + 1L) {
+  expr({
+    !! idx_loop_sym <- UQ(idx_loop_sym) + 1L
+    !! idx_user_sym <- UQ(vec_loop_sym)[[!! idx_loop_sym]]
+    !! goto_lang(state)
+  })
+}

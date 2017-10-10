@@ -90,6 +90,13 @@ if_branch_else <- function(expr) {
   node_cadr(node_cddr(expr))
 }
 
+for_idx_sym <- function(i) {
+  sym(paste0("_for_idx_", i))
+}
+for_vec_sym <- function(i) {
+  sym(paste0("_for_vec_", i))
+}
+
 return_sym <- quote(`return`)
 pause_sym <- quote(`_pause`)
 goto_sym <- quote(`_goto`)
