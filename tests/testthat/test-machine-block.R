@@ -1,5 +1,16 @@
 context("machine-block")
 
+test_that("`{` blocks - one pause with no past or future", {
+  parts <- machine_parts(function() {
+    yield(1L)
+  })
+
+  parts1 <- block(pause_lang("2"))
+  parts2 <- block(return_invisible_lang)
+
+  expect_identical(parts, node_list(parts1, parts2))
+})
+
 test_that("`{` blocks - one pause", {
   parts <- machine_parts(function() {
     "before1"
