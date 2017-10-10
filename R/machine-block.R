@@ -19,7 +19,7 @@ node_list_parts <- function(node) {
     !is_null(node_cdr(rest))
   }
   has_past <- function() {
-    is_null(parent)
+    !is_null(parent)
   }
 
   while (!is_null(rest)) {
@@ -33,10 +33,10 @@ node_list_parts <- function(node) {
       }
 
       if (has_past()) {
-        pause_block <- new_block(pause_node)
-      } else {
         node_poke_cdr(parent, pause_node)
         pause_block <- new_block(node)
+      } else {
+        pause_block <- new_block(pause_node)
       }
       parts <- node_list_poke_cdr(parts, node_list(pause_block))
 
@@ -75,8 +75,6 @@ node_list_parts <- function(node) {
     pausing_part <- node_car(nested_parts)
 
     if (has_past()) {
-      poke_attr(pausing_part, "spliceable", NULL)
-    } else {
       if (is_spliceable(pausing_part)) {
         pausing_part <- node_cdr(pausing_part)
       } else {
@@ -85,6 +83,8 @@ node_list_parts <- function(node) {
 
       node_poke_cdr(parent, pausing_part)
       node_poke_car(nested_parts, new_block(node))
+    } else {
+      poke_attr(pausing_part, "spliceable", NULL)
     }
 
     # Merge nested states
