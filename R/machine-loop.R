@@ -131,3 +131,5 @@ for_next_part <- function(loop_state, expr) {
     !! goto_lang(loop_state + 1L)
   })
 }
+
+utils::globalVariables("!<-")
