@@ -256,3 +256,19 @@ test_that("`while` - pause within `if` with future", {
 
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
 })
+
+test_that("`for` - one pause with no past or future", {
+  parts <- machine_parts(function() {
+    for (i in x) yield(1L)
+  })
+
+  for_parts <- new_for_parts(1L, quote(i), quote(x))
+  parts1 <- node_car(for_parts)
+  parts2 <- node_cadr(for_parts)
+  parts3 <- block(pause_lang("2"))
+  parts4 <- block(return_invisible_lang)
+
+  expect_identical(node_list_tail_car(parts1), goto_lang("2"))
+  expect_identical(node_list_tail_car(parts2), goto_lang("3"))
+  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
+})
