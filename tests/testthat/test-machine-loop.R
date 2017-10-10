@@ -205,10 +205,10 @@ test_that("loops - goto loop start after `if` or `else`", {
 
 
   parts <- machine_parts(function() {
-    repeat if (TRUE) yield() else FALSE
+    repeat if (TRUE) yield(1L) else FALSE
   })
 
-  parts2 <- block(if_lang(TRUE, block(pause_lang("2")), FALSE), goto_lang("2"))
+  parts2 <- block(if_lang(TRUE, block(pause_lang("2", 1L)), FALSE), goto_lang("2"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
 })

@@ -41,14 +41,14 @@ test_that("`{` blocks - no preamble", {
 test_that("`{` blocks - multiple pauses", {
   parts <- machine_parts(function() {
     "before"
-    yield()
+    yield(1L)
     "during"
-    yield()
+    yield(2L)
     "after"
   })
 
-  parts1 <- block("before", pause_lang("2"))
-  parts2 <- block("during", pause_lang("3"))
+  parts1 <- block("before", pause_lang("2", 1L))
+  parts2 <- block("during", pause_lang("3", 2L))
   parts3 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
@@ -57,13 +57,13 @@ test_that("`{` blocks - multiple pauses", {
 test_that("`{` blocks - consecutive pauses", {
   parts <- machine_parts(function() {
     "before"
-    yield()
-    yield()
+    yield(1L)
+    yield(2L)
     "after"
   })
 
-  parts1 <- block("before", pause_lang("2"))
-  parts2 <- block(pause_lang("3"))
+  parts1 <- block("before", pause_lang("2", 1L))
+  parts2 <- block(pause_lang("3", 2L))
   parts3 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
@@ -71,22 +71,22 @@ test_that("`{` blocks - consecutive pauses", {
 
 test_that("`{` blocks - no return value", {
   parts <- machine_parts(function() {
-    yield()
+    yield(1L)
   })
 
-  parts1 <- block(pause_lang("2"))
+  parts1 <- block(pause_lang("2", 1L))
   parts2 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2))
 
 
   parts <- machine_parts(function() {
-    yield()
-    yield()
+    yield(1L)
+    yield(2L)
   })
 
-  parts1 <- block(pause_lang("2"))
-  parts2 <- block(pause_lang("3"))
+  parts1 <- block(pause_lang("2", 1L))
+  parts2 <- block(pause_lang("3", 2L))
   parts3 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
