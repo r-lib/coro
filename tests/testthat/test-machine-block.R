@@ -5,7 +5,7 @@ test_that("`{` blocks - one pause with no past or future", {
     yield(1L)
   })
 
-  parts1 <- block(pause_lang("2"))
+  parts1 <- block(pause_lang("2", 1L))
   parts2 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2))
@@ -15,12 +15,12 @@ test_that("`{` blocks - one pause", {
   parts <- machine_parts(function() {
     "before1"
     "before2"
-    yield()
+    yield(1L)
     "after1"
     "after2"
   })
 
-  parts1 <- block("before1", "before2", pause_lang("2"))
+  parts1 <- block("before1", "before2", pause_lang("2", 1L))
   parts2 <- block("after1", return_lang("after2"))
 
   expect_identical(parts, node_list(parts1, parts2))
@@ -28,11 +28,11 @@ test_that("`{` blocks - one pause", {
 
 test_that("`{` blocks - no preamble", {
   parts <- machine_parts(function() {
-    yield()
+    yield(1L)
     "after"
   })
 
-  parts1 <- block(pause_lang(2))
+  parts1 <- block(pause_lang("2", 1L))
   parts2 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2))
@@ -105,7 +105,7 @@ test_that("`{` blocks - nested", {
     "after2"
   })
 
-  parts1_block <- block("before-inner", pause_lang("2"))
+  parts1_block <- block("before-inner", pause_lang("2", 1L))
   parts1 <- block("before1", "before2", parts1_block)
   parts2 <- block("after-inner", goto_lang("3"))
   parts3 <- block("after1", return_lang("after2"))
@@ -124,7 +124,7 @@ test_that("`{` blocks - nested and no past before pause", {
     "after2"
   })
 
-  parts1 <- block("before-inner", pause_lang("2"))
+  parts1 <- block("before-inner", pause_lang("2", 1L))
   parts2 <- block("after-inner", goto_lang("3"))
   parts3 <- block("after1", return_lang("after2"))
 
@@ -162,9 +162,9 @@ test_that("`{` blocks - complex nesting", {
     "after"
   })
 
-  inner1 <- block("before-inner", pause_lang("2"))
+  inner1 <- block("before-inner", pause_lang("2", 1L))
   parts1 <- block("before", inner1)
-  parts2 <- block(pause_lang("3"))
+  parts2 <- block(pause_lang("3", 2L))
   parts3 <- block(pause_lang("4"))
   parts4 <- block("after-inner", goto_lang("5"))
   parts5 <- block(return_lang("after"))
@@ -183,7 +183,7 @@ test_that("`{` blocks - simple nesting with various continuation states", {
     "after"
   })
 
-  parts1 <- block(pause_lang("2"))
+  parts1 <- block(pause_lang("2", 1L))
   parts2 <- block("after-inner-inner", goto_lang("3"))
   parts3 <- block(return_lang("after"))
 

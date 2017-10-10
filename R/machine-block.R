@@ -27,7 +27,8 @@ node_list_parts <- function(node) {
 
     if (is_pause(expr)) {
       if (has_future()) {
-        pause_node <- node_list(pause_lang(poke_state()))
+        pause_lang <- new_pause(poke_state(), node_cdr(expr))
+        pause_node <- node_list(pause_lang)
       } else {
         pause_node <- peek_pause_node()
       }

@@ -42,6 +42,11 @@ return_lang <- function(...) {
   lang("return", ...)
 }
 
+new_pause <- function(state, cdr = NULL) {
+  args <- node(as.character(state), cdr)
+  new_language(pause_sym, args)
+}
+
 block <- function(...) {
   lang(block_sym, ...)
 }

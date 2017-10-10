@@ -13,7 +13,7 @@ test_that("`if` blocks - one pause", {
     "after"
   })
 
-  inner1 <- if_lang(TRUE, block("if-before", pause_lang("2")), block(FALSE))
+  inner1 <- if_lang(TRUE, block("if-before", pause_lang("2", 1L)), block(FALSE))
   parts1 <- block("before", inner1, goto_lang("3"))
   parts2 <- block("if-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
@@ -34,7 +34,7 @@ test_that("`else` blocks - one pause", {
     "after"
   })
 
-  inner1 <- if_lang(FALSE, block(FALSE), block("else-before", pause_lang("2")))
+  inner1 <- if_lang(FALSE, block(FALSE), block("else-before", pause_lang("2", 1L)))
   parts1 <- block("before", inner1, goto_lang("3"))
   parts2 <- block("else-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
@@ -59,7 +59,7 @@ test_that("`if` blocks - inner block", {
     "after"
   })
 
-  inner1 <- block("inner-before", pause_lang("2"))
+  inner1 <- block("inner-before", pause_lang("2", 1L))
   inner1 <- if_lang(TRUE, block("if-before", inner1), block(FALSE))
   parts1 <- block("before", inner1, goto_lang("4"))
   parts2 <- block("inner-after", goto_lang("3"))
@@ -101,7 +101,7 @@ test_that("`if` blocks - nested and trailing pause", {
     }
   })
 
-  inner1 <- if_lang(FALSE, block(pause_lang("2")), block(return_invisible_lang))
+  inner1 <- if_lang(FALSE, block(pause_lang("2", 1L)), block(return_invisible_lang))
   inner1 <- block("if-before", inner1)
   inner1 <- if_lang(TRUE, inner1, block(return_lang("foo")))
   parts1 <- block("before", inner1)
@@ -117,7 +117,7 @@ test_that("`if` blocks - multiply nested and all trailing", {
       "if-before"
       if (FALSE) {
         if (FALSE) {
-          yield(2L)
+          yield(1L)
           "if-3-after"
         }
         "if-2-after"
@@ -133,7 +133,7 @@ test_that("`if` blocks - multiply nested and all trailing", {
       "if-before"
       if (FALSE) {
         if (FALSE) {
-          !! pause_lang("2")
+          !! pause_lang("2", 1L)
         }
         !! goto_lang("3")
       } else {
@@ -158,7 +158,7 @@ test_that("`if`-`else` blocks - trailing", {
       "if-after"
     } else {
       "else-before"
-      yield(1L)
+      yield(2L)
       "else-after"
     }
   })
@@ -167,10 +167,10 @@ test_that("`if`-`else` blocks - trailing", {
     "before"
     if (TRUE) {
       "if-before"
-      !! pause_lang("2")
+      !! pause_lang("2", 1L)
     } else {
       "else-before"
-      !! pause_lang("3")
+      !! pause_lang("3", 2L)
     }
   })
   parts2 <- block(return_lang("if-after"))
@@ -194,7 +194,7 @@ test_that("`if`-`else` blocks - non trailing", {
     "after"
   })
 
-  inner1 <- if_lang(TRUE, block("if-before", pause_lang("2")), block("else-before", pause_lang("3")))
+  inner1 <- if_lang(TRUE, block("if-before", pause_lang("2", 1L)), block("else-before", pause_lang("3", 2L)))
   parts1 <- block("before", inner1)
   parts2 <- block("if-after", goto_lang("4"))
   parts3 <- block("else-after", goto_lang("4"))
@@ -242,7 +242,7 @@ test_that("`if`-`else` blocks - continuation in `if`", {
   parts1 <- expr({
     "before"
     if (TRUE) {
-      !! pause_lang("2")
+      !! pause_lang("2", 1L)
     } else {
       !! pause_lang("3")
     }
@@ -270,7 +270,7 @@ test_that("`if`-`else` blocks - continuation in `else`", {
     if (TRUE) {
       !! pause_lang("3")
     } else {
-      !! pause_lang("2")
+      !! pause_lang("2", 2L)
     }
   })
   parts2 <- block("else-after", goto_lang("3"))
@@ -293,7 +293,7 @@ test_that("`if` blocks - doubly nested with continuation", {
   parts1 <- expr({
     if (TRUE) {
       if (TRUE) {
-        !! pause_lang("2")
+        !! pause_lang("2", 1L)
       }
       !! goto_lang("3")
     }
@@ -335,7 +335,7 @@ test_that("`if`-`else` blocks - multiply nested and not trailing", {
       "if-before"
       if (TRUE) {
         if (TRUE) {
-          !! pause_lang("2")
+          !! pause_lang("2", 1L)
         }
         !! goto_lang("3")
       } else {

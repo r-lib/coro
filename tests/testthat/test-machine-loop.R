@@ -12,7 +12,7 @@ test_that("`repeat` - one pause", {
   })
 
   parts1 <- block("before", goto_lang("2"))
-  parts2 <- block("loop-before", pause_lang("3"))
+  parts2 <- block("loop-before", pause_lang("3", 1L))
   parts3 <- block("loop-after", goto_lang("2"))
   parts4 <- block(return_lang("after"))
 
@@ -94,7 +94,7 @@ test_that("`repeat` - non-yielding", {
     "after"
   })
 
-  parts1 <- block("before", repeat_lang(NULL), pause_lang("2"))
+  parts1 <- block("before", repeat_lang(NULL), pause_lang("2", 1L))
   parts2 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2))
@@ -127,9 +127,9 @@ test_that("loops - single `next` with past and future", {
   })
 
   parts1 <- block(goto_lang("2"))
-  parts2 <- block("loop-before", pause_lang("3"))
+  parts2 <- block("loop-before", pause_lang("3", 1L))
   parts3 <- block("loop-after", goto_lang("2"))
-  parts4 <- block("next-after", pause_lang("5"))
+  parts4 <- block("next-after", pause_lang("5", 2L))
   parts5 <- block("loop-final", goto_lang("2"))
   parts6 <- block(return_invisible_lang)
 
@@ -182,10 +182,10 @@ test_that("loops - `break` and `next` with past and future", {
   })
 
   parts1 <- block(goto_lang("2"))
-  parts2 <- block("loop-before", pause_lang("3"))
+  parts2 <- block("loop-before", pause_lang("3", 1L))
   parts3 <- block("loop-after", goto_lang("7"))
   parts4 <- block("break-after", goto_lang("2"))
-  parts5 <- block("next-after", pause_lang("6"))
+  parts5 <- block("next-after", pause_lang("6", 2L))
   parts6 <- block("loop-final", goto_lang("2"))
   parts7 <- block(return_invisible_lang)
 
@@ -250,7 +250,7 @@ test_that("`while` - pause within `if` with future", {
   })
 
   parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("4"))))
-  parts2 <- block(if_lang(FALSE, block(pause_lang("3"))), goto_lang("1"))
+  parts2 <- block(if_lang(FALSE, block(pause_lang("3", 1L))), goto_lang("1"))
   parts3 <- block("after-pause", goto_lang("1"))
   parts4 <- block(return_invisible_lang)
 
@@ -269,7 +269,7 @@ test_that("`while` - past before loop", {
 
   parts1 <- block("before")
   parts2 <- block(if_lang(TRUE, block(goto_lang("3")), block(goto_lang("5"))))
-  parts3 <- block("loop-before", pause_lang("4"))
+  parts3 <- block("loop-before", pause_lang("4", 1L))
   parts4 <- block("loop-after", goto_lang("2"))
   parts5 <- block(return_invisible_lang)
 
@@ -306,7 +306,7 @@ test_that("`for` - one pause with past and future", {
   for_parts <- new_for_parts(1L, quote(i), quote(x))
   parts1 <- new_block(node("before", node_cdar(for_parts)))
   parts2 <- node_cadr(for_parts)
-  parts3 <- block("for-before", pause_lang("4"))
+  parts3 <- block("for-before", pause_lang("4", 1L))
   parts4 <- block("for-after", goto_lang("2"))
   parts5 <- block(return_lang("after"))
 
