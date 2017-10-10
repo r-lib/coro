@@ -49,17 +49,40 @@ scoped_state_elt <- function(elt, value, frame = caller_env()) {
 
   invisible(old)
 }
+scoped_state_elts <- function(elts, frame = caller_env()) {
+  nms <- names(elts)
+  old <- list_along(elts)
 
+  exit_lang <- block()
+  cur <- exit_lang
+
+  for (i in seq_along(elts)) {
+    old <- poke_state_elt(nms[[i]], elts[[i]])
+    old[[i]] <- old %||% list(NULL)
+
+    restore_state_lang <- lang(poke_state_elt, nms[[i]], old[[i]])
+    node_poke_cdr(cur, node_list(restore_state_lang))
+    cur <- node_cdr(cur)
+  }
+
+  scoped_exit(!! exit_lang, frame = frame)
+
+  invisible(old)
+}
 with_jump_nodes <- function(goto, pause, expr) {
-  scoped_state_elt("goto", goto)
-  scoped_state_elt("pause", pause)
+  scoped_state_elts(list(
+    goto = goto,
+    pause = pause
+  ))
   expr
 }
 with_loop_nodes <- function(pause, loop_next, loop_break, expr) {
-  scoped_state_elt("pause", pause)
-  scoped_state_elt("goto", loop_next)
-  scoped_state_elt("loop_next", loop_next)
-  scoped_state_elt("loop_break", loop_break)
+  scoped_state_elts(list(
+    pause = pause,
+    goto = loop_next,
+    loop_next = loop_next,
+    loop_break = loop_break
+  ))
   expr
 }
 peek_goto_node <- function() {
