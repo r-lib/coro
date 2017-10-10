@@ -219,7 +219,7 @@ test_that("`while` - single pause no past or future", {
   })
 
   parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("3"))))
-  parts2 <- block(pause_lang("2"))
+  parts2 <- block(pause_lang("1"))
   parts3 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
@@ -233,7 +233,7 @@ test_that("`while` - pause within `if`", {
   })
 
   parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("3"))))
-  parts2 <- block(if_lang(FALSE, block(pause_lang("2"))), goto_lang("2"))
+  parts2 <- block(if_lang(FALSE, block(pause_lang("1"))), goto_lang("1"))
   parts3 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3))
@@ -250,8 +250,8 @@ test_that("`while` - pause within `if` with future", {
   })
 
   parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("4"))))
-  parts2 <- block(if_lang(FALSE, block(pause_lang("3"))), goto_lang("2"))
-  parts3 <- block("after-pause", goto_lang("2"))
+  parts2 <- block(if_lang(FALSE, block(pause_lang("3"))), goto_lang("1"))
+  parts3 <- block("after-pause", goto_lang("1"))
   parts4 <- block(return_invisible_lang)
 
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
