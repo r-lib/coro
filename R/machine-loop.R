@@ -130,11 +130,13 @@ for_parts <- function(expr) {
 for_init_part <- function(loop_state, expr) {
   loop_idx_sym <- for_idx_sym(loop_state)
   loop_vec_sym <- for_vec_sym(loop_state)
+  loop_len_sym <- for_len_sym(loop_state)
   user_vec_expr <- node_cadr(node_cdr(expr))
 
   expr({
     !! loop_idx_sym <- 0L
     !! loop_vec_sym <- !! user_vec_expr
+    !! loop_len_sym <- length(!! loop_vec_sym)
 
     # `for` internally converts factors to character vectors
     if (base::is.factor(!! loop_vec_sym)) {
@@ -148,11 +150,16 @@ for_next_part <- function(loop_state, expr) {
   loop_idx_sym <- for_idx_sym(loop_state)
   user_idx_sym <- node_cadr(expr)
   loop_vec_sym <- for_vec_sym(loop_state)
+  loop_len_sym <- for_len_sym(loop_state)
 
   expr({
-    !! loop_idx_sym <- UQ(loop_idx_sym) + 1L
-    !! user_idx_sym <- UQ(loop_vec_sym)[[!! loop_idx_sym]]
-    !! goto_lang(loop_state + 1L)
+    if (UQ(loop_idx_sym) != !! loop_len_sym) {
+      !! loop_idx_sym <- UQ(loop_idx_sym) + 1L
+      !! user_idx_sym <- UQ(loop_vec_sym)[[!! loop_idx_sym]]
+      !! goto_lang(loop_state + 1L)
+    } else {
+      !! goto_lang(peek_state() + 1L)
+    }
   })
 }
 

@@ -368,7 +368,9 @@ test_that("`for` - one pause with no past or future", {
   parts4 <- block(return_invisible_lang)
 
   expect_identical(node_list_tail_car(parts1), goto_lang("2"))
-  expect_identical(node_list_tail_car(parts2), goto_lang("3"))
+  cond_branches <- node_cddr(node_cadr(parts2))
+  expect_identical(node_list_tail_car(node_car(cond_branches)), goto_lang("3"))
+
   expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
 })
 
@@ -383,7 +385,7 @@ test_that("`for` - one pause with past and future", {
     "after"
   })
 
-  for_parts <- new_for_parts(1L, quote(i), quote(x))
+  for_parts <- new_for_parts(1L, quote(i), quote(x), "5")
   parts1 <- new_block(node("before", node_cdar(for_parts)))
   parts2 <- node_cadr(for_parts)
   parts3 <- block("for-before", pause_lang("4", 1L))
@@ -391,11 +393,14 @@ test_that("`for` - one pause with past and future", {
   parts5 <- block(return_lang("after"))
 
   expect_identical(node_list_tail_car(parts1), goto_lang("2"))
-  expect_identical(node_list_tail_car(parts2), goto_lang("3"))
+  cond_branches <- node_cddr(node_cadr(parts2))
+  expect_identical(node_list_tail_car(node_car(cond_branches)), goto_lang("3"))
+
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
 })
 
 test_that("`for` - one pause within `if` and one `break` within `else`", {
+
   parts <- machine_parts(function() {
     for (i in x) {
       "for-before"
@@ -407,7 +412,7 @@ test_that("`for` - one pause within `if` and one `break` within `else`", {
     }
   })
 
-  for_parts <- new_for_parts(1L, quote(i), quote(x))
+  for_parts <- new_for_parts(1L, quote(i), quote(x), "6")
   parts1 <- node_car(for_parts)
   parts2 <- node_cadr(for_parts)
   parts3 <- block("for-before", if_lang(TRUE, block(pause_lang("4", 1L)), block(goto_lang("6"))))

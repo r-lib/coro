@@ -112,6 +112,9 @@ for_idx_sym <- function(i) {
 for_vec_sym <- function(i) {
   sym(paste0("_for_vec_", i))
 }
+for_len_sym <- function(i) {
+  sym(paste0("_for_len_", i))
+}
 
 return_sym <- quote(`return`)
 pause_sym <- quote(`_pause`)
