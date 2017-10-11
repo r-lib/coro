@@ -14,7 +14,7 @@ loop_parts <- function(expr, loop_state = peek_state()) {
     parts <- node_list_parts(body)
   })
 
-  if (is_null(parts)) {
+  if (is_null(parts) || all_loop_control(parts)) {
     return(NULL)
   }
 
@@ -32,11 +32,31 @@ loop_parts <- function(expr, loop_state = peek_state()) {
 
 next_parts <- function(expr) {
   next_block <- spliceable(new_block(peek_loop_next_node()))
-  node_list(next_block)
+  parts <- node_list(next_block)
+  poke_attr(parts, "loop_control", TRUE)
 }
 break_parts <- function(expr) {
   break_block <- spliceable(new_block(peek_loop_break_node()))
-  node_list(break_block)
+  parts <- node_list(break_block)
+  poke_attr(parts, "loop_control", TRUE)
+}
+
+is_loop_control <- function(x) {
+  is_true(attr(x, "loop_control"))
+}
+all_loop_control <- function(node) {
+  if (is_null(node)) {
+    return(FALSE)
+  }
+
+  while (!is_null(node)) {
+    if (!is_loop_control(node)) {
+      return(FALSE)
+    }
+    node <- node_cdr(node)
+  }
+
+  TRUE
 }
 
 repeat_parts <- function(expr) {
@@ -55,11 +75,10 @@ repeat_parts <- function(expr) {
 }
 
 while_parts <- function(expr) {
+  old_state <- peek_state()
+
   if (peek_has_past()) {
     poke_state()
-    n_poke <- 2L
-  } else {
-    n_poke <- 1L
   }
   loop_state <- peek_state()
   poke_state()
@@ -68,7 +87,7 @@ while_parts <- function(expr) {
   parts <- loop_parts(body, loop_state)
 
   if (is_null(parts)) {
-    poke_state(loop_state - n_poke)
+    poke_state(old_state)
     return(NULL)
   }
 

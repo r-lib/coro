@@ -92,6 +92,9 @@ while_lang <- function(...) {
 for_lang <- function(...) {
   lang(for_sym, ...)
 }
+break_lang <- function() {
+  lang(break_sym)
+}
 
 if_branch_true <- function(expr) {
   node_car(node_cddr(expr))
@@ -119,3 +122,7 @@ for_sym <- quote(`for`)
 ctrl_syms <- list(if_sym, repeat_sym, while_sym, for_sym)
 assignment_sym <- quote(`<-`)
 block_sym <- quote(`{`)
+
+break_sym <- quote(`break`)
+next_sym <- quote(`next`)
+loop_ctrl_syms <- list(break_sym, next_sym)

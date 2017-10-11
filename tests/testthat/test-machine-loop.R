@@ -100,16 +100,34 @@ test_that("`repeat` - non-yielding", {
   expect_identical(parts, node_list(parts1, parts2))
 })
 
+test_that("`repeat` - non-yielding with `break`", {
+  parts <- machine_parts(function() {
+    "before"
+    repeat break
+    yield(1L)
+    "after"
+  })
+
+  parts1 <- block("before", repeat_lang(break_lang()), pause_lang("2", 1L))
+  parts2 <- block(return_lang("after"))
+
+  expect_identical(parts, node_list(parts1, parts2))
+})
+
 test_that("loops - single `next`", {
   parts <- machine_parts(function() {
-    repeat next
+    repeat {
+      next
+      yield(1L)
+    }
   })
 
   parts1 <- block(goto_lang("2"))
   parts2 <- block(goto_lang("2"))
-  parts3 <- block(return_invisible_lang)
+  parts3 <- block(pause_lang("2", 1L))
+  parts4 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
 })
 
 test_that("loops - single `next` with past and future", {
@@ -138,14 +156,18 @@ test_that("loops - single `next` with past and future", {
 
 test_that("loops - single `break`", {
   parts <- machine_parts(function() {
-    repeat break
+    repeat {
+      break
+      yield(1L)
+    }
   })
 
   parts1 <- block(goto_lang("2"))
-  parts2 <- block(goto_lang("3"))
-  parts3 <- block(return_invisible_lang)
+  parts2 <- block(goto_lang("4"))
+  parts3 <- block(pause_lang("2", 1L))
+  parts4 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
 })
 
 test_that("loops - `next` and `break` within `if`-`else`", {
