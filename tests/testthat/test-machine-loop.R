@@ -100,15 +100,17 @@ test_that("`repeat` - non-yielding", {
   expect_identical(parts, node_list(parts1, parts2))
 })
 
-test_that("`repeat` - non-yielding with `break`", {
+test_that("`repeat` - non-yielding but other control flow constructs", {
+  skip("TODO?")
   parts <- machine_parts(function() {
     "before"
-    repeat break
+    repeat if (TRUE) break else next
     yield(1L)
     "after"
   })
 
-  parts1 <- block("before", repeat_lang(break_lang()), pause_lang("2", 1L))
+  inner1 <- repeat_lang(if_lang(TRUE, break_lang(), next_lang()))
+  parts1 <- block("before", inner1, pause_lang("2", 1L))
   parts2 <- block(return_lang("after"))
 
   expect_identical(parts, node_list(parts1, parts2))

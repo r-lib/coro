@@ -95,6 +95,9 @@ for_lang <- function(...) {
 break_lang <- function() {
   lang(break_sym)
 }
+next_lang <- function() {
+  lang(next_sym)
+}
 
 if_branch_true <- function(expr) {
   node_car(node_cddr(expr))
