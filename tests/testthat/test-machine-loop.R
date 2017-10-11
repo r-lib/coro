@@ -267,7 +267,7 @@ test_that("`while` - past before loop", {
     }
   })
 
-  parts1 <- block("before")
+  parts1 <- block("before", goto_lang("2"))
   parts2 <- block(if_lang(TRUE, block(goto_lang("3")), block(goto_lang("5"))))
   parts3 <- block("loop-before", pause_lang("4", 1L))
   parts4 <- block("loop-after", goto_lang("2"))

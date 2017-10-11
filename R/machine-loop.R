@@ -80,8 +80,8 @@ while_parts <- function(expr) {
   loop_parts <- node(cond_state, parts)
 
   if (peek_has_past()) {
-    empty_block <- spliceable(block())
-    loop_parts <- node(empty_block, loop_parts)
+    goto_block <- spliceable(block(goto_lang(loop_state)))
+    loop_parts <- node(goto_block, loop_parts)
   }
 
   loop_parts
