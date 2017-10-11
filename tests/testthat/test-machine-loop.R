@@ -318,6 +318,44 @@ test_that("`while` - pause after loop", {
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
 })
 
+test_that("`while` - complex control flow", {
+  parts <- machine_parts(function() {
+    "before"
+    while (TRUE) break
+    while (TRUE) {
+      "loop-before"
+      yield(1L)
+      "loop-after"
+      if (TRUE) {
+        "break-before"
+        break
+        "break-after"
+      } else {
+        "yield-2-before"
+        yield(2L)
+        "yield-2-after"
+      }
+      "next-before"
+      next
+      "loop-end"
+    }
+    "after"
+  })
+
+  parts1 <- block("before", while_lang(TRUE, break_lang()), goto_lang("2"))
+  parts2 <- block(if_lang(TRUE, block(goto_lang("3")), block(goto_lang("9"))))
+  parts3 <- block("loop-before", pause_lang("4", 1L))
+  inner4 <- if_lang(TRUE, block("break-before", goto_lang("9")), block("yield-2-before", pause_lang("6", 2L)))
+  parts4 <- block("loop-after", inner4)
+  parts5 <- block("break-after", goto_lang("7"))
+  parts6 <- block("yield-2-after", goto_lang("7"))
+  parts7 <- block("next-before", goto_lang("2"))
+  parts8 <- block("loop-end", goto_lang("2"))
+  parts9 <- block(return_lang("after"))
+
+  expect_equal(parts, node_list(parts1, parts2, parts3, parts4, parts5, parts6, parts7, parts8, parts9))
+})
+
 test_that("`for` - one pause with no past or future", {
   parts <- machine_parts(function() {
     for (i in x) yield(1L)
