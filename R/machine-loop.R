@@ -72,13 +72,14 @@ while_parts <- function(expr) {
     return(NULL)
   }
 
-  goto_loop_end <- block(goto_lang(poke_state()))
+  goto_loop_end <- block(goto_lang(peek_state() + 1L))
   goto_loop_start <- block(goto_lang(loop_state + 1L))
 
   cond <- node_cadr(expr)
   cond_state <- block(if_lang(cond, goto_loop_start, goto_loop_end))
   loop_parts <- node(cond_state, parts)
 
+  # Merge into the current state if there is a past
   if (peek_has_past()) {
     goto_block <- spliceable(block(goto_lang(loop_state)))
     loop_parts <- node(goto_block, loop_parts)

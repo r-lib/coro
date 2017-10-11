@@ -276,6 +276,24 @@ test_that("`while` - past before loop", {
   expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
 })
 
+test_that("`while` - pause after loop", {
+  parts <- machine_parts(function() {
+    while (TRUE) {
+      yield(1L)
+      "loop-after"
+    }
+    yield(2L)
+  })
+
+  parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("4"))))
+  parts2 <- block(pause_lang("3", 1L))
+  parts3 <- block("loop-after", goto_lang("1"))
+  parts4 <- block(pause_lang("5", 2L))
+  parts5 <- block(return_invisible_lang)
+
+  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
+})
+
 test_that("`for` - one pause with no past or future", {
   parts <- machine_parts(function() {
     for (i in x) yield(1L)
