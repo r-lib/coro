@@ -128,30 +128,30 @@ for_parts <- function(expr) {
 }
 
 for_init_part <- function(loop_state, expr) {
-  idx_loop_sym <- for_idx_sym(loop_state)
-  vec_loop_sym <- for_vec_sym(loop_state)
-  vec_user_expr <- node_cadr(node_cdr(expr))
+  loop_idx_sym <- for_idx_sym(loop_state)
+  loop_vec_sym <- for_vec_sym(loop_state)
+  user_vec_expr <- node_cadr(node_cdr(expr))
 
   expr({
-    !! idx_loop_sym <- 0L
-    !! vec_loop_sym <- !! vec_user_expr
+    !! loop_idx_sym <- 0L
+    !! loop_vec_sym <- !! user_vec_expr
 
     # `for` internally converts factors to character vectors
-    if (base::is.factor(!! vec_loop_sym)) {
-      !! vec_loop_sym <- base::as.character(!! vec_loop_sym)
+    if (base::is.factor(!! loop_vec_sym)) {
+      !! loop_vec_sym <- base::as.character(!! loop_vec_sym)
     }
 
     !! goto_lang(loop_state)
   })
 }
 for_next_part <- function(loop_state, expr) {
-  idx_loop_sym <- for_idx_sym(loop_state)
-  idx_user_sym <- node_cadr(expr)
-  vec_loop_sym <- for_vec_sym(loop_state)
+  loop_idx_sym <- for_idx_sym(loop_state)
+  user_idx_sym <- node_cadr(expr)
+  loop_vec_sym <- for_vec_sym(loop_state)
 
   expr({
-    !! idx_loop_sym <- UQ(idx_loop_sym) + 1L
-    !! idx_user_sym <- UQ(vec_loop_sym)[[!! idx_loop_sym]]
+    !! loop_idx_sym <- UQ(loop_idx_sym) + 1L
+    !! user_idx_sym <- UQ(loop_vec_sym)[[!! loop_idx_sym]]
     !! goto_lang(loop_state + 1L)
   })
 }
