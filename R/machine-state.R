@@ -1,12 +1,5 @@
 
-state <- new_environment(list(
-  idx = 1L,
-  goto = NULL,
-  pauses = NULL,
-  loop_next = NULL,
-  loop_break = NULL,
-  has_past = NULL
-))
+state <- new_environment()
 
 peek_state <- function() {
   state$idx
@@ -17,7 +10,16 @@ poke_state <- function(idx = NULL) {
   state$idx
 }
 reset_state <- function() {
-  state$idx <- 1L
+  elts <- list(
+    idx = 1L,
+    goto = NULL,
+    pauses = NULL,
+    loop_next = NULL,
+    loop_break = NULL,
+    has_past = NULL,
+    pause_sym = NULL
+  )
+  env_bind(state, !!! elts)
 }
 
 scoped_state <- function(idx, frame = caller_env()) {
