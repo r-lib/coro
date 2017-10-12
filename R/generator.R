@@ -3,7 +3,7 @@
 #' @param fn A function that serves as mold for creating new
 #'   generators.
 #' @export
-gen_factory <- function(fn) {
+new_gen_factory <- function(fn) {
   factory <- expr_interp(function() {
     args <- list(!!! fn_fmls_syms(fn))
     new_generator(body(fn), environment(fn), args)
@@ -31,13 +31,13 @@ new_generator <- function(body, env, args = list()) {
   expr_interp(function() {
     evalq(env, expr = {
       while (TRUE) {
-        !! machine_switch(parts)
+        !! machine_switch_lang(parts)
       }
     })
   })
 }
 
-machine_switch <- function(parts) {
+machine_switch_lang <- function(parts) {
   parts <- node_list_enumerate_tags(parts)
   switch_args <- node(quote(`_state`), parts)
   new_language(switch_sym, switch_args)
