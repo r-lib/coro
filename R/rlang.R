@@ -8,8 +8,11 @@ get_environment <- get_env
 
 node_poke_car <- mut_node_car
 node_poke_cdr <- mut_node_cdr
+node_poke_tag <- mut_node_tag
 node_poke_cadr <- mut_node_cadr
 node_poke_cddr <- mut_node_cddr
+
+env_poke <- env_set
 
 poke_attr <- function(x, name, value) {
   invisible(.Call(rlang_poke_attr, x, sym(name), value))

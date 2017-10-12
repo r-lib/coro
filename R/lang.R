@@ -128,6 +128,7 @@ for_sym <- quote(`for`)
 ctrl_syms <- list(if_sym, repeat_sym, while_sym, for_sym)
 assignment_sym <- quote(`<-`)
 block_sym <- quote(`{`)
+switch_sym <- quote(`switch`)
 
 break_sym <- quote(`break`)
 next_sym <- quote(`next`)
