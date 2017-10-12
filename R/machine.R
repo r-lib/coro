@@ -1,6 +1,7 @@
 
-machine_parts <- function(fn) {
+machine_parts <- function(fn, pause_sym = quote(yield)) {
   reset_state()
+  poke_pause_sym(pause_sym)
 
   node <- set_returns(fn)
   node_list_parts(node)
@@ -39,5 +40,5 @@ push_goto <- function(block, goto_node = NULL) {
 }
 
 is_pause <- function(x) {
-  is_language(x, quote(yield))
+  is_language(x, peek_pause_sym())
 }

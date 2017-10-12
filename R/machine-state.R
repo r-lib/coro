@@ -133,3 +133,10 @@ pause_poke_state <- function(pause, state) {
   node_poke_cadr(pause_lang, as.character(state))
   invisible(pause)
 }
+
+peek_pause_sym <- function() {
+  state$pause_sym
+}
+poke_pause_sym <- function(sym) {
+  state$pause_sym <- sym
+}
