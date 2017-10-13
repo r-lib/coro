@@ -91,6 +91,9 @@ as_iterator <- function(x) {
   if (is_iterator(x)) {
     return(x)
   }
+  if (is_closure(x)) {
+    return(new_iterator(x))
+  }
 
   i <- 0L
 

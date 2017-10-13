@@ -101,3 +101,8 @@ test_that("as_iterator() is a no-op with iterators", {
   out <- as_iterator(iter)
   expect_identical(deref(out), 1L)
 })
+
+test_that("as_iterator() turns bare closures to streams", {
+  iter <- as_iterator(function() "foo")
+  expect_true(is_stream_iterator(iter))
+})
