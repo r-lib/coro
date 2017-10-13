@@ -104,3 +104,36 @@ as_iterator <- function(x) {
 
   new_iterator(iter, length(x))
 }
+
+iterate <- function(expr, env = caller_env()) {
+  expr <- enexpr(expr)
+  if (!is_language(expr, for_sym)) {
+    abort("`expr` must be a `for` loop")
+  }
+  args <- node_cdr(expr)
+
+  iter <- eval_bare(node_cadr(args), env)
+  iter <- as_iterator(iter)
+
+  if (!is_iterator(iter)) {
+    abort("`iterate()` expects a loop over an iterator")
+  }
+
+  elt_name <- as_string(node_car(args))
+  loop_expr <- node_cadr(node_cdr(args))
+
+  if (is_stream_iterator(iter)) {
+    not_done <- function(iter) !is_null(iter())
+    elt <- function(iter) deref(iter)
+  } else {
+    not_done <- function(iter) length(iter)
+    elt <- function(iter) iter()
+  }
+
+  while (not_done(iter)) {
+    env_poke(env, elt_name, elt(iter))
+    eval_bare(loop_expr, env)
+  }
+
+  invisible(NULL)
+}

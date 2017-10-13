@@ -5,6 +5,7 @@ dots_node <- function(...) {
 
 is_language <- is_lang
 get_environment <- get_env
+env_poke <- env_set
 
 node_poke_car <- mut_node_car
 node_poke_cdr <- mut_node_cdr

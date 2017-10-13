@@ -106,3 +106,13 @@ test_that("as_iterator() turns bare closures to streams", {
   iter <- as_iterator(function() "foo")
   expect_true(is_stream_iterator(iter))
 })
+
+test_that("can iterate() with over batch iterators", {
+  iter <- as_iterator(1:3)
+  out <- int()
+
+  iterate(for (x in iter) {
+    out <- c(out, x)
+  })
+  expect_identical(out, 1:3)
+})
