@@ -1,5 +1,5 @@
 
-new_iterator <- function(fn, length = na_int, subclasses = chr()) {
+new_iterator <- function(fn, length = NA, subclasses = chr()) {
   stopifnot(is_closure(fn))
 
   # Support logical `NA`
