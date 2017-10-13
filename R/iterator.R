@@ -85,3 +85,15 @@ print.iterator <- function(x, ...) {
 
   invisible(x)
 }
+
+# Requires length() and `[[` methods
+as_iterator <- function(x) {
+  i <- 0L
+
+  iter <- function() {
+    i <<- i + 1L
+    x[[i]]
+  }
+
+  new_iterator(iter, length(x))
+}

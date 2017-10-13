@@ -78,3 +78,14 @@ test_that("Batch iterators terminate after `n` iterations", {
   expect_identical(iter(), 2L)
   expect_true(is_done(iter))
 })
+
+test_that("can convert vectors to iterators", {
+  iter <- as_iterator(1:3)
+
+  expect_identical(iter(), 1L)
+  expect_identical(iter(), 2L)
+  expect_false(is_done(iter))
+
+  expect_identical(iter(), 3L)
+  expect_true(is_done(iter))
+})
