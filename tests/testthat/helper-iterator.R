@@ -1,3 +1,3 @@
 
-stream_iter <- new_iterator(function() NULL)
-batch_iter <- new_iterator(function() NULL, 10L)
+stream_iter <- new_iterator(function() "body")
+batch_iter <- new_iterator(function() "body", 10L)

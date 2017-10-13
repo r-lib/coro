@@ -1,6 +1,6 @@
 
-new_iterator <- function(x, length = na_int, subclasses = chr()) {
-  stopifnot(is_closure(x))
+new_iterator <- function(fn, length = na_int, subclasses = chr()) {
+  stopifnot(is_closure(fn))
 
   # Support logical `NA`
   if (is_na(length)) {
@@ -11,9 +11,34 @@ new_iterator <- function(x, length = na_int, subclasses = chr()) {
     abort("`length` must be a scalar integer")
   }
 
-  class <- c(subclasses, "iterator")
+  # Flag so methods can check that they have an iterator
+  `_flowery_iterator` <- TRUE
 
-  set_attrs(x, class = class, length = length, done = FALSE)
+  stream <- is_na(length)
+  done <- FALSE
+
+  iter <- function() {
+    if (done) {
+      if (stream) {
+        return(NULL)
+      } else {
+        abort("Batch iteration is done")
+      }
+    }
+
+    out <- fn()
+
+    if (!stream) {
+      length <<- length - 1L
+    }
+    done <<-
+      (stream && is_null(out)) ||
+      (!stream && !length)
+
+    out
+  }
+
+  set_attrs(iter, class = c(subclasses, "iterator"))
 }
 
 is_iterator <- function(x) {
@@ -26,16 +51,22 @@ deref <- function(x) {
 deref.iterator <- function(x) {
   abort("Can't dereference bare iterators")
 }
-
 is_done <- function(x) {
   stopifnot(is_iterator(x))
-  attr(x, "done")
+  env_get(iter_env(x), "done")
 }
-
 length.iterator <- function(x) {
-  attr(x, "length")
+  env_get(iter_env(x), "length")
 }
 remaining <- length
+
+iter_env <- function(iter) {
+  env <- get_env(iter)
+  if (!env_has(env, "_flowery_iterator")) {
+    abort("Expected an iterator")
+  }
+  env
+}
 
 is_batch_iterator <- function(x) {
   !is_na(length(x))
@@ -50,7 +81,8 @@ print.iterator <- function(x, ...) {
   } else {
     cat("<batch-iterator>\n")
   }
-  print(set_attrs(x, NULL))
+  fn <- env_get(iter_env(x), "fn")
+  print(fn)
 
   invisible(x)
 }
