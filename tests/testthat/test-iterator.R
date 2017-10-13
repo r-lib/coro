@@ -19,3 +19,8 @@ test_that("print method distinguishes stream and batch iterators", {
   expect_output(print(stream_iter), "<stream-iterator>")
   expect_output(print(batch_iter), "<batch-iterator>")
 })
+
+test_that("new iterators are not done", {
+  expect_false(is_done(stream_iter))
+  expect_false(is_done(batch_iter))
+})

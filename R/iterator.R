@@ -13,7 +13,11 @@ new_iterator <- function(x, length = na_int, subclasses = chr()) {
 
   class <- c(subclasses, "iterator")
 
-  set_attrs(x, class = class, length = length)
+  set_attrs(x, class = class, length = length, done = FALSE)
+}
+
+is_iterator <- function(x) {
+  inherits(x, "iterator")
 }
 
 deref <- function(x) {
@@ -21,6 +25,11 @@ deref <- function(x) {
 }
 deref.iterator <- function(x) {
   abort("Can't dereference bare iterators")
+}
+
+is_done <- function(x) {
+  stopifnot(is_iterator(x))
+  attr(x, "done")
 }
 
 length.iterator <- function(x) {
