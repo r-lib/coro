@@ -23,7 +23,11 @@ test_that("print method prints original function", {
   fn <- set_attrs(function() NULL, class = "foo")
   print.foo <- function(x) cat("print foo\n")
   iter <- new_iterator(fn)
-  expect_output(print(iter), "print foo")
+
+  with_bindings(.env = global_env(),
+    print.foo = print.foo,
+    expect_output(print(iter), "print foo")
+  )
 })
 
 test_that("new iterators are not done", {
