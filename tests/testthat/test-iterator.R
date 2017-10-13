@@ -45,3 +45,36 @@ test_that("last value is recorded", {
   expect_identical(iter(), 1L)
   expect_identical(deref(iter), 1L)
 })
+
+test_that("NULL terminates stream iterators", {
+  done <- FALSE
+  stream <- new_iterator(function() {
+    if (done) NULL else "foo"
+  })
+
+  expect_false(is_done(stream))
+  expect_identical(stream(), "foo")
+  expect_false(is_done(stream))
+
+  done <- TRUE
+  expect_null(stream())
+  expect_true(is_done(stream))
+})
+
+test_that("NULL does not terminate batch iterators", {
+  iter <- new_iterator(function() NULL, 3)
+  expect_null(iter()); iter()
+
+  expect_false(is_done(iter))
+  expect_null(iter())
+  expect_true(is_done(iter))
+})
+
+test_that("Batch iterators terminate after `n` iterations", {
+  iter <- new_iterator(new_integer_stream(), 3)
+  iter(); iter()
+
+  expect_false(is_done(iter))
+  expect_identical(iter(), 2L)
+  expect_true(is_done(iter))
+})
