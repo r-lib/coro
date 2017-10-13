@@ -93,3 +93,11 @@ test_that("can convert vectors to iterators", {
   expect_identical(iter(), 3L)
   expect_true(is_done(iter))
 })
+
+test_that("as_iterator() is a no-op with iterators", {
+  iter <- as_iterator(1:3)
+  iter()
+
+  out <- as_iterator(iter)
+  expect_identical(deref(out), 1L)
+})

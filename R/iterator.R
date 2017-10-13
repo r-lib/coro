@@ -88,6 +88,10 @@ print.iterator <- function(x, ...) {
 
 # Requires length() and `[[` methods
 as_iterator <- function(x) {
+  if (is_iterator(x)) {
+    return(x)
+  }
+
   i <- 0L
 
   iter <- function() {
