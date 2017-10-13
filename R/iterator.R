@@ -16,6 +16,7 @@ new_iterator <- function(fn, length = na_int, subclasses = chr()) {
 
   stream <- is_na(length)
   done <- FALSE
+  last <- NULL
 
   iter <- function() {
     if (done) {
@@ -26,16 +27,16 @@ new_iterator <- function(fn, length = na_int, subclasses = chr()) {
       }
     }
 
-    out <- fn()
+    last <<- fn()
 
     if (!stream) {
       length <<- length - 1L
     }
     done <<-
-      (stream && is_null(out)) ||
+      (stream && is_null(last)) ||
       (!stream && !length)
 
-    out
+    last
   }
 
   set_attrs(iter, class = c(subclasses, "iterator"))
@@ -46,10 +47,8 @@ is_iterator <- function(x) {
 }
 
 deref <- function(x) {
-  UseMethod("deref")
-}
-deref.iterator <- function(x) {
-  abort("Can't dereference bare iterators")
+  stopifnot(is_iterator(x))
+  env_get(iter_env(x), "last")
 }
 is_done <- function(x) {
   stopifnot(is_iterator(x))
