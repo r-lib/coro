@@ -1,22 +1,21 @@
 context("iterator")
 
-bare_iter <- new_iterator(function() "foo")
-
-test_that("can restart on length() of iterator with unknown length", {
-  expect_error(length(bare_iter), "unknown length")
-
-  n <- with_handlers(length(bare_iter),
-    iterator_unknown_length = restarting("iterator_length", 10L)
-  )
-  expect_identical(n, 10L)
+test_that("can take the length of iterators", {
+  expect_identical(length(stream_iter), na_int)
+  expect_identical(length(batch_iter), 10L)
 })
 
 test_that("remaining() is an alias to length()", {
-  iter <- new_iterator(function() NULL, 10L)
-  expect_identical(remaining(iter), 10L)
-  expect_identical(length(iter), 10L)
+  expect_identical(remaining(stream_iter), na_int)
+  expect_identical(remaining(batch_iter), 10L)
 })
 
 test_that("can't dereference non-subclassed iterators", {
-  expect_error(deref(bare_iter))
+  expect_error(deref(stream_iter), "bare iterators")
+  expect_error(deref(batch_iter), "bare iterators")
+})
+
+test_that("print method distinguishes stream and batch iterators", {
+  expect_output(print(stream_iter), "<stream-iterator>")
+  expect_output(print(batch_iter), "<batch-iterator>")
 })
