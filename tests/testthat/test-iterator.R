@@ -123,3 +123,16 @@ test_that("iter() is a shortcut for creating iterators in factories", {
   expect_identical(it(), 12L)
   expect_error(it(), "done")
 })
+
+test_that("stream() is a shortcut for creating streams in factories", {
+  i <- 0L
+
+  it <- stream({
+    while (TRUE) {
+      i <<- i + 1L
+      return(i + 10L)
+    }
+  })
+
+  expect_identical(c(it(), it(), it(), it()), 11:14)
+})

@@ -4,6 +4,9 @@ iter <- function(n, body, env = caller_env()) {
   fn <- new_function(body, env = env)
   new_iterator(fn, n)
 }
+stream <- function(body, env = caller_env()) {
+  iter(NA, !! enexpr(body), env = env)
+}
 
 new_iterator <- function(fn, length = NA, subclasses = chr()) {
   stopifnot(is_closure(fn))
