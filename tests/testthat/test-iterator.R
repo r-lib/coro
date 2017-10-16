@@ -106,3 +106,20 @@ test_that("as_iterator() turns bare closures to streams", {
   iter <- as_iterator(function() "foo")
   expect_true(is_stream_iterator(iter))
 })
+
+test_that("iter() is a shortcut for creating iterators in factories", {
+  x <- 1:2
+  n <- length(x)
+  i <- 0L
+
+  it <- iter(n, {
+    while (i <= n) {
+      i <<- i + 1L
+      return(x[[i]] + 10L)
+    }
+  })
+
+  expect_identical(it(), 11L)
+  expect_identical(it(), 12L)
+  expect_error(it(), "done")
+})

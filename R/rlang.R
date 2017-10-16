@@ -41,3 +41,9 @@ new_complex <- cpl_len
 new_character <- chr_len
 new_raw <- raw_len
 new_list <- list_len
+
+new_function <- function(body, args = list(), env = caller_env()) {
+  stopifnot(all(have_name(args)), is_expr(body), is_env(env))
+  args <- as_pairlist(args)
+  eval_bare(call("function", args, body), env)
+}

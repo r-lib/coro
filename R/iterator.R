@@ -1,4 +1,10 @@
 
+iter <- function(n, body, env = caller_env()) {
+  body <- enexpr(body)
+  fn <- new_function(body, env = env)
+  new_iterator(fn, n)
+}
+
 new_iterator <- function(fn, length = NA, subclasses = chr()) {
   stopifnot(is_closure(fn))
 
