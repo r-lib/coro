@@ -11,3 +11,7 @@ map_last <- function(.x, .f, ...) {
   vec_last(.x) <- .f(vec_last(.x), ...)
   .x
 }
+
+set_class <- function(x, class) {
+  set_attrs(x, class = class)
+}
