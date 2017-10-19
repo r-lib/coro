@@ -1,65 +1,68 @@
 
-reduce_steps <- function(.x, .step, .init_step, .init) {
-  init_step <- as_closure(.init_step)
+reduce_steps <- function(.x, .steps, .builder, .init) {
+  .builder <- as_closure(.builder)
 
-  # Seal the transducing chain by supplying the initial step (reducer)
-  # to the step joiner (transducer) chain. This chain should have been
-  # built in reverse order (as is the default in `compose()`) so that
-  # the initial step is supplied to the very first step in the chain.
-  if (is_null(.step)) {
-    reducer <- .init_step
+  # Seal the transformation chain by supplying a builder function
+  # (step reducer) to the steps wrapper (transducer). The stack of
+  # transformation steps should have been composed in reverse order
+  # (as is the default in `compose()`). This way the builder is
+  # supplied to the very last step in the chain of transformations,
+  # which itself is supplied to the penultimate step and so on. Input
+  # data will then flow from outermost steps to innermost ones up to
+  # the builder step which decides how to handle this result.
+  if (is_null(.steps)) {
+    reducer <- .builder
   } else {
-    reducer <- .step(init_step)
+    reducer <- .steps(.builder)
   }
   stopifnot(is_closure(reducer))
 
+  # A builder called without argument should return an init value,
+  # typically its identity. If a `.steps` wrapper is supplied, this
+  # causes transducers to call their wrapped steps without arguments
+  # up until the builder step.
   if (missing(.init)) {
-    # An initial step called without argument should return an init
-    # value, typically its identity. If a `.step` chain is supplied,
-    # this causes transducers to call their wrapped steps without
-    # arguments up until the initial step.
     identity <- reducer()
   } else {
     identity <- .init
   }
 
-  # This reduction causes a loop over the data that iteratively calls
-  # all transducers wrapped in `reducer`.
+  # This reduction causes a loop over the data. If `.steps` was
+  # supplied the data flows through all transducers wrapped in
+  # `reducer`.
   result <- reduce(.x, reducer, .init = identity)
 
-  # An initial step called without `input` should finalise the output
-  # if needed. If a `.step` chain is supplied, this causes all
-  # transducers to call their wrapped steps with a single `result`
-  # argument up until the initial step.
+  # Calling without input triggers completion within all
+  # transformation steps.
   reducer(result)
 }
 
 
-into <- function(to, from, step = NULL, coercer = NULL) {
+into <- function(to, from, steps = NULL, coercer = NULL) {
   stopifnot(is_vector(to))
-  reduce_steps(from, step, into_init_step(to, coercer))
+  reduce_steps(from, steps, into_builder(to, coercer))
 }
 
 take <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_init_step(list_len(.n)))
+  reduce_steps(.x, take_step(.n), into_builder(list_len(.n)))
 }
 take_lgl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_init_step(lgl_len(.n)))
+  reduce_steps(.x, take_step(.n), into_builder(lgl_len(.n)))
 }
 take_int <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_init_step(int_len(.n)))
+  reduce_steps(.x, take_step(.n), into_builder(int_len(.n)))
 }
 take_dbl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_init_step(dbl_len(.n)))
+  reduce_steps(.x, take_step(.n), into_builder(dbl_len(.n)))
 }
 take_cpl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_init_step(cpl_len(.n)))
+  reduce_steps(.x, take_step(.n), into_builder(cpl_len(.n)))
 }
 take_chr <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_init_step(chr_len(.n)))
+  reduce_steps(.x, take_step(.n), into_builder(chr_len(.n)))
 }
 take_raw <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_init_step(raw_len(.n)))
+  reduce_steps(.x, take_step(.n), into_builder(raw_len(.n)))
 }
 
 

@@ -13,7 +13,7 @@ take_step <- function(.n) {
 
       if (missing(input)) {
         # Check `result` only after it has been completely finalised
-        # because into_init_step() does not expose intermediary
+        # because into_builder() does not expose intermediary
         # results
         result <- next_step(result)
         if (length(result) < .n) {

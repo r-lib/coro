@@ -14,18 +14,18 @@ test_that("reduce() stops early on reduced input", {
 })
 
 test_that("reduce_steps() calls initial step for initial value", {
-  init_step <- function(result, input) {
+  builder <- function(result, input) {
     if (missing(result) && missing(input)) {
       stop("called for init value")
     }
   }
 
-  step <- compose(map_step(`+`, 1), map_step(`+`, 1))
-  expect_error(reduce_steps(NULL, step, init_step), "called for init value")
+  steps <- compose(map_step(`+`, 1), map_step(`+`, 1))
+  expect_error(reduce_steps(NULL, steps, builder), "called for init value")
 })
 
 test_that("reduce_steps() calls initial step for result completion", {
-  init_step <- function(result, input) {
+  builder <- function(result, input) {
     if (missing(result) && missing(input)) {
       return(NULL)
     }
@@ -34,8 +34,8 @@ test_that("reduce_steps() calls initial step for result completion", {
     }
   }
 
-  step <- compose(map_step(`+`, 1), map_step(`+`, 1))
-  expect_error(reduce_steps(NULL, step, init_step), "called for init completion")
+  steps <- compose(map_step(`+`, 1), map_step(`+`, 1))
+  expect_error(reduce_steps(NULL, steps, builder), "called for init completion")
 })
 
 test_that("into() creates vector of requested type", {

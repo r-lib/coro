@@ -1,6 +1,6 @@
 
 # Supports S3. Requires `[` and `[<-` methods and a supplied `coercer`.
-into_init_step <- function(to, coercer = NULL) {
+into_builder <- function(to, coercer = NULL) {
   stopifnot(is_vector(to))
 
   if (is_null(coercer)) {
