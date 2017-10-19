@@ -1,4 +1,40 @@
 
+reduce_steps <- function(.x, .step, .init_step, .init) {
+  init_step <- as_closure(.init_step)
+
+  # Seal the transducing chain by supplying the initial step (reducer)
+  # to the step joiner (transducer) chain. This chain should have been
+  # built in reverse order (as is the default in `compose()`) so that
+  # the initial step is supplied to the very first step in the chain.
+  if (is_null(.step)) {
+    reducer <- .init_step
+  } else {
+    reducer <- .step(init_step)
+  }
+  stopifnot(is_closure(reducer))
+
+  if (missing(.init)) {
+    # An initial step called without argument should return an init
+    # value, typically its identity. If a `.step` chain is supplied,
+    # this causes transducers to call their wrapped steps without
+    # arguments up until the initial step.
+    identity <- reducer()
+  } else {
+    identity <- .init
+  }
+
+  # This reduction causes a loop over the data that iteratively calls
+  # all transducers wrapped in `reducer`.
+  result <- reduce(.x, reducer, .init = identity)
+
+  # An initial step called without `input` should finalise the output
+  # if needed. If a `.step` chain is supplied, this causes all
+  # transducers to call their wrapped steps with a single `result`
+  # argument up until the initial step.
+  reducer(result)
+}
+
+
 # From purrr. The only change is that this reduce() function supports
 # reduced objects for early termination of reducing.
 reduce <- function(.x, .f, ..., .init) {
