@@ -40,6 +40,28 @@ into <- function(to, from, step = NULL, coercer = NULL) {
   reduce_steps(from, step, into_init_step(to, coercer))
 }
 
+take <- function(.x, .n) {
+  reduce_steps(.x, take_step(.n), into_init_step(list_len(.n)))
+}
+take_lgl <- function(.x, .n) {
+  reduce_steps(.x, take_step(.n), into_init_step(lgl_len(.n)))
+}
+take_int <- function(.x, .n) {
+  reduce_steps(.x, take_step(.n), into_init_step(int_len(.n)))
+}
+take_dbl <- function(.x, .n) {
+  reduce_steps(.x, take_step(.n), into_init_step(dbl_len(.n)))
+}
+take_cpl <- function(.x, .n) {
+  reduce_steps(.x, take_step(.n), into_init_step(cpl_len(.n)))
+}
+take_chr <- function(.x, .n) {
+  reduce_steps(.x, take_step(.n), into_init_step(chr_len(.n)))
+}
+take_raw <- function(.x, .n) {
+  reduce_steps(.x, take_step(.n), into_init_step(raw_len(.n)))
+}
+
 
 # From purrr. The only change is that this reduce() function supports
 # reduced objects for early termination of reducing.

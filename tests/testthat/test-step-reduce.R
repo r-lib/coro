@@ -50,3 +50,17 @@ test_that("into() shrinks vector if needed", {
 test_that("into() grows vector if needed", {
   expect_identical(into(integer(1), 1:3), 1:3)
 })
+
+test_that("take variants return correct output type", {
+  expect_identical(take(1:10, 2), list(1L, 2L))
+  expect_identical(take_lgl(1:10, 2), lgl(1, 2))
+  expect_identical(take_int(1:10, 2), int(1, 2))
+  expect_identical(take_dbl(1:10, 2), dbl(1, 2))
+  expect_identical(take_cpl(1:10, 2), cpl(1, 2))
+  expect_identical(take_chr(1:10, 2), chr("1", "2"))
+  expect_identical(take_raw(1:10, 2), bytes(1, 2))
+})
+
+test_that("take() fails if not enough elements", {
+  expect_error(take(1:10, 15), "10 / 15 elements")
+})
