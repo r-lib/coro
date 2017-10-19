@@ -37,3 +37,49 @@ take_step <- function(.n) {
     }
   }
 }
+
+map_step <- function(.f, ...) {
+  .f <- as_closure(.f)
+
+  function(next_step) {
+    force(next_step)
+
+    function(result, input) {
+      if (missing(result)) {
+        return(next_step())
+      }
+      if (missing(input)) {
+        return(next_step(result))
+      }
+
+      next_step(result, .f(input, ...))
+    }
+  }
+}
+
+keep_step <- function(.p, ...) {
+  .p <- as_closure(.p)
+  discard_step(negate(.p), ...)
+}
+discard_step <- function(.p, ...) {
+  .p <- as_closure(.p)
+
+  function(next_step) {
+    force(next_step)
+
+    function(result, input) {
+      if (missing(result)) {
+        return(next_step())
+      }
+      if (missing(input)) {
+        return(next_step(result))
+      }
+
+      if (.p(input, ...)) {
+        next_step(result, input)
+      } else {
+        result
+      }
+    }
+  }
+}
