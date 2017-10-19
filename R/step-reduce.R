@@ -35,6 +35,12 @@ reduce_steps <- function(.x, .step, .init_step, .init) {
 }
 
 
+into <- function(to, from, step = NULL, coercer = NULL) {
+  stopifnot(is_vector(to))
+  reduce_steps(from, step, into_init_step(to, coercer))
+}
+
+
 # From purrr. The only change is that this reduce() function supports
 # reduced objects for early termination of reducing.
 reduce <- function(.x, .f, ..., .init) {

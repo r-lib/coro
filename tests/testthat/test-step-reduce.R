@@ -37,3 +37,16 @@ test_that("reduce_steps() calls initial step for result completion", {
   step <- compose(map_step(`+`, 1), map_step(`+`, 1))
   expect_error(reduce_steps(NULL, step, init_step), "called for init completion")
 })
+
+test_that("into() creates vector of requested type", {
+  # Also tested indirectly via take tests above
+  expect_identical(into(dbl_len(3), 1:3), as_double(1:3))
+})
+
+test_that("into() shrinks vector if needed", {
+  expect_identical(into(integer(10), 1:3), 1:3)
+})
+
+test_that("into() grows vector if needed", {
+  expect_identical(into(integer(1), 1:3), 1:3)
+})
