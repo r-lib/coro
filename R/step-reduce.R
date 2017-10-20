@@ -38,9 +38,9 @@ reduce_steps <- function(.x, .steps, .builder, .init) {
 }
 
 
-into <- function(to, from, steps = NULL, coercer = NULL) {
+into <- function(to, from, steps = NULL) {
   stopifnot(is_vector(to))
-  reduce_steps(from, steps, into_builder(to, coercer))
+  reduce_steps(from, steps, into_builder(to))
 }
 
 take <- function(.x, .n) {

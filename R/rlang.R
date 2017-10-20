@@ -32,3 +32,11 @@ scoped_exit <- function(expr, frame = caller_env()) {
 
   invisible(expr)
 }
+
+new_logical <- lgl_len
+new_integer <- int_len
+new_double <- dbl_len
+new_complex <- cpl_len
+new_character <- chr_len
+new_raw <- raw_len
+new_list <- list_len
