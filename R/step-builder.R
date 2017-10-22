@@ -2,8 +2,9 @@
 into_builder <- function(to) {
   stopifnot(is_bare_vector(to))
 
-  coercer <- vector_coercer(to)
-  alloc <- vector_allocator(to)
+  type <- typeof(to)
+  coercer <- as_vector_fn(type)
+  alloc <- new_vector_fn(type)
 
   # Reserve some space
   if (!length(to)) {
@@ -42,30 +43,3 @@ into_builder <- function(to) {
   }
 }
 growth_rate <- 1.5
-
-vector_coercer <- function(x) {
-  switch_type(x,
-    logical = as.logical,
-    integer = as.integer,
-    double = as.double,
-    complex = as.complex,
-    string = as.character,
-    character = as.character,
-    raw = as.raw,
-    list = as.list,
-    abort("Internal error: `vector_coercer()` expects a vector")
-  )
-}
-vector_allocator <- function(x) {
-  switch_type(x,
-    logical = new_logical,
-    integer = new_integer,
-    double = new_double,
-    complex = new_complex,
-    string = new_character,
-    character = new_character,
-    raw = new_raw,
-    list = new_list,
-    abort("Internal error: `vector_allocator()` expects a vector")
-  )
-}
