@@ -1,5 +1,9 @@
 
 into_builder <- function(to) {
+  poke_into_builder(duplicate(to, shallow = TRUE))
+}
+
+poke_into_builder <- function(to) {
   stopifnot(is_bare_vector(to))
 
   type <- typeof(to)
@@ -31,12 +35,11 @@ into_builder <- function(to) {
     # extra tooling is needed in rlang to prevent this
     if (next_i > length(to)) {
       new_to <- alloc(ceiling(next_i * growth_rate))
-      idx <- seq_len(i)
-      new_to[idx] <- to[idx]
+      vec_poke_range(new_to, 1L, to, 1L, i)
       to <<- new_to
     }
 
-    to[seq2(i + 1, next_i)] <<- coercer(input)
+    vec_poke_range(to, i + 1, coercer(input))
     i <<- next_i
 
     to

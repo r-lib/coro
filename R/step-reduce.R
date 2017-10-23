@@ -44,25 +44,25 @@ into <- function(to, from, steps = NULL) {
 }
 
 take <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_builder(list_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(list_len(.n)))
 }
 take_lgl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_builder(lgl_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(lgl_len(.n)))
 }
 take_int <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_builder(int_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(int_len(.n)))
 }
 take_dbl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_builder(dbl_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(dbl_len(.n)))
 }
 take_cpl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_builder(cpl_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(cpl_len(.n)))
 }
 take_chr <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_builder(chr_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(chr_len(.n)))
 }
 take_raw <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), into_builder(raw_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(raw_len(.n)))
 }
 
 
