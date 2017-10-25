@@ -81,8 +81,8 @@ reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
     result <- .f(result, .x[[i]], ...)
 
     # Return early if we get a reduced result
-    if (is_reduced(result)) {
-      return(unbox_reduced(result))
+    if (is_box(result, "reduced")) {
+      return(unbox(result))
     }
   }
 
@@ -119,19 +119,37 @@ reduce_index <- function(x, init, left = TRUE) {
   }
 }
 
-new_reduced <- function(x) {
-  set_class(list(x), "reduced")
+#' Create a boxed value for early termination of reduction
+#'
+#' @description
+#'
+#' A [boxed][rlang::box] value of class `reduced` signals early
+#' termination to [reduce_steps()]. The boxed value is unboxed and
+#' returned right away to the caller of `reduce_steps()`.
+#'
+#' * `box_reduced()` always boxes its input in a new box.
+#'
+#' * `ensure_reduced()` first checks if its input is a box of class
+#'   `reduced`. If it isn't, it boxes the input. Otherwise the input
+#'   is returned as is. This is useful to avoid double-boxing a value.
+#'
+#' @param x A value to box.
+#' @export
+#' @examples
+#' box <- box_reduced(letters)
+#'
+#' # Use `is_box(x, "reduced")` to check for a boxed value of type
+#' # "reduced"
+#' rlang::is_box(box, "reduced")
+box_reduced <- function(x) {
+  box(x, "reduced")
 }
-is_reduced <- function(x) {
-  inherits(x, "reduced")
-}
+#' @rdname box_reduced
+#' @export
 ensure_reduced <- function(x) {
-  if (is_reduced(x)) {
+  if (is_box(x, "reduced")) {
     x
   } else {
-    new_reduced(x)
+    box_reduced(x)
   }
-}
-unbox_reduced <- function(x) {
-  x[[1]]
 }
