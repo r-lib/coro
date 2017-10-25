@@ -2,6 +2,7 @@
 
 export(box_reduced)
 export(ensure_reduced)
+export(reduce_steps)
 import(rlang)
 importFrom(glue,glue)
 useDynLib(flowery, .registration = TRUE)

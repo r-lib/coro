@@ -13,6 +13,7 @@ Imports:
     glue,
     rlang
 Suggests:
+    purrr,
     testthat
 Remotes:
     tidyverse/rlang
