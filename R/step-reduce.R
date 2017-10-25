@@ -237,24 +237,50 @@ into <- function(to, from, steps = NULL) {
   reduce_steps(from, steps, along_builder(to))
 }
 
+#' Take n elements from a vector or iterator
+#'
+#' These functions are similar to `head()` but also perform coercion
+#' to a given output type. They support all reducible objects,
+#' including iterators.
+#'
+#' @param .x A reducible object.
+#' @param .n The number of elements to take from `.x`.
+#'
+#' @seealso [take_step()]
+#' @export
+#' @examples
+#' take(letters, 5)
+#' take_chr(1:10, 5)
 take <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(list_len(.n)))
 }
+#' @rdname take
+#' @export
 take_lgl <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(lgl_len(.n)))
 }
+#' @rdname take
+#' @export
 take_int <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(int_len(.n)))
 }
+#' @rdname take
+#' @export
 take_dbl <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(dbl_len(.n)))
 }
+#' @rdname take
+#' @export
 take_cpl <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(cpl_len(.n)))
 }
+#' @rdname take
+#' @export
 take_chr <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(chr_len(.n)))
 }
+#' @rdname take
+#' @export
 take_raw <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(raw_len(.n)))
 }
