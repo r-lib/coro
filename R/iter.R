@@ -19,7 +19,8 @@ new_iterator <- function(fn) {
       return(NULL)
     }
 
-    last <<- fn()
+    out <- withVisible(fn())
+    last <<- out$value
 
     if (is_null(last)) {
       done <<- TRUE
@@ -27,7 +28,11 @@ new_iterator <- function(fn) {
       last <<- NULL
     }
 
-    last
+    if (out$visible) {
+      last
+    } else {
+      invisible(last)
+    }
   }
 
   set_attrs(iter, class = "iterator")

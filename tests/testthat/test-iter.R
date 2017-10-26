@@ -120,3 +120,15 @@ test_that("iter() is a shortcut for creating iterators", {
   expect_identical(it(), 12L)
   expect_null(it())
 })
+
+test_that("iterator wrapper forwards visibility", {
+  it <- new_iterator(function() {
+    if (vis) "foo" else invisible("foo")
+  })
+
+  vis <- TRUE
+  expect_true(withVisible(it())$visible)
+
+  vis <- FALSE
+  expect_false(withVisible(it())$visible)
+})
