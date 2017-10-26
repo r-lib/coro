@@ -11,3 +11,26 @@ map_last <- function(.x, .f, ...) {
   vec_last(.x) <- .f(vec_last(.x), ...)
   .x
 }
+
+set_class <- function(x, class) {
+  set_attrs(x, class = class)
+}
+
+compose <- function(...) {
+  fs <- lapply(list(...), match.fun)
+  n <- length(fs)
+
+  last <- fs[[n]]
+  rest <- fs[-n]
+
+  function(...) {
+    out <- last(...)
+    for (fn in rev(rest)) {
+      out <- fn(out)
+    }
+    out
+  }
+}
+negate <- function(.p) {
+  function(...) !.p(...)
+}

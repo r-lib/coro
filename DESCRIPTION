@@ -13,10 +13,12 @@ Imports:
     glue,
     rlang
 Suggests:
+    purrr,
     testthat
 Remotes:
-    tidyverse/rlang
+    lionel-/rlang@utils-flowery
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE)
