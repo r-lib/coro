@@ -48,6 +48,20 @@ test_that("NULL terminates iterators", {
   expect_null(it())
 })
 
+test_that("boxed NULLs don't terminate iterators", {
+  it <- new_iterator(function() {
+    if (boxed) null_box() else NULL
+  })
+
+  boxed <- TRUE
+  expect_null(it())
+  expect_false(is_done(it))
+
+  boxed <- FALSE
+  expect_null(it())
+  expect_true(is_done(it))
+})
+
 test_that("can convert vectors to iterators", {
   iter <- as_iterator(1:3)
 

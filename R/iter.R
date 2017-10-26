@@ -23,6 +23,8 @@ new_iterator <- function(fn) {
 
     if (is_null(last)) {
       done <<- TRUE
+    } else if (is_box(last, "null_box")) {
+      last <<- NULL
     }
 
     last
@@ -58,6 +60,10 @@ print.iterator <- function(x, ...) {
   print(fn)
 
   invisible(x)
+}
+
+null_box <- function() {
+  box(NULL, "null_box")
 }
 
 # Requires length() and `[[` methods
