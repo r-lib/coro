@@ -115,9 +115,12 @@ for_parts <- function(expr) {
   body <- node_cadr(node_cddr(expr))
   parts <- loop_parts(body, loop_state)
 
+  # We always fully translate a `for` loop in order to support flowery
+  # iterators for convenience
   if (is_null(parts)) {
-    poke_state(loop_state - 1L)
-    return(NULL)
+    body <- duplicate(body, shallow = TRUE)
+    node_list_poke_cdr(body, node_list(goto_lang(loop_state)))
+    parts <- node_list(body)
   }
 
   init_part <- for_init_part(loop_state, expr)
@@ -128,34 +131,28 @@ for_parts <- function(expr) {
 }
 
 for_init_part <- function(loop_state, expr) {
-  loop_idx_sym <- for_idx_sym(loop_state)
-  loop_vec_sym <- for_vec_sym(loop_state)
-  loop_len_sym <- for_len_sym(loop_state)
-  user_vec_expr <- node_cadr(node_cdr(expr))
+  iter_sym <- for_iter_sym(loop_state)
+  coll_expr <- node_cadr(node_cdr(expr))
 
   expr({
-    !! loop_idx_sym <- 0L
-    !! loop_vec_sym <- !! user_vec_expr
-    !! loop_len_sym <- length(!! loop_vec_sym)
+    !! iter_sym <- !! coll_expr
 
-    # `for` internally converts factors to character vectors
-    if (base::is.factor(!! loop_vec_sym)) {
-      !! loop_vec_sym <- base::as.character(!! loop_vec_sym)
+    # `base::for()` internally converts factors to character vectors
+    if (base::is.factor(!! iter_sym)) {
+      !! iter_sym <- base::as.character(!! iter_sym)
     }
+    !! iter_sym <- flowery::as_iterator(!! iter_sym)
 
     !! goto_lang(loop_state)
   })
 }
 for_next_part <- function(loop_state, expr) {
-  loop_idx_sym <- for_idx_sym(loop_state)
-  user_idx_sym <- node_cadr(expr)
-  loop_vec_sym <- for_vec_sym(loop_state)
-  loop_len_sym <- for_len_sym(loop_state)
+  elt_sym <- node_cadr(expr)
+  iter_sym <- for_iter_sym(loop_state)
 
   expr({
-    if (UQ(loop_idx_sym) != !! loop_len_sym) {
-      !! loop_idx_sym <- UQ(loop_idx_sym) + 1L
-      !! user_idx_sym <- UQ(loop_vec_sym)[[!! loop_idx_sym]]
+    if (flowery::advance(!! iter_sym)) {
+      !! elt_sym <- flowery::deref(!! iter_sym)
       !! goto_lang(loop_state + 1L)
     } else {
       !! goto_lang(peek_state() + 1L)

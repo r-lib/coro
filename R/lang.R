@@ -106,14 +106,8 @@ if_branch_else <- function(expr) {
   node_cadr(node_cddr(expr))
 }
 
-for_idx_sym <- function(i) {
-  sym(paste0("_for_idx_", i))
-}
-for_vec_sym <- function(i) {
-  sym(paste0("_for_vec_", i))
-}
-for_len_sym <- function(i) {
-  sym(paste0("_for_len_", i))
+for_iter_sym <- function(i) {
+  sym(paste0("_for_iter_", i))
 }
 
 return_sym <- quote(`return`)
