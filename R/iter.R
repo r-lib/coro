@@ -41,6 +41,10 @@ deref <- function(x) {
   stopifnot(is_iterator(x))
   env_get(iter_env(x), "last")
 }
+advance <- function(x) {
+  stopifnot(is_iterator(x))
+  !(is_null(x()) && is_done(x))
+}
 is_done <- function(x) {
   stopifnot(is_iterator(x))
   env_get(iter_env(x), "done")

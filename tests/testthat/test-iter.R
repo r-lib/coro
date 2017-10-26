@@ -62,6 +62,22 @@ test_that("boxed NULLs don't terminate iterators", {
   expect_true(is_done(it))
 })
 
+test_that("can use advance() to check for termination with side effect", {
+  i <- 0L
+  it <- new_iterator(function() {
+    i <<- i + 1L
+    if (i < 2L) null_box() else NULL
+  })
+
+  expect_true(advance(it))
+  expect_identical(i, 1L)
+  expect_null(deref(it))
+
+  expect_false(advance(it))
+  expect_identical(i, 2L)
+  expect_null(deref(it))
+})
+
 test_that("can convert vectors to iterators", {
   iter <- as_iterator(1:3)
 
