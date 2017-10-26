@@ -5,6 +5,70 @@ iter <- function(body, env = caller_env()) {
   new_iterator(fn)
 }
 
+#' Create a new iterator
+#'
+#' @description
+#'
+#' This wraps `fn` in an iterator function that supports:
+#'
+#' * [deref()] to dereference the current value of the iterator.
+#' * [advance()] to advance to the next value.
+#' * [is_done()] to check if the iterator is terminated
+#'
+#' See [iter()] for more information on iterators.
+#'
+#'
+#' @section Iterable functions:
+#'
+#' In order to be iterable, `fn()` must meet these specifications:
+#'
+#' * It should be callable without arguments. This is how the iterator
+#'   obtains the next value.
+#'
+#' * It should return `NULL` when the iterator has exhausted all
+#'   elements. If the next element is a literal `NULL`, return a
+#'   [boxed NULL][null_box] instead. It will be automatically unboxed.
+#'
+#' @param fn A iterable function.
+#'
+#' @seealso [as_iterator()]
+#' @export
+#' @examples
+#' # An iterator is a stateful function since it must return different
+#' # results each time it is called. A convenient way of setting up
+#' # the state is with a factory function, i.e. a function that
+#' # returns another function:
+#' new_counter <- function(n) {
+#'   force(n)
+#'   fn <- function() {
+#'     if (n == 0) {
+#'       # Return NULL to finish iteration
+#'       return(NULL)
+#'     }
+#'
+#'     # Update the counter each time:
+#'     n <<- n - 1
+#'
+#'     n
+#'   }
+#'
+#'   # Wrapping `fn` in an iterator enables many features
+#'   new_iterator(fn)
+#' }
+#'
+#' # We can instantiate a new iterator by calling the factory:
+#' it <- new_counter(3)
+#' it()
+#'
+#' # This function supports all iterator features. It can be
+#' # dereferenced, advanced, and tested for termination:
+#' advance(it)
+#' deref(it)
+#' is_done(it)
+#'
+#' # You can also use `iterate()`
+#' it <- new_counter(3)
+#' iterate(for(n in it) cat(n, "to go!\n"))
 new_iterator <- function(fn) {
   stopifnot(is_closure(fn))
 
