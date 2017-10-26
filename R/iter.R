@@ -16,7 +16,7 @@ new_iterator <- function(fn) {
 
   iter <- function() {
     if (done) {
-      return(NULL)
+      abort("Iterator is done")
     }
 
     out <- withVisible(fn())
