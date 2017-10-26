@@ -9,6 +9,7 @@ env_poke <- env_set
 
 node_poke_car <- mut_node_car
 node_poke_cdr <- mut_node_cdr
+node_poke_tag <- mut_node_tag
 node_poke_cadr <- mut_node_cadr
 node_poke_cddr <- mut_node_cddr
 
