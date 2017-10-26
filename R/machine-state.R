@@ -1,25 +1,29 @@
 
-state <- new_environment()
+current_state <- new_environment()
 
-peek_state <- function() {
-  state$idx
-}
-poke_state <- function(idx = NULL) {
-  idx <- idx %||% (state$idx + 1L)
-  state$idx <- idx
-  state$idx
-}
-reset_state <- function() {
-  elts <- list(
+new_machine_parts_state <- function(pause_sym = quote(yield)) {
+  list(
     idx = 1L,
     goto = NULL,
     pauses = NULL,
     loop_next = NULL,
     loop_break = NULL,
     has_past = NULL,
-    pause_sym = NULL
+    pause_sym = pause_sym
   )
-  env_bind(state, !!! elts)
+}
+
+peek_state <- function() {
+  current_state$idx
+}
+poke_state <- function(idx = NULL) {
+  idx <- idx %||% (current_state$idx + 1L)
+  current_state$idx <- idx
+  current_state$idx
+}
+reset_state <- function(state = NULL) {
+  state <- state %||% new_machine_parts_state()
+  env_bind(current_state, !!! state)
 }
 
 scoped_state <- function(idx, frame = caller_env()) {
@@ -37,11 +41,11 @@ with_state <- function(idx, expr) {
 }
 
 peek_state_elt <- function(elt) {
-  state[[elt]]
+  current_state[[elt]]
 }
 poke_state_elt <- function(elt, value) {
-  old <- state[[elt]]
-  state[[elt]] <- value
+  old <- current_state[[elt]]
+  current_state[[elt]] <- value
   invisible(old)
 }
 scoped_state_elt <- function(elt, value, frame = caller_env()) {
@@ -94,13 +98,13 @@ with_loop_nodes <- function(pauses, loop_next, loop_break, expr) {
   expr
 }
 peek_goto_node <- function() {
-  state$goto
+  current_state$goto
 }
 peek_loop_next_node <- function() {
-  state$loop_next
+  current_state$loop_next
 }
 peek_loop_break_node <- function() {
-  state$loop_break
+  current_state$loop_break
 }
 
 peek_has_past <- function() {
@@ -108,7 +112,7 @@ peek_has_past <- function() {
 }
 
 push_pause_node <- function(node) {
-  pauses <- state$pauses
+  pauses <- current_state$pauses
   stopifnot(!is_null(pauses))
 
   if (is_null_node(pauses)) {
@@ -135,8 +139,5 @@ pause_poke_state <- function(pause, state) {
 }
 
 peek_pause_sym <- function() {
-  state$pause_sym
-}
-poke_pause_sym <- function(sym) {
-  state$pause_sym <- sym
+  current_state$pause_sym
 }
