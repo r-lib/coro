@@ -7,10 +7,10 @@ iterate <- function(loop) {
   env <- caller_env()
 
   args <- node_cdr(loop)
-  iter <- eval_bare(node_cadr(args), env)
-  iter <- as_iterator(iter)
+  it <- eval_bare(node_cadr(args), env)
+  it <- as_iterator(it)
 
-  if (!is_iterator(iter)) {
+  if (!is_iterator(it)) {
     abort("`iterate()` expects a loop over an iterator")
   }
 
@@ -18,11 +18,11 @@ iterate <- function(loop) {
   loop_expr <- node_cadr(node_cdr(args))
   loop_expr <- poke_loop_keywords(loop_expr)
 
-  not_done <- function(iter) !is_null(iter())
-  elt <- function(iter) deref(iter)
+  not_done <- function(it) !is_null(it())
+  elt <- function(it) deref(it)
 
-  while (!(is_null(iter()) && is_done(iter))) {
-    env_poke(env, elt_name, deref(iter))
+  while (!(is_null(it()) && is_done(it))) {
+    env_poke(env, elt_name, deref(it))
     out <- with_loop_flow(eval_bare(loop_expr, env))
     switch(out,
       `next` = next,
