@@ -40,3 +40,11 @@ test_that("can use next within iterate()", {
 
   expect_identical(out, 1L)
 })
+
+test_that("can iterate with a non-block expression", {
+  iter <- as_iterator(1:3)
+  out <- int()
+
+  iterate(for (x in iter) out <- c(out, x))
+  expect_identical(out, 1:3)
+})

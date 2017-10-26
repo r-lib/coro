@@ -119,6 +119,7 @@ for_parts <- function(expr) {
   # iterators for convenience
   if (is_null(parts)) {
     body <- duplicate(body, shallow = TRUE)
+    body <- as_block(body)
     node_list_poke_cdr(body, node_list(goto_lang(loop_state)))
     parts <- node_list(body)
   }
