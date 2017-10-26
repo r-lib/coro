@@ -18,16 +18,11 @@ iterate <- function(loop) {
   loop_expr <- node_cadr(node_cdr(args))
   loop_expr <- poke_loop_keywords(loop_expr)
 
-  if (is_stream_iterator(iter)) {
-    not_done <- function(iter) !is_null(iter())
-    elt <- function(iter) deref(iter)
-  } else {
-    not_done <- function(iter) length(iter)
-    elt <- function(iter) iter()
-  }
+  not_done <- function(iter) !is_null(iter())
+  elt <- function(iter) deref(iter)
 
-  while (not_done(iter)) {
-    env_poke(env, elt_name, elt(iter))
+  while (!(is_null(iter()) && is_done(iter))) {
+    env_poke(env, elt_name, deref(iter))
     out <- with_loop_flow(eval_bare(loop_expr, env))
     switch(out,
       `next` = next,

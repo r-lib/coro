@@ -1,6 +1,6 @@
 context("iterator-iterate")
 
-test_that("can iterate() with over batch iterators", {
+test_that("can iterate() with iterators", {
   iter <- as_iterator(1:3)
   out <- int()
 

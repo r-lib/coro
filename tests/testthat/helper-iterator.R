@@ -1,12 +1,11 @@
 
-stream_iter <- new_iterator(function() "body")
-batch_iter <- new_iterator(function() "body", 10L)
+simple_iter <- new_iterator(function() "body")
 
-new_integer_stream <- function() {
+new_integer_iterator <- function() {
   i <- 0L
-  function() {
+  new_iterator(function() {
     out <- i
     i <<- i + 1L
     out
-  }
+  })
 }

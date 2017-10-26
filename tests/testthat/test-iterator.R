@@ -1,23 +1,7 @@
 context("iterator")
 
-test_that("can take the length of iterators", {
-  expect_identical(length(stream_iter), na_int)
-  expect_identical(length(batch_iter), 10L)
-})
-
-test_that("remaining() is an alias to length()", {
-  expect_identical(remaining(stream_iter), na_int)
-  expect_identical(remaining(batch_iter), 10L)
-})
-
-test_that("print method distinguishes stream and batch iterators", {
-  expect_output(print(stream_iter), "<stream-iterator>")
-  expect_output(print(batch_iter), "<batch-iterator>")
-})
-
 test_that("print method prints original function", {
-  expect_output(print(stream_iter), "\"body\"")
-  expect_output(print(batch_iter), "\"body\"")
+  expect_output(print(simple_iter), "\"body\"")
 
   # Print methods are preserved
   fn <- set_attrs(function() NULL, class = "foo")
@@ -31,17 +15,15 @@ test_that("print method prints original function", {
 })
 
 test_that("new iterators are not done", {
-  expect_false(is_done(stream_iter))
-  expect_false(is_done(batch_iter))
+  expect_false(is_done(simple_iter))
 })
 
 test_that("first value is NULL", {
-  expect_null(deref(stream_iter))
-  expect_null(deref(batch_iter))
+  expect_null(deref(simple_iter))
 })
 
 test_that("last value is recorded", {
-  iter <- new_iterator(new_integer_stream())
+  iter <- new_integer_iterator()
 
   expect_identical(iter(), 0L)
   expect_identical(deref(iter), 0L)
@@ -50,37 +32,20 @@ test_that("last value is recorded", {
   expect_identical(deref(iter), 1L)
 })
 
-test_that("NULL terminates stream iterators", {
+test_that("NULL terminates iterators", {
   done <- FALSE
-  stream <- new_iterator(function() {
+  it <- new_iterator(function() {
     if (done) NULL else "foo"
   })
 
-  expect_false(is_done(stream))
-  expect_identical(stream(), "foo")
-  expect_false(is_done(stream))
+  expect_false(is_done(it))
+  expect_identical(it(), "foo")
+  expect_false(is_done(it))
 
   done <- TRUE
-  expect_null(stream())
-  expect_true(is_done(stream))
-})
-
-test_that("NULL does not terminate batch iterators", {
-  iter <- new_iterator(function() NULL, 3)
-  expect_null(iter()); iter()
-
-  expect_false(is_done(iter))
-  expect_null(iter())
-  expect_true(is_done(iter))
-})
-
-test_that("Batch iterators terminate after `n` iterations", {
-  iter <- new_iterator(new_integer_stream(), 3)
-  iter(); iter()
-
-  expect_false(is_done(iter))
-  expect_identical(iter(), 2L)
-  expect_true(is_done(iter))
+  expect_null(it())
+  expect_true(is_done(it))
+  expect_null(it())
 })
 
 test_that("can convert vectors to iterators", {
@@ -91,6 +56,7 @@ test_that("can convert vectors to iterators", {
   expect_false(is_done(iter))
 
   expect_identical(iter(), 3L)
+  expect_null(iter())
   expect_true(is_done(iter))
 })
 
@@ -102,18 +68,19 @@ test_that("as_iterator() is a no-op with iterators", {
   expect_identical(deref(out), 1L)
 })
 
-test_that("as_iterator() turns bare closures to streams", {
+test_that("as_iterator() handles bare closures", {
   iter <- as_iterator(function() "foo")
-  expect_true(is_stream_iterator(iter))
+  expect_true(is_iterator(iter))
 })
 
-test_that("iter() is a shortcut for creating iterators in factories", {
+test_that("iter() is a shortcut for creating iterators", {
+
   x <- 1:2
   n <- length(x)
   i <- 0L
 
-  it <- iter(n, {
-    while (i <= n) {
+  it <- iter({
+    while (i < n) {
       i <<- i + 1L
       return(x[[i]] + 10L)
     }
@@ -121,18 +88,5 @@ test_that("iter() is a shortcut for creating iterators in factories", {
 
   expect_identical(it(), 11L)
   expect_identical(it(), 12L)
-  expect_error(it(), "done")
-})
-
-test_that("stream() is a shortcut for creating streams in factories", {
-  i <- 0L
-
-  it <- stream({
-    while (TRUE) {
-      i <<- i + 1L
-      return(i + 10L)
-    }
-  })
-
-  expect_identical(c(it(), it(), it(), it()), 11:14)
+  expect_null(it())
 })
