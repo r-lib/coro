@@ -48,3 +48,11 @@ new_function <- function(body, args = list(), env = caller_env()) {
   args <- as_pairlist(args)
   eval_bare(call("function", args, body), env)
 }
+
+add_attributes <- set_attrs
+
+set_class <- function(x, class) {
+  add_attributes(x, class = class)
+}
+
+expand <- expr_interp

@@ -1,38 +1,77 @@
-
-iter <- function(body, env = caller_env()) {
-  body <- enexpr(body)
-  fn <- new_function(body, env = env)
-  new_iterator(fn)
-}
-
-#' Create a new iterator
+#' Iterator functions
 #'
 #' @description
 #'
-#' This wraps `fn` in an iterator function that supports:
+#' R programming is usually about full lists and vectors. Vectorised
+#' operations such as `+` or function mappers like `lapply()` operate
+#' on whole collections of elements. However these idioms do not work
+#' so well when the data does not fit in memory. In this case vector
+#' idioms must be replaced with chunk ones. Iterators are a convenient
+#' way of structuring the generation of chunks of data. Iterators can
+#' easily be [transformed][iter_adapt], mapped over and drained to a
+#' final output vector.
 #'
-#' * [deref()] to dereference the current value of the iterator.
-#' * [advance()] to advance to the next value.
-#' * [is_done()] to check if the iterator is terminated
+#' Formally, an iterator is a function that returns a new value each
+#' time it is called and that supports:
 #'
-#' See [iter()] for more information on iterators.
+#' * `deref()` to dereference the current value of the iterator.
+#'
+#' * `is_done()` to check if the iterator has exhausted its
+#'   elements. Calling an exhausted iterator causes an error of class
+#'   `exhausted_iter`.
+#'
+#' * `advance()` to advance to the next value. This is similar to
+#'   calling the iterator for a new element but returns `TRUE` if the
+#'   iterator indeed had another element or `FALSE` if the iterator
+#'   was exhausted. The element can then be retrieved with `deref()`.
+#'
+#'   This is useful for looping over an iterator since you cannot know
+#'   in advance whether an iterator is exhausted. You have to request
+#'   the next element. `advance()` does the job of calling the
+#'   iterator and checking if it is done.
+#'
+#'
+#' @section Creating iterators:
+#'
+#' There are three ways of creating an iterator:
+#'
+#' * [gen()] is the recommended way of creating an iterator. It
+#'   creates a generator function that can pause itself and yield a
+#'   value. When it is called again it resumes from where it left
+#'   off. Generators are a convenient way of creating iterators
+#'   because they keep their state.
+#'
+#' * `new_iterator()` takes an iterable function (see section below)
+#'   and wraps it in a proper iterator that can be dereferenced and
+#'   advanced.
+#'
+#' * `as_iterator()` also supports vectors. It creates an iterator
+#'   that iterates over the elements. If passed a regular function, it
+#'   is equivalent to `new_iterator()`. If passed an iterator, it is a
+#'   no-op. `as_iterator()` is convenient for creating functions that
+#'   support both iterators and vectors.
+#'
+#'   Vector-like objects are also supported if the class implements
+#'   `length()` and `[[` methods. The extraction method must support
+#'   positions.
 #'
 #'
 #' @section Iterable functions:
 #'
-#' In order to be iterable, `fn()` must meet these specifications:
+#' Iterators are thin wrappers around iterable functions which do the
+#' actual work of generating data. In order to be iterable, a function
+#' must meet these requirements:
 #'
 #' * It should be callable without arguments. This is how the iterator
 #'   obtains the next value.
 #'
 #' * It should return `NULL` when the iterator has exhausted all
-#'   elements. If the next element is a literal `NULL`, return a
-#'   [boxed NULL][null_box] instead. It will be automatically unboxed.
+#'   elements. If the next element should be a literal `NULL`, return
+#'   a [boxed NULL][null_box] instead. It will be automatically
+#'   unboxed by the iterator wrapper.
 #'
-#' @param fn A iterable function.
-#'
-#' @seealso [as_iterator()]
-#' @export
+#' @seealso [gen()] is the recommended way of creating iterators.
+#' @name iterator
 #' @examples
 #' # An iterator is a stateful function since it must return different
 #' # results each time it is called. A convenient way of setting up
@@ -57,18 +96,25 @@ iter <- function(body, env = caller_env()) {
 #' }
 #'
 #' # We can instantiate a new iterator by calling the factory:
-#' it <- new_counter(3)
-#' it()
+#' iter <- new_counter(3)
+#' iter()
 #'
 #' # This function supports all iterator features. It can be
 #' # dereferenced, advanced, and tested for termination:
-#' advance(it)
-#' deref(it)
-#' is_done(it)
+#' advance(iter)
+#' deref(iter)
+#' is_done(iter)
 #'
-#' # You can also use `iterate()`
-#' it <- new_counter(3)
-#' iterate(for(n in it) cat(n, "to go!\n"))
+#' # You loop over an iterator with `iterate()`. It instruments `for`
+#' # to make it handle iterators:
+#' iter <- new_counter(3)
+#' iterate(for(n in iter) cat(n, "to go!\n"))
+NULL
+
+#' @rdname iterator
+#' @param fn An iterable function. It should be callable without
+#'   arguments and return `NULL` when the iterator is exhausted.
+#' @export
 new_iterator <- function(fn) {
   stopifnot(is_closure(fn))
 
@@ -80,7 +126,7 @@ new_iterator <- function(fn) {
 
   iter <- function() {
     if (done) {
-      abort("Iterator is done")
+      abort("Iterator is done", "exhausted_iter")
     }
 
     out <- withVisible(fn())
@@ -99,47 +145,49 @@ new_iterator <- function(fn) {
     }
   }
 
-  set_attrs(iter, class = "iterator")
+  set_class(iter, "iterator")
 }
-
+#' @rdname iterator
+#' @param x For `is_iterator()`, an object to test. For
+#'   `as_iterator()`, a vector, iterator, or iterable function. S3
+#'   objects with `length()` and position-based `[[` methods are also
+#'   supported.
+#' @export
 is_iterator <- function(x) {
   inherits(x, "iterator")
 }
 
-deref <- function(x) {
-  stopifnot(is_iterator(x))
-  env_get(iter_env(x), "last")
+#' @rdname iterator
+#' @param iter An iterator function.
+#' @export
+deref <- function(iter) {
+  stopifnot(is_iterator(iter))
+  env_get(get_iter_env(iter), "last")
 }
-advance <- function(x) {
-  stopifnot(is_iterator(x))
-  !(is_null(x()) && is_done(x))
+#' @rdname iterator
+#' @export
+advance <- function(iter) {
+  stopifnot(is_iterator(iter))
+  iter()
+  !is_done(iter)
 }
-is_done <- function(x) {
-  stopifnot(is_iterator(x))
-  env_get(iter_env(x), "done")
+#' @rdname iterator
+#' @export
+is_done <- function(iter) {
+  stopifnot(is_iterator(iter))
+  env_get(get_iter_env(iter), "done")
 }
 
-iter_env <- function(iter) {
+get_iter_env <- function(iter) {
   env <- get_env(iter)
   if (!env_has(env, "_flowery_iterator")) {
-    abort("Expected an iterator")
+    abort("`iter` must be an iterator")
   }
   env
 }
 
-print.iterator <- function(x, ...) {
-  cat("<iterator>\n")
-  fn <- env_get(iter_env(x), "fn")
-  print(fn)
-
-  invisible(x)
-}
-
-null_box <- function() {
-  box(NULL, "null_box")
-}
-
-# Requires length() and `[[` methods
+#' @rdname iterator
+#' @export
 as_iterator <- function(x) {
   if (is_iterator(x)) {
     return(x)
@@ -161,6 +209,15 @@ as_iterator <- function(x) {
   }
 
   new_iterator(iter)
+}
+
+#' @export
+print.iterator <- function(x, ...) {
+  cat("<iterator>\n")
+  fn <- env_get(get_iter_env(x), "fn")
+  print(fn)
+
+  invisible(x)
 }
 
 #' Box a NULL value
