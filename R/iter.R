@@ -157,7 +157,7 @@ as_iterator <- function(x) {
     }
 
     i <<- i + 1L
-    x[[i]]
+    as_box_if(x[[i]], is_null, "null_box")
   }
 
   new_iterator(iter)

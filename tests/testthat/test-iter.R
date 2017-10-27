@@ -70,11 +70,9 @@ test_that("can use advance() to check for termination with side effect", {
   })
 
   expect_true(advance(it))
-  expect_identical(i, 1L)
   expect_null(deref(it))
 
   expect_false(advance(it))
-  expect_identical(i, 2L)
   expect_null(deref(it))
 })
 
@@ -131,4 +129,12 @@ test_that("iterator wrapper forwards visibility", {
 
   vis <- FALSE
   expect_false(withVisible(it())$visible)
+})
+
+test_that("as_iterator() handles lists with `NULL` values", {
+  iter <- as_iterator(list(1, NULL, 3))
+  iter()
+  expect_null(iter())
+  expect_false(is_done(iter))
+  expect_true(advance(iter))
 })
