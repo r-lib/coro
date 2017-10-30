@@ -48,3 +48,9 @@ test_that("can iterate with a non-block expression", {
   iterate(for (x in iter) out <- c(out, x))
   expect_identical(out, 1:3)
 })
+
+test_that("iterating with a done iterator cause an error", {
+  iter <- gen("foo")
+  iterate(for (x in iter) x)
+  expect_error(iterate(for (x in iter) x), "is done")
+})
