@@ -5,23 +5,23 @@ test_that("map_step() applies function", {
 })
 
 test_that("discard_step() discards based on predicate", {
-  expect_identical(into(int(), 1:3, discard_step(~ . %% 2 == 0)), 2L)
+  expect_identical(into(int(), 1:3, discard_step(~ . %% 2 == 0)), int(1L, 3L))
 })
 
 test_that("keep_step() keeps based on predicate", {
-  expect_identical(into(int(), 1:3, keep_step(~ . %% 2 == 0)), int(1L, 3L))
+  expect_identical(into(int(), 1:3, keep_step(~ . %% 2 == 0)), 2L)
 })
 
 test_that("can compose steps to form a new step", {
   step <- compose(map_step(`+`, 1), discard_step(~ . %% 2 == 0))
-  expect_identical(into(int(), 1:6, step), int(2L, 4L, 6L))
+  expect_identical(into(int(), 1:6, step), int(3L, 5L, 7L))
 
   step2 <- compose(discard_step(~ . %% 2 == 0), map_step(`+`, 1))
-  expect_identical(into(int(), 1:6, step2), int(3L, 5L, 7L))
+  expect_identical(into(int(), 1:6, step2), int(2L, 4L, 6L))
 
   step3 <- compose(step, map_step(`+`, 1))
-  expect_identical(into(int(), 1:6, step3), int(3L, 5L, 7L))
+  expect_identical(into(int(), 1:6, step3), int(4L, 6L, 8L))
 
   step4 <- compose(map_step(`+`, 1), step)
-  expect_identical(into(int(), 1:6, step4), int(4L, 6L, 8L))
+  expect_identical(into(int(), 1:6, step4), int(3L, 5L, 7L))
 })

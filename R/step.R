@@ -122,9 +122,9 @@ discard_step <- function(.p, ...) {
       }
 
       if (.p(input, ...)) {
-        next_step(result, input)
-      } else {
         result
+      } else {
+        next_step(result, input)
       }
     }
   }
