@@ -1,4 +1,17 @@
-
+#' Iterate over an iterator
+#'
+#' `iterate()` instruments `for` loops to support iteration with
+#' flowery iterators and generators.
+#'
+#' @param loop A `for` loop expression.
+#'
+#' @seealso [iterators][iterator], [generator()]
+#' @export
+#' @examples
+#' iter <- gen(for (x in 1:10) yield(x^2))
+#' iterate(for (x in iter) {
+#'   print(x * 100)
+#' })
 iterate <- function(loop) {
   loop <- enexpr(loop)
   if (!is_language(loop, for_sym)) {
