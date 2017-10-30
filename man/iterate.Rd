@@ -20,5 +20,6 @@ iterate(for (x in iter) {
 })
 }
 \seealso{
-\link[=iterator]{iterators}, \code{\link[=generator]{generator()}}
+\code{\link[=iter_adapt]{iter_adapt()}} for a more functional way of dealing with
+iterated valued.
 }

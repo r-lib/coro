@@ -5,7 +5,8 @@
 #'
 #' @param loop A `for` loop expression.
 #'
-#' @seealso [iterators][iterator], [generator()]
+#' @seealso [iter_adapt()] for a more functional way of dealing with
+#'   iterated valued.
 #' @export
 #' @examples
 #' iter <- gen(for (x in 1:10) yield(x^2))
