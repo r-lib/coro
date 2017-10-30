@@ -76,6 +76,22 @@ test_that("can use advance() to check for termination with side effect", {
   expect_null(deref(it))
 })
 
+test_that("an estimator can terminate early", {
+  it <- new_iterator(function() {
+    if (done) done_box("foo") else "foo"
+  })
+
+  done <- FALSE
+  expect_true(advance(it))
+  expect_identical(deref(it), "foo")
+  expect_false(is_done(it))
+
+  done <- TRUE
+  expect_true(advance(it))
+  expect_identical(deref(it), "foo")
+  expect_true(is_done(it))
+})
+
 test_that("can convert vectors to iterators", {
   iter <- as_iterator(1:3)
 

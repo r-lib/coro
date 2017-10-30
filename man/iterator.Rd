@@ -95,11 +95,22 @@ must meet these requirements:
 \itemize{
 \item It should be callable without arguments. This is how the iterator
 obtains the next value.
-\item It should return \code{NULL} when the iterator has exhausted all
-elements. If the next element should be a literal \code{NULL}, return
-a \link[=null_box]{boxed NULL} instead. It will be automatically
-unboxed by the iterator wrapper.
+\item It should signal termination in one of two ways: either by
+returning \code{NULL} for late termination or by returning a value in
+a \link[=done_box]{done box} for normal termination.
 }
+
+Late termination is useful when you don't know in advance what the
+last value is. It allows reentry even if the iterator might have
+exhausted all elements. Returning \code{NULL} signals that there was no
+new elements after all and causes \code{advance()} to return
+\code{FALSE}. This is the reason why you should always loop over an
+iterator using \code{advance()} as it will check for both early and late
+termination.
+
+If the next element is a literal \code{NULL}, you can return a \link[=null_box]{boxed
+NULL}. It will be automatically unboxed and won't cause
+the iterator to terminate.
 }
 
 \examples{

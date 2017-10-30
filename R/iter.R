@@ -65,12 +65,21 @@
 #' * It should be callable without arguments. This is how the iterator
 #'   obtains the next value.
 #'
-#' * It should return `NULL` when the iterator has exhausted all
-#'   elements. If the next element should be a literal `NULL`, return
-#'   a [boxed NULL][null_box] instead. It will be automatically
-#'   unboxed by the iterator wrapper.
+#' * It should signal termination in one of two ways: either by
+#'   returning `NULL` for late termination or by returning a value in
+#'   a [done box][done_box] for normal termination.
 #'
-#' @seealso [gen()] is the recommended way of creating iterators.
+#' Late termination is useful when you don't know in advance what the
+#' last value is. It allows reentry even if the iterator might have
+#' exhausted all elements. Returning `NULL` signals that there was no
+#' new elements after all and causes `advance()` to return
+#' `FALSE`. This is the reason why you should always loop over an
+#' iterator using `advance()` as it will check for both early and late
+#' termination.
+#'
+#' If the next element is a literal `NULL`, you can return a [boxed
+#' NULL][null_box]. It will be automatically unboxed and won't cause
+#' the iterator to terminate.
 #' @name iterator
 #' @examples
 #' # An iterator is a stateful function since it must return different
@@ -134,6 +143,9 @@ new_iterator <- function(fn) {
 
     if (is_null(last)) {
       done <<- TRUE
+    } else if (is_box(last, "done_box")) {
+      done <<- TRUE
+      last <<- unbox(last)
     } else if (is_box(last, "null_box")) {
       last <<- NULL
     }
@@ -168,8 +180,7 @@ deref <- function(iter) {
 #' @export
 advance <- function(iter) {
   stopifnot(is_iterator(iter))
-  iter()
-  !is_done(iter)
+  !is_null(iter()) || !is_done(iter)
 }
 #' @rdname iterator
 #' @export
@@ -264,4 +275,23 @@ print.iterator <- function(x, ...) {
 #' })
 null_box <- function() {
   box(NULL, "null_box")
+}
+
+#' Box a final value to signal termination
+#'
+#' A done box wraps a value to signal that a job is done. It is used
+#' in flowery for two purposes:
+#'
+#' * From an [iterable function][iterator] to signal early
+#'   termination. If you know there is no more values in the iteration
+#'   you can return the last value in a "done box" to let the iterator
+#'   know that it is done. If you don't signal early, the iterator
+#'   might be reentered (at which point you can return `NULL` to
+#'   signal late termination).
+#'
+#' @param x A final value that will be wrapped in a done box.
+#'
+#' @export
+done_box <- function(x) {
+  box(x, "done_box")
 }
