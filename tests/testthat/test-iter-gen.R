@@ -2,9 +2,7 @@ context("iter-gen")
 
 test_that("can create non-yielding generator functions", {
   gen <- generator("foo")
-  expect_false(is_done(gen))
-  expect_identical(gen(), "foo")
-  expect_true(is_done(gen))
+  expect_identical(drain(gen), list("foo"))
 })
 
 test_that("can yield `NULL` without terminating iteration", {

@@ -26,22 +26,20 @@
 #'   was exhausted. The element can then be retrieved with `deref()`.
 #'
 #'
-#' @section Early and late termination:
+#' @section Termination of an iterator:
 #'
-#' The main purpose of `advance()` and `deref()` is to support two
-#' kinds of iterators: those that terminate early and those that
-#' terminate late.
+#' The main purpose of `advance()` and `deref()` is to make it easier
+#' to work around the termination of an iterator. An exhausted
+#' iterator is signalled not when the last value is returned or
+#' yielded but when a `NULL` value is returned.
 #'
-#' * When an iterator has been called for a new value and notices that
-#'   it is about to return the very last value, it can terminate
-#'   early. That is, it returns the last value and signals itself
-#'   done. Reentering the iterator from that point on is an error.
-#'
-#' * Late termination occurs when the iterator does not know in
-#'   advance whether there are remaining elements. This could happen
-#'   for instance when iterating over a stream of data. In this case,
-#'   the iterator will have to be reentered before it can discover it
-#'   is actually done and signal that iteration is terminated.
+#' The fact that we wait until the next iteration to signal the
+#' exhaustion of new values allows proper termination of the iterator
+#' in corner cases. For example an iterator might not know in advance
+#' whether there are remaining elements, e.g. when iterating over a
+#' stream of data. That is a case where the iterator has to be
+#' reentered before it can discover it is actually done and signal
+#' itself terminated.
 #'
 #' This is why you need to use `advance()` to check whether there was
 #' a new value. It returns `TRUE` if it could indeed obtain a new
@@ -86,21 +84,10 @@
 #' * It should be callable without arguments. This is how the iterator
 #'   obtains the next value.
 #'
-#' * It should signal termination in one of two ways: either by
-#'   returning `NULL` for late termination or by returning a value in
-#'   a [done box][done_box] for normal termination.
-#'
-#' Late termination is useful when you don't know in advance what the
-#' last value is. It allows reentry even if the iterator might have
-#' exhausted all elements. Returning `NULL` signals that there was no
-#' new elements after all and causes `advance()` to return
-#' `FALSE`. This is the reason why you should always loop over an
-#' iterator using `advance()` as it will check for both early and late
-#' termination.
-#'
-#' If the next element is a literal `NULL`, you can return a [boxed
-#' NULL][null_box]. It will be automatically unboxed and won't cause
-#' the iterator to terminate.
+#' * It should signal termination by returning `NULL`. If the next
+#'   element is a literal `NULL`, you can return a [boxed
+#'   NULL][null_box]. It will be automatically unboxed and won't cause
+#'   the iterator to terminate.
 #'
 #' @seealso [generator()] is the recommended way of creating iterators.
 #' @name iterator
@@ -137,10 +124,11 @@
 #' deref(iter)
 #' is_done(iter)
 #'
-#' # A tricky aspect of iterators is that they can return early or
-#' # late. Always use `advance()` when looping over an iterator. It
-#' # returns TRUE or FALSE depending on whether there was actually a
-#' # new element. You then use `deref()` to obtain this element:
+#' # A tricky aspect of iterators is that they don't know whether
+#' # there is a next element. Always use `advance()` when looping over
+#' # an iterator. It tries to advance to the next element and returns
+#' # TRUE if it was succeful, FALSE otherwise. You then use `deref()`
+#' # to get the value of this new element:
 #' iter <- new_counter(3)
 #' while (advance(iter)) {
 #'   cat(deref(iter), "to go!\n")
@@ -191,9 +179,6 @@ new_iterator <- function(fn) {
 
     if (is_null(last)) {
       done <<- TRUE
-    } else if (is_box(last, "done_box")) {
-      done <<- TRUE
-      last <<- unbox(last)
     } else if (is_box(last, "null_box")) {
       last <<- NULL
     }
@@ -228,11 +213,7 @@ deref <- function(iter) {
 #' @export
 advance <- function(iter) {
   stopifnot(is_iterator(iter))
-  if (is_done(iter)) {
-    FALSE
-  } else {
-    !(is_null(iter()) && is_done(iter))
-  }
+  !(is_null(iter()) && is_done(iter))
 }
 #' @rdname iterator
 #' @export
@@ -281,78 +262,4 @@ print.iterator <- function(x, ...) {
   print(fn)
 
   invisible(x)
-}
-
-#' Box a NULL value
-#'
-#' This returns a boxed `NULL` of class `null_box` that can be
-#' returned from an iterator in order to return a literal `NULL`
-#' without marking the iterator as done. If you use the `generator()`
-#' syntax you can simply use
-#'
-#' @export
-#' @examples
-#' # Let's create an iterator that extracts each element of a
-#' # vector. We'll want to support lists and lists might contain
-#' # `NULL`. If that is the case we need
-#' new_vector_iterator <- function(x) {
-#'   n <- length(x)
-#'   i <- 0
-#'
-#'   new_iterator(function() {
-#'     while (i < n) {
-#'       i <<- i + 1
-#'       elt <- rlang::as_box_if(x[[i]], is.null, "null_box")
-#'       return(elt)
-#'     }
-#'   })
-#' }
-#'
-#'
-#' # This iterator factory is equivalent to as_iterator():
-#' iter <- new_vector_iterator(1:10)
-#' iter()
-#'
-#' # Our iterator now supports `NULL` value:
-#' iter <- new_vector_iterator(list(1, NULL, 3))
-#' iter()
-#' iter()
-#' iter()
-#'
-#'
-#' # Note that in the case of generators NULL values are automatically
-#' # boxed by yield():
-#' new_vector_iterator <- function(x) generator({
-#'   # Here we can use `for` instead of `while` since the state is saved
-#'   for (elt in x) yield(elt)
-#' })
-null_box <- function() {
-  box(NULL, "null_box")
-}
-
-#' Box a final value to signal termination
-#'
-#' A done box wraps a value to signal that a job is done. It is used
-#' in flowery for signalling early termination in two contexts:
-#'
-#' * From an [iterable function][iterator]. If you know there is no
-#'   more values in the iteration you can return the last value in a
-#'   "done box" to let the iterator know that it is done. If you don't
-#'   signal early, the iterator might be reentered (at which point you
-#'   can return `NULL` to signal late termination).
-#'
-#' * From a [reducer][reduce_steps]. The boxed value is unboxed and
-#'   returned right away to the caller of `reduce_steps()`.
-#'
-#' @param x A final value that will be wrapped in a done box.
-#'
-#' @export
-#' @examples
-#' box <- done_box(letters)
-#'
-#' # Use `is_box(x, "done_box")` to check for a boxed value of type
-#' # "done_box"
-#' rlang::is_box(box, "done_box")
-done_box <- function(x) {
-  box(x, "done_box")
 }

@@ -23,19 +23,14 @@ iterators.
 The main difference between a regular function and a generator is
 that you can \code{\link[=yield]{yield()}} values. The following rules apply:
 \itemize{
-\item Yielded values never terminate the iterator, even a yielded
-\code{NULL}.
-\item Returned values always terminate the iterator, either early or
-late. Early termination is triggered when returning a normal
-value like \code{return("foo")}. The iterator produces a new value and
-is marked as done. On the other hand, or late (\code{return(NULL)}
-doesn't produce a new value and just terminates the iterator).
+\item Yielded values never terminate the iterator, even a yielded \code{NULL}.
+\item Returned values always terminate the iterator.
 }
 
-While they give a lot of flexibility for terminating an iterator,
-these rules are a bit complicated. For this reason you should
-always use \code{\link[=advance]{advance()}} to check whether there is a new value and
-\code{\link[=deref]{deref()}} to obtain it.
+You can use \code{\link[=advance]{advance()}} to check whether there is a new value and
+\code{\link[=deref]{deref()}} to obtain it. If the generator has returned, the next
+\code{advance()} will return \code{FALSE} and you will know there is no
+further values..
 }
 \examples{
 # A generator statement creates an iterator function:
@@ -83,7 +78,7 @@ iter <- new_yielder("foo", "bar", "barbaz")
 while (advance(iter)) cat(deref(iter), "\\n")
 
 
-# The termination condition of a generator work the way you would
+# The termination condition of a generator works the way you would
 # expect. You can *yield* `NULL` from a generator without
 # terminating the iteration:
 iter <- generator(while (TRUE) yield(NULL))
@@ -91,22 +86,15 @@ iter()
 iter()
 is_done(iter)
 
-# On the other hand *returning* NULL causes late termination of the
-# iterator. This means that even though the generator has been
-# reentered, it has not produced a value:
-iter <- generator({ yield("foo"); NULL })
-advance(iter)
-deref(iter)
-
-# Here advance reenters the iterator but because of late
-# termination it doesn't advance further:
+# On the other hand *returning* NULL terminates the iterator:
+iter <- generator({ while (TRUE) return(NULL) })
 advance(iter)
 
 # This is particularly handy in loops because they return `NULL`
 # when the looping is over. In the following loop, the last yielded
 # value is 3L. The generator is then reentered a last time, at
 # which point the loop completes and the generator returns NULL.
-# This causes late termination of the iterator:
+# This signals that the iterator has completed:
 iter <- generator(for (x in 1:3) yield(x))
 iterate(for (x in iter) cat("iteration", x, "\\n"))
 

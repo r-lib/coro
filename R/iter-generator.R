@@ -10,19 +10,13 @@
 #' The main difference between a regular function and a generator is
 #' that you can [yield()] values. The following rules apply:
 #'
-#' * Yielded values never terminate the iterator, even a yielded
-#'   `NULL`.
+#' * Yielded values never terminate the iterator, even a yielded `NULL`.
+#' * Returned values always terminate the iterator.
 #'
-#' * Returned values always terminate the iterator, either early or
-#'   late. Early termination is triggered when returning a normal
-#'   value like `return("foo")`. The iterator produces a new value and
-#'   is marked as done. On the other hand, or late (`return(NULL)`
-#'   doesn't produce a new value and just terminates the iterator).
-#'
-#' While they give a lot of flexibility for terminating an iterator,
-#' these rules are a bit complicated. For this reason you should
-#' always use [advance()] to check whether there is a new value and
-#' [deref()] to obtain it.
+#' You can use [advance()] to check whether there is a new value and
+#' [deref()] to obtain it. If the generator has returned, the next
+#' `advance()` will return `FALSE` and you will know there is no
+#' further values..
 #'
 #' @param body The function body for the generator. It can [yield()]
 #'   and `return()` values. Within a generator, `for` loops have
@@ -75,7 +69,7 @@
 #' while (advance(iter)) cat(deref(iter), "\n")
 #'
 #'
-#' # The termination condition of a generator work the way you would
+#' # The termination condition of a generator works the way you would
 #' # expect. You can *yield* `NULL` from a generator without
 #' # terminating the iteration:
 #' iter <- generator(while (TRUE) yield(NULL))
@@ -83,22 +77,15 @@
 #' iter()
 #' is_done(iter)
 #'
-#' # On the other hand *returning* NULL causes late termination of the
-#' # iterator. This means that even though the generator has been
-#' # reentered, it has not produced a value:
-#' iter <- generator({ yield("foo"); NULL })
-#' advance(iter)
-#' deref(iter)
-#'
-#' # Here advance reenters the iterator but because of late
-#' # termination it doesn't advance further:
+#' # On the other hand *returning* NULL terminates the iterator:
+#' iter <- generator({ while (TRUE) return(NULL) })
 #' advance(iter)
 #'
 #' # This is particularly handy in loops because they return `NULL`
 #' # when the looping is over. In the following loop, the last yielded
 #' # value is 3L. The generator is then reentered a last time, at
 #' # which point the loop completes and the generator returns NULL.
-#' # This causes late termination of the iterator:
+#' # This signals that the iterator has completed:
 #' iter <- generator(for (x in 1:3) yield(x))
 #' iterate(for (x in iter) cat("iteration", x, "\n"))
 #'
@@ -123,7 +110,15 @@ generator <- function(body) {
   node <- set_returns(enexpr(body))
   parts <- generator_parts(node)
 
-  env <- env_bury(caller_env(), `_state` = "1", !!! control_flow_ops)
+  # Add a late return point
+  return_lang <- lang(base::return, quote(invisible(NULL)))
+  parts <- node_list_poke_cdr(parts, node_list(block(return_lang)))
+
+  env <- env_bury(caller_env(),
+    `_state` = "1",
+    `_return_state` = length(parts),
+    !!! control_flow_ops
+  )
 
   iter <- expand(function() {
     evalq(env, expr = {
@@ -170,7 +165,5 @@ gen <- generator
 #' @seealso [generator()] for examples.
 #' @export
 yield <- function(x) {
-  abort(glue(
-    "`yield()` can't be called directly or within function arguments"
-  ))
+  abort("`yield()` can't be called directly or within function arguments")
 }

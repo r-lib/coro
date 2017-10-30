@@ -29,9 +29,9 @@ node_list_enumerate_tags <- function(node) {
   eval_bare(lang(base::return, value), frame)
 }
 `_return` <- function(value, frame = caller_env()) {
-  if (!is_null(value)) {
-    value <- done_box(value)
-  }
+  # Goto NULL-return state to terminate iterator
+  return_state <- env_get(frame, "_return_state")
+  env_poke(frame, "_state", return_state)
   eval_bare(lang(base::return, value), frame)
 }
 control_flow_ops <- list(

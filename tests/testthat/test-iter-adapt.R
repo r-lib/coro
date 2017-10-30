@@ -17,9 +17,3 @@ test_that("can adapt with composed steps", {
   iter <- iter_adapt(iter, map_step(`+`, 10L), discard_step(~ .x %% 2 == 0))
   expect_identical(drain(iter), list(11L, 13L))
 })
-
-test_that("early termination is propagated", {
-  iter <- as_iterator(list(1L, done_box(2L), 3L))
-  iter <- iter_adapt(iter, map_step(`+`, 10L))
-  expect_identical(drain(iter), list(11L, 12L))
-})

@@ -56,23 +56,21 @@ iterator indeed had another element or \code{FALSE} if the iterator
 was exhausted. The element can then be retrieved with \code{deref()}.
 }
 }
-\section{Early and late termination}{
+\section{Termination of an iterator}{
 
 
-The main purpose of \code{advance()} and \code{deref()} is to support two
-kinds of iterators: those that terminate early and those that
-terminate late.
-\itemize{
-\item When an iterator has been called for a new value and notices that
-it is about to return the very last value, it can terminate
-early. That is, it returns the last value and signals itself
-done. Reentering the iterator from that point on is an error.
-\item Late termination occurs when the iterator does not know in
-advance whether there are remaining elements. This could happen
-for instance when iterating over a stream of data. In this case,
-the iterator will have to be reentered before it can discover it
-is actually done and signal that iteration is terminated.
-}
+The main purpose of \code{advance()} and \code{deref()} is to make it easier
+to work around the termination of an iterator. An exhausted
+iterator is signalled not when the last value is returned or
+yielded but when a \code{NULL} value is returned.
+
+The fact that we wait until the next iteration to signal the
+exhaustion of new values allows proper termination of the iterator
+in corner cases. For example an iterator might not know in advance
+whether there are remaining elements, e.g. when iterating over a
+stream of data. That is a case where the iterator has to be
+reentered before it can discover it is actually done and signal
+itself terminated.
 
 This is why you need to use \code{advance()} to check whether there was
 a new value. It returns \code{TRUE} if it could indeed obtain a new
@@ -117,22 +115,11 @@ function must meet these requirements:
 \itemize{
 \item It should be callable without arguments. This is how the iterator
 obtains the next value.
-\item It should signal termination in one of two ways: either by
-returning \code{NULL} for late termination or by returning a value in
-a \link[=done_box]{done box} for normal termination.
-}
-
-Late termination is useful when you don't know in advance what the
-last value is. It allows reentry even if the iterator might have
-exhausted all elements. Returning \code{NULL} signals that there was no
-new elements after all and causes \code{advance()} to return
-\code{FALSE}. This is the reason why you should always loop over an
-iterator using \code{advance()} as it will check for both early and late
-termination.
-
-If the next element is a literal \code{NULL}, you can return a \link[=null_box]{boxed
+\item It should signal termination by returning \code{NULL}. If the next
+element is a literal \code{NULL}, you can return a \link[=null_box]{boxed
 NULL}. It will be automatically unboxed and won't cause
 the iterator to terminate.
+}
 }
 
 \examples{
@@ -168,10 +155,11 @@ advance(iter)
 deref(iter)
 is_done(iter)
 
-# A tricky aspect of iterators is that they can return early or
-# late. Always use `advance()` when looping over an iterator. It
-# returns TRUE or FALSE depending on whether there was actually a
-# new element. You then use `deref()` to obtain this element:
+# A tricky aspect of iterators is that they don't know whether
+# there is a next element. Always use `advance()` when looping over
+# an iterator. It tries to advance to the next element and returns
+# TRUE if it was succeful, FALSE otherwise. You then use `deref()`
+# to get the value of this new element:
 iter <- new_counter(3)
 while (advance(iter)) {
   cat(deref(iter), "to go!\\n")

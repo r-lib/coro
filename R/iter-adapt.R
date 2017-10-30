@@ -51,7 +51,7 @@ iter_adapt <- function(iter, ...) {
       if (advance(iter)) {
         last <- reducer(flag, deref(iter))
       } else {
-        # Complete and terminate late
+        # Complete and terminate
         reducer(NULL)
         return(NULL)
       }
