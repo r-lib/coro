@@ -8,8 +8,8 @@
 #' so well when the data does not fit in memory. In this case vector
 #' idioms must be replaced with chunk ones. Iterators are a convenient
 #' way of structuring the generation of chunks of data. Iterators can
-#' easily be [transformed][iter_adapt], mapped over and drained to a
-#' final output vector.
+#' easily be [transformed][iter_adapt], [mapped over][steps], or
+#' [drained][drain()] to a final output vector.
 #'
 #' Formally, an iterator is a function that returns a new value each
 #' time it is called and that supports:

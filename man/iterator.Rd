@@ -40,8 +40,8 @@ on whole collections of elements. However these idioms do not work
 so well when the data does not fit in memory. In this case vector
 idioms must be replaced with chunk ones. Iterators are a convenient
 way of structuring the generation of chunks of data. Iterators can
-easily be \link[=iter_adapt]{transformed}, mapped over and drained to a
-final output vector.
+easily be \link[=iter_adapt]{transformed}, \link[=steps]{mapped over}, or
+\link[=drain]{drained} to a final output vector.
 
 Formally, an iterator is a function that returns a new value each
 time it is called and that supports:

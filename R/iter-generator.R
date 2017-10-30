@@ -113,7 +113,12 @@
 #' odds <- gen(for (x in numbers) if (x %% 2 != 0) yield(x))
 #' squares <- gen(for (x in odds) yield(x^2))
 #' greetings <- gen(for (x in squares) yield(paste("Hey", x)))
-#' iterate(for (x in greetings) cat(x, "\n"))
+#'
+#' # As all iterators, you can take() elements from a generator:
+#' take(greetings, 2)
+#'
+#' # Or drain the remaining elements:
+#' drain(greetings)
 generator <- function(body) {
   node <- set_returns(enexpr(body))
   parts <- generator_parts(node)
