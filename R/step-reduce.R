@@ -251,15 +251,20 @@ into <- function(to, from, steps = NULL) {
   stopifnot(is_vector(to))
   reduce_steps(from, steps, along_builder(to))
 }
-drain <- function(from, steps = NULL) {
-  reduce_steps(from, steps, along_builder(list()))
-}
 
-#' Take n elements from a vector or iterator
+#' Take n or all elements from a vector or iterator
+#'
+#' @description
 #'
 #' These functions are similar to `head()` but also perform coercion
 #' to a given output type. They support all reducible objects,
-#' including iterators.
+#' including iterators. In fact their main purpose is to take or drain
+#' elements of an [iterator] or [generator] into a proper vector.
+#'
+#' * The `take()` variants return a defined number of elements.
+#'
+#' * The `drain()` variants return all elements. The vector is grown
+#'   geometrically.
 #'
 #' @param .x A reducible object.
 #' @param .n The number of elements to take from `.x`.
@@ -269,6 +274,9 @@ drain <- function(from, steps = NULL) {
 #' @examples
 #' take(letters, 5)
 #' take_chr(1:10, 5)
+#'
+#' iter <- as_iterator(1:10)
+#' drain(iter)
 take <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(list_len(.n)))
 }
@@ -303,6 +311,41 @@ take_raw <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(raw_len(.n)))
 }
 
+#' @rdname take
+#' @export
+drain <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(list()))
+}
+#' @rdname take
+#' @export
+drain_lgl <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(lgl()))
+}
+#' @rdname take
+#' @export
+drain_int <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(int()))
+}
+#' @rdname take
+#' @export
+drain_dbl <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(dbl()))
+}
+#' @rdname take
+#' @export
+drain_cpl <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(cpl()))
+}
+#' @rdname take
+#' @export
+drain_chr <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(chr()))
+}
+#' @rdname take
+#' @export
+drain_raw <- function(.x, .n) {
+  reduce_steps(.x, NULL, along_builder(raw(0)))
+}
 
 # From purrr. The only change is that this reduce() function supports
 # reduced objects for early termination of reducing.
