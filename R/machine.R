@@ -1,8 +1,8 @@
 
-machine_parts <- function(fn, state = NULL) {
+machine_parts <- function(expr, state = NULL) {
   reset_state(state)
 
-  node <- set_returns(fn)
+  node <- set_returns(expr)
   node_list_parts(node)
 }
 

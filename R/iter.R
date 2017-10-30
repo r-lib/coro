@@ -25,17 +25,35 @@
 #'   iterator indeed had another element or `FALSE` if the iterator
 #'   was exhausted. The element can then be retrieved with `deref()`.
 #'
-#'   This is useful for looping over an iterator since you cannot know
-#'   in advance whether an iterator is exhausted. You have to request
-#'   the next element. `advance()` does the job of calling the
-#'   iterator and checking if it is done.
+#'
+#' @section Early and late termination:
+#'
+#' The main purpose of `advance()` and `deref()` is to support two
+#' kinds of iterators: those that terminate early and those that
+#' terminate late.
+#'
+#' * When an iterator has been called for a new value and notices that
+#'   it is about to return the very last value, it can terminate
+#'   early. That is, it returns the last value and signals itself
+#'   done. Reentering the iterator from that point on is an error.
+#'
+#' * Late termination occurs when the iterator does not know in
+#'   advance whether there are remaining elements. This could happen
+#'   for instance when iterating over a stream of data. In this case,
+#'   the iterator will have to be reentered before it can discover it
+#'   is actually done and signal that iteration is terminated.
+#'
+#' This is why you need to use `advance()` to check whether there was
+#' a new value. It returns `TRUE` if it could indeed obtain a new
+#' value and `FALSE` if there were no remaining elements. You can then
+#' use `deref()` to obtain the last value of the iterator.
 #'
 #'
 #' @section Creating iterators:
 #'
 #' There are three ways of creating an iterator:
 #'
-#' * [gen()] is the recommended way of creating an iterator. It
+#' * [generator()] is the recommended way of creating an iterator. It
 #'   creates a generator function that can pause itself and yield a
 #'   value. When it is called again it resumes from where it left
 #'   off. Generators are a convenient way of creating iterators
@@ -58,9 +76,12 @@
 #'
 #' @section Iterable functions:
 #'
-#' Iterators are thin wrappers around iterable functions which do the
-#' actual work of generating data. In order to be iterable, a function
-#' must meet these requirements:
+#' Technically, iterators are thin wrappers around iterable functions
+#' which do the actual work of generating data. While in most cases
+#' [generator()] is sufficient to create iterators, it is also
+#' possible to create iterators with normal (but iterable) functions
+#' that you pass to `new_iterator()`. In order to be iterable, a
+#' function must meet these requirements:
 #'
 #' * It should be callable without arguments. This is how the iterator
 #'   obtains the next value.
@@ -80,6 +101,8 @@
 #' If the next element is a literal `NULL`, you can return a [boxed
 #' NULL][null_box]. It will be automatically unboxed and won't cause
 #' the iterator to terminate.
+#'
+#' @seealso [generator()] is the recommended way of creating iterators.
 #' @name iterator
 #' @examples
 #' # An iterator is a stateful function since it must return different
@@ -114,8 +137,33 @@
 #' deref(iter)
 #' is_done(iter)
 #'
-#' # You loop over an iterator with `iterate()`. It instruments `for`
-#' # to make it handle iterators:
+#' # A tricky aspect of iterators is that they can return early or
+#' # late. Always use `advance()` when looping over an iterator. It
+#' # returns TRUE or FALSE depending on whether there was actually a
+#' # new element. You then use `deref()` to obtain this element:
+#' iter <- new_counter(3)
+#' while (advance(iter)) {
+#'   cat(deref(iter), "to go!\n")
+#' }
+#'
+#' # It is often easier to loop over an iterator with `iterate()`. It
+#' # instruments `for` and makes it handle iterators:
+#' iter <- new_counter(3)
+#' iterate(for(n in iter) cat(n, "to go!\n"))
+#'
+#'
+#' # It is much easier to create iterators with generators:
+#' new_counter <- function(n) {
+#'   force(n)
+#'   generator({
+#'     while (n > 0) {
+#'       n <- n - 1
+#'       yield(n)
+#'     }
+#'   })
+#' }
+#'
+#' # This generator behaves exactly as our other iterator function:
 #' iter <- new_counter(3)
 #' iterate(for(n in iter) cat(n, "to go!\n"))
 NULL
@@ -239,7 +287,8 @@ print.iterator <- function(x, ...) {
 #'
 #' This returns a boxed `NULL` of class `null_box` that can be
 #' returned from an iterator in order to return a literal `NULL`
-#' without marking the iterator as done.
+#' without marking the iterator as done. If you use the `generator()`
+#' syntax you can simply use
 #'
 #' @export
 #' @examples
@@ -273,7 +322,7 @@ print.iterator <- function(x, ...) {
 #'
 #' # Note that in the case of generators NULL values are automatically
 #' # boxed by yield():
-#' new_vector_iterator <- function(x) gen({
+#' new_vector_iterator <- function(x) generator({
 #'   # Here we can use `for` instead of `while` since the state is saved
 #'   for (elt in x) yield(elt)
 #' })

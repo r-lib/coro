@@ -9,7 +9,8 @@ null_box()
 \description{
 This returns a boxed \code{NULL} of class \code{null_box} that can be
 returned from an iterator in order to return a literal \code{NULL}
-without marking the iterator as done.
+without marking the iterator as done. If you use the \code{generator()}
+syntax you can simply use
 }
 \examples{
 # Let's create an iterator that extracts each element of a
@@ -42,7 +43,7 @@ iter()
 
 # Note that in the case of generators NULL values are automatically
 # boxed by yield():
-new_vector_iterator <- function(x) gen({
+new_vector_iterator <- function(x) generator({
   # Here we can use `for` instead of `while` since the state is saved
   for (elt in x) yield(elt)
 })

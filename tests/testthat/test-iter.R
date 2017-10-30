@@ -118,24 +118,6 @@ test_that("as_iterator() handles bare closures", {
   expect_true(is_iterator(iter))
 })
 
-test_that("iter() is a shortcut for creating iterators", {
-
-  x <- 1:2
-  n <- length(x)
-  i <- 0L
-
-  it <- iter({
-    while (i < n) {
-      i <<- i + 1L
-      return(x[[i]] + 10L)
-    }
-  })
-
-  expect_identical(it(), 11L)
-  expect_identical(it(), 12L)
-  expect_null(it())
-})
-
 test_that("iterator wrapper forwards visibility", {
   it <- new_iterator(function() {
     if (vis) "foo" else invisible("foo")

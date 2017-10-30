@@ -39,7 +39,10 @@ goto_lang <- function(idx) {
   lang("_goto", as.character(idx))
 }
 return_lang <- function(...) {
-  lang("return", ...)
+  lang(return_sym, ...)
+}
+return_state_lang <- function(...) {
+  lang(return_state_sym, ...)
 }
 
 new_pause <- function(state, cdr = NULL) {
@@ -111,9 +114,11 @@ for_iter_sym <- function(i) {
 }
 
 return_sym <- quote(`return`)
+yield_sym <- quote(`yield`)
+
+return_state_sym <- quote(`return`)
 pause_sym <- quote(`_pause`)
 goto_sym <- quote(`_goto`)
-yield_sym <- quote(`yield`)
 
 if_sym <- quote(`if`)
 repeat_sym <- quote(`repeat`)

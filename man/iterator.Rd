@@ -54,19 +54,38 @@ elements. Calling an exhausted iterator causes an error of class
 calling the iterator for a new element but returns \code{TRUE} if the
 iterator indeed had another element or \code{FALSE} if the iterator
 was exhausted. The element can then be retrieved with \code{deref()}.
+}
+}
+\section{Early and late termination}{
 
-This is useful for looping over an iterator since you cannot know
-in advance whether an iterator is exhausted. You have to request
-the next element. \code{advance()} does the job of calling the
-iterator and checking if it is done.
+
+The main purpose of \code{advance()} and \code{deref()} is to support two
+kinds of iterators: those that terminate early and those that
+terminate late.
+\itemize{
+\item When an iterator has been called for a new value and notices that
+it is about to return the very last value, it can terminate
+early. That is, it returns the last value and signals itself
+done. Reentering the iterator from that point on is an error.
+\item Late termination occurs when the iterator does not know in
+advance whether there are remaining elements. This could happen
+for instance when iterating over a stream of data. In this case,
+the iterator will have to be reentered before it can discover it
+is actually done and signal that iteration is terminated.
 }
+
+This is why you need to use \code{advance()} to check whether there was
+a new value. It returns \code{TRUE} if it could indeed obtain a new
+value and \code{FALSE} if there were no remaining elements. You can then
+use \code{deref()} to obtain the last value of the iterator.
 }
+
 \section{Creating iterators}{
 
 
 There are three ways of creating an iterator:
 \itemize{
-\item \code{\link[=gen]{gen()}} is the recommended way of creating an iterator. It
+\item \code{\link[=generator]{generator()}} is the recommended way of creating an iterator. It
 creates a generator function that can pause itself and yield a
 value. When it is called again it resumes from where it left
 off. Generators are a convenient way of creating iterators
@@ -89,9 +108,12 @@ positions.
 \section{Iterable functions}{
 
 
-Iterators are thin wrappers around iterable functions which do the
-actual work of generating data. In order to be iterable, a function
-must meet these requirements:
+Technically, iterators are thin wrappers around iterable functions
+which do the actual work of generating data. While in most cases
+\code{\link[=generator]{generator()}} is sufficient to create iterators, it is also
+possible to create iterators with normal (but iterable) functions
+that you pass to \code{new_iterator()}. In order to be iterable, a
+function must meet these requirements:
 \itemize{
 \item It should be callable without arguments. This is how the iterator
 obtains the next value.
@@ -146,11 +168,36 @@ advance(iter)
 deref(iter)
 is_done(iter)
 
-# You loop over an iterator with `iterate()`. It instruments `for`
-# to make it handle iterators:
+# A tricky aspect of iterators is that they can return early or
+# late. Always use `advance()` when looping over an iterator. It
+# returns TRUE or FALSE depending on whether there was actually a
+# new element. You then use `deref()` to obtain this element:
+iter <- new_counter(3)
+while (advance(iter)) {
+  cat(deref(iter), "to go!\\n")
+}
+
+# It is often easier to loop over an iterator with `iterate()`. It
+# instruments `for` and makes it handle iterators:
+iter <- new_counter(3)
+iterate(for(n in iter) cat(n, "to go!\\n"))
+
+
+# It is much easier to create iterators with generators:
+new_counter <- function(n) {
+  force(n)
+  generator({
+    while (n > 0) {
+      n <- n - 1
+      yield(n)
+    }
+  })
+}
+
+# This generator behaves exactly as our other iterator function:
 iter <- new_counter(3)
 iterate(for(n in iter) cat(n, "to go!\\n"))
 }
 \seealso{
-\code{\link[=gen]{gen()}} is the recommended way of creating iterators.
+\code{\link[=generator]{generator()}} is the recommended way of creating iterators.
 }
