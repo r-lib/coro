@@ -3,7 +3,7 @@ context("step-reduce")
 test_that("reduce() stops early on reduced input", {
   reducer <- function(result, input) {
     if (input %% 2 == 0) {
-      reduced_box(result)
+      done_box(result)
     } else {
       c(result, input)
     }

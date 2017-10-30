@@ -101,7 +101,7 @@
 #'
 #' The `reduce()` function used internally in flowery has support for
 #' early termination. If the reducer returns a `reduced` box
-#' (constructed with [reduced_box()]), remaining inputs in `.x` are
+#' (constructed with [done_box()]), remaining inputs in `.x` are
 #' ignored and `reduce_steps()` finishes the reduction right away.
 #'
 #' @param .x A list to reduce.
@@ -301,7 +301,7 @@ reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
     result <- .f(result, .x[[i]], ...)
 
     # Return early if we get a reduced result
-    if (is_box(result, "reduced_box")) {
+    if (is_box(result, "done_box")) {
       return(unbox(result))
     }
   }
@@ -336,40 +336,5 @@ reduce_index <- function(x, init, left = TRUE) {
     } else {
       rev(seq_len(n))
     }
-  }
-}
-
-#' Create a boxed value for early termination of reduction
-#'
-#' @description
-#'
-#' A [boxed][rlang::box] value of class `reduced_box` signals early
-#' termination to [reduce_steps()]. The boxed value is unboxed and
-#' returned right away to the caller of `reduce_steps()`.
-#'
-#' * `reduced_box()` always boxes its input in a new box.
-#'
-#' * `as_reduced_box()` first checks if its input is a box of class
-#'   `reduced`. If it isn't, it boxes the input. Otherwise the input
-#'   is returned as is. This is useful to avoid double-boxing a value.
-#'
-#' @param x A value to box.
-#' @export
-#' @examples
-#' box <- reduced_box(letters)
-#'
-#' # Use `is_box(x, "reduced_box")` to check for a boxed value of type
-#' # "reduced_box"
-#' rlang::is_box(box, "reduced_box")
-reduced_box <- function(x) {
-  box(x, "reduced_box")
-}
-#' @rdname reduced_box
-#' @export
-as_reduced_box <- function(x) {
-  if (is_box(x, "reduced_box")) {
-    x
-  } else {
-    reduced_box(x)
   }
 }

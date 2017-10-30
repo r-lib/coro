@@ -11,15 +11,23 @@ done_box(x)
 }
 \description{
 A done box wraps a value to signal that a job is done. It is used
-in flowery for two purposes:
+in flowery for signalling early termination in two contexts:
 }
 \details{
 \itemize{
-\item From an \link[=iterator]{iterable function} to signal early
-termination. If you know there is no more values in the iteration
-you can return the last value in a "done box" to let the iterator
-know that it is done. If you don't signal early, the iterator
-might be reentered (at which point you can return \code{NULL} to
-signal late termination).
+\item From an \link[=iterator]{iterable function}. If you know there is no
+more values in the iteration you can return the last value in a
+"done box" to let the iterator know that it is done. If you don't
+signal early, the iterator might be reentered (at which point you
+can return \code{NULL} to signal late termination).
+\item From a \link[=reduce_steps]{reducer}. The boxed value is unboxed and
+returned right away to the caller of \code{reduce_steps()}.
 }
+}
+\examples{
+box <- done_box(letters)
+
+# Use `is_box(x, "done_box")` to check for a boxed value of type
+# "done_box"
+rlang::is_box(box, "done_box")
 }

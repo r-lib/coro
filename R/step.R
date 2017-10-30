@@ -65,7 +65,7 @@ take_step <- function(.n) {
       if (n) {
         result
       } else {
-        as_reduced_box(result)
+        as_box(result, "done_box")
       }
     }
   }

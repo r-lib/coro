@@ -280,18 +280,26 @@ null_box <- function() {
 #' Box a final value to signal termination
 #'
 #' A done box wraps a value to signal that a job is done. It is used
-#' in flowery for two purposes:
+#' in flowery for signalling early termination in two contexts:
 #'
-#' * From an [iterable function][iterator] to signal early
-#'   termination. If you know there is no more values in the iteration
-#'   you can return the last value in a "done box" to let the iterator
-#'   know that it is done. If you don't signal early, the iterator
-#'   might be reentered (at which point you can return `NULL` to
-#'   signal late termination).
+#' * From an [iterable function][iterator]. If you know there is no
+#'   more values in the iteration you can return the last value in a
+#'   "done box" to let the iterator know that it is done. If you don't
+#'   signal early, the iterator might be reentered (at which point you
+#'   can return `NULL` to signal late termination).
+#'
+#' * From a [reducer][reduce_steps]. The boxed value is unboxed and
+#'   returned right away to the caller of `reduce_steps()`.
 #'
 #' @param x A final value that will be wrapped in a done box.
 #'
 #' @export
+#' @examples
+#' box <- done_box(letters)
+#'
+#' # Use `is_box(x, "done_box")` to check for a boxed value of type
+#' # "done_box"
+#' rlang::is_box(box, "done_box")
 done_box <- function(x) {
   box(x, "done_box")
 }
