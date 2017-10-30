@@ -180,7 +180,11 @@ deref <- function(iter) {
 #' @export
 advance <- function(iter) {
   stopifnot(is_iterator(iter))
-  !is_null(iter()) || !is_done(iter)
+  if (is_done(iter)) {
+    FALSE
+  } else {
+    !(is_null(iter()) && is_done(iter))
+  }
 }
 #' @rdname iterator
 #' @export

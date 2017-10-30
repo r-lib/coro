@@ -90,6 +90,7 @@ test_that("an estimator can terminate early", {
   expect_true(advance(it))
   expect_identical(deref(it), "foo")
   expect_true(is_done(it))
+  expect_false(advance(it))
 })
 
 test_that("can convert vectors to iterators", {
