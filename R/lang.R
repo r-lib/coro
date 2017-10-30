@@ -39,7 +39,10 @@ goto_lang <- function(idx) {
   lang("_goto", as.character(idx))
 }
 return_lang <- function(...) {
-  lang("return", ...)
+  lang(return_sym, ...)
+}
+return_state_lang <- function(...) {
+  lang(return_state_sym, ...)
 }
 
 new_pause <- function(state, cdr = NULL) {
@@ -106,20 +109,16 @@ if_branch_else <- function(expr) {
   node_cadr(node_cddr(expr))
 }
 
-for_idx_sym <- function(i) {
-  sym(paste0("_for_idx_", i))
-}
-for_vec_sym <- function(i) {
-  sym(paste0("_for_vec_", i))
-}
-for_len_sym <- function(i) {
-  sym(paste0("_for_len_", i))
+for_iter_sym <- function(i) {
+  sym(paste0("_for_iter_", i))
 }
 
 return_sym <- quote(`return`)
+yield_sym <- quote(`yield`)
+
+return_state_sym <- quote(`return`)
 pause_sym <- quote(`_pause`)
 goto_sym <- quote(`_goto`)
-yield_sym <- quote(`yield`)
 
 if_sym <- quote(`if`)
 repeat_sym <- quote(`repeat`)
@@ -128,6 +127,7 @@ for_sym <- quote(`for`)
 ctrl_syms <- list(if_sym, repeat_sym, while_sym, for_sym)
 assignment_sym <- quote(`<-`)
 block_sym <- quote(`{`)
+switch_sym <- quote(`switch`)
 
 break_sym <- quote(`break`)
 next_sym <- quote(`next`)

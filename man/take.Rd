@@ -8,7 +8,14 @@
 \alias{take_cpl}
 \alias{take_chr}
 \alias{take_raw}
-\title{Take n elements from a vector or iterator}
+\alias{drain}
+\alias{drain_lgl}
+\alias{drain_int}
+\alias{drain_dbl}
+\alias{drain_cpl}
+\alias{drain_chr}
+\alias{drain_raw}
+\title{Take n or all elements from a vector or iterator}
 \usage{
 take(.x, .n)
 
@@ -23,6 +30,20 @@ take_cpl(.x, .n)
 take_chr(.x, .n)
 
 take_raw(.x, .n)
+
+drain(.x)
+
+drain_lgl(.x)
+
+drain_int(.x)
+
+drain_dbl(.x)
+
+drain_cpl(.x)
+
+drain_chr(.x)
+
+drain_raw(.x, .n)
 }
 \arguments{
 \item{.x}{A reducible object.}
@@ -32,11 +53,20 @@ take_raw(.x, .n)
 \description{
 These functions are similar to \code{head()} but also perform coercion
 to a given output type. They support all reducible objects,
-including iterators.
+including iterators. In fact their main purpose is to take or drain
+elements of an \link{iterator} or \link{generator} into a proper vector.
+\itemize{
+\item The \code{take()} variants return a defined number of elements.
+\item The \code{drain()} variants return all elements. The vector is grown
+geometrically.
+}
 }
 \examples{
 take(letters, 5)
 take_chr(1:10, 5)
+
+iter <- as_iterator(1:10)
+drain(iter)
 }
 \seealso{
 \code{\link[=take_step]{take_step()}}

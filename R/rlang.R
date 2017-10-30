@@ -5,9 +5,11 @@ dots_node <- function(...) {
 
 is_language <- is_lang
 get_environment <- get_env
+env_poke <- env_set
 
 node_poke_car <- mut_node_car
 node_poke_cdr <- mut_node_cdr
+node_poke_tag <- mut_node_tag
 node_poke_cadr <- mut_node_cadr
 node_poke_cddr <- mut_node_cddr
 
@@ -40,3 +42,17 @@ new_complex <- cpl_len
 new_character <- chr_len
 new_raw <- raw_len
 new_list <- list_len
+
+new_function <- function(body, args = list(), env = caller_env()) {
+  stopifnot(all(have_name(args)), is_expr(body), is_env(env))
+  args <- as_pairlist(args)
+  eval_bare(call("function", args, body), env)
+}
+
+add_attributes <- set_attrs
+
+set_class <- function(x, class) {
+  add_attributes(x, class = class)
+}
+
+expand <- expr_interp

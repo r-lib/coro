@@ -17,7 +17,7 @@ set_class <- function(x, class) {
 }
 
 compose <- function(...) {
-  fs <- lapply(list(...), match.fun)
+  fs <- lapply(dots_splice(...), match.fun)
   n <- length(fs)
 
   last <- fs[[n]]

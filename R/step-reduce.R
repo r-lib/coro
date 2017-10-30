@@ -19,6 +19,9 @@
 #' and [discard_step()]) with user-friendly wrappers such as
 #' `iter_adapt()`.
 #'
+#' `reduce_steps()` and thus all functions based on it support flowery
+#' [iterators][iterator] and [generators][generator].
+#'
 #' `reduce_steps()` is equivalent to `transduce` in Clojure. See their
 #' [documentation](https://clojure.org/reference/transducers).
 #'
@@ -101,10 +104,10 @@
 #'
 #' The `reduce()` function used internally in flowery has support for
 #' early termination. If the reducer returns a `reduced` box
-#' (constructed with [box_reduced()]), remaining inputs in `.x` are
+#' (constructed with [done_box()]), remaining inputs in `.x` are
 #' ignored and `reduce_steps()` finishes the reduction right away.
 #'
-#' @param .x A list to reduce.
+#' @param .x A vector to reduce or an [iterator].
 #' @param .steps A chain of transformation steps to apply before
 #'   calling the builder function. If `NULL`, the builder function is
 #'   reduced without transformation.
@@ -193,6 +196,18 @@
 #' # builder function separately:
 #' reduce_steps(inputs, steps, base::c)
 #' reduce_steps(inputs, steps, along_builder(""))
+#'
+#'
+#' # reduce_steps() supports iterators as well:
+#' iter <- as_iterator(1:5)
+#' iter()
+#' reduce_steps(iter, map_step(`+`, 10), along_builder(list()))
+#'
+#' # By extension, all functions based on reduce_steps() support
+#' # iterators:
+#' iter <- as_iterator(1:50)
+#' take(iter, 5)
+#' take_chr(iter, 5)
 reduce_steps <- function(.x, .steps, .builder, .init) {
   .builder <- as_closure(.builder)
 
@@ -237,11 +252,19 @@ into <- function(to, from, steps = NULL) {
   reduce_steps(from, steps, along_builder(to))
 }
 
-#' Take n elements from a vector or iterator
+#' Take n or all elements from a vector or iterator
+#'
+#' @description
 #'
 #' These functions are similar to `head()` but also perform coercion
 #' to a given output type. They support all reducible objects,
-#' including iterators.
+#' including iterators. In fact their main purpose is to take or drain
+#' elements of an [iterator] or [generator] into a proper vector.
+#'
+#' * The `take()` variants return a defined number of elements.
+#'
+#' * The `drain()` variants return all elements. The vector is grown
+#'   geometrically.
 #'
 #' @param .x A reducible object.
 #' @param .n The number of elements to take from `.x`.
@@ -251,6 +274,9 @@ into <- function(to, from, steps = NULL) {
 #' @examples
 #' take(letters, 5)
 #' take_chr(1:10, 5)
+#'
+#' iter <- as_iterator(1:10)
+#' drain(iter)
 take <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(list_len(.n)))
 }
@@ -285,6 +311,41 @@ take_raw <- function(.x, .n) {
   reduce_steps(.x, take_step(.n), poke_into_builder(raw_len(.n)))
 }
 
+#' @rdname take
+#' @export
+drain <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(list()))
+}
+#' @rdname take
+#' @export
+drain_lgl <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(lgl()))
+}
+#' @rdname take
+#' @export
+drain_int <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(int()))
+}
+#' @rdname take
+#' @export
+drain_dbl <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(dbl()))
+}
+#' @rdname take
+#' @export
+drain_cpl <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(cpl()))
+}
+#' @rdname take
+#' @export
+drain_chr <- function(.x) {
+  reduce_steps(.x, NULL, along_builder(chr()))
+}
+#' @rdname take
+#' @export
+drain_raw <- function(.x, .n) {
+  reduce_steps(.x, NULL, along_builder(raw(0)))
+}
 
 # From purrr. The only change is that this reduce() function supports
 # reduced objects for early termination of reducing.
@@ -293,6 +354,10 @@ reduce <- function(.x, .f, ..., .init) {
 }
 
 reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
+  if (is_iterator(.x)) {
+    return(iter_reduce_impl(.x, .f, ..., .init = .init, .left = .left))
+  }
+
   result <- reduce_init(.x, .init, left = .left)
   idx <- reduce_index(.x, .init, left = .left)
 
@@ -301,7 +366,7 @@ reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
     result <- .f(result, .x[[i]], ...)
 
     # Return early if we get a reduced result
-    if (is_box(result, "reduced")) {
+    if (is_box(result, "done_box")) {
       return(unbox(result))
     }
   }
@@ -339,37 +404,26 @@ reduce_index <- function(x, init, left = TRUE) {
   }
 }
 
-#' Create a boxed value for early termination of reduction
-#'
-#' @description
-#'
-#' A [boxed][rlang::box] value of class `reduced` signals early
-#' termination to [reduce_steps()]. The boxed value is unboxed and
-#' returned right away to the caller of `reduce_steps()`.
-#'
-#' * `box_reduced()` always boxes its input in a new box.
-#'
-#' * `ensure_reduced()` first checks if its input is a box of class
-#'   `reduced`. If it isn't, it boxes the input. Otherwise the input
-#'   is returned as is. This is useful to avoid double-boxing a value.
-#'
-#' @param x A value to box.
-#' @export
-#' @examples
-#' box <- box_reduced(letters)
-#'
-#' # Use `is_box(x, "reduced")` to check for a boxed value of type
-#' # "reduced"
-#' rlang::is_box(box, "reduced")
-box_reduced <- function(x) {
-  box(x, "reduced")
-}
-#' @rdname box_reduced
-#' @export
-ensure_reduced <- function(x) {
-  if (is_box(x, "reduced")) {
-    x
-  } else {
-    box_reduced(x)
+iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
+  if (!.left) {
+    abort("Can't right-reduce with an iterator")
   }
+  # Trigger done error if needed
+  if (is_done(.x)) {
+    .x()
+  }
+
+  .f <- as_closure(.f)
+
+  result <- NULL
+  while (advance(.x)) {
+    result <- .f(result, deref(.x), ...)
+
+    # Return early if we get a reduced result
+    if (is_box(result, "done_box")) {
+      return(unbox(result))
+    }
+  }
+
+  result
 }

@@ -1,9 +1,8 @@
 
-machine_parts <- function(fn, pause_sym = quote(yield)) {
-  reset_state()
-  poke_pause_sym(pause_sym)
+machine_parts <- function(expr, state = NULL) {
+  reset_state(state)
 
-  node <- set_returns(fn)
+  node <- set_returns(expr)
   node_list_parts(node)
 }
 
