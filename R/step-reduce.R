@@ -19,6 +19,9 @@
 #' and [discard_step()]) with user-friendly wrappers such as
 #' `iter_adapt()`.
 #'
+#' `reduce_steps()` and thus all functions based on it support flowery
+#' [iterators][iterator] and [generators][generator].
+#'
 #' `reduce_steps()` is equivalent to `transduce` in Clojure. See their
 #' [documentation](https://clojure.org/reference/transducers).
 #'
@@ -104,7 +107,7 @@
 #' (constructed with [done_box()]), remaining inputs in `.x` are
 #' ignored and `reduce_steps()` finishes the reduction right away.
 #'
-#' @param .x A list to reduce.
+#' @param .x A vector to reduce or an [iterator].
 #' @param .steps A chain of transformation steps to apply before
 #'   calling the builder function. If `NULL`, the builder function is
 #'   reduced without transformation.
@@ -193,6 +196,18 @@
 #' # builder function separately:
 #' reduce_steps(inputs, steps, base::c)
 #' reduce_steps(inputs, steps, along_builder(""))
+#'
+#'
+#' # reduce_steps() supports iterators as well:
+#' iter <- as_iterator(1:5)
+#' iter()
+#' reduce_steps(iter, map_step(`+`, 10), along_builder(list()))
+#'
+#' # By extension, all functions based on reduce_steps() support
+#' # iterators:
+#' iter <- as_iterator(1:50)
+#' take(iter, 5)
+#' take_chr(iter, 5)
 reduce_steps <- function(.x, .steps, .builder, .init) {
   .builder <- as_closure(.builder)
 
@@ -235,6 +250,9 @@ reduce_steps <- function(.x, .steps, .builder, .init) {
 into <- function(to, from, steps = NULL) {
   stopifnot(is_vector(to))
   reduce_steps(from, steps, along_builder(to))
+}
+drain <- function(from, steps = NULL) {
+  reduce_steps(from, steps, along_builder(list()))
 }
 
 #' Take n elements from a vector or iterator
@@ -293,6 +311,10 @@ reduce <- function(.x, .f, ..., .init) {
 }
 
 reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
+  if (is_iterator(.x)) {
+    return(iter_reduce_impl(.x, .f, ..., .init = .init, .left = .left))
+  }
+
   result <- reduce_init(.x, .init, left = .left)
   idx <- reduce_index(.x, .init, left = .left)
 
@@ -337,4 +359,28 @@ reduce_index <- function(x, init, left = TRUE) {
       rev(seq_len(n))
     }
   }
+}
+
+iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
+  if (!.left) {
+    abort("Can't right-reduce with an iterator")
+  }
+  # Trigger done error if needed
+  if (is_done(.x)) {
+    .x()
+  }
+
+  .f <- as_closure(.f)
+
+  result <- NULL
+  while (advance(.x)) {
+    result <- .f(result, deref(.x), ...)
+
+    # Return early if we get a reduced result
+    if (is_box(result, "done_box")) {
+      return(unbox(result))
+    }
+  }
+
+  result
 }

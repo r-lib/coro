@@ -7,7 +7,7 @@
 reduce_steps(.x, .steps, .builder, .init)
 }
 \arguments{
-\item{.x}{A list to reduce.}
+\item{.x}{A vector to reduce or an \link{iterator}.}
 
 \item{.steps}{A chain of transformation steps to apply before
 calling the builder function. If \code{NULL}, the builder function is
@@ -39,6 +39,9 @@ write one. However most of the time you shouldn't have to use
 typically use existing steps provided in flowery (like \code{\link[=map_step]{map_step()}}
 and \code{\link[=discard_step]{discard_step()}}) with user-friendly wrappers such as
 \code{iter_adapt()}.
+
+\code{reduce_steps()} and thus all functions based on it support flowery
+\link[=iterator]{iterators} and \link[=generator]{generators}.
 
 \code{reduce_steps()} is equivalent to \code{transduce} in Clojure. See their
 \href{https://clojure.org/reference/transducers}{documentation}.
@@ -203,6 +206,18 @@ reduce_steps(inputs, NULL, steps(base::c))
 # builder function separately:
 reduce_steps(inputs, steps, base::c)
 reduce_steps(inputs, steps, along_builder(""))
+
+
+# reduce_steps() supports iterators as well:
+iter <- as_iterator(1:5)
+iter()
+reduce_steps(iter, map_step(`+`, 10), along_builder(list()))
+
+# By extension, all functions based on reduce_steps() support
+# iterators:
+iter <- as_iterator(1:50)
+take(iter, 5)
+take_chr(iter, 5)
 }
 \seealso{
 \link{steps}, \code{\link[=along_builder]{along_builder()}}

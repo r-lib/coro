@@ -64,3 +64,15 @@ test_that("take variants return correct output type", {
 test_that("take() fails if not enough elements", {
   expect_error(take(1:10, 15), "10 / 15 elements")
 })
+
+test_that("can reduce iterators", {
+  iter <- as_iterator(1:3)
+  out <- reduce_steps(iter, NULL, along_builder(chr()))
+  expect_identical(out, as.character(1:3))
+})
+
+test_that("reducing done iterators is an error", {
+  iter <- as_iterator(list())
+  iter()
+  expect_error(drain(iter), "is done")
+})
