@@ -13,7 +13,9 @@ Imports:
     glue,
     rlang
 Suggests:
+    knitr,
     purrr,
+    rmarkdown,
     testthat
 Remotes:
     lionel-/rlang@utils-flowery
@@ -22,3 +24,4 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr
