@@ -5,18 +5,20 @@
 #' A generator is an [iterator function][iterator] that can pause its
 #' execution with [yield()] and resume from where it left off. Because
 #' they manage state for you, generators are the easiest way to create
-#' iterators.
+#' iterators. The main difference between a regular function and a
+#' generator is thus that you can [yield()] values. The following
+#' rules apply:
 #'
-#' The main difference between a regular function and a generator is
-#' that you can [yield()] values. The following rules apply:
+#' * Yielded values never terminate the iterator, even a yielded
+#'   `NULL`.  If you call the generator or [advance()] it, the
+#'   execution resumes right after the yielding point. All local
+#'   variables are preserved.
 #'
-#' * Yielded values never terminate the iterator, even a yielded `NULL`.
-#' * Returned values always terminate the iterator.
+#' * Returned values always terminate the iterator. Reentering the
+#'   generator after a return is an error.
 #'
-#' You can use [advance()] to check whether there is a new value and
-#' [deref()] to obtain it. If the generator has returned, the next
-#' `advance()` will return `FALSE` and you will know there is no
-#' further values..
+#' Generators are compatible with all iterator features such as
+#' [iterate()], [iter_adapt()], or [drain()].
 #'
 #' @param body The function body for the generator. It can [yield()]
 #'   and `return()` values. Within a generator, `for` loops have

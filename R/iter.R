@@ -25,26 +25,7 @@
 #'   iterator indeed had another element or `FALSE` if the iterator
 #'   was exhausted. The element can then be retrieved with `deref()`.
 #'
-#'
-#' @section Termination of an iterator:
-#'
-#' The main purpose of `advance()` and `deref()` is to make it easier
-#' to work around the termination of an iterator. An exhausted
-#' iterator is signalled not when the last value is returned or
-#' yielded but when a `NULL` value is returned.
-#'
-#' The fact that we wait until the next iteration to signal the
-#' exhaustion of new values allows proper termination of the iterator
-#' in corner cases. For example an iterator might not know in advance
-#' whether there are remaining elements, e.g. when iterating over a
-#' stream of data. That is a case where the iterator has to be
-#' reentered before it can discover it is actually done and signal
-#' itself terminated.
-#'
-#' This is why you need to use `advance()` to check whether there was
-#' a new value. It returns `TRUE` if it could indeed obtain a new
-#' value and `FALSE` if there were no remaining elements. You can then
-#' use `deref()` to obtain the last value of the iterator.
+#' The recommended way of creating an iterator is with [generator()].
 #'
 #'
 #' @section Creating iterators:
@@ -70,6 +51,32 @@
 #'   Vector-like objects are also supported if the class implements
 #'   `length()` and `[[` methods. The extraction method must support
 #'   positions.
+#'
+#'
+#' @section Termination of an iterator:
+#'
+#' There is no general way to know in advance whether an iterator has
+#' remaining elements. E.g. when iterating over a stream of data the
+#' stream might close abruptly. The main purpose of `advance()` and
+#' `deref()` is to make it easy to work with iterators.
+#'
+#' * You first try to `advance()` your iterator. If advance was
+#'   succesful, the iterator now sits at the next value. Otherwise the
+#'   iterator is done and you can finish the current operation.
+#'
+#' * If there was indeed a next value, you can obtain it by
+#'   dereferencing the iterator with `deref()`.
+#'
+#' The idiom of advancing and dereferencing is useful for looping
+#' manually over an iterator:
+#'
+#' ```
+#' while (advance(iter)) do(deref(iter))
+#' ```
+#'
+#' Note that functions like [iterate()] or [drain()] deal with the
+#' looping automatically so that you don't have to worry about
+#' termination and derefencing.
 #'
 #'
 #' @section Iterable functions:

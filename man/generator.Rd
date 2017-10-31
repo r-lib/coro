@@ -18,19 +18,20 @@ and \code{return()} values. Within a generator, \code{for} loops have
 A generator is an \link[=iterator]{iterator function} that can pause its
 execution with \code{\link[=yield]{yield()}} and resume from where it left off. Because
 they manage state for you, generators are the easiest way to create
-iterators.
-
-The main difference between a regular function and a generator is
-that you can \code{\link[=yield]{yield()}} values. The following rules apply:
+iterators. The main difference between a regular function and a
+generator is thus that you can \code{\link[=yield]{yield()}} values. The following
+rules apply:
 \itemize{
-\item Yielded values never terminate the iterator, even a yielded \code{NULL}.
-\item Returned values always terminate the iterator.
+\item Yielded values never terminate the iterator, even a yielded
+\code{NULL}.  If you call the generator or \code{\link[=advance]{advance()}} it, the
+execution resumes right after the yielding point. All local
+variables are preserved.
+\item Returned values always terminate the iterator. Reentering the
+generator after a return is an error.
 }
 
-You can use \code{\link[=advance]{advance()}} to check whether there is a new value and
-\code{\link[=deref]{deref()}} to obtain it. If the generator has returned, the next
-\code{advance()} will return \code{FALSE} and you will know there is no
-further values..
+Generators are compatible with all iterator features such as
+\code{\link[=iterate]{iterate()}}, \code{\link[=iter_adapt]{iter_adapt()}}, or \code{\link[=drain]{drain()}}.
 }
 \examples{
 # A generator statement creates an iterator function:
