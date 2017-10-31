@@ -37,10 +37,12 @@ supported.}
 R programming is usually about full lists and vectors. Vectorised
 operations such as \code{+} or function mappers like \code{lapply()} operate
 on whole collections of elements. However these idioms do not work
-so well when the data does not fit in memory. In this case vector
-idioms must be replaced with chunk ones. Iterators are a convenient
-way of structuring the generation of chunks of data. Iterators can
-easily be \link[=iter_adapt]{transformed}, \link[=steps]{mapped over}, or
+so well when the data does not fit in memory or when the data
+arrives continuously and we need to work on it as it is coming
+in. In these cases vector idioms must be replaced with steams of
+chunked data idioms. Iterators are a convenient way of structuring
+the generation of chunks of data. Iterators can easily be
+\link[=iter_adapt]{transformed}, \link[=steps]{mapped over}, or
 \link[=drain]{drained} to a final output vector.
 
 Formally, an iterator is a function that returns a new value each
@@ -133,7 +135,9 @@ the iterator to terminate.
 # returns another function:
 new_counter <- function(n) {
   force(n)
-  fn <- function() {
+
+  # Wrapping the lambda function in an iterator enables many features
+  new_iterator(function() {
     if (n == 0) {
       # Return NULL to finish iteration
       return(NULL)
@@ -143,10 +147,7 @@ new_counter <- function(n) {
     n <<- n - 1
 
     n
-  }
-
-  # Wrapping `fn` in an iterator enables many features
-  new_iterator(fn)
+  })
 }
 
 # We can instantiate a new iterator by calling the factory:
