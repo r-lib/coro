@@ -1,12 +1,11 @@
 Package: flowery
-Title: Delimited Continuations in R
+Title: Generators and transducers for R
 Version: 0.0.0.9000
 Authors@R: c(
     person("Lionel", "Henry", ,"lionel@rstudio.com", c("aut", "cre")),
     person("RStudio", role = "cph")
     )
-Description: This brings delimited continuations to R with a
-    computing-on-the-language approach.
+Description: Make R a more flowery language with generators and transducers.
 Depends:
     R (>= 3.1.0)
 Imports:
