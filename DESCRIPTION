@@ -18,7 +18,7 @@ Suggests:
     rmarkdown,
     testthat
 Remotes:
-    lionel-/rlang@utils-flowery
+    tidyverse/rlang
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

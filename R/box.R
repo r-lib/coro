@@ -42,7 +42,7 @@
 #'   for (elt in x) yield(elt)
 #' })
 null_box <- function() {
-  box(NULL, "null_box")
+  new_box(NULL, "null_box")
 }
 
 #' Box a final value to signal termination
@@ -62,5 +62,5 @@ null_box <- function() {
 #' # "done_box"
 #' rlang::is_box(box, "done_box")
 done_box <- function(x) {
-  box(x, "done_box")
+  new_box(x, "done_box")
 }
