@@ -1,0 +1,470 @@
+---
+title: "Iteration in R"
+author: "Lionel Henry"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE}
+library("flowery")
+```
+
+
+## Vector operations versus chunked data flow
+
+Every piece of data is a vector in R. Lists and data frames are finite
+collections of atomic vectors and hold all of their data in memory.
+Accordingly, R programming is vector-oriented. Arithmetic operations
+like `+` are vectorised and applying functions over vectors (e.g. with
+`base::lapply()` or `purrr::map()` and variants) is a favourite of R
+programmers.
+
+However the vector approach only works when all of the data fits in
+memory. If it doesn't fit, the data needs to be processed chunk by
+chunk. This is a task that is not well structured in R as of now. The
+purpose of flowery iterators is to provide the tools and idioms needed
+for structuring the generation and transformation of streams of
+chunked data.
+
+The flowery package provides three complementary features:
+
+  * **Iterators**: An iterator is a reference to the current data
+    chunk that has two basic operations: advancing to the next chunk
+    with `advance()` and dereferencing the current chunk with
+    `deref()`. Advancing causes the actual generation of the next data
+    chunk. You can use regular functions to create an iterator but it
+    is often easier to use generators.
+
+  * **Generators**: Generators are the preferred way of creating
+    iterators in flowery. They are special functions that can *pause*
+    themselves. This feature is particularly handy for creating chunks
+    of data iteratively.
+
+  * **Transformation steps**: Also
+    called [transducers](https://clojure.org/reference/transducers),
+    transformation steps make it easy to adapt iterators by mapping a
+    function over incoming chunks or discarding unwanted elements.
+    While understanding how transformation steps work under the hood
+    is a bit involved, using them on iterators is very easy.
+
+This vignette explores how flowery envisions chunked iteration in R.
+It describes what it takes to generate data chunkwise, how the
+iterator wrappers structure the process of iterating over chunks, and
+finally how generators provide syntax that makes the process easy.
+
+
+## Iteration
+
+Iteration is a stateful thing. It is about advancing from one state to
+the next. Consider that simple loop:
+
+```{r}
+greet <- function(x) paste("hey", x)
+x <- character(length(letters))
+
+for (i in seq_along(letters)) {
+  x[[i]] <- greet(letters[[i]])
+}
+
+x
+```
+
+At each step the state changes. In this example the state is pretty
+simple, it is the index variable `i`. This changing state lets us
+*generate* different pieces of data. In this case `letters[[i]]`
+generates simple strings containing the letters of the alphabet. In a
+more involved case, we might pull out heavy data frames from a
+database.
+
+What if we wanted to reuse that piece of code in a function with the
+objective of returning the data one piece at a time? Simply wrapping
+our loop only works when we want to return the whole vector:
+
+```{r}
+iter <- function(x) {
+  x <- character(length(letters))
+
+  for (i in seq_along(letters)) {
+    x[[i]] <- greet(letters[[i]])
+  }
+
+  x
+}
+iter(letters)
+```
+
+Instead we need to emulate the loop manually. This means that we need
+a placeholder for the state! One way to achieve this is with function
+factories. See the relevant
+[Advanced R chapter](http://adv-r.had.co.nz/Functional-programming.html)
+if you are not familiar with factories. Basically, a factory is a
+function that returns another function. Any data that you create
+there can be accessed by the new function. That's a great way of
+keeping state between invocation:
+
+```{r}
+make_iter <- function(x) {
+  # Create placeholder for iteration state
+  i <- 0
+
+  # Create and return the new iterator function
+  function() {
+    # Use the `<<-` operator to update non-local variables
+    i <<- i + 1
+    greet(x[[i]])
+  }
+}
+iter <- make_iter(letters)
+```
+
+Now let's call our new iterator function:
+
+```{r}
+iter(); iter()
+```
+
+To sum up, creating an iterator with a function factory involves two
+phases:
+
+- Creating a persistent state in the environment of the returned iterator.
+
+- Updating this state from the iterator function with the `<<-` operator.
+
+We'll see later that generators make it very easy to manage the
+iteration state. But first let's see what is missing from the iterator
+that we have created in order to use it effectively.
+
+
+## Iterator operations
+
+We have created a function that generates chunks of data on demand.
+We need to apply three operations to work with this iterator
+effectively:
+
+- Advance to a new chunk.
+- Get the current chunk.
+- Check if the iterator is done.
+
+The first two operations are accomplished in a single step simply by
+calling the iterator function:
+
+```{r}
+iter <- make_iter("foo")
+
+# We advance the iterator and obtain the next value in one call:
+x <- iter()
+x
+```
+
+However how can we check that we are done iterating? The iterator that
+we created had only one element to iterate over. If we call it again
+we get an out-of-bounds error:
+
+```{r, error = TRUE}
+iter()
+```
+
+We need some kind of convention to signal termination of an iterator.
+In Python you would do this by throwing a special kind of exception.
+That requires wrapping iterators with `tryCatch()` each time they are
+advanced. For flowery we decided to signal termination with a sentinel
+value instead. The `NULL` value is a natural candidate. It is
+especially practical for iteration because many control flow operators
+return `NULL`. Let's modify our iterator factory so that it returns
+`NULL` when it is done:
+
+```{r}
+make_iter <- function(x) {
+  i <- 0
+  n <- length(x)  # We'll need to check the length of the vector
+
+  function() {
+    i <<- i + 1
+
+    # Return NULL if we are out of bounds
+    if (i <= n) {
+      greet(x[[i]])
+    } else {
+      NULL
+    }
+  }
+}
+
+iter <- make_iter("foo")
+iter(); iter()
+```
+
+Not bad. Now how can we use this sentinel value to stop iterating at
+the right time? One way to do it would be to assign the next value in
+a temporary object and check that this value is not the sentinel. We
+can do both at the same time in a loop condition:
+
+```{r}
+iter <- make_iter(c("foo", "bar"))
+
+while (!is.null(elt <- iter())) {
+  print(elt)
+}
+```
+
+This is a bit hard to read though. For this reason flowery provides an
+iterator constructor that provides structured operations.
+
+
+## Flowery iterators
+
+A flowery iterator is a wrapper around an iterable function. An
+iterable function is a function that:
+
+- can be called without arguments to get the next value;
+- returns NULL when it is done.
+
+Luckily our iterator factory already meets both these specifications!
+We can supply the iterable functions to `new_iterator()` to create a
+proper flowery iterator:
+
+```{r}
+make_flowery_iter <- function(x) new_iterator(make_iter(x))
+```
+
+The iterator works just like before:
+
+```{r}
+iter <- make_flowery_iter(letters[1:8])
+iter(); iter()
+```
+
+But you can now use `advance()` and `deref()`. `advance()` returns
+`TRUE` or `FALSE` depending on whether the next value was a
+termination sentinel. `deref()` then dereferences the iterator to get
+its current value:
+
+```{r}
+advance(iter)
+deref(iter)
+```
+
+This is handy in loops:
+
+```{r}
+while (advance(iter)) print(deref(iter))
+```
+
+A flowery iterator verbosely fails if you try to reenter it when it
+has exhausted its values:
+
+```{r, error = TRUE}
+is_done(iter)
+iter()
+```
+
+Flowery iterators are terminated with `NULL` but in some cases it
+might make sense to return `NULL` literally. In this case you can
+return a `null_box()`. It is automatically transformed to a `NULL`
+value and does not cause the iterator to terminate. In the following
+example we create an infinite iterator that always returns `NULL`
+without ever terminating:
+
+```{r}
+iter <- new_iterator(function() null_box())
+
+iter()
+iter()
+```
+
+Finally you can use `drain()` and its variants to materialise the
+iterator into a vector. These functions sink all iterated values into
+a vector. `drain()` creates a list:
+
+```{r}
+iter <- make_flowery_iter(letters[1:3])
+drain(iter)
+```
+
+While the other typed variants create atomic vectors:
+
+```{r}
+iter <- make_flowery_iter(letters[1:3])
+drain_chr(iter)
+```
+
+It is perfectly possible for an iterator to never terminate. In this
+case you might want to take only a specific number of elements:
+
+```{r}
+iter <- make_flowery_iter(letters)
+take_chr(iter, 5)
+```
+
+
+## Generators
+
+The purpose of generators is to maintain state. This is why they are
+ideally suited for generation of data during iteration. The iterators
+that we created manually in the previous section can easily be turned
+into a generator:
+
+```{r}
+iter <- generator({
+  for (x in letters) yield(greet(x))
+})
+```
+
+The generator can be used just like any iterator:
+
+```{r}
+iter(); iter()
+```
+
+There are two things going on:
+
+- `generator()` returns an iterator function.
+
+- `yield()` pauses the iterator function. When it is reentered,
+  execution resumes from there. In this case the `for` loop inside our
+  generator continues iterating as if the generator never exited.
+
+When a generator has yielded, it can be called or advanced to the
+next value and its execution will resume right at the yielding
+point. The ability to pause and resume considerably simplifies the
+task of generating data chunk by chunk because the state of the
+iterator is kept between iteration steps.
+
+Note that generators (and iterators in general) are one-shot. Once
+iteration is done, reentering the generator issues an error. Let's
+drain the remaining elements from the iterator:
+
+```{r}
+drain_chr(iter)
+```
+
+From that point on, reentering the iterator is an error:
+
+```{r, error = TRUE}
+iter()
+```
+
+For this reason it is often a good idea to provide a **generator
+factory**. The principle is identical to function factories except
+that we don't have to maintain the iteration state. Creating a
+generator factory is thus straightforward:
+
+```{r}
+make_iter <- function(x) {
+  generator({
+    for (elt in x) yield(greet(elt))
+  })
+}
+
+iter <- make_iter(c("foo", "bar"))
+drain(iter)
+```
+
+This generator factory can be reused as many times as needed to create
+fresh generators:
+
+```{r}
+iter <- make_iter(c("baz", "barbaz"))
+drain(iter)
+```
+
+Note finally that generators don't have to yield, they can also
+return. Once it has returned the generator is done:
+
+```{r}
+iter <- generator({
+  x <- 1:10
+
+  for (elt in x) {
+    if (elt < 5) {
+      yield(elt)
+    } else {
+      return(100)
+    }
+  }
+})
+
+drain_dbl(iter)
+```
+
+
+## Transforming iterators
+
+As we have seen iterator and generators are useful for generating data
+chunk by chunk in a structured way. The flowery package also offers
+several ways of transforming the stream of data chunks.
+
+
+### Chaining generator expressions
+
+Inside a generator you can supply iterators to `for` loops. This makes
+it easy to chain generators:
+
+```{r}
+integer_iter <- generator(for (x in 1:10) yield(x))
+square_iter <- generator(for (x in integer_iter) yield(x^2))
+```
+
+in addition a shorthand `gen()` alias is provided for `generator()`.
+There is no difference between the two versions. The long version is
+appropriate in generator factories while the shorthand reads better in
+generator expressions:
+
+```{r}
+integer_iter <- as_iterator(1:10)
+square_iter <- gen(for (x in integer_iter) yield(x^2))
+final_iter <- gen(for (x in square_iter) yield(x * 100))
+```
+
+Draining the final iterator iterates over all iterators in turn. What
+happens to intermediate values? They are discarded from memory as
+iteration advances. Only the final summary value is kept in the final
+output vector:
+
+```{r}
+drain_dbl(final_iter)
+```
+
+
+### Transformation step
+
+Transformation steps bring the familiar `map`, `keep` or `discard`
+idioms that you know from purrr to iterators. You can map a function
+over iterated chunks with `map_step()` and discard or keep unwanted
+elements with `discard_step()` and `keep_step()`. You apply these
+steps to iterators with `iter_adapt()`, which takes an iterator and
+steps as inputs and returns another iterator.
+
+Let's apply steps so that odd numbers are discarded and all values
+that pass through the filter are squared by mapping the `^`
+operator. Note that transformation steps support purrr's `~` notation
+for lambda functions:
+
+```{r}
+iter <- as_iterator(1:10)
+
+iter <- iter_adapt(iter,
+  discard_step(~ . %% 2 != 0),
+  map_step(`^`, 2)
+)
+
+drain_dbl(iter)
+```
+
+
+### Iteration with for loops
+
+Finally, flowery provides `iterate()`. It takes a `for` loop
+expression and instruments it so it understands flowery iterators.
+
+```{r}
+iter <- gen(for (x in 1:10) yield(x^2))
+
+iterate(for (x in iter) {
+  cat("iteration:", x, "\n")
+})
+```
