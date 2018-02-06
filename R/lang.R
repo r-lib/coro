@@ -33,16 +33,16 @@ as_exprs_node <- function(expr) {
 }
 
 pause_lang <- function(idx, ...) {
-  lang("_pause", as.character(idx), ...)
+  call2("_pause", as.character(idx), ...)
 }
 goto_lang <- function(idx) {
-  lang("_goto", as.character(idx))
+  call2("_goto", as.character(idx))
 }
 return_lang <- function(...) {
-  lang(return_sym, ...)
+  call2(return_sym, ...)
 }
 return_state_lang <- function(...) {
-  lang(return_state_sym, ...)
+  call2(return_state_sym, ...)
 }
 
 new_pause <- function(state, cdr = NULL) {
@@ -51,7 +51,7 @@ new_pause <- function(state, cdr = NULL) {
 }
 
 block <- function(...) {
-  lang(block_sym, ...)
+  call2(block_sym, ...)
 }
 new_block <- function(x) {
   new_language(block_sym, x)
@@ -81,25 +81,25 @@ is_separate_state <- function(x) {
 }
 
 yield_lang <- function(...) {
-  lang(yield_sym, ...)
+  call2(yield_sym, ...)
 }
 if_lang <- function(...) {
-  lang(if_sym, ...)
+  call2(if_sym, ...)
 }
 repeat_lang <- function(...) {
-  lang(repeat_sym, ...)
+  call2(repeat_sym, ...)
 }
 while_lang <- function(...) {
-  lang(while_sym, ...)
+  call2(while_sym, ...)
 }
 for_lang <- function(...) {
-  lang(for_sym, ...)
+  call2(for_sym, ...)
 }
 break_lang <- function() {
-  lang(break_sym)
+  call2(break_sym)
 }
 next_lang <- function() {
-  lang(next_sym)
+  call2(next_sym)
 }
 
 if_branch_true <- function(expr) {

@@ -26,13 +26,13 @@ node_list_enumerate_tags <- function(node) {
   if (is_null(value)) {
     value <- null_box()
   }
-  eval_bare(lang(base::return, value), frame)
+  eval_bare(call2(base::return, value), frame)
 }
 `_return` <- function(value, frame = caller_env()) {
   # Goto NULL-return state to terminate iterator
   return_state <- env_get(frame, "_return_state")
   env_poke(frame, "_state", return_state)
-  eval_bare(lang(base::return, value), frame)
+  eval_bare(call2(base::return, value), frame)
 }
 control_flow_ops <- list(
   `_goto` = `_goto`,

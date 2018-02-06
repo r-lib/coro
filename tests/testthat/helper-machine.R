@@ -1,5 +1,5 @@
 
-return_invisible_lang <- return_lang(rlang::lang("invisible", NULL))
+return_invisible_lang <- return_lang(rlang::call2("invisible", NULL))
 
 new_for_parts <- function(state, i, x,
                           next_state = NULL,

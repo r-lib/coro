@@ -30,7 +30,7 @@ scoped_state <- function(idx, frame = caller_env()) {
   old <- peek_state()
   poke_state(idx)
 
-  restore_state_lang <- lang(poke_state, old)
+  restore_state_lang <- call2(poke_state, old)
   scoped_exit(!! restore_state_lang, frame = frame)
 
   invisible(old)
@@ -51,7 +51,7 @@ poke_state_elt <- function(elt, value) {
 scoped_state_elt <- function(elt, value, frame = caller_env()) {
   old <- poke_state_elt(elt, value)
 
-  restore_state_lang <- lang(poke_state_elt, elt, old)
+  restore_state_lang <- call2(poke_state_elt, elt, old)
   scoped_exit(!! restore_state_lang, frame = frame)
 
   invisible(old)
@@ -67,7 +67,7 @@ scoped_state_elts <- function(elts, frame = caller_env()) {
     old <- poke_state_elt(nms[[i]], elts[[i]])
     old[[i]] <- old %||% list(NULL)
 
-    restore_state_lang <- lang(poke_state_elt, nms[[i]], old[[i]])
+    restore_state_lang <- call2(poke_state_elt, nms[[i]], old[[i]])
     node_poke_cdr(cur, node_list(restore_state_lang))
     cur <- node_cdr(cur)
   }
