@@ -4,10 +4,9 @@
 \name{flowery-package}
 \alias{flowery}
 \alias{flowery-package}
-\title{flowery: Delimited Continuations in R}
+\title{flowery: Generators and transducers for R}
 \description{
-This brings delimited continuations to R with a
-computing-on-the-language approach.
+Make R a more flowery language with generators and transducers.
 }
 \author{
 \strong{Maintainer}: Lionel Henry \email{lionel@rstudio.com}
