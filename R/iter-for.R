@@ -15,7 +15,7 @@
 #' })
 iterate <- function(loop) {
   loop <- enexpr(loop)
-  if (!is_language(loop, for_sym)) {
+  if (!is_call(loop, for_sym)) {
     abort("`loop` must be a `for` loop")
   }
 

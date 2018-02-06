@@ -12,7 +12,7 @@ poke_returns <- function(expr) {
   tail <- node_list_tail(expr)
   last <- node_car(tail)
 
-  if (!is_language(last) || !is_symbol(node_car(last))) {
+  if (!is_call(last) || !is_symbol(node_car(last))) {
     last <- return_state_lang(last)
   } else {
     head <- as_string(node_car(last))

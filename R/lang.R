@@ -1,6 +1,6 @@
 
 lang_has <- function(lang, is_element) {
-  if (!is_language(lang)) {
+  if (!is_call(lang)) {
     return(FALSE)
   }
   if (is_element(lang)) {
@@ -19,13 +19,13 @@ lang_has <- function(lang, is_element) {
 }
 
 is_named_language <- function(x) {
-  is_language(x) && is_symbol(node_car(x))
+  is_call(x) && is_symbol(node_car(x))
 }
 
 as_exprs_node <- function(expr) {
   if (is_pairlist(expr)) {
     expr
-  } else if (is_language(expr, quote(`{`))) {
+  } else if (is_call(expr, quote(`{`))) {
     node_cdr(expr) %||% node_list(NULL)
   } else {
     node(expr, NULL)
@@ -57,7 +57,7 @@ new_block <- function(x) {
   new_language(block_sym, x)
 }
 is_block <- function(x) {
-  is_language(x, block_sym)
+  is_call(x, block_sym)
 }
 as_block <- function(x) {
   if (is_block(x)) {

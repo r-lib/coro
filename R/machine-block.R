@@ -140,7 +140,7 @@ is_exiting_block <- function(x) {
       is_exiting_block(last)
     },
 
-    is_language(x, exiting_syms)
+    is_call(x, exiting_syms)
   )
 }
 exiting_syms <- list(return_sym, pause_sym, goto_sym)

@@ -7,7 +7,7 @@ machine_parts <- function(expr, state = NULL) {
 }
 
 expr_parts <- function(expr) {
-  if (!is_language(expr)) {
+  if (!is_call(expr)) {
     return(NULL)
   }
 
@@ -39,5 +39,5 @@ push_goto <- function(block, goto_node = NULL) {
 }
 
 is_pause <- function(x) {
-  is_language(x, peek_pause_sym())
+  is_call(x, peek_pause_sym())
 }
