@@ -145,7 +145,7 @@ for_init_part <- function(loop_state, expr) {
     !! iter_sym <- flowery::as_iterator(!! iter_sym)
 
     # Trigger an iteration error if iterator was already done
-    if (is_done(!! iter_sym)) {
+    if (flowery::is_done(!! iter_sym)) {
       UQ(iter_sym)()
     }
 
