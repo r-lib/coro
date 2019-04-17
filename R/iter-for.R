@@ -14,7 +14,7 @@
 #'   print(x * 100)
 #' })
 iterate <- function(loop) {
-  loop <- enexpr(loop)
+  loop <- substitute(loop)
   if (!is_call(loop, for_sym)) {
     abort("`loop` must be a `for` loop")
   }

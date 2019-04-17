@@ -109,7 +109,9 @@
 #' # Or drain the remaining elements:
 #' drain(greetings)
 generator <- function(body) {
-  node <- set_returns(enexpr(body))
+  body <- substitute(body)
+
+  node <- set_returns(body)
   parts <- generator_parts(node)
 
   # Add a late return point
