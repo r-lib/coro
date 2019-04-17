@@ -1,6 +1,6 @@
 Package: flowery
 Title: Generators and transducers for R
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: c(
     person("Lionel", "Henry", ,"lionel@rstudio.com", c("aut", "cre")),
     person("RStudio", role = "cph")
