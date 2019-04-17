@@ -34,3 +34,8 @@ compose <- function(...) {
 negate <- function(.p) {
   function(...) !.p(...)
 }
+
+unstructure <- function(x) {
+  attributes(x) <- NULL
+  x
+}

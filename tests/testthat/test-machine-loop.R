@@ -342,18 +342,46 @@ test_that("`while` - complex control flow", {
     "after"
   })
 
-  parts1 <- block("before", while_lang(TRUE, break_lang()), goto_lang("2"))
-  parts2 <- block(if_lang(TRUE, block(goto_lang("3")), block(goto_lang("9"))))
-  parts3 <- block("loop-before", pause_lang("4", 1L))
-  inner4 <- if_lang(TRUE, block("break-before", goto_lang("9")), block("yield-2-before", pause_lang("6", 2L)))
-  parts4 <- block("loop-after", inner4)
-  parts5 <- block("break-after", goto_lang("7"))
-  parts6 <- block("yield-2-after", goto_lang("7"))
-  parts7 <- block("next-before", goto_lang("2"))
-  parts8 <- block("loop-end", goto_lang("2"))
-  parts9 <- block(return_lang("after"))
+  parts1 <- block("before", goto_lang("2"))
+  parts2 <- block(if_lang(TRUE, block(goto_lang("3")), block(goto_lang("4"))))
+  parts3 <- block(goto_lang("4"))
+  parts4 <- block(if_lang(TRUE, block(goto_lang("5")), block(goto_lang("11"))))
+  parts5 <- block("loop-before", pause_lang("6", 1L))
+  inner6 <- if_lang(TRUE, block("break-before", goto_lang("11")), block("yield-2-before", pause_lang("8", 2L)))
+  parts6 <- block("loop-after", inner6)
+  parts7 <- block("break-after", goto_lang("9"))
+  parts8 <- block("yield-2-after", goto_lang("9"))
+  parts9 <- block("next-before", goto_lang("4"))
+  parts10 <- block("loop-end", goto_lang("4"))
+  parts11 <- block(return_lang("after"))
 
-  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4, parts5, parts6, parts7, parts8, parts9))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4, parts5, parts6, parts7, parts8, parts9, parts10, parts11))
+})
+
+test_that("`while` - top level break", {
+  parts <- machine_parts(function() {
+    while (TRUE) {
+      "before-break"
+      break
+    }
+  })
+
+  parts1 <- block(if_lang(TRUE, block(goto_lang("2")), block(goto_lang("3"))))
+  parts2 <- block("before-break", goto_lang("3"))
+  parts3 <- block(return_invisible_lang)
+
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
+})
+
+test_that("`for` - top level break (#7)", {
+  parts <- machine_parts(function() {
+    for (i in x) break
+  })
+
+  parts1 <- block(goto_lang("4"))
+  parts2 <- block(return_invisible_lang)
+
+  expect_equal(unstructure(node_cddr(parts)), pairlist(parts1, parts2))
 })
 
 test_that("`for` - one pause with no past or future", {

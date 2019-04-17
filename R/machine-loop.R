@@ -14,10 +14,6 @@ loop_parts <- function(expr, loop_state = peek_state()) {
     parts <- node_list_parts(body)
   })
 
-  if (is_null(parts) || all_loop_control(parts)) {
-    return(NULL)
-  }
-
   # Update the `break` gotos and `pause nodes` to point to the next state
   node_poke_car(break_node, goto_lang(peek_state() + 1L))
   pauses_push_state(pauses, loop_state)
