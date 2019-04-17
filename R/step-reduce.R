@@ -104,7 +104,7 @@
 #'
 #' The `reduce()` function used internally in flowery has support for
 #' early termination. If the reducer returns a `reduced` box
-#' (constructed with [done_box()]), remaining inputs in `.x` are
+#' (constructed with [done()]), remaining inputs in `.x` are
 #' ignored and `reduce_steps()` finishes the reduction right away.
 #'
 #' @param .x A vector to reduce or an [iterator].
@@ -366,7 +366,7 @@ reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
     result <- .f(result, .x[[i]], ...)
 
     # Return early if we get a reduced result
-    if (is_box(result, "done_box")) {
+    if (is_done_box(result)) {
       return(unbox(result))
     }
   }
@@ -420,7 +420,7 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
     result <- .f(result, deref(.x), ...)
 
     # Return early if we get a reduced result
-    if (is_box(result, "done_box")) {
+    if (is_done_box(result)) {
       return(unbox(result))
     }
   }

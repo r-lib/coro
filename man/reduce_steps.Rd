@@ -127,7 +127,7 @@ basically equivalent to \code{reduce(x, s(b))}.
 
 The \code{reduce()} function used internally in flowery has support for
 early termination. If the reducer returns a \code{reduced} box
-(constructed with \code{\link[=done_box]{done_box()}}), remaining inputs in \code{.x} are
+(constructed with \code{\link[=done]{done()}}), remaining inputs in \code{.x} are
 ignored and \code{reduce_steps()} finishes the reduction right away.
 }
 

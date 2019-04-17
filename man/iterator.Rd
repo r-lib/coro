@@ -122,8 +122,7 @@ function must meet these requirements:
 \item It should be callable without arguments. This is how the iterator
 obtains the next value.
 \item It should signal termination by returning \code{NULL}. If the next
-element is a literal \code{NULL}, you can return a \link[=null_box]{boxed
-NULL}. It will be automatically unboxed and won't cause
+element is a literal \code{NULL}, you can return a \link[=null_box]{boxed NULL}. It will be automatically unboxed and won't cause
 the iterator to terminate.
 }
 }

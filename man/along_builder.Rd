@@ -34,8 +34,7 @@ size when the reduction completes. To avoid the extra copies caused
 by vector growing and shrinking, supply a vector whose size matches
 exactly the final output.
 
-The builder functions can be combined with \link[=steps]{transformation
-steps} to provide interesting functionality. See the
+The builder functions can be combined with \link[=steps]{transformation steps} to provide interesting functionality. See the
 \code{\link[=take]{take()}} variants for higher-level functions.
 }
 \examples{
