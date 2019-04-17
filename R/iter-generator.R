@@ -119,13 +119,13 @@ generator <- function(body) {
   env <- env_bury(caller_env(),
     `_state` = "1",
     `_return_state` = length(parts),
-    !!! control_flow_ops
+    !!!control_flow_ops
   )
 
   iter <- expand(function() {
     evalq(env, expr = {
       while (TRUE) {
-        !! machine_switch_lang(parts)
+        !!machine_switch_lang(parts)
       }
     })
   })

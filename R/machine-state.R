@@ -23,7 +23,7 @@ poke_state <- function(idx = NULL) {
 }
 reset_state <- function(state = NULL) {
   state <- state %||% new_machine_parts_state()
-  env_bind(current_state, !!! state)
+  env_bind(current_state, !!!state)
 }
 
 scoped_state <- function(idx, frame = caller_env()) {
@@ -31,7 +31,7 @@ scoped_state <- function(idx, frame = caller_env()) {
   poke_state(idx)
 
   restore_state_lang <- call2(poke_state, old)
-  scoped_exit(!! restore_state_lang, frame = frame)
+  scoped_exit(!!restore_state_lang, frame = frame)
 
   invisible(old)
 }
@@ -52,7 +52,7 @@ scoped_state_elt <- function(elt, value, frame = caller_env()) {
   old <- poke_state_elt(elt, value)
 
   restore_state_lang <- call2(poke_state_elt, elt, old)
-  scoped_exit(!! restore_state_lang, frame = frame)
+  scoped_exit(!!restore_state_lang, frame = frame)
 
   invisible(old)
 }
@@ -72,7 +72,7 @@ scoped_state_elts <- function(elts, frame = caller_env()) {
     cur <- node_cdr(cur)
   }
 
-  scoped_exit(!! exit_lang, frame = frame)
+  scoped_exit(!!exit_lang, frame = frame)
 
   invisible(old)
 }

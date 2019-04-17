@@ -136,20 +136,20 @@ for_init_part <- function(loop_state, expr) {
   coll_expr <- node_cadr(node_cdr(expr))
 
   expr({
-    !! iter_sym <- !! coll_expr
+    !!iter_sym <- !!coll_expr
 
     # `base::for()` internally converts factors to character vectors
-    if (base::is.factor(!! iter_sym)) {
-      !! iter_sym <- base::as.character(!! iter_sym)
+    if (base::is.factor(!!iter_sym)) {
+      !!iter_sym <- base::as.character(!!iter_sym)
     }
-    !! iter_sym <- flowery::as_iterator(!! iter_sym)
+    !!iter_sym <- flowery::as_iterator(!!iter_sym)
 
     # Trigger an iteration error if iterator was already done
-    if (is_done(!! iter_sym)) {
+    if (is_done(!!iter_sym)) {
       UQ(iter_sym)()
     }
 
-    !! goto_lang(loop_state)
+    !!goto_lang(loop_state)
   })
 }
 for_next_part <- function(loop_state, expr) {
@@ -157,11 +157,11 @@ for_next_part <- function(loop_state, expr) {
   iter_sym <- for_iter_sym(loop_state)
 
   expr({
-    if (flowery::advance(!! iter_sym)) {
-      !! elt_sym <- flowery::deref(!! iter_sym)
-      !! goto_lang(loop_state + 1L)
+    if (flowery::advance(!!iter_sym)) {
+      !!elt_sym <- flowery::deref(!!iter_sym)
+      !!goto_lang(loop_state + 1L)
     } else {
-      !! goto_lang(peek_state() + 1L)
+      !!goto_lang(peek_state() + 1L)
     }
   })
 }

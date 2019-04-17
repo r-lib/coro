@@ -56,9 +56,9 @@ test_that("`repeat` - pause within `if`", {
   parts2 <- expr({
     "loop-before"
     if (TRUE) {
-      !! pause_lang("3", 1L)
+      !!pause_lang("3", 1L)
     }
-    !! goto_lang("3")
+    !!goto_lang("3")
   })
   parts3 <- block("loop-after", goto_lang("2"))
   parts4 <- block(return_lang("after"))
