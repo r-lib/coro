@@ -26,10 +26,6 @@ node_list_walk_car <- function(.x, .f, ...) {
   node_list_walk(.x, f)
 }
 
-node_list <- function(...) {
-  as.pairlist(dots_list(...))
-}
-
 node_list_tail <- function(node) {
   while (!is_null(node_cdr(node))) {
     node <- node_cdr(node)

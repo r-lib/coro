@@ -16,7 +16,7 @@ test_that("`repeat` - one pause", {
   parts3 <- block("loop-after", goto_lang("2"))
   parts4 <- block(return_lang("after"))
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("`repeat` - no continuation", {
@@ -30,7 +30,7 @@ test_that("`repeat` - no continuation", {
   parts2 <- block(pause_lang("2", 1L))
   parts3 <- block(return_lang("after"))
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, pairlist(parts1, parts2, parts3))
 
   parts <- machine_parts(function() {
     "before"
@@ -38,7 +38,7 @@ test_that("`repeat` - no continuation", {
     "after"
   })
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`repeat` - pause within `if`", {
@@ -63,7 +63,7 @@ test_that("`repeat` - pause within `if`", {
   parts3 <- block("loop-after", goto_lang("2"))
   parts4 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("`repeat` - nested loop", {
@@ -83,7 +83,7 @@ test_that("`repeat` - nested loop", {
   parts4 <- block("loop-after", goto_lang("2"))
   parts5 <- block(return_lang("after"))
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4, parts5))
 })
 
 test_that("`repeat` - non-yielding", {
@@ -97,7 +97,7 @@ test_that("`repeat` - non-yielding", {
   parts1 <- block("before", repeat_lang(NULL), pause_lang("2", 1L))
   parts2 <- block(return_lang("after"))
 
-  expect_identical(parts, node_list(parts1, parts2))
+  expect_identical(parts, pairlist(parts1, parts2))
 })
 
 test_that("`repeat` - non-yielding but other control flow constructs", {
@@ -113,7 +113,7 @@ test_that("`repeat` - non-yielding but other control flow constructs", {
   parts1 <- block("before", inner1, pause_lang("2", 1L))
   parts2 <- block(return_lang("after"))
 
-  expect_identical(parts, node_list(parts1, parts2))
+  expect_identical(parts, pairlist(parts1, parts2))
 })
 
 test_that("loops - single `next`", {
@@ -129,7 +129,7 @@ test_that("loops - single `next`", {
   parts3 <- block(pause_lang("2", 1L))
   parts4 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("loops - single `next` with past and future", {
@@ -153,7 +153,7 @@ test_that("loops - single `next` with past and future", {
   parts5 <- block("loop-final", goto_lang("2"))
   parts6 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5, parts6))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4, parts5, parts6))
 })
 
 test_that("loops - single `break`", {
@@ -169,7 +169,7 @@ test_that("loops - single `break`", {
   parts3 <- block(pause_lang("2", 1L))
   parts4 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("loops - `next` and `break` within `if`-`else`", {
@@ -187,7 +187,7 @@ test_that("loops - `next` and `break` within `if`-`else`", {
   parts3 <- block("next-after", goto_lang("2"))
   parts4 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("loops - `break` and `next` with past and future", {
@@ -213,7 +213,7 @@ test_that("loops - `break` and `next` with past and future", {
   parts6 <- block("loop-final", goto_lang("2"))
   parts7 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5, parts6, parts7))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4, parts5, parts6, parts7))
 })
 
 test_that("loops - goto loop start after `if` or `else`", {
@@ -225,7 +225,7 @@ test_that("loops - goto loop start after `if` or `else`", {
   parts2 <- block(if_lang(TRUE, block(pause_lang("2"))), goto_lang("2"))
   parts3 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, pairlist(parts1, parts2, parts3))
 
 
   parts <- machine_parts(function() {
@@ -234,7 +234,7 @@ test_that("loops - goto loop start after `if` or `else`", {
 
   parts2 <- block(if_lang(TRUE, block(pause_lang("2", 1L)), FALSE), goto_lang("2"))
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`while` - single pause no past or future", {
@@ -246,7 +246,7 @@ test_that("`while` - single pause no past or future", {
   parts2 <- block(pause_lang("1", 1L))
   parts3 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`while` - pause within `if`", {
@@ -260,7 +260,7 @@ test_that("`while` - pause within `if`", {
   parts2 <- block(if_lang(FALSE, block(pause_lang("1", 1L))), goto_lang("1"))
   parts3 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3))
+  expect_identical(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`while` - pause within `if` with future", {
@@ -278,7 +278,7 @@ test_that("`while` - pause within `if` with future", {
   parts3 <- block("after-pause", goto_lang("1"))
   parts4 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("`while` - past before loop", {
@@ -297,7 +297,7 @@ test_that("`while` - past before loop", {
   parts4 <- block("loop-after", goto_lang("2"))
   parts5 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4, parts5))
 })
 
 test_that("`while` - pause after loop", {
@@ -315,7 +315,7 @@ test_that("`while` - pause after loop", {
   parts4 <- block(pause_lang("5", 2L))
   parts5 <- block(return_invisible_lang)
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4, parts5))
 })
 
 test_that("`while` - complex control flow", {
@@ -353,7 +353,7 @@ test_that("`while` - complex control flow", {
   parts8 <- block("loop-end", goto_lang("2"))
   parts9 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3, parts4, parts5, parts6, parts7, parts8, parts9))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4, parts5, parts6, parts7, parts8, parts9))
 })
 
 test_that("`for` - one pause with no past or future", {
@@ -371,7 +371,7 @@ test_that("`for` - one pause with no past or future", {
   cond_branches <- node_cddr(node_cadr(parts2))
   expect_identical(node_list_tail_car(node_car(cond_branches)), goto_lang("3"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("`for` - one pause with past and future", {
@@ -396,7 +396,7 @@ test_that("`for` - one pause with past and future", {
   cond_branches <- node_cddr(node_cadr(parts2))
   expect_identical(node_list_tail_car(node_car(cond_branches)), goto_lang("3"))
 
-  expect_identical(parts, node_list(parts1, parts2, parts3, parts4, parts5))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4, parts5))
 })
 
 test_that("`for` - one pause within `if` and one `break` within `else`", {
@@ -420,5 +420,5 @@ test_that("`for` - one pause within `if` and one `break` within `else`", {
   parts5 <- block("for-after", goto_lang("2"))
   parts6 <- block(return_invisible_lang)
 
-  expect_equal(parts, node_list(parts1, parts2, parts3, parts4, parts5, parts6))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4, parts5, parts6))
 })

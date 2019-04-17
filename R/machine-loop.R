@@ -23,7 +23,7 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   pauses_push_state(pauses, loop_state)
 
   # Add a looping goto at the end
-  goto_node <- node_list(goto_lang(loop_state))
+  goto_node <- pairlist(goto_lang(loop_state))
   tail <- node_list_tail_car(parts)
   push_goto(tail, goto_node)
 
@@ -32,12 +32,12 @@ loop_parts <- function(expr, loop_state = peek_state()) {
 
 next_parts <- function(expr) {
   next_block <- spliceable(new_block(peek_loop_next_node()))
-  parts <- node_list(next_block)
+  parts <- pairlist(next_block)
   poke_attr(parts, "loop_control", TRUE)
 }
 break_parts <- function(expr) {
   break_block <- spliceable(new_block(peek_loop_break_node()))
-  parts <- node_list(break_block)
+  parts <- pairlist(break_block)
   poke_attr(parts, "loop_control", TRUE)
 }
 
@@ -120,8 +120,8 @@ for_parts <- function(expr) {
   if (is_null(parts)) {
     body <- duplicate(body, shallow = TRUE)
     body <- as_block(body)
-    node_list_poke_cdr(body, node_list(goto_lang(loop_state)))
-    parts <- node_list(body)
+    node_list_poke_cdr(body, pairlist(goto_lang(loop_state)))
+    parts <- pairlist(body)
   }
 
   init_part <- for_init_part(loop_state, expr)

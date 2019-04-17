@@ -30,10 +30,10 @@ node_list_parts <- function(node) {
       # resume to. We register it so the state can be adjusted later.
       if (has_future()) {
         pause_lang <- new_pause(poke_state(), node_cdr(expr))
-        pause_node <- node_list(pause_lang)
+        pause_node <- pairlist(pause_lang)
       } else {
         pause_lang <- new_pause(peek_state(), node_cdr(expr))
-        pause_node <- node_list(pause_lang)
+        pause_node <- pairlist(pause_lang)
         push_pause_node(pause_node)
       }
 
@@ -43,7 +43,7 @@ node_list_parts <- function(node) {
       } else {
         pause_block <- new_block(pause_node)
       }
-      parts <- node_list_poke_cdr(parts, node_list(pause_block))
+      parts <- node_list_poke_cdr(parts, pairlist(pause_block))
 
       rest <- node <- node_cdr(rest)
       parent <- NULL
@@ -90,7 +90,7 @@ node_list_parts <- function(node) {
       if (is_spliceable(pausing_part)) {
         pausing_part <- node_cdr(pausing_part)
       } else {
-        pausing_part <- node_list(pausing_part)
+        pausing_part <- pairlist(pausing_part)
       }
 
       node_poke_cdr(parent, pausing_part)
@@ -114,7 +114,7 @@ node_list_parts <- function(node) {
   # `node` may be NULL if there is no expression after a pause
   if (!is_null(node)) {
     remaining <- new_block(node)
-    node_list_poke_cdr(parts, node_list(remaining))
+    node_list_poke_cdr(parts, pairlist(remaining))
   }
 
   parts

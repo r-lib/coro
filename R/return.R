@@ -25,7 +25,7 @@ poke_returns <- function(expr) {
       `while` = ,
       `for` = {
         return_lang <- return_state_lang(call2("invisible", NULL))
-        node_poke_cdr(tail, node_list(return_lang))
+        node_poke_cdr(tail, pairlist(return_lang))
         last
       },
       return_lang(last)
@@ -43,7 +43,7 @@ if_poke_returns <- function(expr) {
   node_poke_car(branches, if_branch)
 
   if (is_null(node_cadr(branches))) {
-    explicit_else <- node_list(block(return_state_lang(call2("invisible", NULL))))
+    explicit_else <- pairlist(block(return_state_lang(call2("invisible", NULL))))
     node_poke_cdr(branches, explicit_else)
   } else {
     else_branch <- new_block(poke_returns(node_cadr(branches)))

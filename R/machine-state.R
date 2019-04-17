@@ -68,7 +68,7 @@ scoped_state_elts <- function(elts, frame = caller_env()) {
     old[[i]] <- old %||% list(NULL)
 
     restore_state_lang <- call2(poke_state_elt, nms[[i]], old[[i]])
-    node_poke_cdr(cur, node_list(restore_state_lang))
+    node_poke_cdr(cur, pairlist(restore_state_lang))
     cur <- node_cdr(cur)
   }
 
@@ -118,7 +118,7 @@ push_pause_node <- function(node) {
   if (is_null_node(pauses)) {
     node_poke_car(pauses, node)
   } else {
-    node_list_poke_cdr(pauses, node_list(node))
+    node_list_poke_cdr(pauses, pairlist(node))
   }
 
   invisible(pauses)

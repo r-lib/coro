@@ -114,7 +114,7 @@ generator <- function(body) {
 
   # Add a late return point
   return_lang <- call2(base::return, quote(invisible(NULL)))
-  parts <- node_list_poke_cdr(parts, node_list(block(return_lang)))
+  parts <- node_list_poke_cdr(parts, pairlist(block(return_lang)))
 
   env <- env_bury(caller_env(),
     `_state` = "1",
@@ -137,7 +137,7 @@ generator_parts <- function(node) {
   parts <- node_list_parts(node)
 
   if (is_null(parts)) {
-    node_list(new_language(block_sym, node))
+    pairlist(new_language(block_sym, node))
   } else {
     parts
   }

@@ -26,7 +26,7 @@ as_exprs_node <- function(expr) {
   if (is_pairlist(expr)) {
     expr
   } else if (is_call(expr, quote(`{`))) {
-    node_cdr(expr) %||% node_list(NULL)
+    node_cdr(expr) %||% pairlist(NULL)
   } else {
     node(expr, NULL)
   }

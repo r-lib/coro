@@ -38,7 +38,7 @@ iter_for <- function(elt, coll, expr, env = caller_env()) {
   parts <- node_list_parts(node)
 
   # Add breaking state to state machine
-  node_list_poke_cdr(parts, node_list(block(break_lang())))
+  node_list_poke_cdr(parts, pairlist(block(break_lang())))
 
   # Wrap `while` in parens to disable JIT in case `env` is GlobalEnv
   expr <- rlang::expr({
