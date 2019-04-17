@@ -14,7 +14,7 @@
 #'   print(x * 100)
 #' })
 iterate <- function(loop) {
-  loop <- enexpr(loop)
+  loop <- substitute(loop)
   if (!is_call(loop, for_sym)) {
     abort("`loop` must be a `for` loop")
   }
@@ -26,7 +26,7 @@ iterate <- function(loop) {
   coll <- node_cadr(args)
   expr <- node_cadr(node_cdr(args))
 
-  iter_for(!! elt, coll, !! expr, env = env)
+  iter_for(!!elt, coll, !!expr, env = env)
 }
 
 iter_for <- function(elt, coll, expr, env = caller_env()) {
@@ -38,17 +38,17 @@ iter_for <- function(elt, coll, expr, env = caller_env()) {
   parts <- node_list_parts(node)
 
   # Add breaking state to state machine
-  node_list_poke_cdr(parts, node_list(block(break_lang())))
+  node_list_poke_cdr(parts, pairlist(block(break_lang())))
 
   # Wrap `while` in parens to disable JIT in case `env` is GlobalEnv
   expr <- rlang::expr({
     (`while`)(TRUE, {
-      !! machine_switch_lang(parts)
+      !!machine_switch_lang(parts)
     })
   })
 
   # Put machine state operators in scope temporarily
-  scoped_bindings(.env = env, `_state` = 1L, !!! control_flow_ops)
+  scoped_bindings(.env = env, `_state` = 1L, !!!control_flow_ops)
 
   eval_bare(expr, env)
 }

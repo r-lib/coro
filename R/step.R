@@ -65,7 +65,7 @@ take_step <- function(.n) {
       if (n) {
         result
       } else {
-        as_box(result, "done_box")
+        as_box(result, "rlang_box_done")
       }
     }
   }

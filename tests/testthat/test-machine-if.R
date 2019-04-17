@@ -18,7 +18,7 @@ test_that("`if` blocks - one pause", {
   parts2 <- block("if-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3))
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`else` blocks - one pause", {
@@ -39,7 +39,7 @@ test_that("`else` blocks - one pause", {
   parts2 <- block("else-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3))
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`if` blocks - inner block", {
@@ -66,7 +66,7 @@ test_that("`if` blocks - inner block", {
   parts3 <- block("if-after", goto_lang("4"))
   parts4 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("`if` blocks - nested", {
@@ -87,7 +87,7 @@ test_that("`if` blocks - nested", {
   parts1 <- block("before", inner1)
   parts2 <- block(return_lang("if-after"))
 
-  expect_equal(parts, node_list(parts1, parts2))
+  expect_equal(parts, pairlist(parts1, parts2))
 })
 
 test_that("`if` blocks - nested and trailing pause", {
@@ -107,7 +107,7 @@ test_that("`if` blocks - nested and trailing pause", {
   parts1 <- block("before", inner1)
   parts2 <- block(return_invisible_lang)
 
-  expect_equal(parts, node_list(parts1, parts2))
+  expect_equal(parts, pairlist(parts1, parts2))
 })
 
 test_that("`if` blocks - multiply nested and all trailing", {
@@ -133,11 +133,11 @@ test_that("`if` blocks - multiply nested and all trailing", {
       "if-before"
       if (FALSE) {
         if (FALSE) {
-          !! pause_lang("2", 1L)
+          !!pause_lang("2", 1L)
         }
-        !! goto_lang("3")
+        !!goto_lang("3")
       } else {
-        !! return_invisible_lang
+        !!return_invisible_lang
       }
     } else {
       return(FALSE)
@@ -146,7 +146,7 @@ test_that("`if` blocks - multiply nested and all trailing", {
   parts2 <- block("if-3-after", goto_lang("3"))
   parts3 <- block(return_lang("if-2-after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3))
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`if`-`else` blocks - trailing", {
@@ -167,16 +167,16 @@ test_that("`if`-`else` blocks - trailing", {
     "before"
     if (TRUE) {
       "if-before"
-      !! pause_lang("2", 1L)
+      !!pause_lang("2", 1L)
     } else {
       "else-before"
-      !! pause_lang("3", 2L)
+      !!pause_lang("3", 2L)
     }
   })
   parts2 <- block(return_lang("if-after"))
   parts3 <- block(return_lang("else-after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3))
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`if`-`else` blocks - non trailing", {
@@ -200,7 +200,7 @@ test_that("`if`-`else` blocks - non trailing", {
   parts3 <- block("else-after", goto_lang("4"))
   parts4 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })
 
 test_that("`if`-`else` blocks - same continuation", {
@@ -217,14 +217,14 @@ test_that("`if`-`else` blocks - same continuation", {
   parts1 <- expr({
     "before"
     if (TRUE) {
-      !! pause_lang("2", 1L)
+      !!pause_lang("2", 1L)
     } else {
-      !! pause_lang("2", 2L)
+      !!pause_lang("2", 2L)
     }
   })
   parts2 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2))
+  expect_equal(parts, pairlist(parts1, parts2))
 })
 
 test_that("`if`-`else` blocks - continuation in `if`", {
@@ -242,15 +242,15 @@ test_that("`if`-`else` blocks - continuation in `if`", {
   parts1 <- expr({
     "before"
     if (TRUE) {
-      !! pause_lang("2", 1L)
+      !!pause_lang("2", 1L)
     } else {
-      !! pause_lang("3", 2L)
+      !!pause_lang("3", 2L)
     }
   })
   parts2 <- block("if-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3))
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`if`-`else` blocks - continuation in `else`", {
@@ -268,15 +268,15 @@ test_that("`if`-`else` blocks - continuation in `else`", {
   parts1 <- expr({
     "before"
     if (TRUE) {
-      !! pause_lang("3", 1L)
+      !!pause_lang("3", 1L)
     } else {
-      !! pause_lang("2", 2L)
+      !!pause_lang("2", 2L)
     }
   })
   parts2 <- block("else-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3))
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`if` blocks - doubly nested with continuation", {
@@ -293,16 +293,16 @@ test_that("`if` blocks - doubly nested with continuation", {
   parts1 <- expr({
     if (TRUE) {
       if (TRUE) {
-        !! pause_lang("2", 1L)
+        !!pause_lang("2", 1L)
       }
-      !! goto_lang("3")
+      !!goto_lang("3")
     }
-    !! goto_lang("3")
+    !!goto_lang("3")
   })
   parts2 <- block("if-3-after", goto_lang("3"))
   parts3 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3))
+  expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
 
 test_that("`if`-`else` blocks - multiply nested and not trailing", {
@@ -335,25 +335,25 @@ test_that("`if`-`else` blocks - multiply nested and not trailing", {
       "if-before"
       if (TRUE) {
         if (TRUE) {
-          !! pause_lang("2", 1L)
+          !!pause_lang("2", 1L)
         }
-        !! goto_lang("3")
+        !!goto_lang("3")
       } else {
         if (FALSE) {
           FALSE
         } else {
-          !! pause_lang("4", 2L)
+          !!pause_lang("4", 2L)
         }
-        !! goto_lang("4")
+        !!goto_lang("4")
       }
     } else {
       FALSE
     }
-    !! goto_lang("4")
+    !!goto_lang("4")
   })
   parts2 <- block("if-3-after", goto_lang("3"))
   parts3 <- block("if-2-after", goto_lang("4"))
   parts4 <- block(return_lang("after"))
 
-  expect_equal(parts, node_list(parts1, parts2, parts3, parts4))
+  expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })

@@ -1,6 +1,6 @@
 Package: flowery
 Title: Generators and transducers for R
-Version: 0.0.0.9000
+Version: 0.0.1.9000
 Authors@R: c(
     person("Lionel", "Henry", ,"lionel@rstudio.com", c("aut", "cre")),
     person("RStudio", role = "cph")
@@ -10,7 +10,7 @@ Depends:
     R (>= 3.1.0)
 Imports:
     glue,
-    rlang (>= 0.1.6.9003)
+    rlang (>= 0.3.1)
 Suggests:
     knitr,
     purrr,
@@ -21,6 +21,6 @@ Remotes:
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

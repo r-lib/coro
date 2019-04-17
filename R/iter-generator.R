@@ -109,23 +109,25 @@
 #' # Or drain the remaining elements:
 #' drain(greetings)
 generator <- function(body) {
-  node <- set_returns(enexpr(body))
+  body <- substitute(body)
+
+  node <- set_returns(body)
   parts <- generator_parts(node)
 
   # Add a late return point
   return_lang <- call2(base::return, quote(invisible(NULL)))
-  parts <- node_list_poke_cdr(parts, node_list(block(return_lang)))
+  parts <- node_list_poke_cdr(parts, pairlist(block(return_lang)))
 
   env <- env_bury(caller_env(),
     `_state` = "1",
     `_return_state` = length(parts),
-    !!! control_flow_ops
+    !!!control_flow_ops
   )
 
   iter <- expand(function() {
     evalq(env, expr = {
       while (TRUE) {
-        !! machine_switch_lang(parts)
+        !!machine_switch_lang(parts)
       }
     })
   })
@@ -137,7 +139,7 @@ generator_parts <- function(node) {
   parts <- node_list_parts(node)
 
   if (is_null(parts)) {
-    node_list(new_language(block_sym, node))
+    pairlist(new_language(block_sym, node))
   } else {
     parts
   }

@@ -14,16 +14,12 @@ loop_parts <- function(expr, loop_state = peek_state()) {
     parts <- node_list_parts(body)
   })
 
-  if (is_null(parts) || all_loop_control(parts)) {
-    return(NULL)
-  }
-
   # Update the `break` gotos and `pause nodes` to point to the next state
   node_poke_car(break_node, goto_lang(peek_state() + 1L))
   pauses_push_state(pauses, loop_state)
 
   # Add a looping goto at the end
-  goto_node <- node_list(goto_lang(loop_state))
+  goto_node <- pairlist(goto_lang(loop_state))
   tail <- node_list_tail_car(parts)
   push_goto(tail, goto_node)
 
@@ -32,12 +28,12 @@ loop_parts <- function(expr, loop_state = peek_state()) {
 
 next_parts <- function(expr) {
   next_block <- spliceable(new_block(peek_loop_next_node()))
-  parts <- node_list(next_block)
+  parts <- pairlist(next_block)
   poke_attr(parts, "loop_control", TRUE)
 }
 break_parts <- function(expr) {
   break_block <- spliceable(new_block(peek_loop_break_node()))
-  parts <- node_list(break_block)
+  parts <- pairlist(break_block)
   poke_attr(parts, "loop_control", TRUE)
 }
 
@@ -120,8 +116,8 @@ for_parts <- function(expr) {
   if (is_null(parts)) {
     body <- duplicate(body, shallow = TRUE)
     body <- as_block(body)
-    node_list_poke_cdr(body, node_list(goto_lang(loop_state)))
-    parts <- node_list(body)
+    node_list_poke_cdr(body, pairlist(goto_lang(loop_state)))
+    parts <- pairlist(body)
   }
 
   init_part <- for_init_part(loop_state, expr)
@@ -136,20 +132,20 @@ for_init_part <- function(loop_state, expr) {
   coll_expr <- node_cadr(node_cdr(expr))
 
   expr({
-    !! iter_sym <- !! coll_expr
+    !!iter_sym <- !!coll_expr
 
     # `base::for()` internally converts factors to character vectors
-    if (base::is.factor(!! iter_sym)) {
-      !! iter_sym <- base::as.character(!! iter_sym)
+    if (base::is.factor(!!iter_sym)) {
+      !!iter_sym <- base::as.character(!!iter_sym)
     }
-    !! iter_sym <- flowery::as_iterator(!! iter_sym)
+    !!iter_sym <- flowery::as_iterator(!!iter_sym)
 
     # Trigger an iteration error if iterator was already done
     if (flowery::is_done(!! iter_sym)) {
       UQ(iter_sym)()
     }
 
-    !! goto_lang(loop_state)
+    !!goto_lang(loop_state)
   })
 }
 for_next_part <- function(loop_state, expr) {
@@ -157,11 +153,11 @@ for_next_part <- function(loop_state, expr) {
   iter_sym <- for_iter_sym(loop_state)
 
   expr({
-    if (flowery::advance(!! iter_sym)) {
-      !! elt_sym <- flowery::deref(!! iter_sym)
-      !! goto_lang(loop_state + 1L)
+    if (flowery::advance(!!iter_sym)) {
+      !!elt_sym <- flowery::deref(!!iter_sym)
+      !!goto_lang(loop_state + 1L)
     } else {
-      !! goto_lang(peek_state() + 1L)
+      !!goto_lang(peek_state() + 1L)
     }
   })
 }
