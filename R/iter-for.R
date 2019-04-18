@@ -26,7 +26,7 @@ iterate <- function(loop) {
   coll <- node_cadr(args)
   expr <- node_cadr(node_cdr(args))
 
-  iter_for(!!elt, coll, !!expr, env = env)
+  invisible(iter_for(!!elt, coll, !!expr, env = env))
 }
 
 iter_for <- function(elt, coll, expr, env = caller_env()) {
