@@ -84,5 +84,8 @@ test_that("can reduce iterators", {
 test_that("reducing done iterators is an error", {
   iter <- as_iterator(list())
   iter()
-  expect_error(drain(iter), "is done")
+  expect_error(
+    drain(iter),
+    class = "flowery_error_iterator_done"
+  )
 })

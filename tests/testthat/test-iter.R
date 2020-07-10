@@ -45,7 +45,10 @@ test_that("NULL terminates iterators", {
   done <- TRUE
   expect_null(it())
   expect_true(is_done(it))
-  expect_error(it(), "done")
+  expect_error(
+    it(),
+    class = "flowery_error_iterator_done"
+  )
 })
 
 test_that("boxed NULLs don't terminate iterators", {

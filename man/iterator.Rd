@@ -51,7 +51,7 @@ time it is called and that supports:
 \item \code{deref()} to dereference the current value of the iterator.
 \item \code{is_done()} to check if the iterator has exhausted its
 elements. Calling an exhausted iterator causes an error of class
-\code{exhausted_iter}.
+\code{flowery_error_iterator_done}.
 \item \code{advance()} to advance to the next value. This is similar to
 calling the iterator for a new element but returns \code{TRUE} if the
 iterator indeed had another element or \code{FALSE} if the iterator
