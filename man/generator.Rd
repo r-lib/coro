@@ -72,11 +72,11 @@ iter <- new_yielder("foo", "bar", "barbaz")
 # As generators are regular iterators, you can use all iterator
 # tools such as iterate() which allows you to loop over all values
 # with a `for` loop:
-iterate(for (x in iter) cat(x, "\\n"))
+iterate(for (x in iter) cat(x, "\n"))
 
 # You can also use advance() and deref() to loop manually:
 iter <- new_yielder("foo", "bar", "barbaz")
-while (advance(iter)) cat(deref(iter), "\\n")
+while (advance(iter)) cat(deref(iter), "\n")
 
 
 # The termination condition of a generator works the way you would
@@ -97,7 +97,7 @@ advance(iter)
 # which point the loop completes and the generator returns NULL.
 # This signals that the iterator has completed:
 iter <- generator(for (x in 1:3) yield(x))
-iterate(for (x in iter) cat("iteration", x, "\\n"))
+iterate(for (x in iter) cat("iteration", x, "\n"))
 
 
 # The generator also has a short syntax `gen()`. It is completely

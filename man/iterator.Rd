@@ -166,13 +166,13 @@ is_done(iter)
 # to get the value of this new element:
 iter <- new_counter(3)
 while (advance(iter)) {
-  cat(deref(iter), "to go!\\n")
+  cat(deref(iter), "to go!\n")
 }
 
 # It is often easier to loop over an iterator with `iterate()`. It
 # instruments `for` and makes it handle iterators:
 iter <- new_counter(3)
-iterate(for(n in iter) cat(n, "to go!\\n"))
+iterate(for(n in iter) cat(n, "to go!\n"))
 
 
 # It is much easier to create iterators with generators:
@@ -188,7 +188,7 @@ new_counter <- function(n) {
 
 # This generator behaves exactly as our other iterator function:
 iter <- new_counter(3)
-iterate(for(n in iter) cat(n, "to go!\\n"))
+iterate(for(n in iter) cat(n, "to go!\n"))
 }
 \seealso{
 \code{\link[=generator]{generator()}} is the recommended way of creating iterators.

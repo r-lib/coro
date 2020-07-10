@@ -20,13 +20,13 @@ discard_step(.p, ...)
 \item{.n}{The number of inputs to take.}
 
 \item{.f}{A function to map over inputs. If needed this argument is
-transformed to a function with \code{\link[rlang:as_closure]{rlang::as_closure()}} and thus
+transformed to a function with \code{\link[rlang:as_function]{rlang::as_closure()}} and thus
 supports the lambda-formula notation.}
 
 \item{...}{Further arguments passed over to \code{.f} or \code{.p}.}
 
 \item{.p}{A predicate function applied to inputs. If needed this
-argument is transformed to a function with \code{\link[rlang:as_closure]{rlang::as_closure()}}
+argument is transformed to a function with \code{\link[rlang:as_function]{rlang::as_closure()}}
 and thus supports the lambda-formula notation.}
 }
 \description{
