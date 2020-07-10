@@ -54,7 +54,7 @@ node_list_parts <- function(node) {
     # relevant goto and pause nodes. Fill those nodes only when we
     # extracted the parts so they get the right state index.
     if (has_future()) {
-      next_goto <- node(goto_lang(-1L), NULL)
+      next_goto <- new_node(goto_lang(-1L), NULL)
       pauses <- null_node()
 
       with_jump_nodes(next_goto, pauses, has_past(), {

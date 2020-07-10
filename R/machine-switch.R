@@ -1,8 +1,8 @@
 
 machine_switch_lang <- function(parts) {
   parts <- node_list_enumerate_tags(parts)
-  switch_args <- node(quote(`_state`), parts)
-  new_language(switch_sym, switch_args)
+  switch_args <- new_node(quote(`_state`), parts)
+  new_call(switch_sym, switch_args)
 }
 node_list_enumerate_tags <- function(node) {
   i <- 0L

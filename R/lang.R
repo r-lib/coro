@@ -28,7 +28,7 @@ as_exprs_node <- function(expr) {
   } else if (is_call(expr, quote(`{`))) {
     node_cdr(expr) %||% pairlist(NULL)
   } else {
-    node(expr, NULL)
+    new_node(expr, NULL)
   }
 }
 
@@ -46,15 +46,15 @@ return_state_lang <- function(...) {
 }
 
 new_pause <- function(state, cdr = NULL) {
-  args <- node(as.character(state), cdr)
-  new_language(pause_sym, args)
+  args <- new_node(as.character(state), cdr)
+  new_call(pause_sym, args)
 }
 
 block <- function(...) {
   call2(block_sym, ...)
 }
 new_block <- function(x) {
-  new_language(block_sym, x)
+  new_call(block_sym, x)
 }
 is_block <- function(x) {
   is_call(x, block_sym)

@@ -124,7 +124,7 @@ generator <- function(body) {
     !!!control_flow_ops
   )
 
-  iter <- expand(function() {
+  iter <- blast(function() {
     evalq(env, expr = {
       while (TRUE) {
         !!machine_switch_lang(parts)
@@ -139,7 +139,7 @@ generator_parts <- function(node) {
   parts <- node_list_parts(node)
 
   if (is_null(parts)) {
-    pairlist(new_language(block_sym, node))
+    pairlist(new_call(block_sym, node))
   } else {
     parts
   }

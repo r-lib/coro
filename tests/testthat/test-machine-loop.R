@@ -414,7 +414,7 @@ test_that("`for` - one pause with past and future", {
   })
 
   for_parts <- new_for_parts(1L, quote(i), quote(x), "5")
-  parts1 <- new_block(node("before", node_cdar(for_parts)))
+  parts1 <- new_block(new_node("before", node_cdar(for_parts)))
   parts2 <- node_cadr(for_parts)
   parts3 <- block("for-before", pause_lang("4", 1L))
   parts4 <- block("for-after", goto_lang("2"))

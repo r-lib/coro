@@ -41,7 +41,7 @@ node_list_tail_cdr <- function(node) {
 
 node_list_poke_car <- function(node, new_car) {
   if (is_null(node)) {
-    node(new_car, NULL)
+    new_node(new_car, NULL)
   } else {
     node_poke_car(node_list_tail(node), new_car)
     node
@@ -123,7 +123,7 @@ node_list_poke_cdr_at <- function(x, at, newcdr) {
 
 null_node_sym <- quote(`__rlang_null_node`)
 null_node <- function() {
-  node(null_node_sym, NULL)
+  new_node(null_node_sym, NULL)
 }
 is_null_node <- function(x) {
   is_pairlist(x) &&

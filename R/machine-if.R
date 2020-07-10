@@ -47,5 +47,5 @@ if_parts <- function(expr) {
     push_goto(expr)
   }
 
-  node(expr, parts)
+  new_node(expr, parts)
 }

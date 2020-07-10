@@ -4,7 +4,7 @@ test_that("print method prints original function", {
   expect_output(print(simple_iter), "\"body\"")
 
   # Print methods are preserved
-  fn <- set_attrs(function() NULL, class = "foo")
+  fn <- structure(function() NULL, class = "foo")
   print.foo <- function(x) cat("print foo\n")
   iter <- new_iterator(fn)
 

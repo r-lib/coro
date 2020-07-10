@@ -40,7 +40,7 @@ test_that("reduce_steps() calls initial step for result completion", {
 
 test_that("into() creates vector of requested type", {
   # Also tested indirectly via take tests above
-  expect_identical(into(dbl_len(3), 1:3), as_double(1:3))
+  expect_identical(into(new_double(3), 1:3), dbl(1:3))
 })
 
 test_that("into() shrinks vector if needed", {

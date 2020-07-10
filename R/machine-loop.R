@@ -3,11 +3,11 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # These pausing nodes are used only when there is no continuation after
   # the pause. It ensures we restart at the start of the loop.
   pauses <- null_node()
-  next_node <- node(goto_lang(loop_state), NULL)
+  next_node <- new_node(goto_lang(loop_state), NULL)
 
   # We don't know the finishing state until we've obtained all states
   # nested within the loop
-  break_node <- node(goto_lang(-1L), NULL)
+  break_node <- new_node(goto_lang(-1L), NULL)
 
   body <- as_exprs_node(expr)
   with_loop_nodes(pauses, next_node, break_node, {
@@ -67,7 +67,7 @@ repeat_parts <- function(expr) {
   }
 
   loop_state <- spliceable(block(goto_lang(loop_state)))
-  node(loop_state, parts)
+  new_node(loop_state, parts)
 }
 
 while_parts <- function(expr) {
@@ -92,12 +92,12 @@ while_parts <- function(expr) {
 
   cond <- node_cadr(expr)
   cond_state <- block(if_lang(cond, goto_loop_start, goto_loop_end))
-  loop_parts <- node(cond_state, parts)
+  loop_parts <- new_node(cond_state, parts)
 
   # Merge into the current state if there is a past
   if (peek_has_past()) {
     goto_block <- spliceable(block(goto_lang(loop_state)))
-    loop_parts <- node(goto_block, loop_parts)
+    loop_parts <- new_node(goto_block, loop_parts)
   }
 
   loop_parts
@@ -123,8 +123,8 @@ for_parts <- function(expr) {
   init_part <- for_init_part(loop_state, expr)
   next_part <- for_next_part(loop_state, expr)
 
-  init_parts <- set_attrs(init_part, spliceable = TRUE) # FIXME
-  node(init_parts, node(next_part, parts))
+  init_parts <- structure(init_part, spliceable = TRUE) # FIXME
+  new_node(init_parts, new_node(next_part, parts))
 }
 
 for_init_part <- function(loop_state, expr) {

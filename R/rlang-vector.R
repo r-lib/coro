@@ -13,14 +13,14 @@ as_vector_fn <- function(type) {
     abort("`type` must be a vector type")
   }
   switch(type,
-    logical = as_logical,
-    integer = as_integer,
-    double = as_double,
-    complex = as_complex,
+    logical = as.logical,
+    integer = as.integer,
+    double = as.double,
+    complex = as.complex,
     # FIXME: explicit rlang::as_character() should serialise input
     character = as.character,
     raw = as.raw,
-    list = as_list,
+    list = function(x) list2(!!!x),
     abort("Internal error in `as_vector()`: unexpected type")
   )
 }

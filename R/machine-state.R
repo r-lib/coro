@@ -58,7 +58,7 @@ scoped_state_elt <- function(elt, value, frame = caller_env()) {
 }
 scoped_state_elts <- function(elts, frame = caller_env()) {
   nms <- names(elts)
-  old <- list_along(elts)
+  old <- new_list(length(elts))
 
   exit_lang <- block()
   cur <- exit_lang

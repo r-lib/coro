@@ -13,7 +13,7 @@ map_last <- function(.x, .f, ...) {
 }
 
 set_class <- function(x, class) {
-  set_attrs(x, class = class)
+  structure(x, class = class)
 }
 
 compose <- function(...) {

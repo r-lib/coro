@@ -278,37 +278,37 @@ into <- function(to, from, steps = NULL) {
 #' iter <- as_iterator(1:10)
 #' drain(iter)
 take <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(list_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(new_list(.n)))
 }
 #' @rdname take
 #' @export
 take_lgl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(lgl_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(new_logical(.n)))
 }
 #' @rdname take
 #' @export
 take_int <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(int_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(new_integer(.n)))
 }
 #' @rdname take
 #' @export
 take_dbl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(dbl_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(new_double(.n)))
 }
 #' @rdname take
 #' @export
 take_cpl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(cpl_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(new_complex(.n)))
 }
 #' @rdname take
 #' @export
 take_chr <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(chr_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(new_character(.n)))
 }
 #' @rdname take
 #' @export
 take_raw <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(raw_len(.n)))
+  reduce_steps(.x, take_step(.n), poke_into_builder(new_raw(.n)))
 }
 
 #' @rdname take

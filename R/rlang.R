@@ -27,24 +27,22 @@ scoped_exit <- function(expr, frame = caller_env()) {
   invisible(expr)
 }
 
-new_logical <- lgl_len
-new_integer <- int_len
-new_double <- dbl_len
-new_complex <- cpl_len
-new_character <- chr_len
-new_raw <- raw_len
-new_list <- list_len
-
 new_function <- function(body, args = list(), env = caller_env()) {
   stopifnot(all(have_name(args)), is_expr(body), is_env(env))
   args <- as_pairlist(args)
   eval_bare(call("function", args, body), env)
 }
 
-add_attributes <- set_attrs
-
-set_class <- function(x, class) {
-  add_attributes(x, class = class)
+add_attributes <- function(.x, ...) {
+  attributes(.x) <- list2(...)
+  .x
 }
 
-expand <- expr_interp
+set_class <- function(x, class) {
+  class(x) <- class
+  x
+}
+
+blast <- function(expr, env = caller_env()) {
+  eval_bare(enexpr(expr), env)
+}
