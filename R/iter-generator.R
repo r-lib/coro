@@ -132,6 +132,9 @@ generator <- function(body) {
     })
   })
 
+  # Zap source references so you can see the state machine
+  attributes(iter) <- NULL
+
   new_iterator(iter)
 }
 generator_parts <- function(node) {
