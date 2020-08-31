@@ -38,33 +38,33 @@ iter_take <- function(n) {
     orig_n <- n
     curr_n <- n
 
-    function(result, input) {
-      if (missing(result)) {
+    function(out, new) {
+      if (missing(out)) {
         return(next_step())
       }
 
-      if (missing(input)) {
-        # Check `result` only after it has been completely finalised
+      if (missing(new)) {
+        # Check `out` only after it has been completely finalised
         # because along_builder() does not expose intermediary
         # results
-        result <- next_step(result)
-        if (length(result) < orig_n) {
+        out <- next_step(out)
+        if (length(out) < orig_n) {
           abort(glue(
             "Not enough elements for `take()` \\
-             ({ length(result) } / { orig_n } elements)"
+             ({ length(out) } / { orig_n } elements)"
           ))
         }
 
-        return(result)
+        return(out)
       }
 
       curr_n <<- curr_n - 1L
-      result <- next_step(result, input)
+      out <- next_step(out, new)
 
       if (curr_n) {
-        result
+        out
       } else {
-        as_box(result, "rlang_box_done")
+        as_box(out, "rlang_box_done")
       }
     }
   }
@@ -82,15 +82,15 @@ iter_map <- function(.f, ...) {
   function(next_step) {
     force(next_step)
 
-    function(result, input) {
-      if (missing(result)) {
+    function(out, new) {
+      if (missing(out)) {
         return(next_step())
       }
-      if (missing(input)) {
-        return(next_step(result))
+      if (missing(new)) {
+        return(next_step(out))
       }
 
-      next_step(result, .f(input, ...))
+      next_step(out, .f(new, ...))
     }
   }
 }
@@ -112,18 +112,18 @@ iter_discard <- function(.p, ...) {
   function(next_step) {
     force(next_step)
 
-    function(result, input) {
-      if (missing(result)) {
+    function(out, new) {
+      if (missing(out)) {
         return(next_step())
       }
-      if (missing(input)) {
-        return(next_step(result))
+      if (missing(new)) {
+        return(next_step(out))
       }
 
-      if (.p(input, ...)) {
-        result
+      if (.p(new, ...)) {
+        out
       } else {
-        next_step(result, input)
+        next_step(out, new)
       }
     }
   }

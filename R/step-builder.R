@@ -67,11 +67,11 @@ poke_into_builder <- function(to) {
 
   i <- 0L
 
-  function(result, input) {
-    if (missing(result)) {
+  function(out, new) {
+    if (missing(out)) {
       return(to[0])
     }
-    if (missing(input)) {
+    if (missing(new)) {
       # Shrink vector if needed
       if (length(to) > i) {
         to <- to[seq_len(i)]
@@ -79,7 +79,7 @@ poke_into_builder <- function(to) {
       return(to)
     }
 
-    next_i <- i + length(input)
+    next_i <- i + length(new)
 
     # Grow vector geometrically. Note that this incurs several copies,
     # extra tooling is needed in rlang to prevent this
@@ -89,7 +89,7 @@ poke_into_builder <- function(to) {
       to <<- new_to
     }
 
-    vec_poke_range(to, i + 1, coercer(input))
+    vec_poke_range(to, i + 1, coercer(new))
     i <<- next_i
 
     to
