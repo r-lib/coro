@@ -33,21 +33,21 @@ NULL
 iter_take <- function(n) {
   force(n)
 
-  function(next_step) {
+  function(continue) {
     # Forward `n` here to make it safe for mutation
     orig_n <- n
     curr_n <- n
 
     function(out, new) {
       if (missing(out)) {
-        return(next_step())
+        return(continue())
       }
 
       if (missing(new)) {
         # Check `out` only after it has been completely finalised
         # because along_builder() does not expose intermediary
         # results
-        out <- next_step(out)
+        out <- continue(out)
         if (length(out) < orig_n) {
           abort(glue(
             "Not enough elements for `take()` \\
@@ -59,7 +59,7 @@ iter_take <- function(n) {
       }
 
       curr_n <<- curr_n - 1L
-      out <- next_step(out, new)
+      out <- continue(out, new)
 
       if (curr_n) {
         out
@@ -79,18 +79,18 @@ iter_take <- function(n) {
 iter_map <- function(.f, ...) {
   .f <- as_closure(.f)
 
-  function(next_step) {
-    force(next_step)
+  function(continue) {
+    force(continue)
 
     function(out, new) {
       if (missing(out)) {
-        return(next_step())
+        return(continue())
       }
       if (missing(new)) {
-        return(next_step(out))
+        return(continue(out))
       }
 
-      next_step(out, .f(new, ...))
+      continue(out, .f(new, ...))
     }
   }
 }
@@ -109,21 +109,21 @@ iter_keep <- function(.p, ...) {
 iter_discard <- function(.p, ...) {
   .p <- as_closure(.p)
 
-  function(next_step) {
-    force(next_step)
+  function(continue) {
+    force(continue)
 
     function(out, new) {
       if (missing(out)) {
-        return(next_step())
+        return(continue())
       }
       if (missing(new)) {
-        return(next_step(out))
+        return(continue(out))
       }
 
       if (.p(new, ...)) {
         out
       } else {
-        next_step(out, new)
+        continue(out, new)
       }
     }
   }
