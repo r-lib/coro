@@ -26,17 +26,17 @@ reset_state <- function(state = NULL) {
   env_bind(current_state, !!!state)
 }
 
-scoped_state <- function(idx, frame = caller_env()) {
+local_state <- function(idx, frame = caller_env()) {
   old <- peek_state()
   poke_state(idx)
 
   restore_state_lang <- call2(poke_state, old)
-  scoped_exit(!!restore_state_lang, frame = frame)
+  local_exit(!!restore_state_lang, frame = frame)
 
   invisible(old)
 }
 with_state <- function(idx, expr) {
-  scoped_state(idx)
+  local_state(idx)
   expr
 }
 
@@ -48,15 +48,15 @@ poke_state_elt <- function(elt, value) {
   current_state[[elt]] <- value
   invisible(old)
 }
-scoped_state_elt <- function(elt, value, frame = caller_env()) {
+local_state_elt <- function(elt, value, frame = caller_env()) {
   old <- poke_state_elt(elt, value)
 
   restore_state_lang <- call2(poke_state_elt, elt, old)
-  scoped_exit(!!restore_state_lang, frame = frame)
+  local_exit(!!restore_state_lang, frame = frame)
 
   invisible(old)
 }
-scoped_state_elts <- function(elts, frame = caller_env()) {
+local_state_elts <- function(elts, frame = caller_env()) {
   nms <- names(elts)
   old <- new_list(length(elts))
 
@@ -72,24 +72,24 @@ scoped_state_elts <- function(elts, frame = caller_env()) {
     cur <- node_cdr(cur)
   }
 
-  scoped_exit(!!exit_lang, frame = frame)
+  local_exit(!!exit_lang, frame = frame)
 
   invisible(old)
 }
 
-scoped_jump_nodes <- function(goto, pauses, has_past, frame = caller_env()) {
-  scoped_state_elts(frame = frame, list(
+local_jump_nodes <- function(goto, pauses, has_past, frame = caller_env()) {
+  local_state_elts(frame = frame, list(
     goto = goto,
     pauses = pauses,
     has_past = has_past
   ))
 }
 with_jump_nodes <- function(goto, pauses, has_past, expr) {
-  scoped_jump_nodes(goto, pauses, has_past)
+  local_jump_nodes(goto, pauses, has_past)
   expr
 }
 with_loop_nodes <- function(pauses, loop_next, loop_break, expr) {
-  scoped_state_elts(list(
+  local_state_elts(list(
     pauses = pauses,
     goto = loop_next,
     loop_next = loop_next,

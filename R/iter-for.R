@@ -48,7 +48,7 @@ iter_for <- function(elt, coll, expr, env = caller_env()) {
   })
 
   # Put machine state operators in scope temporarily
-  scoped_bindings(.env = env, `_state` = 1L, !!!control_flow_ops)
+  local_bindings(.env = env, `_state` = 1L, !!!control_flow_ops)
 
   eval_bare(expr, env)
 }
