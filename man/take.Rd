@@ -17,38 +17,38 @@
 \alias{drain_raw}
 \title{Take n or all elements from a vector or iterator}
 \usage{
-take(.x, .n)
+take(x, n)
 
-take_lgl(.x, .n)
+take_lgl(x, n)
 
-take_int(.x, .n)
+take_int(x, n)
 
-take_dbl(.x, .n)
+take_dbl(x, n)
 
-take_cpl(.x, .n)
+take_cpl(x, n)
 
-take_chr(.x, .n)
+take_chr(x, n)
 
-take_raw(.x, .n)
+take_raw(x, n)
 
-drain(.x)
+drain(x)
 
-drain_lgl(.x)
+drain_lgl(x)
 
-drain_int(.x)
+drain_int(x)
 
-drain_dbl(.x)
+drain_dbl(x)
 
-drain_cpl(.x)
+drain_cpl(x)
 
-drain_chr(.x)
+drain_chr(x)
 
-drain_raw(.x, .n)
+drain_raw(x, n)
 }
 \arguments{
-\item{.x}{A reducible object.}
+\item{x}{A reducible object.}
 
-\item{.n}{The number of elements to take from \code{.x}.}
+\item{n}{The number of elements to take from \code{x}.}
 }
 \description{
 These functions are similar to \code{head()} but also perform coercion

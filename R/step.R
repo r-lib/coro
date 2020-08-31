@@ -11,7 +11,7 @@
 #'   inputs and discard or keep the selected elements.
 #'
 #' * `take_step()` is a transformation step that terminates early
-#'   after `.n` inputs.
+#'   after `n` inputs.
 #'
 #' @details
 #'
@@ -28,14 +28,15 @@
 NULL
 
 #' @rdname steps
-#' @param .n The number of inputs to take.
+#' @param n The number of inputs to take.
 #' @export
-take_step <- function(.n) {
-  force(.n)
+take_step <- function(n) {
+  force(n)
 
   function(next_step) {
-    # Forward `.n` here to make it safe for mutation
-    n <- .n
+    # Forward `n` here to make it safe for mutation
+    orig_n <- n
+    curr_n <- n
 
     function(result, input) {
       if (missing(result)) {
@@ -47,20 +48,20 @@ take_step <- function(.n) {
         # because along_builder() does not expose intermediary
         # results
         result <- next_step(result)
-        if (length(result) < .n) {
+        if (length(result) < orig_n) {
           abort(glue(
             "Not enough elements for `take()` \\
-             ({ length(result) } / { .n } elements)"
+             ({ length(result) } / { orig_n } elements)"
           ))
         }
 
         return(result)
       }
 
-      n <<- n - 1L
+      curr_n <<- curr_n - 1L
       result <- next_step(result, input)
 
-      if (n) {
+      if (curr_n) {
         result
       } else {
         as_box(result, "rlang_box_done")

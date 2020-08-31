@@ -8,7 +8,7 @@
 \alias{discard_step}
 \title{Transformation steps}
 \usage{
-take_step(.n)
+take_step(n)
 
 map_step(.f, ...)
 
@@ -17,7 +17,7 @@ keep_step(.p, ...)
 discard_step(.p, ...)
 }
 \arguments{
-\item{.n}{The number of inputs to take.}
+\item{n}{The number of inputs to take.}
 
 \item{.f}{A function to map over inputs. If needed this argument is
 transformed to a function with \code{\link[rlang:as_function]{rlang::as_closure()}} and thus
@@ -37,7 +37,7 @@ behaviour of an iterator (see \code{\link[=iter_adapt]{iter_adapt()}}).
 \item \code{discard_step()} and \code{keep_step()} apply a predicate \code{.p} over
 inputs and discard or keep the selected elements.
 \item \code{take_step()} is a transformation step that terminates early
-after \code{.n} inputs.
+after \code{n} inputs.
 }
 }
 \details{

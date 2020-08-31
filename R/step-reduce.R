@@ -5,7 +5,7 @@
 #'
 #' `reduce_steps()` is like [purrr::reduce()] but supports chains of
 #' transformation steps. These transformations are applied to each
-#' element of `.x` and are passed as `input` to the builder function
+#' element of `x` and are passed as `input` to the builder function
 #' `.builder` as final step. All transformations are applied in
 #' sequence for each input, so no intermediary output is
 #' constructed. This makes transformation steps ideal to transform
@@ -105,18 +105,18 @@
 #'
 #' The `reduce()` function used internally in flowery has support for
 #' early termination. If the reducer returns a `reduced` box
-#' (constructed with [done()]), remaining inputs in `.x` are
+#' (constructed with [done()]), remaining inputs in `x` are
 #' ignored and `reduce_steps()` finishes the reduction right away.
 #'
-#' @param .x A vector to reduce or an [iterator].
-#' @param .steps A chain of transformation steps to apply before
+#' @param x A vector to reduce or an [iterator].
+#' @param steps A chain of transformation steps to apply before
 #'   calling the builder function. If `NULL`, the builder function is
 #'   reduced without transformation.
-#' @param .builder A builder function that takes a "result so far" as
+#' @param builder A builder function that takes a "result so far" as
 #'   first argument and a new input as second argument. It is called
-#'   iteratively by `reduce_steps()` with each elements of `.x` as new
+#'   iteratively by `reduce_steps()` with each elements of `x` as new
 #'   input.
-#' @param .init An initial `result` value. If not supplied, the
+#' @param init An initial `result` value. If not supplied, the
 #'   builder function is called without argument to get an initial
 #'   value.
 #'
@@ -208,8 +208,8 @@
 #' iter <- as_iterator(1:50)
 #' take(iter, 5)
 #' take_chr(iter, 5)
-reduce_steps <- function(.x, .steps, .builder, .init) {
-  .builder <- as_closure(.builder)
+reduce_steps <- function(x, steps, builder, init) {
+  builder <- as_closure(builder)
 
   # Seal the transformation chain by supplying a builder function
   # (step reducer) to the steps wrapper (transducer). The stack of
@@ -219,27 +219,27 @@ reduce_steps <- function(.x, .steps, .builder, .init) {
   # which itself is supplied to the penultimate step and so on. Input
   # data will then flow from outermost steps to innermost ones up to
   # the builder step which decides how to handle this result.
-  if (is_null(.steps)) {
-    reducer <- .builder
+  if (is_null(steps)) {
+    reducer <- builder
   } else {
-    reducer <- .steps(.builder)
+    reducer <- steps(builder)
   }
   stopifnot(is_closure(reducer))
 
   # A builder called without argument should return an init value,
-  # typically its identity. If a `.steps` wrapper is supplied, this
+  # typically its identity. If a `steps` wrapper is supplied, this
   # causes transducers to call their wrapped steps without arguments
   # up until the builder step.
-  if (missing(.init)) {
+  if (missing(init)) {
     identity <- reducer()
   } else {
-    identity <- .init
+    identity <- init
   }
 
-  # This reduction causes a loop over the data. If `.steps` was
+  # This reduction causes a loop over the data. If `steps` was
   # supplied the data flows through all transducers wrapped in
   # `reducer`.
-  result <- reduce(.x, reducer, .init = identity)
+  result <- reduce(x, reducer, .init = identity)
 
   # Calling without input triggers completion within all
   # transformation steps.
@@ -266,8 +266,8 @@ into <- function(to, from, steps = NULL) {
 #' * The `drain()` variants return all elements. The vector is grown
 #'   geometrically.
 #'
-#' @param .x A reducible object.
-#' @param .n The number of elements to take from `.x`.
+#' @param x A reducible object.
+#' @param n The number of elements to take from `x`.
 #'
 #' @seealso [take_step()]
 #' @export
@@ -277,74 +277,74 @@ into <- function(to, from, steps = NULL) {
 #'
 #' iter <- as_iterator(1:10)
 #' drain(iter)
-take <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(new_list(.n)))
+take <- function(x, n) {
+  reduce_steps(x, take_step(n), poke_into_builder(new_list(n)))
 }
 #' @rdname take
 #' @export
-take_lgl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(new_logical(.n)))
+take_lgl <- function(x, n) {
+  reduce_steps(x, take_step(n), poke_into_builder(new_logical(n)))
 }
 #' @rdname take
 #' @export
-take_int <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(new_integer(.n)))
+take_int <- function(x, n) {
+  reduce_steps(x, take_step(n), poke_into_builder(new_integer(n)))
 }
 #' @rdname take
 #' @export
-take_dbl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(new_double(.n)))
+take_dbl <- function(x, n) {
+  reduce_steps(x, take_step(n), poke_into_builder(new_double(n)))
 }
 #' @rdname take
 #' @export
-take_cpl <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(new_complex(.n)))
+take_cpl <- function(x, n) {
+  reduce_steps(x, take_step(n), poke_into_builder(new_complex(n)))
 }
 #' @rdname take
 #' @export
-take_chr <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(new_character(.n)))
+take_chr <- function(x, n) {
+  reduce_steps(x, take_step(n), poke_into_builder(new_character(n)))
 }
 #' @rdname take
 #' @export
-take_raw <- function(.x, .n) {
-  reduce_steps(.x, take_step(.n), poke_into_builder(new_raw(.n)))
+take_raw <- function(x, n) {
+  reduce_steps(x, take_step(n), poke_into_builder(new_raw(n)))
 }
 
 #' @rdname take
 #' @export
-drain <- function(.x) {
-  reduce_steps(.x, NULL, along_builder(list()))
+drain <- function(x) {
+  reduce_steps(x, NULL, along_builder(list()))
 }
 #' @rdname take
 #' @export
-drain_lgl <- function(.x) {
-  reduce_steps(.x, NULL, along_builder(lgl()))
+drain_lgl <- function(x) {
+  reduce_steps(x, NULL, along_builder(lgl()))
 }
 #' @rdname take
 #' @export
-drain_int <- function(.x) {
-  reduce_steps(.x, NULL, along_builder(int()))
+drain_int <- function(x) {
+  reduce_steps(x, NULL, along_builder(int()))
 }
 #' @rdname take
 #' @export
-drain_dbl <- function(.x) {
-  reduce_steps(.x, NULL, along_builder(dbl()))
+drain_dbl <- function(x) {
+  reduce_steps(x, NULL, along_builder(dbl()))
 }
 #' @rdname take
 #' @export
-drain_cpl <- function(.x) {
-  reduce_steps(.x, NULL, along_builder(cpl()))
+drain_cpl <- function(x) {
+  reduce_steps(x, NULL, along_builder(cpl()))
 }
 #' @rdname take
 #' @export
-drain_chr <- function(.x) {
-  reduce_steps(.x, NULL, along_builder(chr()))
+drain_chr <- function(x) {
+  reduce_steps(x, NULL, along_builder(chr()))
 }
 #' @rdname take
 #' @export
-drain_raw <- function(.x, .n) {
-  reduce_steps(.x, NULL, along_builder(raw(0)))
+drain_raw <- function(x, n) {
+  reduce_steps(x, NULL, along_builder(raw(0)))
 }
 
 # From purrr. The only change is that this reduce() function supports
