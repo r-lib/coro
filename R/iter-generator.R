@@ -115,7 +115,7 @@ generator <- function(body) {
   parts <- generator_parts(node)
 
   # Add a late return point
-  return_call <- call2(base::return, quote(invisible(NULL)))
+  return_call <- call2(quote(base::return), quote(invisible(NULL)))
   parts <- node_list_poke_cdr(parts, pairlist(block(return_call)))
 
   env <- env_bury(caller_env(),
