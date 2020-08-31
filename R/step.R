@@ -5,12 +5,12 @@
 #' Transformation steps can be chained together to modify the
 #' behaviour of an iterator (see [iter_adapt()]).
 #'
-#' * `map_step()` applies a function `.f` over all inputs.
+#' * `iter_map()` applies a function `.f` over all inputs.
 #'
-#' * `discard_step()` and `keep_step()` apply a predicate `.p` over
+#' * `iter_discard()` and `iter_keep()` apply a predicate `.p` over
 #'   inputs and discard or keep the selected elements.
 #'
-#' * `take_step()` is a transformation step that terminates early
+#' * `iter_take()` is a transformation step that terminates early
 #'   after `n` inputs.
 #'
 #' @details
@@ -24,13 +24,13 @@
 #' # `purrr::compose()` is the recommended way to chain transformation
 #' # steps:
 #' compose <- purrr::compose
-#' steps <- compose(map_step(`+`, 10), discard_step(`>`, 15))
+#' steps <- compose(iter_map(`+`, 10), iter_discard(`>`, 15))
 NULL
 
 #' @rdname steps
 #' @param n The number of inputs to take.
 #' @export
-take_step <- function(n) {
+iter_take <- function(n) {
   force(n)
 
   function(next_step) {
@@ -76,7 +76,7 @@ take_step <- function(n) {
 #'   supports the lambda-formula notation.
 #' @param ... Further arguments passed over to `.f` or `.p`.
 #' @export
-map_step <- function(.f, ...) {
+iter_map <- function(.f, ...) {
   .f <- as_closure(.f)
 
   function(next_step) {
@@ -100,13 +100,13 @@ map_step <- function(.f, ...) {
 #'   argument is transformed to a function with [rlang::as_closure()]
 #'   and thus supports the lambda-formula notation.
 #' @export
-keep_step <- function(.p, ...) {
+iter_keep <- function(.p, ...) {
   .p <- as_closure(.p)
-  discard_step(negate(.p), ...)
+  iter_discard(negate(.p), ...)
 }
 #' @rdname steps
 #' @export
-discard_step <- function(.p, ...) {
+iter_discard <- function(.p, ...) {
   .p <- as_closure(.p)
 
   function(next_step) {

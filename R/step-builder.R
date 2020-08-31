@@ -33,7 +33,7 @@
 #' @examples
 #' # Let's discard all pair elements during reduction to make the
 #' # examples a bit more interesting
-#' trans <- keep_step(~ . %% 2 == 0)
+#' trans <- iter_keep(~ . %% 2 == 0)
 #'
 #' # You can supply an empty vector to indicate the output type. The
 #' # output vector will be grown efficiently.

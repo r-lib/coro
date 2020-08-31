@@ -20,7 +20,7 @@ test_that("reduce_steps() calls initial step for initial value", {
     }
   }
 
-  steps <- compose(map_step(`+`, 1), map_step(`+`, 1))
+  steps <- compose(iter_map(`+`, 1), iter_map(`+`, 1))
   expect_error(reduce_steps(NULL, steps, builder), "called for init value")
 })
 
@@ -34,7 +34,7 @@ test_that("reduce_steps() calls initial step for result completion", {
     }
   }
 
-  steps <- compose(map_step(`+`, 1), map_step(`+`, 1))
+  steps <- compose(iter_map(`+`, 1), iter_map(`+`, 1))
   expect_error(reduce_steps(NULL, steps, builder), "called for init completion")
 })
 

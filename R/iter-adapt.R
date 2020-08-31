@@ -17,19 +17,19 @@
 #' iter()
 #'
 #' # We can transform it by mapping functions over the elements:
-#' iter <- iter_adapt(iter, map_step(`+`, 100L))
+#' iter <- iter_adapt(iter, iter_map(`+`, 100L))
 #' take(iter, 5)
 #'
 #' # Or by discarding unwanted values:
-#' iter <- iter_adapt(iter, discard_step(~ .x %% 2 == 0))
+#' iter <- iter_adapt(iter, iter_discard(~ .x %% 2 == 0))
 #' take(iter, 5)
 #'
 #' # Note that iter_adapt() accepts several transformation at once and
 #' # can of course adapt generators which are regular iterators:
 #' iter <- gen(for (x in 1:10) yield(x))
 #' iter <- iter_adapt(iter,
-#'   map_step(`+`, 100L),
-#'   discard_step(~ .x %% 2 == 0)
+#'   iter_map(`+`, 100L),
+#'   iter_discard(~ .x %% 2 == 0)
 #' )
 #' take(iter, 5)
 iter_adapt <- function(iter, ...) {

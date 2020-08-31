@@ -69,5 +69,5 @@ iter <- as_iterator(1:10)
 drain(iter)
 }
 \seealso{
-\code{\link[=take_step]{take_step()}}
+\code{\link[=iter_take]{iter_take()}}
 }

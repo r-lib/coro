@@ -2,19 +2,19 @@
 % Please edit documentation in R/step.R
 \name{steps}
 \alias{steps}
-\alias{take_step}
-\alias{map_step}
-\alias{keep_step}
-\alias{discard_step}
+\alias{iter_take}
+\alias{iter_map}
+\alias{iter_keep}
+\alias{iter_discard}
 \title{Transformation steps}
 \usage{
-take_step(n)
+iter_take(n)
 
-map_step(.f, ...)
+iter_map(.f, ...)
 
-keep_step(.p, ...)
+iter_keep(.p, ...)
 
-discard_step(.p, ...)
+iter_discard(.p, ...)
 }
 \arguments{
 \item{n}{The number of inputs to take.}
@@ -33,10 +33,10 @@ and thus supports the lambda-formula notation.}
 Transformation steps can be chained together to modify the
 behaviour of an iterator (see \code{\link[=iter_adapt]{iter_adapt()}}).
 \itemize{
-\item \code{map_step()} applies a function \code{.f} over all inputs.
-\item \code{discard_step()} and \code{keep_step()} apply a predicate \code{.p} over
+\item \code{iter_map()} applies a function \code{.f} over all inputs.
+\item \code{iter_discard()} and \code{iter_keep()} apply a predicate \code{.p} over
 inputs and discard or keep the selected elements.
-\item \code{take_step()} is a transformation step that terminates early
+\item \code{iter_take()} is a transformation step that terminates early
 after \code{n} inputs.
 }
 }
@@ -49,5 +49,5 @@ function with modified behaviour.
 # `purrr::compose()` is the recommended way to chain transformation
 # steps:
 compose <- purrr::compose
-steps <- compose(map_step(`+`, 10), discard_step(`>`, 15))
+steps <- compose(iter_map(`+`, 10), iter_discard(`>`, 15))
 }

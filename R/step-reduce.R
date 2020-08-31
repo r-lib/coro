@@ -16,8 +16,8 @@
 #' abstract and it takes some time understand how they work and how to
 #' write one. However most of the time you shouldn't have to use
 #' `reduce_steps()` or write your own transformation step. You will
-#' typically use existing steps provided in flowery (like [map_step()]
-#' and [discard_step()]) with user-friendly wrappers such as
+#' typically use existing steps provided in flowery (like [iter_map()]
+#' and [iter_discard()]) with user-friendly wrappers such as
 #' `iter_adapt()`.
 #'
 #' `reduce_steps()` and thus all functions based on it support flowery
@@ -155,14 +155,14 @@
 #' # always starts with the builder function:
 #' steps <- base::c
 #'
-#' # Maybe we want to add `10` to all inputs. `map_step()` lazily
+#' # Maybe we want to add `10` to all inputs. `iter_map()` lazily
 #' # returns a transformation step. This is a function that accepts a
 #' # reducer and returns another one:
-#' map_step(`+`, 10)
+#' iter_map(`+`, 10)
 #'
 #' # Let's supply our builder function `c()` to that first
 #' # transformation step:
-#' steps <- map_step(`+`, 10)(steps)
+#' steps <- iter_map(`+`, 10)(steps)
 #'
 #' # We get a transformed reducer function that is ready to use with
 #' # `reduce()` or `reduce_steps()`:
@@ -172,7 +172,7 @@
 #' # transformed reducer function can be supplied to other
 #' # transformation steps and so on! Let's discard any input smaller
 #' # than 5 in the next step:
-#' steps <- discard_step(`<`, 5)(steps)
+#' steps <- iter_discard(`<`, 5)(steps)
 #'
 #' # Remember that we are building the transformations in reverse
 #' # order though, so the inputs will be first passed to `discard`,
@@ -184,7 +184,7 @@
 #' # unintuitive. It is recommended to use `purrr::compose()` to build
 #' # a transformation chain:
 #' compose <- purrr::compose
-#' steps <- compose(discard_step(`<`, 5), map_step(`+`, 10))
+#' steps <- compose(iter_discard(`<`, 5), iter_map(`+`, 10))
 #'
 #' # `compose()` returns a function whose input will be supplied to
 #' # the last composed function.
@@ -201,7 +201,7 @@
 #' # reduce_steps() supports iterators as well:
 #' iter <- as_iterator(1:5)
 #' iter()
-#' reduce_steps(iter, map_step(`+`, 10), along_builder(list()))
+#' reduce_steps(iter, iter_map(`+`, 10), along_builder(list()))
 #'
 #' # By extension, all functions based on reduce_steps() support
 #' # iterators:
@@ -269,7 +269,7 @@ into <- function(to, from, steps = NULL) {
 #' @param x A reducible object.
 #' @param n The number of elements to take from `x`.
 #'
-#' @seealso [take_step()]
+#' @seealso [iter_take()]
 #' @export
 #' @examples
 #' take(letters, 5)
@@ -278,37 +278,37 @@ into <- function(to, from, steps = NULL) {
 #' iter <- as_iterator(1:10)
 #' drain(iter)
 take <- function(x, n) {
-  reduce_steps(x, take_step(n), poke_into_builder(new_list(n)))
+  reduce_steps(x, iter_take(n), poke_into_builder(new_list(n)))
 }
 #' @rdname take
 #' @export
 take_lgl <- function(x, n) {
-  reduce_steps(x, take_step(n), poke_into_builder(new_logical(n)))
+  reduce_steps(x, iter_take(n), poke_into_builder(new_logical(n)))
 }
 #' @rdname take
 #' @export
 take_int <- function(x, n) {
-  reduce_steps(x, take_step(n), poke_into_builder(new_integer(n)))
+  reduce_steps(x, iter_take(n), poke_into_builder(new_integer(n)))
 }
 #' @rdname take
 #' @export
 take_dbl <- function(x, n) {
-  reduce_steps(x, take_step(n), poke_into_builder(new_double(n)))
+  reduce_steps(x, iter_take(n), poke_into_builder(new_double(n)))
 }
 #' @rdname take
 #' @export
 take_cpl <- function(x, n) {
-  reduce_steps(x, take_step(n), poke_into_builder(new_complex(n)))
+  reduce_steps(x, iter_take(n), poke_into_builder(new_complex(n)))
 }
 #' @rdname take
 #' @export
 take_chr <- function(x, n) {
-  reduce_steps(x, take_step(n), poke_into_builder(new_character(n)))
+  reduce_steps(x, iter_take(n), poke_into_builder(new_character(n)))
 }
 #' @rdname take
 #' @export
 take_raw <- function(x, n) {
-  reduce_steps(x, take_step(n), poke_into_builder(new_raw(n)))
+  reduce_steps(x, iter_take(n), poke_into_builder(new_raw(n)))
 }
 
 #' @rdname take
