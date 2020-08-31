@@ -3,11 +3,11 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # These pausing nodes are used only when there is no continuation after
   # the pause. It ensures we restart at the start of the loop.
   pauses <- null_node()
-  next_node <- new_node(goto_lang(loop_state), NULL)
+  next_node <- new_node(goto_call(loop_state), NULL)
 
   # We don't know the finishing state until we've obtained all states
   # nested within the loop
-  break_node <- new_node(goto_lang(-1L), NULL)
+  break_node <- new_node(goto_call(-1L), NULL)
 
   body <- as_exprs_node(expr)
   with_loop_nodes(pauses, next_node, break_node, {
@@ -15,11 +15,11 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   })
 
   # Update the `break` gotos and `pause nodes` to point to the next state
-  node_poke_car(break_node, goto_lang(peek_state() + 1L))
+  node_poke_car(break_node, goto_call(peek_state() + 1L))
   pauses_push_state(pauses, loop_state)
 
   # Add a looping goto at the end
-  goto_node <- pairlist(goto_lang(loop_state))
+  goto_node <- pairlist(goto_call(loop_state))
   tail <- node_list_tail_car(parts)
   push_goto(tail, goto_node)
 
@@ -66,7 +66,7 @@ repeat_parts <- function(expr) {
     return(NULL)
   }
 
-  loop_state <- spliceable(block(goto_lang(loop_state)))
+  loop_state <- spliceable(block(goto_call(loop_state)))
   new_node(loop_state, parts)
 }
 
@@ -87,16 +87,16 @@ while_parts <- function(expr) {
     return(NULL)
   }
 
-  goto_loop_end <- block(goto_lang(peek_state() + 1L))
-  goto_loop_start <- block(goto_lang(loop_state + 1L))
+  goto_loop_end <- block(goto_call(peek_state() + 1L))
+  goto_loop_start <- block(goto_call(loop_state + 1L))
 
   cond <- node_cadr(expr)
-  cond_state <- block(if_lang(cond, goto_loop_start, goto_loop_end))
+  cond_state <- block(if_call(cond, goto_loop_start, goto_loop_end))
   loop_parts <- new_node(cond_state, parts)
 
   # Merge into the current state if there is a past
   if (peek_has_past()) {
-    goto_block <- spliceable(block(goto_lang(loop_state)))
+    goto_block <- spliceable(block(goto_call(loop_state)))
     loop_parts <- new_node(goto_block, loop_parts)
   }
 
@@ -116,7 +116,7 @@ for_parts <- function(expr) {
   if (is_null(parts)) {
     body <- duplicate(body, shallow = TRUE)
     body <- as_block(body)
-    node_list_poke_cdr(body, pairlist(goto_lang(loop_state)))
+    node_list_poke_cdr(body, pairlist(goto_call(loop_state)))
     parts <- pairlist(body)
   }
 
@@ -145,7 +145,7 @@ for_init_part <- function(loop_state, expr) {
       UQ(iter_sym)()
     }
 
-    !!goto_lang(loop_state)
+    !!goto_call(loop_state)
   })
 }
 for_next_part <- function(loop_state, expr) {
@@ -155,9 +155,9 @@ for_next_part <- function(loop_state, expr) {
   expr({
     if (flowery::advance(!!iter_sym)) {
       !!elt_sym <- flowery::deref(!!iter_sym)
-      !!goto_lang(loop_state + 1L)
+      !!goto_call(loop_state + 1L)
     } else {
-      !!goto_lang(peek_state() + 1L)
+      !!goto_call(peek_state() + 1L)
     }
   })
 }

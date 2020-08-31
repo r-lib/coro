@@ -29,11 +29,11 @@ node_list_parts <- function(node) {
       # If pause has no future we don't know which state it should
       # resume to. We register it so the state can be adjusted later.
       if (has_future()) {
-        pause_lang <- new_pause(poke_state(), node_cdr(expr))
-        pause_node <- pairlist(pause_lang)
+        pause_call <- new_pause(poke_state(), node_cdr(expr))
+        pause_node <- pairlist(pause_call)
       } else {
-        pause_lang <- new_pause(peek_state(), node_cdr(expr))
-        pause_node <- pairlist(pause_lang)
+        pause_call <- new_pause(peek_state(), node_cdr(expr))
+        pause_node <- pairlist(pause_call)
         push_pause_node(pause_node)
       }
 
@@ -54,7 +54,7 @@ node_list_parts <- function(node) {
     # relevant goto and pause nodes. Fill those nodes only when we
     # extracted the parts so they get the right state index.
     if (has_future()) {
-      next_goto <- new_node(goto_lang(-1L), NULL)
+      next_goto <- new_node(goto_call(-1L), NULL)
       pauses <- null_node()
 
       with_jump_nodes(next_goto, pauses, has_past(), {
@@ -69,7 +69,7 @@ node_list_parts <- function(node) {
         if (is_separate_state(nested_parts)) {
           state <- poke_state()
         }
-        node_poke_car(next_goto, goto_lang(state))
+        node_poke_car(next_goto, goto_call(state))
         pauses_push_state(pauses, state)
       }
     } else {
@@ -121,7 +121,7 @@ node_list_parts <- function(node) {
 }
 
 is_exiting_block <- function(x) {
-  if (!is_named_language(x)) {
+  if (!is_named_call(x)) {
     return(FALSE)
   }
 

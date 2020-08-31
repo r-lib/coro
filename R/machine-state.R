@@ -30,8 +30,8 @@ local_state <- function(idx, frame = caller_env()) {
   old <- peek_state()
   poke_state(idx)
 
-  restore_state_lang <- call2(poke_state, old)
-  local_exit(!!restore_state_lang, frame = frame)
+  restore_state_call <- call2(poke_state, old)
+  local_exit(!!restore_state_call, frame = frame)
 
   invisible(old)
 }
@@ -51,8 +51,8 @@ poke_state_elt <- function(elt, value) {
 local_state_elt <- function(elt, value, frame = caller_env()) {
   old <- poke_state_elt(elt, value)
 
-  restore_state_lang <- call2(poke_state_elt, elt, old)
-  local_exit(!!restore_state_lang, frame = frame)
+  restore_state_call <- call2(poke_state_elt, elt, old)
+  local_exit(!!restore_state_call, frame = frame)
 
   invisible(old)
 }
@@ -60,19 +60,19 @@ local_state_elts <- function(elts, frame = caller_env()) {
   nms <- names(elts)
   old <- new_list(length(elts))
 
-  exit_lang <- block()
-  cur <- exit_lang
+  exit_call <- block()
+  cur <- exit_call
 
   for (i in seq_along(elts)) {
     old <- poke_state_elt(nms[[i]], elts[[i]])
     old[[i]] <- old %||% list(NULL)
 
-    restore_state_lang <- call2(poke_state_elt, nms[[i]], old[[i]])
-    node_poke_cdr(cur, pairlist(restore_state_lang))
+    restore_state_call <- call2(poke_state_elt, nms[[i]], old[[i]])
+    node_poke_cdr(cur, pairlist(restore_state_call))
     cur <- node_cdr(cur)
   }
 
-  local_exit(!!exit_lang, frame = frame)
+  local_exit(!!exit_call, frame = frame)
 
   invisible(old)
 }
@@ -133,8 +133,8 @@ pauses_push_state <- function(pauses, state) {
   invisible(pauses)
 }
 pause_poke_state <- function(pause, state) {
-  pause_lang <- node_car(pause)
-  node_poke_cadr(pause_lang, as.character(state))
+  pause_call <- node_car(pause)
+  node_poke_cadr(pause_call, as.character(state))
   invisible(pause)
 }
 

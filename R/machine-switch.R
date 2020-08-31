@@ -1,5 +1,5 @@
 
-machine_switch_lang <- function(parts) {
+machine_switch_call <- function(parts) {
   parts <- node_list_enumerate_tags(parts)
   switch_args <- new_node(quote(`_state`), parts)
   new_call(switch_sym, switch_args)
@@ -19,7 +19,7 @@ node_list_enumerate_tags <- function(node) {
 
 `_goto` <- function(state, frame = caller_env()) {
   env_poke(frame, "_state", state)
-  eval_bare(next_lang(), frame)
+  eval_bare(next_call(), frame)
 }
 `_pause` <- function(state, value = NULL, frame = caller_env()) {
   env_poke(frame, "_state", state)

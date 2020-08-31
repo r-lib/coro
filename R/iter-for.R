@@ -30,7 +30,7 @@ iterate <- function(loop) {
 }
 
 iter_for <- function(elt, coll, expr, env = caller_env()) {
-  lang <- for_lang(enexpr(elt), coll, enexpr(expr))
+  lang <- for_call(enexpr(elt), coll, enexpr(expr))
 
   # Translate `for` loop to machine state
   reset_state()
@@ -38,12 +38,12 @@ iter_for <- function(elt, coll, expr, env = caller_env()) {
   parts <- node_list_parts(node)
 
   # Add breaking state to state machine
-  node_list_poke_cdr(parts, pairlist(block(break_lang())))
+  node_list_poke_cdr(parts, pairlist(block(break_call())))
 
   # Wrap `while` in parens to disable JIT in case `env` is GlobalEnv
   expr <- rlang::expr({
     (`while`)(TRUE, {
-      !!machine_switch_lang(parts)
+      !!machine_switch_call(parts)
     })
   })
 

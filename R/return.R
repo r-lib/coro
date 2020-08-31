@@ -13,7 +13,7 @@ poke_returns <- function(expr) {
   last <- node_car(tail)
 
   if (!is_call(last) || !is_symbol(node_car(last))) {
-    last <- return_state_lang(last)
+    last <- return_state_call(last)
   } else {
     head <- as_string(node_car(last))
     last <- switch(head,
@@ -24,11 +24,11 @@ poke_returns <- function(expr) {
       `repeat` = ,
       `while` = ,
       `for` = {
-        return_lang <- return_state_lang(call2("invisible", NULL))
-        node_poke_cdr(tail, pairlist(return_lang))
+        return_call <- return_state_call(call2("invisible", NULL))
+        node_poke_cdr(tail, pairlist(return_call))
         last
       },
-      return_lang(last)
+      return_call(last)
     )
   }
 
@@ -43,7 +43,7 @@ if_poke_returns <- function(expr) {
   node_poke_car(branches, if_branch)
 
   if (is_null(node_cadr(branches))) {
-    explicit_else <- pairlist(block(return_state_lang(call2("invisible", NULL))))
+    explicit_else <- pairlist(block(return_state_call(call2("invisible", NULL))))
     node_poke_cdr(branches, explicit_else)
   } else {
     else_branch <- new_block(poke_returns(node_cadr(branches)))

@@ -18,7 +18,7 @@ lang_has <- function(lang, is_element) {
   FALSE
 }
 
-is_named_language <- function(x) {
+is_named_call <- function(x) {
   is_call(x) && is_symbol(node_car(x))
 }
 
@@ -32,16 +32,16 @@ as_exprs_node <- function(expr) {
   }
 }
 
-pause_lang <- function(idx, ...) {
+pause_call <- function(idx, ...) {
   call2("_pause", as.character(idx), ...)
 }
-goto_lang <- function(idx) {
+goto_call <- function(idx) {
   call2("_goto", as.character(idx))
 }
-return_lang <- function(...) {
+return_call <- function(...) {
   call2(return_sym, ...)
 }
-return_state_lang <- function(...) {
+return_state_call <- function(...) {
   call2(return_state_sym, ...)
 }
 
@@ -80,25 +80,25 @@ is_separate_state <- function(x) {
   is_block(head) && is_spliceable(head) && is_null(node_cdr(head))
 }
 
-yield_lang <- function(...) {
+yield_call <- function(...) {
   call2(yield_sym, ...)
 }
-if_lang <- function(...) {
+if_call <- function(...) {
   call2(if_sym, ...)
 }
-repeat_lang <- function(...) {
+repeat_call <- function(...) {
   call2(repeat_sym, ...)
 }
-while_lang <- function(...) {
+while_call <- function(...) {
   call2(while_sym, ...)
 }
-for_lang <- function(...) {
+for_call <- function(...) {
   call2(for_sym, ...)
 }
-break_lang <- function() {
+break_call <- function() {
   call2(break_sym)
 }
-next_lang <- function() {
+next_call <- function() {
   call2(next_sym)
 }
 
