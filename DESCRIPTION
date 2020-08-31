@@ -16,8 +16,6 @@ Suggests:
     purrr,
     rmarkdown,
     testthat
-Remotes:
-    tidyverse/rlang
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
