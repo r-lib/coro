@@ -66,3 +66,12 @@ test_that("iterating works when flowery is not loaded", {
   expect_equal(new_env[["x"]], 3)
 })
 
+test_that("iterate returns invisibly", {
+  out <- withVisible(iterate(
+    for (i in as_iterator(1:3)) {
+      i
+    }
+  ))
+  expect_false(out$visible)
+})
+
