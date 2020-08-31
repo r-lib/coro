@@ -1,6 +1,9 @@
 
 # flowery 0.0.1.9000
 
+* Exhausted iterators no longer throw when called again. Instead, they
+  return `NULL` (#6).
+
 * Fixed top-level `break` statements in loops (#7).
 
 

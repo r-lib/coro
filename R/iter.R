@@ -19,8 +19,7 @@
 #' * `deref()` to dereference the current value of the iterator.
 #'
 #' * `is_done()` to check if the iterator has exhausted its
-#'   elements. Calling an exhausted iterator causes an error of class
-#'   `flowery_error_iterator_done`.
+#'   elements. Calling an exhausted iterator returns `NULL`.
 #'
 #' * `advance()` to advance to the next value. This is similar to
 #'   calling the iterator for a new element but returns `TRUE` if the
@@ -179,7 +178,7 @@ new_iterator <- function(fn) {
 
   iter <- function() {
     if (done) {
-      abort("Iterator is done", "flowery_error_iterator_done")
+      return(NULL)
     }
 
     out <- withVisible(fn())

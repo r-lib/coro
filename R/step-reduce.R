@@ -408,9 +408,8 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   if (!.left) {
     abort("Can't right-reduce with an iterator")
   }
-  # Trigger done error if needed
   if (is_done(.x)) {
-    .x()
+    abort("Iterator is done", "flowery_error_iterator_done")
   }
 
   .f <- as_closure(.f)
