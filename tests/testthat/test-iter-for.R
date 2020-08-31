@@ -67,18 +67,11 @@ test_that("iterating works when flowery is not loaded", {
 })
 
 test_that("iterate returns invisibly", {
-  output <- capture_output(iterate(
+  out <- withVisible(iterate(
     for (i in as_iterator(1:3)) {
       i
     }
   ))
-  expect_equal(output, "")
-
-  output <- iterate(
-    for (i in as_iterator(1:3)) {
-      i
-    }
-  )
-  expect_null(output)
+  expect_false(out$visible)
 })
 
