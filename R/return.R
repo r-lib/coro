@@ -3,7 +3,7 @@ set_returns <- function(expr) {
   if (is_closure(expr)) {
     expr <- body(expr)
   }
-  expr <- duplicate(expr)
+  expr <- duplicate(expr, shallow = TRUE)
   poke_returns(expr)
 }
 
