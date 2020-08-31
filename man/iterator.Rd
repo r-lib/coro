@@ -34,15 +34,15 @@ supported.}
 \item{iter}{An iterator function.}
 }
 \description{
-R programming is usually about full lists and vectors. Vectorised
-operations such as \code{+} or function mappers like \code{lapply()} operate
-on whole collections of elements. However these idioms do not work
-so well when the data does not fit in memory or when the data
-arrives continuously and we need to work on it as it is coming
-in. In these cases vector idioms must be replaced with steams of
-chunked data idioms. Iterators are a convenient way of structuring
-the generation of chunks of data. Iterators can easily be
-\link[=iter_adapt]{transformed}, \link[=steps]{mapped over}, or
+R programming is usually concerned with complete lists and vectors.
+Vectorised operations such as \code{+} or function mappers like
+\code{lapply()} operate on whole collections of elements. However these
+idioms do not work so well when the data does not fit in memory or
+when the data arrives continuously and we need to work on it as it
+is coming in. In these cases vector-based programming must be
+replaced with stream-based programming. Iterators are a convenient
+way of structuring the generation of chunks of data. Iterators can
+easily be \link[=iter_adapt]{transformed}, \link[=steps]{mapped over}, or
 \link[=drain]{drained} to a final output vector.
 
 Formally, an iterator is a function that returns a new value each
