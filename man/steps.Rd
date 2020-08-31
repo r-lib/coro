@@ -48,6 +48,5 @@ function with modified behaviour.
 \examples{
 # `purrr::compose()` is the recommended way to chain transformation
 # steps:
-compose <- purrr::compose
-steps <- compose(iter_map(`+`, 10), iter_discard(`>`, 15))
+steps <- purrr::compose(iter_map(`+`, 10), iter_discard(`>`, 15))
 }
