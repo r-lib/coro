@@ -1,5 +1,6 @@
 #' Build a typed output
 #'
+#' @noRd
 #' @description
 #'
 #' `along_builder()` and `poke_into_builder()` are builder functions,
@@ -29,7 +30,6 @@
 #'   when grown and/or shrunk.
 #'
 #' @seealso [reduce_steps()], [steps]
-#' @export
 #' @examples
 #' # Let's discard all pair elements during reduction to make the
 #' # examples a bit more interesting
@@ -51,8 +51,8 @@ along_builder <- function(along) {
   to <- duplicate(along, shallow = TRUE)
   poke_into_builder(to)
 }
+#' @noRd
 #' @rdname along_builder
-#' @export
 poke_into_builder <- function(to) {
   stopifnot(is_bare_vector(to))
 

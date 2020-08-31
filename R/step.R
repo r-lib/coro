@@ -3,8 +3,7 @@
 #' @description
 #'
 #' Transformation steps can be chained together to modify the
-#' behaviour of a reducer (see [reduce_steps()]) or from an
-#' iterator (see `iter_adapt()`).
+#' behaviour of an iterator (see [iter_adapt()]).
 #'
 #' * `map_step()` applies a function `.f` over all inputs.
 #'
@@ -18,8 +17,7 @@
 #'
 #' Transformation steps, also called transducers, are function
 #' operators that take a reducer function and return another reducer
-#' function with modified behaviour. See [reduce_steps()] for more
-#' information.
+#' function with modified behaviour.
 #'
 #' @name steps
 #' @examples

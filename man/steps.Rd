@@ -31,8 +31,7 @@ and thus supports the lambda-formula notation.}
 }
 \description{
 Transformation steps can be chained together to modify the
-behaviour of a reducer (see \code{\link[=reduce_steps]{reduce_steps()}}) or from an
-iterator (see \code{iter_adapt()}).
+behaviour of an iterator (see \code{\link[=iter_adapt]{iter_adapt()}}).
 \itemize{
 \item \code{map_step()} applies a function \code{.f} over all inputs.
 \item \code{discard_step()} and \code{keep_step()} apply a predicate \code{.p} over
@@ -44,8 +43,7 @@ after \code{.n} inputs.
 \details{
 Transformation steps, also called transducers, are function
 operators that take a reducer function and return another reducer
-function with modified behaviour. See \code{\link[=reduce_steps]{reduce_steps()}} for more
-information.
+function with modified behaviour.
 }
 \examples{
 # `purrr::compose()` is the recommended way to chain transformation

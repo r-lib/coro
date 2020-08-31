@@ -1,5 +1,6 @@
 #' Reduce with a chain of transformation
 #'
+#' @noRd
 #' @description
 #'
 #' `reduce_steps()` is like [purrr::reduce()] but supports chains of
@@ -120,7 +121,6 @@
 #'   value.
 #'
 #' @seealso [steps], [along_builder()]
-#' @export
 #' @examples
 #' # Let's create a chain of transformation. Let's start with the very
 #' # last step, the builder function.
