@@ -109,11 +109,20 @@ for_iter_sym <- function(i) {
   sym(paste0("_for_iter_", i))
 }
 
+call_lhs <- function(call) {
+  node_cadr(call)
+}
+call_rhs <- function(call) {
+  node_cadr(node_cdr(call))
+}
+
 return_sym <- quote(`return`)
 yield_sym <- quote(`yield`)
 
 return_state_sym <- quote(`return`)
 goto_sym <- quote(`_goto`)
+
+next_value_sym <- quote(`_next`)
 
 if_sym <- quote(`if`)
 repeat_sym <- quote(`repeat`)

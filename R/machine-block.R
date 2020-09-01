@@ -25,6 +25,19 @@ node_list_parts <- function(node) {
   while (!is_null(rest)) {
     expr <- node_car(rest)
 
+    if (is_call(expr, "<-") && is_pause(rhs <- call_rhs(expr))) {
+      # Signal constructor that this generator is a coroutine that
+      # takes a `_next` argument
+      poke_state_elt("coroutine", TRUE)
+
+      # Splice the yield() assignment in the continuation
+      assign_call <- call("<-", call_lhs(expr), next_value_sym)
+      node_poke_cdr(rest, new_node(assign_call, node_cdr(rest)))
+
+      # Continue with a normal pause
+      expr <- rhs
+    }
+
     if (is_pause(expr)) {
       # If pause has no future we don't know which state it should
       # resume to. We register it so the state can be adjusted later.
