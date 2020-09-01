@@ -27,3 +27,22 @@ test_that("short syntax and for loop support", {
   })
   expect_identical(out, dbl(1, 9, 25))
 })
+
+test_that("generator prints nicely", {
+  zap_env <- function(x) {
+    g <- env_get(get_iter_env(x), "fn")
+    environment(g) <- global_env()
+    g
+  }
+
+  expect_snapshot({
+    print(zap_env(gen({
+      while (TRUE) {
+        if (TRUE) {
+          yield(1)
+        }
+        return(2)
+      }
+    })))
+  })
+})
