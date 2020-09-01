@@ -38,11 +38,6 @@ add_attributes <- function(.x, ...) {
   .x
 }
 
-set_class <- function(x, class) {
-  class(x) <- class
-  x
-}
-
 blast <- function(expr, env = caller_env()) {
   eval_bare(enexpr(expr), env)
 }

@@ -197,7 +197,7 @@ new_iterator <- function(fn) {
     }
   }
 
-  set_class(iter, "iterator")
+  structure(iter, class = "flowery_iterator")
 }
 #' @rdname iterator
 #' @param x For `is_iterator()`, an object to test. For
@@ -206,7 +206,7 @@ new_iterator <- function(fn) {
 #'   supported.
 #' @export
 is_iterator <- function(x) {
-  inherits(x, "iterator")
+  inherits(x, "flowery_iterator")
 }
 
 #' @rdname iterator
@@ -263,7 +263,7 @@ as_iterator <- function(x) {
 }
 
 #' @export
-print.iterator <- function(x, ...) {
+print.flowery_iterator <- function(x, ...) {
   cat("<iterator>\n")
   fn <- env_get(get_iter_env(x), "fn")
   print(fn)

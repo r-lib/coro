@@ -12,10 +12,6 @@ map_last <- function(.x, .f, ...) {
   .x
 }
 
-set_class <- function(x, class) {
-  structure(x, class = class)
-}
-
 compose <- function(...) {
   fs <- lapply(dots_splice(...), match.fun)
   n <- length(fs)
