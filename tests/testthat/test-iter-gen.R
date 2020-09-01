@@ -1,11 +1,11 @@
 
 test_that("can create non-yielding generator functions", {
-  gen <- generator("foo")
+  gen <- generator(function() "foo")
   expect_identical(drain(gen), list("foo"))
 })
 
 test_that("can yield `NULL` without terminating iteration", {
-  gen <- generator(NULL)
+  gen <- gen(NULL)
   expect_null(gen())
   expect_null(gen())
 })
@@ -19,6 +19,7 @@ test_that("short syntax and for loop support", {
   iterate(for (x in squares) {
     out <- c(out, x)
   })
+
   expect_identical(out, dbl(1, 9, 25))
 })
 

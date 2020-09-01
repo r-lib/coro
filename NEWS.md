@@ -1,6 +1,8 @@
 
 # flowery 0.0.1.9000
 
+* `generator()` now takes functions.
+
 * The iterator abstraction has been removed from flowery. It is
   replaced with the following protocol:
 

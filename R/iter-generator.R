@@ -19,14 +19,14 @@
 #' Generators are compatible with all iterator features such as
 #' [iterate()], [iter_adapt()], or [drain()].
 #'
-#' @param body The function body for the generator. It can [yield()]
-#'   and `return()` values. Within a generator, `for` loops have
-#'   [iterator] support.
+#' @param fn A function of zero arguments to be transformed into a
+#'   generator function that can [yield()] and `return()` values.
+#'   Within a generator, `for` loops have [iterator] support.
 #'
 #' @export
 #' @examples
 #' # A generator statement creates an iterator function:
-#' iter <- generator({
+#' iter <- generator(function() {
 #'   yield("foo")
 #'   yield("bar")
 #'   "baz"
@@ -44,7 +44,7 @@
 #' # You can only exhaust a generator once. Let's create a generator
 #' # factory to make it easy to get fresh generators:
 #' new_yielder <- function(...) {
-#'   generator({
+#'   generator(function() {
 #'     values <- list(...)
 #'     n <- length(values)
 #'     last <- values[[n]]
@@ -82,31 +82,12 @@
 #'
 #' # Or drain the remaining elements:
 #' drain(greetings)
-generator <- function(body) {
-  body <- substitute(body)
+generator <- function(fn) {
+  if (!is_null(formals(fn))) {
+    abort("Generators can't have arguments.")
+  }
 
-  node <- set_returns(body)
-  parts <- generator_parts(node)
-
-  # Add a late return point
-  return_call <- call2(quote(base::return), quote(invisible(NULL)))
-  parts <- node_list_poke_cdr(parts, pairlist(block(return_call)))
-
-  env <- env(caller_env(),
-    `_state` = "1",
-    `_return_state` = length(parts)
-  )
-
-  iter <- blast(function() {
-    evalq(env, expr = {
-      while (TRUE) {
-        !!machine_switch_call(parts)
-      }
-    })
-  })
-
-  # Zap source references so you can see the state machine
-  unstructure(iter)
+  blast(gen(!!body(fn), environment(fn)))
 }
 generator_parts <- function(node) {
   reset_state()
@@ -121,7 +102,43 @@ generator_parts <- function(node) {
 
 #' @rdname generator
 #' @export
-gen <- generator
+gen <- function(expr, env = caller_env()) {
+  body <- substitute(expr)
+  node <- set_returns(body)
+  parts <- generator_parts(node)
+
+  # Add a late return point
+  return_call <- call2(quote(base::return), quote(invisible(NULL)))
+  parts <- node_list_poke_cdr(parts, pairlist(block(return_call)))
+
+  # Create the persistent closure environment of the generator
+  env <- env(env,
+    `_state` = "1",
+    `_return_state` = length(parts)
+  )
+
+  out <- blast(function() {
+    # Evaluate in the persistent environment
+    evalq(env, expr = {
+      while (TRUE) {
+        !!machine_switch_call(parts)
+      }
+    })
+  })
+
+  # Zap source references so you can see the state machine
+  unstructure(out)
+}
+generator_parts <- function(node) {
+  reset_state()
+  parts <- node_list_parts(node)
+
+  if (is_null(parts)) {
+    pairlist(new_call(block_sym, node))
+  } else {
+    parts
+  }
+}
 
 #' Yield a value from a generator
 #'

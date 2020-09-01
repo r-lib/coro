@@ -192,7 +192,7 @@ take_chr(iter, 5)
 The purpose of generators is to maintain state. This is why they are ideally suited for generation of data during iteration. The iterators that we created manually in the previous section can easily be turned into a generator:
 
 ```{r}
-iter <- generator({
+iter <- generator(function() {
   for (x in letters) yield(greet(x))
 })
 ```
@@ -227,7 +227,7 @@ For this reason it is often a good idea to provide a **generator factory**. The 
 
 ```{r}
 make_iter <- function(x) {
-  generator({
+  generator(function() {
     for (elt in x) yield(greet(elt))
   })
 }
@@ -246,7 +246,7 @@ drain(iter)
 Note finally that generators don't have to yield, they can also return. Once it has returned the generator is done:
 
 ```{r}
-iter <- generator({
+iter <- generator(function() {
   x <- 1:10
 
   for (elt in x) {
@@ -272,11 +272,11 @@ As we have seen iterator and generators are useful for generating data chunk by 
 Inside a generator you can supply iterators to `for` loops. This makes it easy to chain generators:
 
 ```{r}
-integer_iter <- generator(for (x in 1:10) yield(x))
-square_iter <- generator(for (x in integer_iter) yield(x^2))
+integer_iter <- generator(function() for (x in 1:10) yield(x))
+square_iter <- generator(function() for (x in integer_iter) yield(x^2))
 ```
 
-in addition a shorthand `gen()` alias is provided for `generator()`.  There is no difference between the two versions. The long version is appropriate in generator factories while the shorthand reads better in generator expressions:
+The `gen()` alias is a shortcut for creating small generator functions:
 
 ```{r}
 data <- 1:10

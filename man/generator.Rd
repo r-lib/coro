@@ -5,14 +5,14 @@
 \alias{gen}
 \title{Create a generator function}
 \usage{
-generator(body)
+generator(fn)
 
-gen(body)
+gen(expr, env = caller_env())
 }
 \arguments{
-\item{body}{The function body for the generator. It can \code{\link[=yield]{yield()}}
-and \code{return()} values. Within a generator, \code{for} loops have
-\link{iterator} support.}
+\item{fn}{A function of zero arguments to be transformed into a
+generator function that can \code{\link[=yield]{yield()}} and \code{return()} values.
+Within a generator, \code{for} loops have \link{iterator} support.}
 }
 \description{
 A generator is an \link[=iterator]{iterator function} that can pause its
@@ -34,7 +34,7 @@ Generators are compatible with all iterator features such as
 }
 \examples{
 # A generator statement creates an iterator function:
-iter <- generator({
+iter <- generator(function() {
   yield("foo")
   yield("bar")
   "baz"
@@ -52,7 +52,7 @@ iter()
 # You can only exhaust a generator once. Let's create a generator
 # factory to make it easy to get fresh generators:
 new_yielder <- function(...) {
-  generator({
+  generator(function() {
     values <- list(...)
     n <- length(values)
     last <- values[[n]]
