@@ -118,7 +118,7 @@ generator <- function(body) {
   return_call <- call2(quote(base::return), quote(invisible(NULL)))
   parts <- node_list_poke_cdr(parts, pairlist(block(return_call)))
 
-  env <- env_bury(caller_env(),
+  env <- env(caller_env(),
     `_state` = "1",
     `_return_state` = length(parts),
     !!!control_flow_ops
