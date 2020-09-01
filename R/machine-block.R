@@ -121,13 +121,20 @@ node_list_parts <- function(node) {
 }
 
 is_exiting_block <- function(x) {
-  if (!is_named_call(x)) {
+  if (!is_call(x)) {
     return(FALSE)
   }
 
-  head <- as_string(node_car(x))
+  if (is_call(x, exiting_syms)) {
+    return(TRUE)
+  }
 
-  switch(head,
+  car <- node_car(x)
+  if (!is_symbol(car)) {
+    return(FALSE)
+  }
+
+  switch(as_string(car),
     `if` = {
       if (!is_exiting_block(if_branch_true(x))) {
         return(FALSE)
@@ -140,7 +147,7 @@ is_exiting_block <- function(x) {
       is_exiting_block(last)
     },
 
-    is_call(x, exiting_syms)
+    FALSE
   )
 }
-exiting_syms <- list(return_sym, pause_sym, goto_sym)
+exiting_syms <- list(return_sym, quote(coro_yield), quote(coro_goto))

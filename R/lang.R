@@ -18,10 +18,6 @@ lang_has <- function(lang, is_element) {
   FALSE
 }
 
-is_named_call <- function(x) {
-  is_call(x) && is_symbol(node_car(x))
-}
-
 as_exprs_node <- function(expr) {
   if (is_pairlist(expr)) {
     expr
@@ -33,10 +29,10 @@ as_exprs_node <- function(expr) {
 }
 
 pause_call <- function(idx, ...) {
-  call2("_pause", as.character(idx), ...)
+  call2(quote(flowery::coro_yield), as.character(idx), ...)
 }
 goto_call <- function(idx) {
-  call2("_goto", as.character(idx))
+  call2(quote(flowery::coro_goto), as.character(idx))
 }
 return_call <- function(...) {
   call2(return_sym, ...)
@@ -47,7 +43,7 @@ return_state_call <- function(...) {
 
 new_pause <- function(state, cdr = NULL) {
   args <- new_node(as.character(state), cdr)
-  new_call(pause_sym, args)
+  new_call(quote(flowery::coro_yield), args)
 }
 
 block <- function(...) {
@@ -117,7 +113,6 @@ return_sym <- quote(`return`)
 yield_sym <- quote(`yield`)
 
 return_state_sym <- quote(`return`)
-pause_sym <- quote(`_pause`)
 goto_sym <- quote(`_goto`)
 
 if_sym <- quote(`if`)

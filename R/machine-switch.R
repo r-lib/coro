@@ -17,22 +17,31 @@ node_list_enumerate_tags <- function(node) {
   invisible(node)
 }
 
-`_goto` <- function(state, frame = caller_env()) {
-  env_poke(frame, "_state", state)
-  eval_bare(next_call(), frame)
+#' Control flow for coroutine state machines
+#'
+#' @keywords internal
+#' @export
+coro_goto <- function(state, frame = caller_env()) {
+  frame$`_state` <- state
+  eval_bare(call2(next_sym), frame)
 }
-`_pause` <- function(state, value = NULL, frame = caller_env()) {
+#' @rdname coro_goto
+#' @export
+coro_yield <- function(state, value = NULL, frame = caller_env()) {
   env_poke(frame, "_state", state)
   eval_bare(call2(base::return, value), frame)
 }
-`_return` <- function(value, frame = caller_env()) {
+#' @rdname coro_goto
+#' @export
+coro_return <- function(value, frame = caller_env()) {
   # Goto NULL-return state to terminate iterator
   return_state <- env_get(frame, "_return_state")
   env_poke(frame, "_state", return_state)
   eval_bare(call2(base::return, value), frame)
 }
+
 control_flow_ops <- list(
-  `_goto` = `_goto`,
-  `_pause` = `_pause`,
-  `return` = `_return`
+  `_goto` = coro_goto,
+  `_pause` = coro_yield,
+  `return` = coro_return
 )
