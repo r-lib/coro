@@ -186,7 +186,7 @@ new_iterator <- function(fn) {
 
     if (is_null(last)) {
       done <<- TRUE
-    } else if (is_box(last, "null_box")) {
+    } else if (is_box(last, "rlib_null_box")) {
       last <<- NULL
     }
 
@@ -256,7 +256,7 @@ as_iterator <- function(x) {
     }
 
     i <<- i + 1L
-    as_box_if(x[[i]], is_null, "null_box")
+    as_box_if(x[[i]], is_null, "rlib_null_box")
   }
 
   new_iterator(iter)

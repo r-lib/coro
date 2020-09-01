@@ -23,7 +23,7 @@ new_vector_iterator <- function(x) {
   new_iterator(function() {
     while (i < n) {
       i <<- i + 1
-      elt <- rlang::as_box_if(x[[i]], is.null, "null_box")
+      elt <- rlang::as_box_if(x[[i]], is.null, "rlib_null_box")
       return(elt)
     }
   })
