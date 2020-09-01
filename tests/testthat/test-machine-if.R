@@ -1,4 +1,3 @@
-context("machine-if")
 
 test_that("`if` blocks - one pause", {
   parts <- machine_parts(function() {

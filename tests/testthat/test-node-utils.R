@@ -1,4 +1,3 @@
-context("node-utils")
 
 test_that("node_list_walk_at() applies to correct cell", {
   x <- pairlist(1L, 2L, 3L)

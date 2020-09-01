@@ -1,4 +1,3 @@
-context("iter-for")
 
 test_that("can iterate() with iterators", {
   iter <- as_iterator(1:3)

@@ -1,4 +1,3 @@
-context("return")
 
 test_that("explicit return is added to blocks", {
   exprs <- set_returns(function() {

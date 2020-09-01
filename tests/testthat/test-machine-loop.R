@@ -1,4 +1,3 @@
-context("machine-loop")
 
 test_that("`repeat` - one pause", {
   parts <- machine_parts(function() {

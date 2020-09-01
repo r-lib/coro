@@ -1,4 +1,3 @@
-context("iter-gen")
 
 test_that("can create non-yielding generator functions", {
   gen <- generator("foo")

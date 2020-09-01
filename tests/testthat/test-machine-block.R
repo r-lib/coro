@@ -1,4 +1,3 @@
-context("machine-block")
 
 test_that("`{` blocks - one pause with no past or future", {
   parts <- machine_parts(function() {

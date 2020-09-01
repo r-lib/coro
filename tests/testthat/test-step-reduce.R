@@ -1,4 +1,3 @@
-context("step-reduce")
 
 test_that("reduce() stops early on reduced input", {
   reducer <- function(result, input) {

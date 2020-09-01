@@ -1,4 +1,3 @@
-context("iter")
 
 test_that("print method prints original function", {
   expect_output(print(simple_iter), "\"body\"")

@@ -1,4 +1,3 @@
-context("iter-adapt")
 
 test_that("can adapt with a simple transformation", {
   iter <- as_iterator(1:2)

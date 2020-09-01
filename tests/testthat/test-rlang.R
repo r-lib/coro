@@ -1,4 +1,3 @@
-context("node-list")
 
 test_that("node list pokers poke list tails", {
   l <- pairlist(1L, 2L)
@@ -14,9 +13,6 @@ test_that("node list pokers handle empty list", {
   expect_identical(node_list_poke_car(NULL, 1L), pairlist(1L))
   expect_identical(node_list_poke_cdr(NULL, pairlist(1L)), pairlist(1L))
 })
-
-
-context("attrs")
 
 test_that("poke_attr() modifies attributes in place", {
   x <- 1:3
