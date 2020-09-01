@@ -38,7 +38,7 @@ return_call <- function(...) {
   call2(return_sym, ...)
 }
 return_state_call <- function(...) {
-  call2(return_state_sym, ...)
+  call2(quote(flowery::coro_return), ...)
 }
 
 new_pause <- function(state, cdr = NULL) {

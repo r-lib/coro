@@ -28,7 +28,7 @@
                   }, `3` = {
                       return(2)
                   }, `4` = {
-                      return(invisible(NULL))
+                      flowery::coro_return(invisible(NULL))
                   }, `5` = {
                       base::return(invisible(NULL))
                   })

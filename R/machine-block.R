@@ -150,4 +150,9 @@ is_exiting_block <- function(x) {
     FALSE
   )
 }
-exiting_syms <- list(return_sym, quote(coro_yield), quote(coro_goto))
+exiting_syms <- list(
+  return_sym,
+  quote(coro_return),
+  quote(coro_yield),
+  quote(coro_goto)
+)
