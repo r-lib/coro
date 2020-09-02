@@ -1,5 +1,14 @@
 # generator prints nicely
 
+    Code
+      print(zap_env(gen({
+        while (TRUE) {
+          if (TRUE) {
+            yield(1)
+          }
+          return(2)
+        }
+      })))
     Output
       function () 
       {
