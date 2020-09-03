@@ -140,21 +140,31 @@ for_init_part <- function(loop_state, expr) {
     }
     !!iter_sym <- flowery::as_iterator(!!iter_sym)
 
-    # Trigger an iteration error if iterator was already done
-    if (flowery::is_done(!! iter_sym)) {
-      UQ(iter_sym)()
-    }
-
     !!goto_call(loop_state)
   })
 }
+
+
+#' Operators for coroutine state machines
+#' @keywords internal
+#' @export
+coro_advance <- function(elt_sym, iterator, env = caller_env()) {
+  out <- iterator()
+
+  if (is_null(out)) {
+    FALSE
+  } else {
+    env[[as_string(elt_sym)]] <- out
+    TRUE
+  }
+}
+
 for_next_part <- function(loop_state, expr) {
   elt_sym <- node_cadr(expr)
   iter_sym <- for_iter_sym(loop_state)
 
   expr({
-    if (flowery::advance(!!iter_sym)) {
-      !!elt_sym <- flowery::deref(!!iter_sym)
+    if (flowery::coro_advance(quote(!!elt_sym), !!iter_sym)) {
       !!goto_call(loop_state + 1L)
     } else {
       !!goto_call(peek_state() + 1L)

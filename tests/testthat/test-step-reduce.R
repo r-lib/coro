@@ -80,11 +80,9 @@ test_that("can reduce iterators", {
   expect_identical(out, as.character(1:3))
 })
 
-test_that("reducing done iterators is an error", {
-  iter <- as_iterator(list())
-  iter()
-  expect_error(
-    drain(iter),
-    class = "flowery_error_iterator_done"
+test_that("reducing exhausted iterators produces empty output", {
+  expect_identical(
+    drain(function() NULL),
+    list()
   )
 })

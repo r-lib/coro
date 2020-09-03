@@ -9,13 +9,12 @@
 #' generator is thus that you can [yield()] values. The following
 #' rules apply:
 #'
-#' * Yielded values never terminate the iterator, even a yielded
-#'   `NULL`.  If you call the generator or [advance()] it, the
-#'   execution resumes right after the yielding point. All local
-#'   variables are preserved.
+#' * Yielded values do not terminate the generator. If you call the
+#'   generator again, the execution resumes right after the yielding
+#'   point. All local variables are preserved.
 #'
-#' * Returned values always terminate the iterator. Reentering the
-#'   generator after a return is an error.
+#' * Returned values terminate the generator. If called again after a
+#' `return()`, the generator keeps returning `NULL`.
 #'
 #' Generators are compatible with all iterator features such as
 #' [iterate()], [iter_adapt()], or [drain()].
@@ -35,21 +34,15 @@
 #' iter()
 #' iter()
 #'
-#' # As long as the generator yields, the iterator is not done:
-#' is_done(iter)
-#'
-#' # Once a generator has returned the iterator is done:
+#' # Once a generator has returned it keeps returning `NULL`. This
+#' # signals to its caller that new values can no longer be
+#' # produced. The generator is exhausted:
 #' iter()
-#' is_done(iter)
+#' iter()
 #'
 #'
-#' # Like any iterator, once a generator has exhausted its elements it
-#' # fails with an error if you reenter it:
-#' # iter()  # Would be an error if run
-#'
-#' # Let's regenerate our generator. If you're going to use the same
-#' # kind of iterators repeatedly, it often makes sense to create a
-#' # generator factory for that purpose:
+#' # You can only exhaust a generator once. Let's create a generator
+#' # factory to make it easy to get fresh generators:
 #' new_yielder <- function(...) {
 #'   generator({
 #'     values <- list(...)
@@ -66,30 +59,10 @@
 #' # with a `for` loop:
 #' iterate(for (x in iter) cat(x, "\n"))
 #'
-#' # You can also use advance() and deref() to loop manually:
+#' # You can also check for `NULL` values that signal exhaustion to
+#' # loop manually:
 #' iter <- new_yielder("foo", "bar", "barbaz")
-#' while (advance(iter)) cat(deref(iter), "\n")
-#'
-#'
-#' # The termination condition of a generator works the way you would
-#' # expect. You can *yield* `NULL` from a generator without
-#' # terminating the iteration:
-#' iter <- generator(while (TRUE) yield(NULL))
-#' iter()
-#' iter()
-#' is_done(iter)
-#'
-#' # On the other hand *returning* NULL terminates the iterator:
-#' iter <- generator({ while (TRUE) return(NULL) })
-#' advance(iter)
-#'
-#' # This is particularly handy in loops because they return `NULL`
-#' # when the looping is over. In the following loop, the last yielded
-#' # value is 3L. The generator is then reentered a last time, at
-#' # which point the loop completes and the generator returns NULL.
-#' # This signals that the iterator has completed:
-#' iter <- generator(for (x in 1:3) yield(x))
-#' iterate(for (x in iter) cat("iteration", x, "\n"))
+#' while (!is.null(new <- iter())) cat(new, "\n")
 #'
 #'
 #' # The generator also has a short syntax `gen()`. It is completely
@@ -102,6 +75,7 @@
 #' odds <- gen(for (x in numbers) if (x %% 2 != 0) yield(x))
 #' squares <- gen(for (x in odds) yield(x^2))
 #' greetings <- gen(for (x in squares) yield(paste("Hey", x)))
+#'
 #'
 #' # As all iterators, you can take() elements from a generator:
 #' take(greetings, 2)
@@ -133,9 +107,7 @@ generator <- function(body) {
   })
 
   # Zap source references so you can see the state machine
-  attributes(iter) <- NULL
-
-  new_iterator(iter)
+  unstructure(iter)
 }
 generator_parts <- function(node) {
   reset_state()

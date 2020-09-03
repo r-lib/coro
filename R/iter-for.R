@@ -52,3 +52,44 @@ iter_for <- function(elt, coll, expr, env = caller_env()) {
 
   eval_bare(expr, env)
 }
+
+#' Iterable functions
+#'
+#' @description
+#'
+#' A flowery iterator is a function that implements the iteration
+#' protocol:
+#'
+#' - The iterator is advanced by invoking it without argument. This
+#'   returns the next value.
+#'
+#' - An iterator signals exhaustion by returning `NULL`.
+#'
+#'  The `NULL` sentinel synergises well with the R control flow
+#' constructs like `while ()` as they return `NULL` when they are
+#' done.
+#'
+#' @name iterator
+NULL
+
+#' @rdname iterator
+#' @param x A vector to be transformed to an iterable function.
+#'   Functions are returned as is.
+#' @export
+as_iterator <- function(x) {
+  if (is_closure(x)) {
+    return(x)
+  }
+
+  n <- length(x)
+  i <- 0L
+
+  function() {
+    if (i == n) {
+      return(NULL)
+    }
+
+    i <<- i + 1L
+    x[[i]]
+  }
+}
