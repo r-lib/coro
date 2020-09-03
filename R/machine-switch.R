@@ -39,9 +39,3 @@ coro_return <- function(value, frame = caller_env()) {
   env_poke(frame, "_state", return_state)
   eval_bare(call2(base::return, value), frame)
 }
-
-control_flow_ops <- list(
-  `_goto` = coro_goto,
-  `_pause` = coro_yield,
-  `return` = coro_return
-)

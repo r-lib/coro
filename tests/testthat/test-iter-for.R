@@ -74,3 +74,9 @@ test_that("iterate returns invisibly", {
   expect_false(out$visible)
 })
 
+test_that("can return from `iterate()`", {
+  fn <- function() {
+    iterate(for (x in 1) return("foo"))
+  }
+  expect_identical(fn(), "foo")
+})
