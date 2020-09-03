@@ -43,7 +43,7 @@ iterate <- function(loop) {
   env <- caller_env()
 
   # Put machine state operators in scope temporarily
-  local_bindings(.env = env, `_state` = 1L, !!!control_flow_ops)
+  local_bindings(.env = env, `_state` = 1L)
 
   invisible(eval_bare(call, env))
 }

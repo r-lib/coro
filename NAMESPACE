@@ -2,6 +2,9 @@
 
 export(as_iterator)
 export(coro_advance)
+export(coro_goto)
+export(coro_return)
+export(coro_yield)
 export(drain)
 export(drain_chr)
 export(drain_cpl)

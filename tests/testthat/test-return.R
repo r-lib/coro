@@ -3,30 +3,30 @@ test_that("explicit return is added to blocks", {
   exprs <- set_returns(function() {
     "foo"
   })
-  expect_identical(exprs, pairlist(return_call("foo")))
+  expect_identical(exprs, pairlist(return_state_call("foo")))
 
   exprs <- set_returns(function() {
     "foo"
     "bar"
   })
-  expect_identical(exprs, pairlist("foo", return_call("bar")))
+  expect_identical(exprs, pairlist("foo", return_state_call("bar")))
 
   exprs <- set_returns(function() { })
-  expect_identical(exprs, pairlist(return_call(NULL)))
+  expect_identical(exprs, pairlist(return_state_call(NULL)))
 
   exprs <- set_returns(function() {{ }})
-  expect_identical(exprs, pairlist(block(return_call(NULL))))
+  expect_identical(exprs, pairlist(block(return_state_call(NULL))))
 
   exprs <- set_returns(function() {{ "foo"; "bar" }})
-  expect_identical(exprs, pairlist(block("foo", return_call("bar"))))
+  expect_identical(exprs, pairlist(block("foo", return_state_call("bar"))))
 })
 
 test_that("explicit return is added to if else branches", {
   exprs <- set_returns(function() if (TRUE) "foo")
-  expect_identical(exprs, pairlist(if_call(TRUE, block(return_call("foo")), block(return_invisible_call))))
+  expect_identical(exprs, pairlist(if_call(TRUE, block(return_state_call("foo")), block(return_invisible_call))))
 
   exprs <- set_returns(function() { if (TRUE) "foo" else "bar" })
-  explicit <- if_call(TRUE, block(return_call("foo")), block(return_call("bar")))
+  explicit <- if_call(TRUE, block(return_state_call("foo")), block(return_state_call("bar")))
   expect_identical(exprs, pairlist(explicit))
 
   exprs <- set_returns(function() {
@@ -39,8 +39,8 @@ test_that("explicit return is added to if else branches", {
     else
       "baz"
   })
-  inner <- if_call(TRUE, block(return_call("foo")), block(return_call("bar")))
-  outer <- if_call(TRUE, block(inner), block(return_call("baz")))
+  inner <- if_call(TRUE, block(return_state_call("foo")), block(return_state_call("bar")))
+  outer <- if_call(TRUE, block(inner), block(return_state_call("baz")))
   expect_identical(exprs, pairlist("before", outer))
 })
 
@@ -64,12 +64,15 @@ test_that("explicit return is added after loops", {
   expect_identical(exprs, explicit_for)
 })
 
-test_that("explicit returns are left alone", {
+test_that("explicit returns are swapped", {
   exprs <- set_returns(function() return("foo"))
-  expect_identical(exprs, pairlist(return_call("foo")))
+  expect_identical(exprs, pairlist(return_state_call("foo")))
 
   exprs <- set_returns(function() { "foo"; return("bar") })
-  expect_identical(exprs, pairlist("foo", return_call("bar")))
+  expect_identical(exprs, pairlist("foo", return_state_call("bar")))
+
+  exprs <- set_returns(function() list("foo"))
+  expect_identical(exprs, pairlist(return_state_call(quote(list("foo")))))
 })
 
 test_that("invisible return is added after trailing yield()", {

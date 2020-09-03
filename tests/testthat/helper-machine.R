@@ -6,7 +6,7 @@ machine_parts <- function(expr, state = NULL) {
   node_list_parts(node)
 }
 
-return_invisible_call <- return_call(rlang::call2("invisible", NULL))
+return_invisible_call <- return_state_call(rlang::call2("invisible", NULL))
 
 new_for_parts <- function(state, i, x,
                           next_state = NULL,

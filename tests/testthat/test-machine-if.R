@@ -15,7 +15,7 @@ test_that("`if` blocks - one pause", {
   inner1 <- if_call(TRUE, block("if-before", pause_call("2", 1L)), block(FALSE))
   parts1 <- block("before", inner1, goto_call("3"))
   parts2 <- block("if-after", goto_call("3"))
-  parts3 <- block(return_call("after"))
+  parts3 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
@@ -36,7 +36,7 @@ test_that("`else` blocks - one pause", {
   inner1 <- if_call(FALSE, block(FALSE), block("else-before", pause_call("2", 1L)))
   parts1 <- block("before", inner1, goto_call("3"))
   parts2 <- block("else-after", goto_call("3"))
-  parts3 <- block(return_call("after"))
+  parts3 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
@@ -63,7 +63,7 @@ test_that("`if` blocks - inner block", {
   parts1 <- block("before", inner1, goto_call("4"))
   parts2 <- block("inner-after", goto_call("3"))
   parts3 <- block("if-after", goto_call("4"))
-  parts4 <- block(return_call("after"))
+  parts4 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })
@@ -82,9 +82,9 @@ test_that("`if` blocks - nested", {
 
   inner1 <- if_call(FALSE, block(pause_call("2", 1L)))
   inner1 <- block("if-before", inner1, goto_call("2"))
-  inner1 <- if_call(TRUE, inner1, block(return_call("foo")))
+  inner1 <- if_call(TRUE, inner1, block(return_state_call("foo")))
   parts1 <- block("before", inner1)
-  parts2 <- block(return_call("if-after"))
+  parts2 <- block(return_state_call("if-after"))
 
   expect_equal(parts, pairlist(parts1, parts2))
 })
@@ -102,7 +102,7 @@ test_that("`if` blocks - nested and trailing pause", {
 
   inner1 <- if_call(FALSE, block(pause_call("2", 1L)), block(return_invisible_call))
   inner1 <- block("if-before", inner1)
-  inner1 <- if_call(TRUE, inner1, block(return_call("foo")))
+  inner1 <- if_call(TRUE, inner1, block(return_state_call("foo")))
   parts1 <- block("before", inner1)
   parts2 <- block(return_invisible_call)
 
@@ -139,11 +139,11 @@ test_that("`if` blocks - multiply nested and all trailing", {
         !!return_invisible_call
       }
     } else {
-      return(FALSE)
+      !!return_state_call(FALSE)
     }
   })
   parts2 <- block("if-3-after", goto_call("3"))
-  parts3 <- block(return_call("if-2-after"))
+  parts3 <- block(return_state_call("if-2-after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
@@ -172,8 +172,8 @@ test_that("`if`-`else` blocks - trailing", {
       !!pause_call("3", 2L)
     }
   })
-  parts2 <- block(return_call("if-after"))
-  parts3 <- block(return_call("else-after"))
+  parts2 <- block(return_state_call("if-after"))
+  parts3 <- block(return_state_call("else-after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
@@ -197,7 +197,7 @@ test_that("`if`-`else` blocks - non trailing", {
   parts1 <- block("before", inner1)
   parts2 <- block("if-after", goto_call("4"))
   parts3 <- block("else-after", goto_call("4"))
-  parts4 <- block(return_call("after"))
+  parts4 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })
@@ -221,7 +221,7 @@ test_that("`if`-`else` blocks - same continuation", {
       !!pause_call("2", 2L)
     }
   })
-  parts2 <- block(return_call("after"))
+  parts2 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2))
 })
@@ -247,7 +247,7 @@ test_that("`if`-`else` blocks - continuation in `if`", {
     }
   })
   parts2 <- block("if-after", goto_call("3"))
-  parts3 <- block(return_call("after"))
+  parts3 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
@@ -273,7 +273,7 @@ test_that("`if`-`else` blocks - continuation in `else`", {
     }
   })
   parts2 <- block("else-after", goto_call("3"))
-  parts3 <- block(return_call("after"))
+  parts3 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
@@ -299,7 +299,7 @@ test_that("`if` blocks - doubly nested with continuation", {
     !!goto_call("3")
   })
   parts2 <- block("if-3-after", goto_call("3"))
-  parts3 <- block(return_call("after"))
+  parts3 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3))
 })
@@ -352,7 +352,7 @@ test_that("`if`-`else` blocks - multiply nested and not trailing", {
   })
   parts2 <- block("if-3-after", goto_call("3"))
   parts3 <- block("if-2-after", goto_call("4"))
-  parts4 <- block(return_call("after"))
+  parts4 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })

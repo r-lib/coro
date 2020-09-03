@@ -94,8 +94,7 @@ generator <- function(body) {
 
   env <- env(caller_env(),
     `_state` = "1",
-    `_return_state` = length(parts),
-    !!!control_flow_ops
+    `_return_state` = length(parts)
   )
 
   iter <- blast(function() {

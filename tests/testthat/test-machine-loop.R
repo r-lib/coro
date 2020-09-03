@@ -13,7 +13,7 @@ test_that("`repeat` - one pause", {
   parts1 <- block("before", goto_call("2"))
   parts2 <- block("loop-before", pause_call("3", 1L))
   parts3 <- block("loop-after", goto_call("2"))
-  parts4 <- block(return_call("after"))
+  parts4 <- block(return_state_call("after"))
 
   expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
 })
@@ -27,7 +27,7 @@ test_that("`repeat` - no continuation", {
 
   parts1 <- block("before", goto_call("2"))
   parts2 <- block(pause_call("2", 1L))
-  parts3 <- block(return_call("after"))
+  parts3 <- block(return_state_call("after"))
 
   expect_identical(parts, pairlist(parts1, parts2, parts3))
 
@@ -60,7 +60,7 @@ test_that("`repeat` - pause within `if`", {
     !!goto_call("3")
   })
   parts3 <- block("loop-after", goto_call("2"))
-  parts4 <- block(return_call("after"))
+  parts4 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3, parts4))
 })
@@ -80,7 +80,7 @@ test_that("`repeat` - nested loop", {
   parts2 <- block("loop-before", goto_call("3"))
   parts3 <- block(pause_call("3", 1L))
   parts4 <- block("loop-after", goto_call("2"))
-  parts5 <- block(return_call("after"))
+  parts5 <- block(return_state_call("after"))
 
   expect_identical(parts, pairlist(parts1, parts2, parts3, parts4, parts5))
 })
@@ -94,7 +94,7 @@ test_that("`repeat` - non-yielding", {
   })
 
   parts1 <- block("before", repeat_call(NULL), pause_call("2", 1L))
-  parts2 <- block(return_call("after"))
+  parts2 <- block(return_state_call("after"))
 
   expect_identical(parts, pairlist(parts1, parts2))
 })
@@ -110,7 +110,7 @@ test_that("`repeat` - non-yielding but other control flow constructs", {
 
   inner1 <- repeat_call(if_call(TRUE, break_call(), next_call()))
   parts1 <- block("before", inner1, pause_call("2", 1L))
-  parts2 <- block(return_call("after"))
+  parts2 <- block(return_state_call("after"))
 
   expect_identical(parts, pairlist(parts1, parts2))
 })
@@ -352,7 +352,7 @@ test_that("`while` - complex control flow", {
   parts8 <- block("yield-2-after", goto_call("9"))
   parts9 <- block("next-before", goto_call("4"))
   parts10 <- block("loop-end", goto_call("4"))
-  parts11 <- block(return_call("after"))
+  parts11 <- block(return_state_call("after"))
 
   expect_equal(parts, pairlist(parts1, parts2, parts3, parts4, parts5, parts6, parts7, parts8, parts9, parts10, parts11))
 })
@@ -423,7 +423,7 @@ test_that("`for` - one pause with past and future", {
   parts2 <- node_cadr(for_parts)
   parts3 <- block("for-before", pause_call("4", 1L))
   parts4 <- block("for-after", goto_call("2"))
-  parts5 <- block(return_call("after"))
+  parts5 <- block(return_state_call("after"))
 
   expect_identical(node_list_tail_car(parts1), goto_call("2"))
   cond_branches <- node_cddr(node_cadr(parts2))
@@ -458,5 +458,18 @@ test_that("`for` - one pause within `if` and one `break` within `else`", {
   expect_identical(
     lapply(parts, unstructure),
     lapply(pairlist(parts1, parts2, parts3, parts4, parts5, parts6), unstructure)
+  )
+})
+
+test_that("`return()` deep in control flow", {
+  parts <- machine_parts(function() { while (TRUE) if (TRUE) return(1L) else yield(2L) })
+
+  parts1 <- block(if_call(TRUE, block(goto_call("2")), block(goto_call("3"))))
+  parts2 <- if_call(TRUE, return_state_call(1L), block(pause_call("1", 2L)))
+  parts3 <- block(return_invisible_call)
+
+  expect_identical(
+    parts,
+    pairlist(parts1, parts2, parts3)
   )
 })
