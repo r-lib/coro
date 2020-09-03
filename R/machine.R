@@ -1,11 +1,4 @@
 
-machine_parts <- function(expr, state = NULL) {
-  reset_state(state)
-
-  node <- set_returns(expr)
-  node_list_parts(node)
-}
-
 expr_parts <- function(expr) {
   if (!is_call(expr)) {
     return(NULL)
