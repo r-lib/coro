@@ -26,7 +26,7 @@
                       }
                       flowery::coro_goto("3")
                   }, `3` = {
-                      return(2)
+                      flowery::coro_return(2)
                   }, `4` = {
                       flowery::coro_return(invisible(NULL))
                   }, `5` = {

@@ -64,12 +64,15 @@ test_that("explicit return is added after loops", {
   expect_identical(exprs, explicit_for)
 })
 
-test_that("explicit returns are left alone", {
+test_that("explicit returns are swapped", {
   exprs <- set_returns(function() return("foo"))
-  expect_identical(exprs, pairlist(return_call("foo")))
+  expect_identical(exprs, pairlist(return_state_call("foo")))
 
   exprs <- set_returns(function() { "foo"; return("bar") })
-  expect_identical(exprs, pairlist("foo", return_call("bar")))
+  expect_identical(exprs, pairlist("foo", return_state_call("bar")))
+
+  exprs <- set_returns(function() list("foo"))
+  expect_identical(exprs, pairlist(return_state_call(quote(list("foo")))))
 })
 
 test_that("invisible return is added after trailing yield()", {

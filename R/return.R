@@ -8,33 +8,62 @@ set_returns <- function(expr) {
 }
 
 poke_returns <- function(expr) {
-  expr <- as_exprs_node(expr)
-  tail <- node_list_tail(expr)
+  node <- as_exprs_node(expr)
+  node <- swap_returns(node)
+
+  tail <- node_list_tail(node)
   last <- node_car(tail)
 
-  if (!is_call(last) || !is_symbol(node_car(last))) {
+  if (is_call(last, "coro_return", ns = "flowery")) {
+    last <- last
+  } else if (!is_call(last) || !is_symbol(node_car(last))) {
     last <- return_state_call(last)
   } else {
     head <- as_string(node_car(last))
     last <- switch(head,
-      `return` = last,
+      `return` = return_state_call(node_cadr(last)),
       `{` = new_block(poke_returns(last)),
       `if` = if_poke_returns(last),
       `yield` = ,
       `repeat` = ,
       `while` = ,
       `for` = {
-        return_call <- return_state_call(call2("invisible", NULL))
+        return_call <- return_state_call(quote(invisible(NULL)))
         node_poke_cdr(tail, pairlist(return_call))
         last
       },
-      return_call(last)
+      return_state_call(last)
     )
   }
 
   node_poke_car(tail, last)
-  expr
+  node
 }
+
+swap_returns <- function(node) {
+  out <- node
+
+  while (!is_null(node)) {
+    car <- node_car(node)
+
+    if (!is_call(car)) {
+      node <- node_cdr(node)
+      next
+    }
+
+    if (identical(node_car(car), return_sym)) {
+      car <- return_state_call(node_cadr(car))
+    } else {
+      car <- swap_returns(car)
+    }
+    node_poke_car(node, car)
+
+    node <- node_cdr(node)
+  }
+
+  out
+}
+
 
 if_poke_returns <- function(expr) {
   branches <- node_cddr(expr)

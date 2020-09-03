@@ -460,3 +460,16 @@ test_that("`for` - one pause within `if` and one `break` within `else`", {
     lapply(pairlist(parts1, parts2, parts3, parts4, parts5, parts6), unstructure)
   )
 })
+
+test_that("`return()` deep in control flow", {
+  parts <- machine_parts(function() { while (TRUE) if (TRUE) return(1L) else yield(2L) })
+
+  parts1 <- block(if_call(TRUE, block(goto_call("2")), block(goto_call("3"))))
+  parts2 <- if_call(TRUE, return_state_call(1L), block(pause_call("1", 2L)))
+  parts3 <- block(return_invisible_call)
+
+  expect_identical(
+    parts,
+    pairlist(parts1, parts2, parts3)
+  )
+})
