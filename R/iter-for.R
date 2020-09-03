@@ -53,6 +53,11 @@ iter_for <- function(elt, coll, expr, env = caller_env()) {
   eval_bare(expr, env)
 }
 
+#' Transform vector to an iterator
+#'
+#' @param x A vector to be transformed to an iterable function.
+#'   Functions are returned as is.
+#' @export
 as_iterator <- function(x) {
   if (is_closure(x)) {
     return(x)
