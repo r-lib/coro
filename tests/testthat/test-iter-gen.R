@@ -7,13 +7,7 @@ test_that("can create non-yielding generator functions", {
 test_that("can yield `NULL` without terminating iteration", {
   gen <- generator(NULL)
   expect_null(gen())
-  expect_true(is_done(gen))
-
-  gen <- generator(yield(NULL))
   expect_null(gen())
-  expect_false(is_done(gen))
-  expect_null(gen())
-  expect_true(is_done(gen))
 })
 
 test_that("short syntax and for loop support", {
@@ -30,9 +24,8 @@ test_that("short syntax and for loop support", {
 
 test_that("generator prints nicely", {
   zap_env <- function(x) {
-    g <- env_get(get_iter_env(x), "fn")
-    environment(g) <- global_env()
-    g
+    environment(x) <- global_env()
+    x
   }
 
   expect_snapshot({

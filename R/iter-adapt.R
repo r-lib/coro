@@ -41,24 +41,23 @@ iter_adapt <- function(iter, ...) {
   # Initialisation
   reducer()
 
-  new_iterator(function() {
+  function() {
     flag <- "_flowery_iter_adapt_result"
     last <- flag
 
     # If we get `flag` back, it means a transducer has skipped this
     # input. Continue until we get an actual result.
     while (identical(last, flag)) {
-      if (advance(iter)) {
-        last <- reducer(flag, deref(iter))
-      } else {
+      if (is_null(out <- iter())) {
         # Complete and terminate
         reducer(NULL)
         return(NULL)
       }
+      last <- reducer(flag, out)
     }
 
     last
-  })
+  }
 }
 iter_builder <- function(result, input) {
   if (missing(result) || missing(input)) {

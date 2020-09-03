@@ -52,3 +52,21 @@ iter_for <- function(elt, coll, expr, env = caller_env()) {
 
   eval_bare(expr, env)
 }
+
+as_iterator <- function(x) {
+  if (is_closure(x)) {
+    return(x)
+  }
+
+  n <- length(x)
+  i <- 0L
+
+  function() {
+    if (i == n) {
+      return(NULL)
+    }
+
+    i <<- i + 1L
+    x[[i]]
+  }
+}

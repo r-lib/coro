@@ -354,7 +354,7 @@ reduce <- function(.x, .f, ..., .init) {
 }
 
 reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
-  if (is_iterator(.x)) {
+  if (is_closure(.x)) {
     return(iter_reduce_impl(.x, .f, ..., .init = .init, .left = .left))
   }
 
@@ -408,21 +408,18 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   if (!.left) {
     abort("Can't right-reduce with an iterator")
   }
-  if (is_done(.x)) {
-    abort("Iterator is done", "flowery_error_iterator_done")
-  }
 
-  .f <- as_closure(.f)
+  .f <- as_function(.f)
 
-  result <- NULL
-  while (advance(.x)) {
-    result <- .f(result, deref(.x), ...)
+  out <- NULL
+  while (!is_null(new <- .x())) {
+    out <- .f(out, new, ...)
 
     # Return early if we get a reduced result
-    if (is_done_box(result)) {
-      return(unbox(result))
+    if (is_done_box(out)) {
+      return(unbox(out))
     }
   }
 
-  result
+  out
 }

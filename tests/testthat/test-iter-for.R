@@ -57,8 +57,8 @@ test_that("iterating with a done iterator cause an error", {
 test_that("iterating works when flowery is not loaded", {
   new_env <- new.env(parent = baseenv())
 
-  eval(
-    quote(flowery::iterate(for (x in flowery::as_iterator(1:3)) x)),
+  evalq(
+    flowery::iterate(for (x in flowery::as_iterator(1:3)) x),
     new_env
   )
 

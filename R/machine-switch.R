@@ -23,9 +23,6 @@ node_list_enumerate_tags <- function(node) {
 }
 `_pause` <- function(state, value = NULL, frame = caller_env()) {
   env_poke(frame, "_state", state)
-  if (is_null(value)) {
-    value <- null_box()
-  }
   eval_bare(call2(base::return, value), frame)
 }
 `_return` <- function(value, frame = caller_env()) {
