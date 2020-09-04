@@ -87,26 +87,11 @@ generator <- function(fn) {
     abort("Generators can't have arguments.")
   }
 
-  blast(gen(!!body(fn), environment(fn)))
-}
-generator_parts <- function(node) {
-  reset_state()
-  parts <- node_list_parts(node)
-
-  if (is_null(parts)) {
-    pairlist(new_call(block_sym, node))
-  } else {
-    parts
-  }
+  gen0(body(fn), environment(fn))
 }
 
-#' @rdname generator
-#' @param expr A yielding expression.
-#' @param env The environment in which to evaluate `expr`.
-#' @export
-gen <- function(expr, env = caller_env()) {
-  body <- substitute(expr)
-  node <- set_returns(body)
+gen0 <- function(expr, env) {
+  node <- set_returns(expr)
   parts <- generator_parts(node)
 
   # Add a late return point
@@ -140,6 +125,13 @@ generator_parts <- function(node) {
   } else {
     parts
   }
+}
+
+#' @rdname generator
+#' @param expr A yielding expression.
+#' @export
+gen <- function(expr) {
+  gen0(substitute(expr), env = caller_env())
 }
 
 #' Yield a value from a generator
