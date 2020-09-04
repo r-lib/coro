@@ -27,12 +27,6 @@ local_exit <- function(expr, frame = caller_env()) {
   invisible(expr)
 }
 
-new_function <- function(body, args = list(), env = caller_env()) {
-  stopifnot(all(have_name(args)), is_expr(body), is_env(env))
-  args <- as_pairlist(args)
-  eval_bare(call("function", args, body), env)
-}
-
 add_attributes <- function(.x, ...) {
   attributes(.x) <- list2(...)
   .x

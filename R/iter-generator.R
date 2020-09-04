@@ -83,16 +83,19 @@
 #' # Or drain the remaining elements:
 #' drain(greetings)
 generator <- function(fn) {
-  if (!is_null(formals(fn))) {
-    abort("Generators can't have arguments.")
+  fmls <- formals(fn)
+
+  if (length(fmls) > 1) {
+    abort("Generators must have 0 or 1 argument.")
   }
 
-  gen0(body(fn), environment(fn))
+  gen0(body(fn), environment(fn), fmls)
 }
 
-gen0 <- function(expr, env) {
+gen0 <- function(expr, env, fmls = NULL) {
   node <- set_returns(expr)
-  parts <- generator_parts(node)
+  arg <- names(fmls)[[1]]
+  parts <- generator_parts(node, arg = arg)
 
   # Add a late return point
   return_call <- call2(quote(base::return), quote(invisible(NULL)))
@@ -113,12 +116,18 @@ gen0 <- function(expr, env) {
     })
   })
 
+  formals(out) <- fmls
+
   # Zap source references so you can see the state machine
   unstructure(out)
 }
-generator_parts <- function(node) {
+generator_parts <- function(node, arg = NULL) {
   reset_state()
   parts <- node_list_parts(node)
+
+  if (!is_null(arg)) {
+    poke_state_elt("sent_sym", sym(arg))
+  }
 
   if (is_null(parts)) {
     pairlist(new_call(block_sym, node))
