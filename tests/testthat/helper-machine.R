@@ -2,6 +2,11 @@
 machine_parts <- function(expr, state = NULL) {
   reset_state(state)
 
+  fmls <- formals(expr)
+  if (length(fmls) == 1) {
+    poke_state_elt("arg_sym", sym(names(fmls)))
+  }
+
   node <- set_returns(expr)
   node_list_parts(node)
 }

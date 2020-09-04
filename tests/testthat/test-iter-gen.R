@@ -40,3 +40,18 @@ test_that("generator prints nicely", {
     })))
   })
 })
+
+test_that("can send values to generators", {
+  g <- generator(function(x) repeat x <- yield(x))
+  expect_identical(g(1), 1)
+  expect_identical(g(2), 2)
+})
+
+test_that("first input is not overwritten", {
+  g <- generator(function(x) {
+    y <- yield(x)
+    yield(x)
+  })
+  expect_identical(g(1), 1)
+  expect_identical(g("foo"), 1)
+})

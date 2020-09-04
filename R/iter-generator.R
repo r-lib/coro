@@ -107,14 +107,22 @@ gen0 <- function(expr, env, fmls = NULL) {
     `_return_state` = length(parts)
   )
 
-  out <- blast(function() {
+  if (is_null(arg)) {
+    next_arg <- NULL
+  } else {
+    next_arg <- exprs(env$`_next_arg` <- !!sym(arg))
+  }
+
+  out <- new_function(fmls, expr({
+    !!!next_arg
+
     # Evaluate in the persistent environment
     evalq(env, expr = {
       while (TRUE) {
         !!machine_switch_call(parts)
       }
     })
-  })
+  }))
 
   formals(out) <- fmls
 
@@ -123,11 +131,11 @@ gen0 <- function(expr, env, fmls = NULL) {
 }
 generator_parts <- function(node, arg = NULL) {
   reset_state()
-  parts <- node_list_parts(node)
-
   if (!is_null(arg)) {
-    poke_state_elt("sent_sym", sym(arg))
+    poke_state_elt("arg_sym", sym(arg))
   }
+
+  parts <- node_list_parts(node)
 
   if (is_null(parts)) {
     pairlist(new_call(block_sym, node))
