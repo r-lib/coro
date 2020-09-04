@@ -28,14 +28,13 @@ coro_goto <- function(state, frame = caller_env()) {
 #' @rdname coro_goto
 #' @export
 coro_yield <- function(state, value = NULL, frame = caller_env()) {
-  env_poke(frame, "_state", state)
+  frame$`_state` <- state
   eval_bare(call2(base::return, value), frame)
 }
 #' @rdname coro_goto
 #' @export
 coro_return <- function(value, frame = caller_env()) {
   # Goto NULL-return state to terminate iterator
-  return_state <- env_get(frame, "_return_state")
-  env_poke(frame, "_state", return_state)
+  frame$`_state` <- env_get(frame, "_return_state")
   eval_bare(call2(base::return, value), frame)
 }
