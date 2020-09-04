@@ -68,6 +68,20 @@ test_that("`{` blocks - consecutive pauses", {
   expect_identical(parts, pairlist(parts1, parts2, parts3))
 })
 
+test_that("`{` blocks - return value from pause", {
+  parts <- machine_parts(function(x) {
+    "before"
+    value <- yield(1L)
+    "after"
+  })
+
+  parts1 <- block(quote(x <- `_next_arg`), goto_call("2"))
+  parts2 <- block("before", pause_call("3", 1L))
+  parts3 <- block(quote(value <- `_next_arg`), return_state_call("after"))
+
+  expect_identical(parts, pairlist(parts1, parts2, parts3))
+})
+
 test_that("`{` blocks - no return value", {
   parts <- machine_parts(function() {
     yield(1L)

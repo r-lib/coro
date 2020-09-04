@@ -1,7 +1,8 @@
 
 current_state <- new_environment()
 
-new_machine_parts_state <- function(pause_sym = quote(yield)) {
+new_machine_parts_state <- function(pause_sym = quote(yield),
+                                    arg_sym = NULL) {
   list(
     idx = 1L,
     goto = NULL,
@@ -9,7 +10,8 @@ new_machine_parts_state <- function(pause_sym = quote(yield)) {
     loop_next = NULL,
     loop_break = NULL,
     has_past = NULL,
-    pause_sym = pause_sym
+    pause_sym = pause_sym,
+    arg_sym = arg_sym
   )
 }
 

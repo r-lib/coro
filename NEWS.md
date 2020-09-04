@@ -1,6 +1,11 @@
 
 # flowery 0.0.1.9000
 
+* `generator()` now accepts functions of one argument. The first time
+  a generator is called the argument is defined in the suspendable
+  function. On subsequent invokations, the argument is returned from
+  `yield()`.
+
 * `generator()` now takes functions.
 
 * The iterator abstraction has been removed from flowery. It is

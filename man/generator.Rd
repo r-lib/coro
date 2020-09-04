@@ -7,16 +7,14 @@
 \usage{
 generator(fn)
 
-gen(expr, env = caller_env())
+gen(expr)
 }
 \arguments{
-\item{fn}{A function of zero arguments to be transformed into a
-generator function that can \code{\link[=yield]{yield()}} and \code{return()} values.
+\item{fn}{A function of zero or one argument to be transformed into
+a generator function that can \code{\link[=yield]{yield()}} and \code{return()} values.
 Within a generator, \code{for} loops have \link{iterator} support.}
 
 \item{expr}{A yielding expression.}
-
-\item{env}{The environment in which to evaluate \code{expr}.}
 }
 \description{
 A generator is an \link[=iterator]{iterator function} that can pause its
@@ -36,6 +34,15 @@ point. All local variables are preserved.
 Generators are compatible with all iterator features such as
 \code{\link[=iterate]{iterate()}}, \code{\link[=iter_adapt]{iter_adapt()}}, or \code{\link[=drain]{drain()}}.
 }
+\section{Passing arguments to a generator}{
+
+
+You can create generator functions that take one argument. The
+first time the generator is called, the argument is defined in the
+suspendable function. On subsequent invokations, the argument is
+returned from \code{yield()}.
+}
+
 \examples{
 # A generator statement creates an iterator function:
 iter <- generator(function() {
@@ -94,4 +101,19 @@ take(greetings, 2)
 
 # Or drain the remaining elements:
 drain(greetings)
+
+
+# You can create generator functions that take one argument. The
+# first invokation defines the supplied argument. With subsequent
+# invokations, supplied arguments are returned from `yield()`.
+tally <- generator(function(x) {
+  count <- 0
+  while (TRUE) {
+    count <- count + x
+    yield(count)
+  }
+})
+tally(1)
+tally(2)
+tally(10)
 }

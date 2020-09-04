@@ -22,8 +22,33 @@ node_list_parts <- function(node) {
     !is_null(parent)
   }
 
+  arg_sym <- peek_state_elt("arg_sym")
+
+  # First assign initial argument in the machine state environment
+  if (!is_null(arg_sym)) {
+    state <- poke_state()
+    block <- block(
+      expr(!!arg_sym <- `_next_arg`),
+      goto_call(state)
+    )
+    parts <- new_node(block)
+  }
+
   while (!is_null(rest)) {
     expr <- node_car(rest)
+
+    if (is_call(expr, "<-") && is_pause(rhs <- call_rhs(expr))) {
+      if (is_null(arg_sym)) {
+        abort("Can't send values to a generator that doesn't take an argument.")
+      }
+
+      # Splice the yield() assignment in the continuation
+      assign_call <- call("<-", call_lhs(expr), quote(`_next_arg`))
+      node_poke_cdr(rest, new_node(assign_call, node_cdr(rest)))
+
+      # Continue with a normal pause
+      expr <- rhs
+    }
 
     if (is_pause(expr)) {
       # If pause has no future we don't know which state it should
@@ -156,3 +181,5 @@ exiting_syms <- list(
   quote(coro_yield),
   quote(coro_goto)
 )
+
+utils::globalVariables("_next_arg")

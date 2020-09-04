@@ -19,9 +19,16 @@
 #' Generators are compatible with all iterator features such as
 #' [iterate()], [iter_adapt()], or [drain()].
 #'
-#' @param fn A function of zero arguments to be transformed into a
-#'   generator function that can [yield()] and `return()` values.
+#' @param fn A function of zero or one argument to be transformed into
+#'   a generator function that can [yield()] and `return()` values.
 #'   Within a generator, `for` loops have [iterator] support.
+#'
+#' @section Passing arguments to a generator:
+#'
+#' You can create generator functions that take one argument. The
+#' first time the generator is called, the argument is defined in the
+#' suspendable function. On subsequent invokations, the argument is
+#' returned from `yield()`.
 #'
 #' @export
 #' @examples
@@ -82,32 +89,35 @@
 #'
 #' # Or drain the remaining elements:
 #' drain(greetings)
+#'
+#'
+#' # You can create generator functions that take one argument. The
+#' # first invokation defines the supplied argument. With subsequent
+#' # invokations, supplied arguments are returned from `yield()`.
+#' tally <- generator(function(x) {
+#'   count <- 0
+#'   while (TRUE) {
+#'     count <- count + x
+#'     yield(count)
+#'   }
+#' })
+#' tally(1)
+#' tally(2)
+#' tally(10)
 generator <- function(fn) {
-  if (!is_null(formals(fn))) {
-    abort("Generators can't have arguments.")
+  fmls <- formals(fn)
+
+  if (length(fmls) > 1) {
+    abort("Generators must have 0 or 1 argument.")
   }
 
-  blast(gen(!!body(fn), environment(fn)))
-}
-generator_parts <- function(node) {
-  reset_state()
-  parts <- node_list_parts(node)
-
-  if (is_null(parts)) {
-    pairlist(new_call(block_sym, node))
-  } else {
-    parts
-  }
+  gen0(body(fn), environment(fn), fmls)
 }
 
-#' @rdname generator
-#' @param expr A yielding expression.
-#' @param env The environment in which to evaluate `expr`.
-#' @export
-gen <- function(expr, env = caller_env()) {
-  body <- substitute(expr)
-  node <- set_returns(body)
-  parts <- generator_parts(node)
+gen0 <- function(expr, env, fmls = NULL) {
+  node <- set_returns(expr)
+  arg <- names(fmls)[[1]]
+  parts <- generator_parts(node, arg = arg)
 
   # Add a late return point
   return_call <- call2(quote(base::return), quote(invisible(NULL)))
@@ -119,20 +129,34 @@ gen <- function(expr, env = caller_env()) {
     `_return_state` = length(parts)
   )
 
-  out <- blast(function() {
+  if (is_null(arg)) {
+    next_arg <- NULL
+  } else {
+    next_arg <- exprs(env$`_next_arg` <- !!sym(arg))
+  }
+
+  out <- new_function(fmls, expr({
+    !!!next_arg
+
     # Evaluate in the persistent environment
     evalq(env, expr = {
       while (TRUE) {
         !!machine_switch_call(parts)
       }
     })
-  })
+  }))
+
+  formals(out) <- fmls
 
   # Zap source references so you can see the state machine
   unstructure(out)
 }
-generator_parts <- function(node) {
+generator_parts <- function(node, arg = NULL) {
   reset_state()
+  if (!is_null(arg)) {
+    poke_state_elt("arg_sym", sym(arg))
+  }
+
   parts <- node_list_parts(node)
 
   if (is_null(parts)) {
@@ -140,6 +164,13 @@ generator_parts <- function(node) {
   } else {
     parts
   }
+}
+
+#' @rdname generator
+#' @param expr A yielding expression.
+#' @export
+gen <- function(expr) {
+  gen0(substitute(expr), env = caller_env())
 }
 
 #' Yield a value from a generator
