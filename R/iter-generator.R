@@ -101,6 +101,8 @@ generator_parts <- function(node) {
 }
 
 #' @rdname generator
+#' @param expr A yielding expression.
+#' @param env The environment in which to evaluate `expr`.
 #' @export
 gen <- function(expr, env = caller_env()) {
   body <- substitute(expr)

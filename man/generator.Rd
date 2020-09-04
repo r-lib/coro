@@ -13,6 +13,10 @@ gen(expr, env = caller_env())
 \item{fn}{A function of zero arguments to be transformed into a
 generator function that can \code{\link[=yield]{yield()}} and \code{return()} values.
 Within a generator, \code{for} loops have \link{iterator} support.}
+
+\item{expr}{A yielding expression.}
+
+\item{env}{The environment in which to evaluate \code{expr}.}
 }
 \description{
 A generator is an \link[=iterator]{iterator function} that can pause its
