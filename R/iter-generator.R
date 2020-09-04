@@ -19,9 +19,16 @@
 #' Generators are compatible with all iterator features such as
 #' [iterate()], [iter_adapt()], or [drain()].
 #'
-#' @param fn A function of zero arguments to be transformed into a
-#'   generator function that can [yield()] and `return()` values.
+#' @param fn A function of zero or one argument to be transformed into
+#'   a generator function that can [yield()] and `return()` values.
 #'   Within a generator, `for` loops have [iterator] support.
+#'
+#' @section Passing arguments to a generator:
+#'
+#' You can create generator functions that take one argument. The
+#' first time the generator is called, the argument is defined in the
+#' suspendable function. On subsequent invokations, the argument is
+#' returned from `yield()`.
 #'
 #' @export
 #' @examples
@@ -82,6 +89,21 @@
 #'
 #' # Or drain the remaining elements:
 #' drain(greetings)
+#'
+#'
+#' # You can create generator functions that take one argument. The
+#' # first invokation defines the supplied argument. With subsequent
+#' # invokations, supplied arguments are returned from `yield()`.
+#' tally <- generator(function(x) {
+#'   count <- 0
+#'   while (TRUE) {
+#'     count <- count + x
+#'     yield(count)
+#'   }
+#' })
+#' tally(1)
+#' tally(2)
+#' tally(10)
 generator <- function(fn) {
   fmls <- formals(fn)
 
