@@ -218,3 +218,19 @@ test_that("`{` blocks - simple nesting with various continuation states", {
 
   expect_identical(parts, pairlist(parts1, parts2, parts3))
 })
+
+test_that("can change the input symbol for `<-yield`", {
+  state <- new_machine_parts_state(sent_sym = quote(foo))
+
+  parts <- machine_parts(state = state, function(foo) repeat foo <- yield(foo))
+  parts1 <- block(goto_call("2"))
+  parts2 <- block(pause_call("3", quote(foo)))
+  parts3 <- block(quote(foo <- foo), goto_call("2"))
+  parts4 <- block(return_invisible_call)
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
+
+  parts <- machine_parts(state = state, function(foo) repeat bar <- yield(baz))
+  parts2 <- block(pause_call("3", quote(baz)))
+  parts3 <- block(quote(bar <- foo), goto_call("2"))
+  expect_identical(parts, pairlist(parts1, parts2, parts3, parts4))
+})

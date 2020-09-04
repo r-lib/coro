@@ -122,7 +122,7 @@ yield_sym <- quote(`yield`)
 return_state_sym <- quote(`return`)
 goto_sym <- quote(`_goto`)
 
-next_value_sym <- quote(`_next`)
+sent_sym <- quote(`_next`)
 
 if_sym <- quote(`if`)
 repeat_sym <- quote(`repeat`)

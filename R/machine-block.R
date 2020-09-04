@@ -31,7 +31,7 @@ node_list_parts <- function(node) {
       poke_state_elt("coroutine", TRUE)
 
       # Splice the yield() assignment in the continuation
-      assign_call <- call("<-", call_lhs(expr), next_value_sym)
+      assign_call <- call("<-", call_lhs(expr), peek_state_elt("sent_sym"))
       node_poke_cdr(rest, new_node(assign_call, node_cdr(rest)))
 
       # Continue with a normal pause
