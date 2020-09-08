@@ -83,3 +83,12 @@ test_that("invisible return is added after trailing yield()", {
   block <- block(yield_call(), return_invisible_call)
   expect_identical(exprs, pairlist(if_call(TRUE, block, block(return_invisible_call))))
 })
+
+test_that("setting returns does not mutate expression", {
+  handle <- function() generator(function() { while (TRUE) { 1; yield(); 2 } })
+  body <- node_car(node_cddr(node_cadr(body(handle))))
+  exp <- quote({ while (TRUE) { 1; yield(); 2 } })
+  expect_identical(body, exp)
+  handle()
+  expect_identical(body, exp)
+})

@@ -130,3 +130,20 @@ is_null_node <- function(x) {
     identical(node_car(x), null_node_sym) &&
     identical(node_cdr(x), NULL)
 }
+
+node_clone <- function(node) {
+  out <- duplicate(node, shallow = TRUE)
+
+  node <- out
+  while (!is_null(node)) {
+    car <- node_car(node)
+
+    if (typeof(car) %in% c("language", "pairlist")) {
+      node_poke_car(node, node_clone(car))
+    }
+
+    node <- node_cdr(node)
+  }
+
+  out
+}

@@ -3,8 +3,9 @@ set_returns <- function(expr) {
   if (is_closure(expr)) {
     expr <- body(expr)
   }
-  expr <- duplicate(expr, shallow = TRUE)
-  poke_returns(expr)
+  node <- as_exprs_node(expr)
+  node <- node_clone(node)
+  poke_returns(node)
 }
 
 poke_returns <- function(expr) {
