@@ -6,7 +6,7 @@
   function. On subsequent invokations, the argument is returned from
   `yield()`.
 
-* `generator()` now takes functions.
+* `generator()` now takes anonymous functions.
 
 * The iterator abstraction has been removed from flowery. It is
   replaced with the following protocol:

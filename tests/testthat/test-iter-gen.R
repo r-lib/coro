@@ -55,3 +55,8 @@ test_that("first input is not overwritten", {
   expect_identical(g(1), 1)
   expect_identical(g("foo"), 1)
 })
+
+test_that("generator() takes anonymous functions", {
+  fn <- function() NULL
+  expect_error(generator(fn), "anonymous")
+})

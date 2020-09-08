@@ -105,8 +105,12 @@
 #' tally(2)
 #' tally(10)
 generator <- function(fn) {
-  fmls <- formals(fn)
+  call <- substitute(fn)
+  if (!is_call(call, "function")) {
+    abort("`fn` must be an anonymous function.")
+  }
 
+  fmls <- formals(fn)
   if (length(fmls) > 1) {
     abort("Generators must have 0 or 1 argument.")
   }
