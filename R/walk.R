@@ -33,20 +33,20 @@ walk_blocks_switch <- function(expr, type, fn) {
   if (is_string(type, "if")) {
     cddr <- node_cddr(expr)
 
-    node_poke_car(cddr, walk_blocks(node_car(cddr), fn))
+    node_poke_car(cddr, walk_blocks(as_block(node_car(cddr)), fn))
 
     else_expr <- node_cadr(cddr)
     if (!is_null(else_expr)) {
-      node_poke_cadr(cddr, walk_blocks(else_expr, fn))
+      node_poke_cadr(cddr, walk_blocks(as_block(else_expr), fn))
     }
 
     return(expr)
   }
 
   switch(type,
-    `repeat` = node_poke_cadr(expr, walk_blocks(node_cadr(expr), fn)),
-    `while` = node_poke_car(node_cddr(expr), walk_blocks(node_car(node_cddr(expr)), fn)),
-    `for` = node_poke_cadr(node_cddr(expr), walk_blocks(node_cadr(node_cddr(expr)), fn)),
+    `repeat` = node_poke_cadr(expr, walk_blocks(as_block(node_cadr(expr)), fn)),
+    `while` = node_poke_car(node_cddr(expr), walk_blocks(as_block(node_car(node_cddr(expr))), fn)),
+    `for` = node_poke_cadr(node_cddr(expr), walk_blocks(as_block(node_cadr(node_cddr(expr))), fn)),
     abort("Unexpected state in `walk_blocks_switch()`.")
   )
 

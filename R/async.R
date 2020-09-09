@@ -1,11 +1,11 @@
 
 #' @export
 async <- function(fn) {
-  body(fn) <- walk_blocks(body(fn), poke_await)
+  body(fn) <- walk_blocks(fn_block(fn), poke_await)
+  fmls <- pairlist2(`_resolved` = )
+  info <- gen0_list(body(fn), environment(), fmls)
 
   new_function(formals(fn), expr({
-    fmls <- pairlist2(`_resolved` = )
-    info <- gen0_list(body(fn), environment(), fmls)
     gen <- new_function(fmls, info$expr)
 
     # Wrap generator so it always returns a promise
