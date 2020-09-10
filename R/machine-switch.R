@@ -49,10 +49,6 @@ coro_return <- function(value, frame = caller_env()) {
   frame$`_state` <- env_get(frame, "_return_state")
   eval_bare(call2(base::return, value), frame)
 }
-#' @export
-coro_await <- function(x, callback) {
-  promises::then(as_promise(x), onFulfilled = callback)
-}
 
 is_coro_return_call <- function(x) {
   is_call(x, "coro_return", ns = "flowery")

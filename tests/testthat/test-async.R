@@ -17,6 +17,11 @@ test_that("async functions are not sensitive to blocks", {
   expect_equal(async_generator(fn1), async_generator(fn2))
 })
 
+test_that("async() takes anonymous functions", {
+  fn <- function() await("value")
+  expect_error(async(fn), "anonymous")
+})
+
 
 # -------------------------------------------------------------------------
 # The following tests rely on promises internals and so should be

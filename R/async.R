@@ -1,6 +1,15 @@
 
 #' @export
 async <- function(fn) {
+  call <- substitute(fn)
+  if (!is_call(call, "function")) {
+    abort("`fn` must be an anonymous function.")
+  }
+  new_async(fn)
+}
+
+#' @export
+new_async <- function(fn, ops = NULL) {
   body <- fn_block(fn)
 
   # We make three extra passes for convenience. This will be changed
@@ -14,10 +23,11 @@ async <- function(fn) {
 
   `_env` <- info$env
 
-  env_bind(`_env`,
+  ops <- ops %||% list(
     `_then` = function(x, callback) promises::then(x, onFulfilled = callback),
     `_as_promise` = function(x) as_promise(x)
   )
+  env_bind(`_env`, !!!ops)
 
   fmls <- formals(fn)
 
