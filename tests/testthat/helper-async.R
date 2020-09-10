@@ -1,11 +1,7 @@
 
 async_generator <- function(fn) {
-  body(fn) <- walk_blocks(fn_block(fn), poke_await)
-
-  node <- set_returns(body(fn))
-  arg <- "_resolved"
-
-  generator_parts(node, arg = arg)
+  block <- walk_blocks(fn_block(fn), poke_await)
+  generator_parts(set_returns(block), arg = "_resolved")
 }
 
 expect_async_snapshot <- function(fn) {

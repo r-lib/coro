@@ -2,10 +2,10 @@
 #' @export
 async <- function(fn) {
   body(fn) <- walk_blocks(fn_block(fn), poke_await)
-  fmls <- pairlist2(`_resolved` = )
-  info <- gen0_list(body(fn), environment(), fmls)
 
   new_function(formals(fn), expr({
+    fmls <- pairlist2(`_resolved` = )
+    info <- gen0_list(body(fn), environment(), fmls)
     gen <- new_function(fmls, info$expr)
 
     # Wrap generator so it always returns a promise
@@ -43,7 +43,7 @@ is_await <- function(expr) {
   is_call(expr, "await", ns = c("", "flowery"))
 }
 yield_await_call <- function(arg) {
-  expr(yield(promises::then(!!arg, `_async_generator`)))
+  expr(yield(flowery::coro_await(!!arg, `_async_generator`)))
 }
 
 as_promise <- function(x) {

@@ -3,6 +3,7 @@
 export(as_iterator)
 export(async)
 export(coro_advance)
+export(coro_await)
 export(coro_goto)
 export(coro_return)
 export(coro_yield)

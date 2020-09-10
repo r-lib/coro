@@ -28,7 +28,7 @@
       
       [[2]]
       {
-          flowery::coro_yield("3", promises::then("value", `_async_generator`))
+          flowery::coro_yield("3", flowery::coro_await("value", `_async_generator`))
       }
       
       [[3]]
@@ -59,7 +59,7 @@
       
       [[3]]
       {
-          flowery::coro_yield("4", promises::then("value", `_async_generator`))
+          flowery::coro_yield("4", flowery::coro_await("value", `_async_generator`))
       }
       
       [[4]]
@@ -111,7 +111,7 @@
       
       [[5]]
       {
-          flowery::coro_yield("2", promises::then("value", `_async_generator`))
+          flowery::coro_yield("2", flowery::coro_await("value", `_async_generator`))
       }
       
       [[6]]
@@ -149,7 +149,7 @@
       
       [[4]]
       {
-          flowery::coro_yield("5", promises::then("value", `_async_generator`))
+          flowery::coro_yield("5", flowery::coro_await("value", `_async_generator`))
       }
       
       [[5]]
