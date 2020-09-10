@@ -120,6 +120,8 @@ generator <- function(fn) {
 
 gen0 <- function(expr, env, fmls = NULL) {
   info <- gen0_list(expr, env, fmls = fmls)
+  `_env` <- info$env
+
   out <- new_function(fmls, info$expr)
 
   # Zap source references so you can see the state machine
@@ -148,7 +150,6 @@ gen0_list <- function(expr, env, fmls = NULL) {
   }
 
   expr <- expr({
-    `_env` <- !!env
     !!!next_arg
 
     # Evaluate in the persistent environment

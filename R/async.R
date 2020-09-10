@@ -1,28 +1,72 @@
 
 #' @export
 async <- function(fn) {
-  body(fn) <- walk_blocks(fn_block(fn), poke_await)
+  body <- fn_block(fn)
 
-  new_function(formals(fn), expr({
-    fmls <- pairlist2(`_resolved` = )
-    info <- gen0_list(body(fn), environment(), fmls)
-    gen <- new_function(fmls, info$expr)
+  # We make three extra passes for convenience. This will be changed
+  # to a single pass later on.
+  body <- walk_blocks(body, poke_await)
+  body <- new_call(quote(`{`), set_returns(body))
+  body <- walk_blocks(body, poke_async_return)
 
-    # Wrap generator so it always returns a promise
-    `_async_generator` <- function(x) as_promise(gen(x))
+  gen_fmls <- pairlist2(`_resolved` = )
+  info <- gen0_list(body, fn_env(fn), gen_fmls)
 
-    # environment() contains initial arguments
-    `_resolved` <- NULL
-    as_promise(eval(info$expr))
+  `_env` <- info$env
+
+  env_bind(`_env`,
+    `_then` = function(x, callback) promises::then(x, onFulfilled = callback),
+    `_as_promise` = function(x) as_promise(x)
+  )
+
+  fmls <- formals(fn)
+
+  forward_args_calls <- lapply(names(fmls), function(nm) {
+    if (identical(nm, "...")) {
+      quote(delayedAssign("...", get("..."), assign.env = `_env`))
+    } else {
+      expr(delayedAssign(!!nm, !!sym(nm), assign.env = `_env`))
+    }
+  })
+
+  out <- new_function(fmls, expr({
+    # Refresh the state machine environment
+    `_env` <- env_clone(`_env`)
+
+    !!!forward_args_calls
+
+    gen <- new_function(gen_fmls, info$expr)
+    env_bind(`_env`, `_self` = gen)
+
+    gen(NULL)
   }))
+
+  structure(out, class = c("flowery_async", "function"))
+}
+
+#' @export
+print.flowery_async <- function(x, ...) {
+  # TODO: Print user-friendly async function by default. Make it
+  # configurable for easier development.
+
+  writeLines("<async>")
+  print(unclass(x), ...)
+
+  writeLines("State machine:")
+  print(async_generator(x), ...)
+
+  invisible(x)
+}
+
+async_generator <- function(fn) {
+  env_get(fn_env(fn), "info")$expr
 }
 
 poke_await <- function(node) {
   car <- node_car(node)
 
   if (is_await(car)) {
-    arg <- node_cadr(car)
-    node_poke_car(node, yield_await_call(arg))
+    node_poke_car(node, yield_await_call(await_arg(car)))
     return()
   }
 
@@ -39,11 +83,30 @@ poke_await <- function(node) {
   }
 }
 
+poke_async_return <- function(node) {
+  car <- node_car(node)
+
+  if (is_coro_return_call(car)) {
+    node_poke_car(node, async_return_call(node_cadr(car)))
+  }
+
+  if (is_coro_yield_call(car)) {
+    stop("TODO")
+  }
+}
+
 is_await <- function(expr) {
   is_call(expr, "await", ns = c("", "flowery"))
 }
+await_arg <- function(call) {
+  node_cadr(call)
+}
+
 yield_await_call <- function(arg) {
-  expr(yield(flowery::coro_await(!!arg, `_async_generator`)))
+  expr(yield(`_then`(`_as_promise`(!!arg), callback = `_self`)))
+}
+async_return_call <- function(arg) {
+  expr(flowery::coro_return(`_as_promise`(!!arg)))
 }
 
 as_promise <- function(x) {

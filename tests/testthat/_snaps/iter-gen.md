@@ -12,7 +12,6 @@
     Output
       function () 
       {
-          `_env` <- <environment>
           evalq(`_env`, expr = {
               while (TRUE) {
                   switch({

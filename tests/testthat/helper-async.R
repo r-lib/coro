@@ -1,9 +1,24 @@
 
-async_generator <- function(fn) {
-  block <- walk_blocks(fn_block(fn), poke_await)
-  generator_parts(set_returns(block), arg = "_resolved")
+async_state_machine <- function(fn) {
+  gen <- async_generator(async(fn))
+
+  expr <- gen[[3]][[3]][[2]][[3]][[2]][-(1:2)]
+  machine <- as.pairlist(as.list(expr))
+
+  machine
 }
 
 expect_async_snapshot <- function(fn) {
-  blast(expect_snapshot(print(async_generator(!!enexpr(fn))), cran = TRUE), caller_env())
+  blast(expect_snapshot(async_state_machine(!!enexpr(fn)), cran = TRUE), caller_env())
+}
+
+expect_promise <- function(x, value, status = NULL) {
+  expect_true(inherits(x, "promise"))
+
+  if (!missing(value)) {
+    expect_equal(prom_value(x), value)
+  }
+  if (!is_null(status)) {
+    expect_equal(prom_status(x), status)
+  }
 }

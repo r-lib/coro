@@ -53,3 +53,10 @@ coro_return <- function(value, frame = caller_env()) {
 coro_await <- function(x, callback) {
   promises::then(as_promise(x), onFulfilled = callback)
 }
+
+is_coro_return_call <- function(x) {
+  is_call(x, "coro_return", ns = "flowery")
+}
+is_coro_yield_call <- function(x) {
+  is_call(x, "coro_yield", ns = "flowery")
+}
