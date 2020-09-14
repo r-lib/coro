@@ -1,4 +1,9 @@
-
+#' Construct an async function
+#'
+#' @param fn An anonymous function within which `await()` calls are
+#'   allowed.
+#' @return A function that returns a [promises::promise()].
+#'
 #' @export
 async <- function(fn) {
   call <- substitute(fn)
@@ -8,6 +13,14 @@ async <- function(fn) {
   new_async(fn)
 }
 
+#' Low-level constructor for async functions
+#'
+#' Unlike [async()] which uses concurrency based on
+#' [promises](https://rstudio.github.io/promises/), [new_async()]
+#' allows constructing async-await functions for other concurrency
+#' frameworks.
+#'
+#' @keywords internal
 #' @export
 new_async <- function(fn, ops = NULL) {
   body <- fn_block(fn)
@@ -126,3 +139,5 @@ as_promise <- function(x) {
     promises::promise_resolve(x)
   }
 }
+
+utils::globalVariables(c("_self", "_as_promise", "_then"))
