@@ -60,3 +60,11 @@ test_that("generator() takes anonymous functions", {
   fn <- function() NULL
   expect_error(generator(fn), "anonymous")
 })
+
+test_that("generators can't yield `NULL`", {
+  g <- generator(function() yield())
+  expect_error(g(), "Can't yield `NULL`")
+
+  g <- generator(function() yield(NULL))
+  expect_error(g(), "Can't yield `NULL`")
+})

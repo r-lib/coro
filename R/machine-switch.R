@@ -28,6 +28,9 @@ coro_goto <- function(state, frame = caller_env()) {
 #' @rdname coro_goto
 #' @export
 coro_yield <- function(state, value = NULL, frame = caller_env()) {
+  if (is_null(value)) {
+    abort("Can't yield `NULL`.")
+  }
   frame$`_state` <- state
   eval_bare(call2(base::return, value), frame)
 }
