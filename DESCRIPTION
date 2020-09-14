@@ -10,11 +10,11 @@ Depends:
     R (>= 3.1.0)
 Imports:
     glue,
-    later (>= 1.1.0),
-    promises,
     rlang (>= 0.4.7)
 Suggests:
     knitr,
+    later (>= 1.1.0),
+    promises,
     purrr,
     rmarkdown,
     testthat (>= 2.99.0.9000)

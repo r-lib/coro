@@ -10,6 +10,15 @@ async <- function(fn) {
   if (!is_call(call, "function")) {
     abort("`fn` must be an anonymous function.")
   }
+
+  body(fn) <- expr({
+    if (!rlang::is_installed(c("promises", "later"))) {
+      rlang::abort("The {later} and {promises} packages must be installed.")
+    }
+
+    !!!fn_body(fn)
+  })
+
   new_async(fn)
 }
 
