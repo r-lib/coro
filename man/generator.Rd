@@ -17,12 +17,11 @@ Within a generator, \code{for} loops have \link{iterator} support.}
 \item{expr}{A yielding expression.}
 }
 \description{
-A generator is an \link[=iterator]{iterator function} that can pause its
+\code{generator()} creates a factory function for generators. A
+generator is an \link[=iterator]{iterator function} that can pause its
 execution with \code{\link[=yield]{yield()}} and resume from where it left off. Because
 they manage state for you, generators are the easiest way to create
-iterators. The main difference between a regular function and a
-generator is thus that you can \code{\link[=yield]{yield()}} values. The following
-rules apply:
+iterators. The following rules apply:
 \itemize{
 \item Yielded values do not terminate the generator. If you call the
 generator again, the execution resumes right after the yielding
@@ -44,12 +43,16 @@ returned from \code{yield()}.
 }
 
 \examples{
-# A generator statement creates an iterator function:
-iter <- generator(function() {
+# A generator statement creates a generator constructor:
+new_gen <- generator(function() {
   yield("foo")
   yield("bar")
   "baz"
 })
+
+# The constructor creates generator functions. They are essentially
+# iterators that you can call successively to obtain values from:
+iter <- new_gen()
 iter()
 iter()
 
@@ -60,59 +63,41 @@ iter()
 iter()
 
 
-# You can only exhaust a generator once. Let's create a generator
-# factory to make it easy to get fresh generators:
-new_yielder <- function(...) {
-  generator(function() {
-    values <- list(...)
-    n <- length(values)
-    last <- values[[n]]
-    for (x in values[-n]) yield(x)
-    last
-  })
-}
-iter <- new_yielder("foo", "bar", "barbaz")
+# You can only exhaust a generator once but you can always create
+# new ones from a factory:
+iter <- new_gen()
+iter()
 
 # As generators are regular iterators, you can use all iterator
 # tools such as iterate() which allows you to loop over all values
 # with a `for` loop:
 iterate(for (x in iter) cat(x, "\n"))
 
-# You can also check for `NULL` values that signal exhaustion to
-# loop manually:
-iter <- new_yielder("foo", "bar", "barbaz")
-while (!is.null(new <- iter())) cat(new, "\n")
 
-
-# The generator also has a short syntax `gen()`. It is completely
-# identical to the long version but is handy when chaining
-# generator expressions like in Python. Note that within a
-# generator you can supply iterators to `for` loops just like in
-# `iterate()`. This feature and the short alias make it handy to
-# chain iterators:
+# flowery provides a short syntax `gen()` for creating one-off
+# generator functions. It is handy to chain iterators:
 numbers <- 1:10
 odds <- gen(for (x in numbers) if (x \%\% 2 != 0) yield(x))
 squares <- gen(for (x in odds) yield(x^2))
 greetings <- gen(for (x in squares) yield(paste("Hey", x)))
 
-
-# As all iterators, you can take() elements from a generator:
+# As with all iterators, you can take() elements from a generator:
 take(greetings, 2)
 
 # Or drain the remaining elements:
 drain(greetings)
 
 
-# You can create generator functions that take one argument. The
-# first invokation defines the supplied argument. With subsequent
-# invokations, supplied arguments are returned from `yield()`.
-tally <- generator(function(x) {
+# You can supply arguments to generator functions. They are
+# returned from `yield()`.
+new_tally <- generator(function() {
   count <- 0
   while (TRUE) {
-    count <- count + x
-    yield(count)
+    i <- yield(count)
+    count <- count + i
   }
 })
+tally <- new_tally()
 tally(1)
 tally(2)
 tally(10)

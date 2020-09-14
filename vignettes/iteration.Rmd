@@ -189,12 +189,18 @@ take_chr(iter, 5)
 
 ## Generators
 
-The purpose of generators is to maintain state. This is why they are ideally suited for generation of data during iteration. The iterators that we created manually in the previous section can easily be turned into a generator:
+The purpose of generators is to maintain state. This is why they are ideally suited for generation of data during iteration. The iterators that we created manually in the previous section can easily be turned into a generator. First create a generator constructor:
 
 ```{r}
-iter <- generator(function() {
-  for (x in letters) yield(greet(x))
+make_gen <- generator(function(names) {
+  for (x in names) yield(greet(x))
 })
+```
+
+Then use it to create an iterator function:
+
+```{r}
+iter <- make_gen(letters)
 ```
 
 The generator can be used just like any iterator:
@@ -223,30 +229,17 @@ From that point on, reentering the iterator is an error:
 iter()
 ```
 
-For this reason it is often a good idea to provide a **generator factory**. The principle is identical to function factories except that we don't have to maintain the iteration state. Creating a generator factory is thus straightforward:
-
-```{r}
-make_iter <- function(x) {
-  generator(function() {
-    for (elt in x) yield(greet(elt))
-  })
-}
-
-iter <- make_iter(c("foo", "bar"))
-drain(iter)
-```
-
 This generator factory can be reused as many times as needed to create fresh generators:
 
 ```{r}
-iter <- make_iter(c("baz", "barbaz"))
+iter <- make_gen(c("baz", "barbaz"))
 drain(iter)
 ```
 
 Note finally that generators don't have to yield, they can also return. Once it has returned the generator is done:
 
 ```{r}
-iter <- generator(function() {
+my_gen <- generator(function() {
   x <- 1:10
 
   for (elt in x) {
@@ -258,7 +251,7 @@ iter <- generator(function() {
   }
 })
 
-drain_dbl(iter)
+drain_dbl(my_gen())
 ```
 
 
@@ -272,11 +265,11 @@ As we have seen iterator and generators are useful for generating data chunk by 
 Inside a generator you can supply iterators to `for` loops. This makes it easy to chain generators:
 
 ```{r}
-integer_iter <- generator(function() for (x in 1:10) yield(x))
-square_iter <- generator(function() for (x in integer_iter) yield(x^2))
+integer_gen <- generator(function(vec) for (x in vec) yield(x))
+square_gen <- generator(function(iter) for (x in iter) yield(x^2))
 ```
 
-The `gen()` alias is a shortcut for creating small generator functions:
+The `gen()` alias is a shortcut for creating generator functions on the spot without going through a constructor:
 
 ```{r}
 data <- 1:10

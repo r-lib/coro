@@ -38,10 +38,6 @@ node_list_parts <- function(node) {
     expr <- node_car(rest)
 
     if (is_call(expr, "<-") && is_pause(rhs <- call_rhs(expr))) {
-      if (is_null(arg_sym)) {
-        abort("Can't send values to a generator that doesn't take an argument.")
-      }
-
       # Splice the yield() assignment in the continuation
       assign_call <- call("<-", call_lhs(expr), quote(`_next_arg`))
       node_poke_cdr(rest, new_node(assign_call, node_cdr(rest)))

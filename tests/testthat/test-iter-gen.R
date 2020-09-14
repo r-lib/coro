@@ -1,7 +1,7 @@
 
 test_that("can create non-yielding generator functions", {
   gen <- generator(function() "foo")
-  expect_identical(drain(gen), list("foo"))
+  expect_identical(drain(gen()), list("foo"))
 })
 
 test_that("can yield `NULL` without terminating iteration", {
@@ -43,17 +43,18 @@ test_that("generator prints nicely", {
 
 test_that("can send values to generators", {
   g <- generator(function(x) repeat x <- yield(x))
-  expect_identical(g(1), 1)
-  expect_identical(g(2), 2)
+  expect_identical(g(1)(), 1)
+  expect_identical(g(2)(), 2)
 })
 
-test_that("first input is not overwritten", {
+test_that("state is refreshed", {
   g <- generator(function(x) {
     y <- yield(x)
     yield(x)
   })
-  expect_identical(g(1), 1)
-  expect_identical(g("foo"), 1)
+
+  expect_identical(g(1)(), 1)
+  expect_identical(g("foo")(), "foo")
 })
 
 test_that("generator() takes anonymous functions", {
@@ -63,8 +64,14 @@ test_that("generator() takes anonymous functions", {
 
 test_that("generators can't yield `NULL`", {
   g <- generator(function() yield())
-  expect_error(g(), "Can't yield `NULL`")
+  expect_error(g()(), "Can't yield `NULL`")
 
   g <- generator(function() yield(NULL))
-  expect_error(g(), "Can't yield `NULL`")
+  expect_error(g()(), "Can't yield `NULL`")
+})
+
+test_that("generator functions inherit from `flowery_generator`", {
+  g <- generator(function() NULL)
+  expect_true(inherits(g, "flowery_generator"))
+  expect_false(inherits(g(), "flowery_generator"))
 })

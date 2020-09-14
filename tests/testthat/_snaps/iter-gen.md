@@ -10,8 +10,9 @@
         }
       })))
     Output
-      function () 
+      function (`_next_arg` = NULL) 
       {
+          `_env`$`_next_arg` <- `_next_arg`
           evalq(`_env`, expr = {
               while (TRUE) {
                   switch({

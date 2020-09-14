@@ -1,15 +1,18 @@
 
 # flowery 0.0.1.9000
 
-* The `async()` function operator creates functions for cooperative
-  concurrency using the _later_ and _promises_ framework.
-
 * `generator()` now accepts functions of one argument. The first time
   a generator is called the argument is defined in the suspendable
   function. On subsequent invokations, the argument is returned from
   `yield()`.
 
-* `generator()` now takes anonymous functions.
+* `generator()` now creates generator factories. It takes a function
+  template and returns a function that creates generator functions
+  from this template. This is consistent with languages like
+  Javascript and Python.
+
+* The `async()` function operator creates functions for cooperative
+  concurrency using the _later_ and _promises_ framework.
 
 * The iterator abstraction has been removed from flowery. It is
   replaced with the following protocol:

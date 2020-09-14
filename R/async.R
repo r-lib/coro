@@ -63,9 +63,7 @@ new_async <- function(fn, ops = NULL) {
   body <- new_call(quote(`{`), set_returns(body))
   body <- walk_blocks(body, poke_async_return)
 
-  gen_fmls <- pairlist2(`_resolved` = )
-  info <- gen0_list(body, fn_env(fn), gen_fmls)
-
+  info <- gen0_list(body, fn_env(fn))
   `_env` <- info$env
 
   ops <- ops %||% list(
@@ -76,23 +74,20 @@ new_async <- function(fn, ops = NULL) {
 
   fmls <- formals(fn)
 
-  forward_args_calls <- lapply(names(fmls), function(nm) {
-    if (identical(nm, "...")) {
-      quote(delayedAssign("...", get("..."), assign.env = `_env`))
-    } else {
-      expr(delayedAssign(!!nm, !!sym(nm), assign.env = `_env`))
-    }
-  })
-
   out <- new_function(fmls, expr({
     # Refresh the state machine environment
     `_env` <- env_clone(`_env`)
 
-    !!!forward_args_calls
+    # Forward arguments inside the state machine environment
+    !!!forward_args_calls(fmls)
 
-    gen <- new_function(gen_fmls, info$expr)
+    # Create function around the state machine
+    gen <- function(`_next_arg` = NULL) !!info$expr
+
+    # Bind generator to `_self`. This binding can be hooked as callback.
     env_bind(`_env`, `_self` = gen)
 
+    # Step in the async function
     gen(NULL)
   }))
 
