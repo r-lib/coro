@@ -132,3 +132,9 @@ test_that("can adapt async streams", {
 
   expect_identical(consumed, 1:3 * 3L)
 })
+
+test_that("async() functions can take dots", {
+  fn <- async(function(...) list(...))
+  expect_equal(wait_for(fn(x = 1)), list(x = 1))
+})
+

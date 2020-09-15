@@ -75,3 +75,11 @@ test_that("generator functions inherit from `flowery_generator`", {
   expect_true(inherits(g, "flowery_generator"))
   expect_false(inherits(g(), "flowery_generator"))
 })
+
+test_that("generator factories can take dots", {
+  new_gen <- generator(function(...) yield(list(...)))
+  gen1 <- new_gen(x = 1)
+  gen2 <- new_gen(x = 2)
+
+  expect_equal(gen1(), list(x = 1))
+})
