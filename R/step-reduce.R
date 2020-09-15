@@ -411,19 +411,7 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
 
   .f <- as_function(.f)
 
-  out <- .x()
-
-  if (is_null(out)) {
-    return(NULL)
-  }
-  if (is_async_value(out)) {
-    while (prom_is_pending(out)) {
-      later::run_now(Inf)
-    }
-    out <- .f(NULL, prom_value(out), ...)
-    out <- wait_for(async_reduce(out, rest, .x, .f, ...))
-    return(out)
-  }
+  out <- NULL
 
   while (!is_null(new <- .x())) {
     out <- .f(out, new, ...)
@@ -437,7 +425,39 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   out
 }
 
-on_load(async_reduce <- async(function(out, rest, .x, .f, ...) {
+
+#' Collect output of an asynchronous iterator
+#'
+#' @inheritParams take
+#'
+#' @export
+async_collect <- function(x, n = NULL) {
+  steps <- n %&&% iter_take(n)
+  async_reduce_steps(x, steps, along_builder(list()))
+}
+
+on_load(async_reduce_steps <- async(function(x, steps, builder, init) {
+  builder <- as_closure(builder)
+
+  if (is_null(steps)) {
+    reducer <- builder
+  } else {
+    reducer <- steps(builder)
+  }
+  stopifnot(is_closure(reducer))
+
+  if (missing(init)) {
+    identity <- reducer()
+  } else {
+    identity <- init
+  }
+
+  result <- await(async_reduce(x, reducer))
+
+  reducer(result)
+}))
+
+on_load(async_reduce <- async(function(.x, .f, ...) {
   while (TRUE) {
     new <- await(.x())
 
@@ -455,7 +475,3 @@ on_load(async_reduce <- async(function(out, rest, .x, .f, ...) {
 
   out
 }))
-
-is_async_value <- function(x) {
-  inherits_any(x, c("promise", "deferred"))
-}

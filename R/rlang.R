@@ -39,3 +39,11 @@ blast <- function(expr, env = caller_env()) {
 fn_block <- function(fn) {
   as_block(body(fn))
 }
+
+`%&&%` <- function(x, y) {
+  if (is_null(x)) {
+    x
+  } else {
+    y
+  }
+}

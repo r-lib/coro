@@ -138,3 +138,19 @@ test_that("async() functions can take dots", {
   expect_equal(wait_for(fn(x = 1)), list(x = 1))
 })
 
+test_that("async_collect() collects", {
+  new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+
+  s1 <- new_stream(1:5)
+  s2 <- async_adapt(s1, iter_map(`*`, 3))
+
+  out <- wait_for(async_collect(s2))
+  expect_equal(out, as.list(1:5 * 3))
+
+
+  s1 <- new_stream(1:5)
+  s2 <- async_adapt(s1, iter_map(`*`, 3))
+
+  out <- wait_for(async_collect(s2, n = 3))
+  expect_equal(out, as.list(1:3 * 3))
+})
