@@ -90,10 +90,7 @@
 #' tally(2)
 #' tally(10)
 generator <- function(fn) {
-  call <- substitute(fn)
-  if (!is_call(call, "function")) {
-    abort("`fn` must be an anonymous function.")
-  }
+  assert_lambda(substitute(fn))
 
   info <- gen0_list(body(fn), fn_env(fn))
   `_env` <- info$env

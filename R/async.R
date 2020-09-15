@@ -23,10 +23,7 @@
 #'
 #' @export
 async <- function(fn) {
-  call <- substitute(fn)
-  if (!is_call(call, "function")) {
-    abort("`fn` must be an anonymous function.")
-  }
+  assert_lambda(substitute(fn))
 
   body(fn) <- expr({
     if (!rlang::is_installed(c("promises", "later"))) {
