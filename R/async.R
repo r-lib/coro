@@ -103,12 +103,12 @@ print.flowery_async <- function(x, ...) {
   print(unclass(x), ...)
 
   writeLines("State machine:")
-  print(async_generator(x), ...)
+  print(async_internal_generator(x), ...)
 
   invisible(x)
 }
 
-async_generator <- function(fn) {
+async_internal_generator <- function(fn) {
   env_get(fn_env(fn), "info")$expr
 }
 
