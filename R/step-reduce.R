@@ -355,7 +355,7 @@ reduce <- function(.x, .f, ..., .init) {
 
 reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   if (is_closure(.x)) {
-    return(iter_reduce_impl(.x, .f, ..., .init = .init, .left = .left))
+    return(iter_reduce_impl(.x, .f, ..., .left = .left))
   }
 
   result <- reduce_init(.x, .init, left = .left)
@@ -406,12 +406,25 @@ reduce_index <- function(x, init, left = TRUE) {
 
 iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   if (!.left) {
-    abort("Can't right-reduce with an iterator")
+    abort("Can't right-reduce with an iterator.")
   }
 
   .f <- as_function(.f)
 
-  out <- NULL
+  out <- .x()
+
+  if (is_null(out)) {
+    return(NULL)
+  }
+  if (is_async_value(out)) {
+    while (prom_is_pending(out)) {
+      later::run_now(Inf)
+    }
+    out <- .f(NULL, prom_value(out), ...)
+    out <- wait_for(async_reduce(out, rest, .x, .f, ...))
+    return(out)
+  }
+
   while (!is_null(new <- .x())) {
     out <- .f(out, new, ...)
 
@@ -422,4 +435,27 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   }
 
   out
+}
+
+on_load(async_reduce <- async(function(out, rest, .x, .f, ...) {
+  while (TRUE) {
+    new <- await(.x())
+
+    if (is_null(new)) {
+      break
+    }
+
+    out <- .f(out, new, ...)
+
+    # Return early if we get a reduced result
+    if (is_done_box(out)) {
+      return(unbox(out))
+    }
+  }
+
+  out
+}))
+
+is_async_value <- function(x) {
+  inherits_any(x, c("promise", "deferred"))
 }

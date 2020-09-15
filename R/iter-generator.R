@@ -123,7 +123,13 @@ print.flowery_generator <- function(x, ...) {
 forward_args_calls <- function(fmls) {
   lapply(names(fmls), function(nm) {
     if (identical(nm, "...")) {
-      quote(`_env`$... <- get("..."))
+      quote({
+        if (missing(...)) {
+          `_env`$... <- quote(expr = )
+        } else {
+          `_env`$... <- get("...")
+        }
+      })
     } else {
       expr(delayedAssign(!!nm, !!sym(nm), assign.env = `_env`))
     }
