@@ -77,3 +77,36 @@ test_that("state of async() functions are independent", {
   fn()
   expect_equal(async_state(fn), "1")
 })
+
+test_that("async_generator() creates streams", {
+  produced <- NULL
+  new_stream <- async_generator(function(x) {
+    for (elt in x) {
+      await(async_sleep(0))
+      produced <<- c(produced, elt)
+      yield(elt)
+    }
+  })
+
+  s <- new_stream(1:3)
+  out <- wait_for(s())
+  expect_equal(out, 1L)
+
+  consumed <- NULL
+  async_obs <- async(function(i) {
+    while (TRUE) {
+      x <- await(i())
+      consumed <<- c(consumed, x)
+
+      if (is_null(x)) {
+        return("done")
+      }
+    }
+  })
+
+  out <- wait_for(async_obs(s))
+  expect_equal(out, "done")
+
+  expect_equal(produced, 1:3)
+  expect_equal(consumed, 2:3)
+})

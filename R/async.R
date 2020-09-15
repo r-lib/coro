@@ -24,16 +24,8 @@
 #' @export
 async <- function(fn) {
   assert_lambda(substitute(fn))
-
-  body(fn) <- expr({
-    if (!rlang::is_installed(c("promises", "later"))) {
-      rlang::abort("The {later} and {promises} packages must be installed.")
-    }
-
-    !!!fn_body(fn)
-  })
-
-  new_async(fn)
+  fn <- ensure_promises(fn)
+  new_async_generator(fn, step = TRUE)
 }
 #' @rdname async
 #' @param x An awaitable value, i.e. a [promise][promises::promise].
@@ -42,16 +34,48 @@ await <- function(x) {
   abort("`await()` can't be called directly or within function arguments.")
 }
 
+#' Construct an async generator
+#'
+#' @param fn An anonymous function describing an async generator
+#'   within which `await()` calls are allowed.
+#' @return A generator factory. Generators constructed with this
+#'   factory always return [promises::promise()].
+#'
+#' @export
+async_generator <- function(fn) {
+  assert_lambda(substitute(fn))
+  fn <- ensure_promises(fn)
+  new_async_generator(fn, step = FALSE)
+}
+
+ensure_promises <- function(fn) {
+  body(fn) <- expr({
+    if (!rlang::is_installed(c("promises", "later"))) {
+      rlang::abort("The {later} and {promises} packages must be installed.")
+    }
+
+    !!!fn_body(fn)
+  })
+
+  fn
+}
+
 #' Low-level constructor for async functions
 #'
 #' Unlike [async()] which uses concurrency based on
-#' [promises](https://rstudio.github.io/promises/), [new_async()]
-#' allows constructing async-await functions for other concurrency
-#' frameworks.
+#' [promises](https://rstudio.github.io/promises/),
+#' `new_async_generator()` allows constructing async-await functions
+#' and async generators for other concurrency frameworks.
+#'
+#' @param step If `TRUE`, the async generator is immediately stepped
+#'   in after creation. This returns a promise. If `FALSE`, the async
+#'   generator is returned instead. Set `step` to `TRUE` when you
+#'   create an [async()] variant and to `FALSE` when you create an
+#'   [async_generator()] variant.
 #'
 #' @keywords internal
 #' @export
-new_async <- function(fn, ops = NULL) {
+new_async_generator <- function(fn, step, ops = NULL) {
   body <- fn_block(fn)
 
   # We make three extra passes for convenience. This will be changed
@@ -79,16 +103,23 @@ new_async <- function(fn, ops = NULL) {
     !!!forward_args_calls(fmls)
 
     # Create function around the state machine
-    gen <- function(`_next_arg` = NULL) !!info$expr
+    generator <- function(`_next_arg` = NULL) !!info$expr
 
     # Bind generator to `_self`. This binding can be hooked as callback.
-    env_bind(`_env`, `_self` = gen)
+    env_bind(`_env`, `_self` = generator)
 
-    # Step in the async function
-    gen(NULL)
+    if (step) {
+      generator(NULL)
+    } else {
+      generator
+    }
   }))
 
-  structure(out, class = c("flowery_async", "function"))
+  if (step) {
+    structure(out, class = c("flowery_async", "function"))
+  } else {
+    structure(out, class = c("flowery_generator", "function"))
+  }
 }
 
 #' @export
