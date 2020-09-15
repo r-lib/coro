@@ -22,6 +22,13 @@ test_that("async() takes anonymous functions", {
   expect_error(async(fn), "anonymous")
 })
 
+test_that("await() can't be called directly or out of place", {
+  expect_error(await(1), "called directly")
+
+  f <- async(function() list(await(1)))
+  expect_error(f(), "within function arguments")
+})
+
 
 # -------------------------------------------------------------------------
 # The following tests rely on promises internals and so should be

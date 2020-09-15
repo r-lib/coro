@@ -21,6 +21,12 @@ async <- function(fn) {
 
   new_async(fn)
 }
+#' @rdname async
+#' @param x An awaitable value, i.e. a [promise][promises::promise].
+#' @export
+await <- function(x) {
+  abort("`await()` can't be called directly or within function arguments.")
+}
 
 #' Low-level constructor for async functions
 #'

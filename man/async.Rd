@@ -2,13 +2,18 @@
 % Please edit documentation in R/async.R
 \name{async}
 \alias{async}
+\alias{await}
 \title{Construct an async function}
 \usage{
 async(fn)
+
+await(x)
 }
 \arguments{
 \item{fn}{An anonymous function within which \code{await()} calls are
 allowed.}
+
+\item{x}{An awaitable value, i.e. a \link[promises:promise]{promise}.}
 }
 \value{
 A function that returns a \code{\link[promises:promise]{promises::promise()}}.
