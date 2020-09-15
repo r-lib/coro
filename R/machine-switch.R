@@ -56,3 +56,11 @@ is_coro_return_call <- function(x) {
 is_coro_yield_call <- function(x) {
   is_call(x, "coro_yield", ns = "flowery")
 }
+
+
+state_machine_variables <- c("_state", "_self", "_as_promise", "_then")
+
+flowery_declare_globals <- function(env = caller_env()) {
+  evalq(utils::globalVariables(state_machine_variables), env)
+}
+flowery_declare_globals()

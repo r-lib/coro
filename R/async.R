@@ -194,5 +194,3 @@ as_promise <- function(x) {
     promises::promise_resolve(x)
   }
 }
-
-utils::globalVariables(c("_self", "_as_promise", "_then"))

@@ -110,3 +110,25 @@ test_that("async_generator() creates streams", {
   expect_equal(produced, 1:3)
   expect_equal(consumed, 2:3)
 })
+
+test_that("can adapt async streams", {
+  new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+
+  consumed <- NULL
+  async_obs <- async(function(i) {
+    while (TRUE) {
+      x <- await(i())
+      consumed <<- c(consumed, x)
+
+      if (is_null(x)) {
+        return("done")
+      }
+    }
+  })
+
+  s1 <- new_stream(1:3)
+  s2 <- async_adapt(s1, iter_map(`*`, 3L))
+  wait_for(async_obs(s2))
+
+  expect_identical(consumed, 1:3 * 3L)
+})

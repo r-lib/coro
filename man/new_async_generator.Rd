@@ -16,7 +16,7 @@ create an \code{\link[=async]{async()}} variant and to \code{FALSE} when you cre
 \description{
 Unlike \code{\link[=async]{async()}} which uses concurrency based on
 \href{https://rstudio.github.io/promises/}{promises},
-\code{\link[=new_async_generator]{new_async_generator()}} allows constructing async-await functions
+\code{new_async_generator()} allows constructing async-await functions
 and async generators for other concurrency frameworks.
 }
 \keyword{internal}

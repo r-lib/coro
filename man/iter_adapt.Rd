@@ -2,14 +2,17 @@
 % Please edit documentation in R/iter-adapt.R
 \name{iter_adapt}
 \alias{iter_adapt}
+\alias{async_adapt}
 \title{Adapt an iterator with transformation steps}
 \usage{
 iter_adapt(iter, ...)
+
+async_adapt(iter, steps)
 }
 \arguments{
 \item{iter}{An \link{iterator}.}
 
-\item{...}{\link[=steps]{Transformation steps}. These dots are taken with
+\item{steps, ...}{\link[=steps]{Transformation steps}. These dots are taken with
 implicit splicing of lists and passed to \code{compose()}.}
 }
 \description{
