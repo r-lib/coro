@@ -4,7 +4,7 @@
 \alias{new_async_generator}
 \title{Low-level constructor for async functions}
 \usage{
-new_async_generator(fn, step, ops = NULL)
+new_async_generator(fn, step)
 }
 \arguments{
 \item{step}{If \code{TRUE}, the async generator is immediately stepped

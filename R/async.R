@@ -24,7 +24,6 @@
 #' @export
 async <- function(fn) {
   assert_lambda(substitute(fn))
-  fn <- ensure_promises(fn)
   new_async_generator(fn, step = TRUE)
 }
 #' @rdname async
@@ -44,15 +43,25 @@ await <- function(x) {
 #' @export
 async_generator <- function(fn) {
   assert_lambda(substitute(fn))
-  fn <- ensure_promises(fn)
   new_async_generator(fn, step = FALSE)
 }
 
-ensure_promises <- function(fn) {
+# Customisation point for the {async} package or any concurrency
+# framework that defines a "then" operation
+flowery_ops <- function(env) {
+  ops <- env_get(env, ".__flowery_async_ops__.", inherit = TRUE, default = NULL)
+
+  ops %||% list(
+    package = "promises",
+    `_then` = function(x, callback) promises::then(x, onFulfilled = callback),
+    `_as_promise` = function(x) as_promise(x)
+  )
+}
+
+ensure_promises <- function(fn, package) {
+  stopifnot(is_string(package))
+
   body(fn) <- expr({
-    if (!rlang::is_installed(c("promises", "later"))) {
-      rlang::abort("The {later} and {promises} packages must be installed.")
-    }
 
     !!!fn_body(fn)
   })
@@ -75,7 +84,7 @@ ensure_promises <- function(fn) {
 #'
 #' @keywords internal
 #' @export
-new_async_generator <- function(fn, step, ops = NULL) {
+new_async_generator <- function(fn, step) {
   body <- fn_block(fn)
 
   # We make three extra passes for convenience. This will be changed
@@ -87,23 +96,28 @@ new_async_generator <- function(fn, step, ops = NULL) {
   info <- gen0_list(body, fn_env(fn))
   `_env` <- info$env
 
-  ops <- ops %||% list(
-    `_then` = function(x, callback) promises::then(x, onFulfilled = callback),
-    `_as_promise` = function(x) as_promise(x)
-  )
-  env_bind(`_env`, !!!ops)
-
   fmls <- formals(fn)
 
-  out <- new_function(fmls, expr({
+  out <- new_function(fmls, quote({
     # Refresh the state machine environment
     `_env` <- env_clone(`_env`)
 
+    # Look up lexically defined async operations
+    ops <- flowery_ops(caller_env())
+
+    if (!is_installed(ops$package)) {
+      abort(sprintf("The %s package must be installed.", ops$package))
+    }
+
+    # Define async operations in the state machine environment
+    env_bind(`_env`, !!!ops)
+
     # Forward arguments inside the state machine environment
-    !!!forward_args_calls(fmls)
+    frame <- environment()
+    lapply(names(fmls), function(arg) env_bind_arg(`_env`, arg, frame = frame))
 
     # Create function around the state machine
-    generator <- function(`_next_arg` = NULL) !!info$expr
+    generator <- blast(function(`_next_arg` = NULL) !!info$expr)
 
     # Bind generator to `_self`. This binding can be hooked as callback.
     env_bind(`_env`, `_self` = generator)

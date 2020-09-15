@@ -83,3 +83,9 @@ test_that("generator factories can take dots", {
 
   expect_equal(gen1(), list(x = 1))
 })
+
+test_that("generators can take missing arguments", {
+  new_gen <- generator(function(arg) missing(arg))
+  expect_true(new_gen()())
+  expect_false(new_gen(1)())
+})

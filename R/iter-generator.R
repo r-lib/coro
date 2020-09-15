@@ -97,15 +97,16 @@ generator <- function(fn) {
 
   fmls <- formals(fn)
 
-  out <- new_function(fmls, expr({
+  out <- new_function(fmls, quote({
     # Refresh the state machine environment
     `_env` <- env_clone(`_env`)
 
     # Forward arguments inside the state machine environment
-    !!!forward_args_calls(fmls)
+    frame <- environment()
+    lapply(names(fmls), function(arg) env_bind_arg(`_env`, arg, frame = frame))
 
     # Create function around the state machine
-    gen <- function(`_next_arg` = NULL) !!info$expr
+    gen <- blast(function(`_next_arg` = NULL) !!info$expr)
 
     # Zap source references so we can see the state machine
     unstructure(gen)
@@ -120,22 +121,13 @@ print.flowery_generator <- function(x, ...) {
   print(unstructure(x))
 }
 
-forward_args_calls <- function(fmls) {
-  lapply(names(fmls), function(nm) {
-    if (identical(nm, "...")) {
-      quote({
-        if (missing(...)) {
-          `_env`$... <- quote(expr = )
-        } else {
-          `_env`$... <- get("...")
-        }
-      })
-    } else {
-      expr(delayedAssign(!!nm, !!sym(nm), assign.env = `_env`))
-    }
-  })
+env_bind_arg <- function(env, arg, frame = caller_env()) {
+  if (identical(arg, "...")) {
+    env$... <- env_get(frame, "...", inherit = TRUE, default = missing_arg())
+  } else {
+    env_bind_lazy(env, !!arg := !!sym(arg), .eval_env = frame)
+  }
 }
-utils::globalVariables("_env")
 
 gen0 <- function(expr, env) {
   info <- gen0_list(expr, env)

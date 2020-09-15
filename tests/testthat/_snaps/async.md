@@ -5,9 +5,6 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
-          }
           flowery::coro_return(`_as_promise`("value"))
       }
       
@@ -30,9 +27,6 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
-          }
           flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
               callback = `_self`))
       }
@@ -60,17 +54,11 @@
       async_state_machine(function() if (1) await("value") else "else")
     Output
       $`1`
-      {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
-          }
-          if (1) {
-              flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
-                  callback = `_self`))
-          }
-          else {
-              flowery::coro_return(`_as_promise`("else"))
-          }
+      if (1) {
+          flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
+              callback = `_self`))
+      } else {
+          flowery::coro_return(`_as_promise`("else"))
       }
       
       $`2`
@@ -97,37 +85,29 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
+          if (1) {
+              flowery::coro_goto("2")
           }
-          flowery::coro_goto("2")
+          else {
+              flowery::coro_goto("3")
+          }
       }
       
       $`2`
       {
-          if (1) {
-              flowery::coro_goto("3")
+          if (2) {
+              flowery::coro_yield("1", `_then`(`_as_promise`("value"), 
+                  callback = `_self`))
           }
-          else {
-              flowery::coro_goto("4")
-          }
+          flowery::coro_goto("1")
       }
       
       $`3`
       {
-          if (2) {
-              flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
-                  callback = `_self`))
-          }
-          flowery::coro_goto("2")
-      }
-      
-      $`4`
-      {
           flowery::coro_return(`_as_promise`(invisible(NULL)))
       }
       
-      $`5`
+      $`4`
       {
           base::return(invisible(NULL))
       }
@@ -146,40 +126,32 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
+          if (1) {
+              flowery::coro_goto("2")
           }
-          flowery::coro_goto("2")
+          else {
+              flowery::coro_goto("4")
+          }
       }
       
       $`2`
       {
-          if (1) {
-              flowery::coro_goto("3")
-          }
-          else {
-              flowery::coro_goto("5")
-          }
+          flowery::coro_yield("3", `_then`(`_as_promise`("value"), 
+              callback = `_self`))
       }
       
       $`3`
       {
-          flowery::coro_yield("4", `_then`(`_as_promise`("value"), 
-              callback = `_self`))
+          foo <- `_next_arg`
+          flowery::coro_goto("1")
       }
       
       $`4`
       {
-          foo <- `_next_arg`
-          flowery::coro_goto("2")
-      }
-      
-      $`5`
-      {
           flowery::coro_return(`_as_promise`(invisible(NULL)))
       }
       
-      $`6`
+      $`5`
       {
           base::return(invisible(NULL))
       }
