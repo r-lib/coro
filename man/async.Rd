@@ -3,11 +3,14 @@
 \name{async}
 \alias{async}
 \alias{await}
+\alias{await_each}
 \title{Make an async function}
 \usage{
 async(fn)
 
 await(x)
+
+await_each(x)
 }
 \arguments{
 \item{fn}{An anonymous function within which \code{await()} calls are

@@ -32,6 +32,11 @@ async <- function(fn) {
 await <- function(x) {
   abort("`await()` can't be called directly or within function arguments.")
 }
+#' @rdname async
+#' @export
+await_each <- function(x) {
+  abort("`await_each()` must be called within a `for` loop.")
+}
 
 #' Construct an async generator
 #'
@@ -89,7 +94,7 @@ new_async_generator <- function(fn, step) {
 
   # We make three extra passes for convenience. This will be changed
   # to a single pass later on.
-  body <- walk_blocks(body, poke_await)
+  body <- walk_poke_await(body)
   body <- new_call(quote(`{`), set_returns(body))
   body <- walk_blocks(body, poke_async_return)
 
@@ -154,7 +159,15 @@ async_internal_generator <- function(fn) {
   env_get(fn_env(fn), "info")$expr
 }
 
-poke_await <- function(node) {
+walk_poke_await <- function(expr) {
+  walk_blocks(expr, poke_await, which = c("arg", "for"))
+}
+
+poke_await <- function(node, type = NULL) {
+  if (identical(type, "for")) {
+    return(poke_async_for(node))
+  }
+
   car <- node_car(node)
 
   if (is_await(car)) {
@@ -173,6 +186,39 @@ poke_await <- function(node) {
     }
     return()
   }
+}
+
+poke_async_for <- function(node) {
+  cdr <- node_cdr(node)
+  cddr <- node_cdr(cdr)
+  cdddr <- node_cdr(cddr)
+
+  for_iteratee <- node_car(cddr)
+
+  block <- as_block(node_car(cdddr))
+  block <- walk_poke_await(block)
+
+  if (is_call(for_iteratee, "await_each", ns = c("", "flowery"))) {
+    for_var <- node_car(cdr)
+    new_await_loop_call(for_var, node_cadr(for_iteratee), block)
+  } else {
+    node_poke_car(cdddr, block)
+    node
+  }
+}
+
+new_await_loop_call <- function(var, iterable, block) {
+  if (!is_symbol(iterable)) {
+    abort("Can't supply a complex expression to `await_each()`.")
+  }
+
+  expr(while (TRUE) {
+    !!var <- !!yield_await_call(call2(iterable))
+    if (base::is.null(!!var)) {
+      break
+    }
+    !!!block
+  })
 }
 
 poke_async_return <- function(node) {

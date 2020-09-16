@@ -1,11 +1,18 @@
 
-walk_blocks <- function(expr, fn) {
-  walk_blocks_switch(expr, cflow_type(expr), fn)
+walk_blocks <- function(expr, fn, which = "arg") {
+  walk_blocks_switch(expr, cflow_type(expr), fn, which = which)
 }
 
-walk_blocks_switch <- function(expr, type, fn) {
+walk_blocks_switch <- function(expr, type, fn, which) {
+  recurse_switch <- function(expr, type) walk_blocks_switch(expr, type, fn = fn, which = which)
+  recurse <- function(expr) walk_blocks_switch(expr, cflow_type(expr), fn = fn, which = which)
+
   if (is_null(type)) {
     return(expr)
+  }
+
+  if (type %in% which) {
+    return(fn(expr, type = type))
   }
 
   expr <- duplicate(expr, shallow = TRUE)
@@ -17,11 +24,10 @@ walk_blocks_switch <- function(expr, type, fn) {
       car <- node_car(node)
       type <- cflow_type(car)
 
-      if (is_null(type)) {
-        # Apply function and end recursion
+      if (!is_null(type)) {
+        node_poke_car(node, recurse_switch(car, type))
+      } else if ("arg" %in%  which) {
         fn(node)
-      } else {
-        node_poke_car(node, walk_blocks_switch(car, type, fn))
       }
 
       node <- node_cdr(node)
@@ -33,20 +39,20 @@ walk_blocks_switch <- function(expr, type, fn) {
   if (is_string(type, "if")) {
     cddr <- node_cddr(expr)
 
-    node_poke_car(cddr, walk_blocks(as_block(node_car(cddr)), fn))
+    node_poke_car(cddr, recurse(as_block(node_car(cddr))))
 
     else_expr <- node_cadr(cddr)
     if (!is_null(else_expr)) {
-      node_poke_cadr(cddr, walk_blocks(as_block(else_expr), fn))
+      node_poke_cadr(cddr, recurse(as_block(else_expr)))
     }
 
     return(expr)
   }
 
   switch(type,
-    `repeat` = node_poke_cadr(expr, walk_blocks(as_block(node_cadr(expr)), fn)),
-    `while` = node_poke_car(node_cddr(expr), walk_blocks(as_block(node_car(node_cddr(expr))), fn)),
-    `for` = node_poke_cadr(node_cddr(expr), walk_blocks(as_block(node_cadr(node_cddr(expr))), fn)),
+    `repeat` = node_poke_cadr(expr, recurse(as_block(node_cadr(expr)))),
+    `while` = node_poke_car(node_cddr(expr), recurse(as_block(node_car(node_cddr(expr))))),
+    `for` = node_poke_cadr(node_cddr(expr), recurse(as_block(node_cadr(node_cddr(expr))))),
     abort("Unexpected state in `walk_blocks_switch()`.")
   )
 

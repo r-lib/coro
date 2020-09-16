@@ -154,3 +154,34 @@ test_that("async_collect() collects", {
   out <- wait_for(async_collect(s2, n = 3))
   expect_equal(out, as.list(1:3 * 3))
 })
+
+test_that("for loops support await_each()", {
+  skip("fixme")
+  new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+
+  f <- async_generator(function(s) for (x in await_each(s)) yield(x * 2))
+  out <- wait_for(async_collect(f(new_stream(1:3))))
+  expect_equal(out, list(2, 4, 6))
+
+  values <- NULL
+  f <- async_generator(function(s1, s2) {
+    for (x in await_each(s1)) {
+      values <<- c(values, x)
+      for (y in await_each(s2)) {
+        values <<- c(values, y)
+      }
+    }
+  })
+  wait_for(async_collect(f(new_stream(1:3), new_stream(11:12))))
+
+  expect_equal(out, list(11, 12))
+
+  expect_async_snapshot(function(s1, s2) {
+    for (x in await_each(s1)) {
+      values <<- c(values, x)
+      for (y in await_each(s2)) {
+        values <<- c(values, y)
+      }
+    }
+  })
+})

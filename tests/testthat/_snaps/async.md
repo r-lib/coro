@@ -163,3 +163,83 @@
       }
       
 
+# for loops support await_each()
+
+    Code
+      async_state_machine(function(s1, s2) {
+        for (x in await_each(s1)) {
+          values <<- c(values, x)
+          for (y in await_each(s2)) {
+            values <<- c(values, y)
+          }
+        }
+      })
+    Output
+      $`1`
+      {
+          if (TRUE) {
+              flowery::coro_goto("2")
+          }
+          else {
+              flowery::coro_goto("8")
+          }
+      }
+      
+      $`2`
+      {
+          flowery::coro_yield("3", `_then`(`_as_promise`(s1()), callback = `_self`))
+      }
+      
+      $`3`
+      {
+          x <- `_next_arg`
+          if (base::is.null(x)) {
+              flowery::coro_goto("8")
+          }
+          flowery::coro_goto("4")
+      }
+      
+      $`4`
+      {
+          values <<- c(values, x)
+          {
+              if (TRUE) {
+                  flowery::coro_goto("5")
+              }
+              else {
+                  flowery::coro_goto("8")
+              }
+          }
+      }
+      
+      $`5`
+      {
+          flowery::coro_yield("6", `_then`(`_as_promise`(s2()), callback = `_self`))
+      }
+      
+      $`6`
+      {
+          y <- `_next_arg`
+          if (base::is.null(y)) {
+              flowery::coro_goto("8")
+          }
+          flowery::coro_goto("7")
+      }
+      
+      $`7`
+      {
+          values <<- c(values, y)
+          flowery::coro_goto("4")
+      }
+      
+      $`8`
+      {
+          flowery::coro_return(`_as_promise`(invisible(NULL)))
+      }
+      
+      $`9`
+      {
+          base::return(invisible(NULL))
+      }
+      
+

@@ -119,6 +119,11 @@ generator <- function(fn) {
 print.flowery_generator <- function(x, ...) {
   writeLines("<generator>")
   print(unstructure(x))
+
+  writeLines("State machine:")
+  print(env_get(fn_env(x), "info")$expr)
+
+  invisible(x)
 }
 
 env_bind_arg <- function(env, arg, frame = caller_env()) {
