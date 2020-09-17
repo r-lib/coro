@@ -89,25 +89,30 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("3")
+              flowery::coro_goto("4")
           }
       }
       
       $`2`
       {
           if (2) {
-              flowery::coro_yield("1", `_then`(`_as_promise`("value"), 
+              flowery::coro_yield("3", `_then`(`_as_promise`("value"), 
                   callback = `_self`))
           }
-          flowery::coro_goto("1")
+          flowery::coro_goto("3")
       }
       
       $`3`
       {
-          flowery::coro_return(`_as_promise`(invisible(NULL)))
+          flowery::coro_goto("1")
       }
       
       $`4`
+      {
+          flowery::coro_return(`_as_promise`(invisible(NULL)))
+      }
+      
+      $`5`
       {
           base::return(invisible(NULL))
       }
@@ -181,7 +186,7 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("8")
+              flowery::coro_goto("10")
           }
       }
       
@@ -194,7 +199,7 @@
       {
           x <- `_next_arg`
           if (base::is.null(x)) {
-              flowery::coro_goto("8")
+              flowery::coro_goto("10")
           }
           flowery::coro_goto("4")
       }
@@ -202,42 +207,50 @@
       $`4`
       {
           values <<- c(values, x)
-          {
-              if (TRUE) {
-                  flowery::coro_goto("5")
-              }
-              else {
-                  flowery::coro_goto("8")
-              }
-          }
+          flowery::coro_goto("5")
       }
       
       $`5`
       {
-          flowery::coro_yield("6", `_then`(`_as_promise`(s2()), callback = `_self`))
+          if (TRUE) {
+              flowery::coro_goto("6")
+          }
+          else {
+              flowery::coro_goto("9")
+          }
       }
       
       $`6`
       {
-          y <- `_next_arg`
-          if (base::is.null(y)) {
-              flowery::coro_goto("8")
-          }
-          flowery::coro_goto("7")
+          flowery::coro_yield("7", `_then`(`_as_promise`(s2()), callback = `_self`))
       }
       
       $`7`
       {
-          values <<- c(values, y)
-          flowery::coro_goto("4")
+          y <- `_next_arg`
+          if (base::is.null(y)) {
+              flowery::coro_goto("9")
+          }
+          flowery::coro_goto("8")
       }
       
       $`8`
       {
-          flowery::coro_return(`_as_promise`(invisible(NULL)))
+          values <<- c(values, y)
+          flowery::coro_goto("5")
       }
       
       $`9`
+      {
+          flowery::coro_goto("1")
+      }
+      
+      $`10`
+      {
+          flowery::coro_return(`_as_promise`(invisible(NULL)))
+      }
+      
+      $`11`
       {
           base::return(invisible(NULL))
       }

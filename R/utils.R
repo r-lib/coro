@@ -41,3 +41,7 @@ assert_lambda <- function(call) {
     abort("`fn` must be an anonymous function.")
   }
 }
+
+stop_internal <- function(fn) {
+  abort(sprintf("Internal error in `%s()`."))
+}

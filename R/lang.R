@@ -111,6 +111,27 @@ call_rhs <- function(call) {
   node_cadr(node_cdr(call))
 }
 
+call_repeat_body <- function(x) {
+  node_cadr(x)
+}
+call_repeat_poke_body <- function(x, body) {
+  node_poke_cadr(x, body)
+}
+
+call_while_body <- function(x) {
+  node_cadr(node_cdr(x))
+}
+call_while_poke_body <- function(x, body) {
+  node_poke_cadr(node_cdr(x), body)
+}
+
+call_for_body <- function(x) {
+  node_cadr(node_cddr(x))
+}
+call_for_poke_body <- function(x, body) {
+  node_poke_cadr(node_cddr(x), body)
+}
+
 return_sym <- quote(`return`)
 yield_sym <- quote(`yield`)
 

@@ -49,18 +49,18 @@ test_that("explicit return is added after loops", {
     "before"
     repeat "foo"
   })
-  explicit_repeat <- pairlist("before", repeat_call("foo"), return_invisible_call)
+  explicit_repeat <- pairlist("before", repeat_call(block("foo", quote(next))), return_invisible_call)
   expect_identical(exprs, explicit_repeat)
 
   exprs <- set_returns(function() {
     "before"
     while (TRUE) "foo"
   })
-  explicit_while <- pairlist("before", while_call(TRUE, "foo"), return_invisible_call)
+  explicit_while <- pairlist("before", while_call(TRUE, block("foo", quote(next))), return_invisible_call)
   expect_identical(exprs, explicit_while)
 
   exprs <- set_returns(function() for (i in x) "foo")
-  explicit_for <- pairlist(for_call(quote(i), quote(x), "foo"), return_invisible_call)
+  explicit_for <- pairlist(for_call(quote(i), quote(x), block("foo", quote(next))), return_invisible_call)
   expect_identical(exprs, explicit_for)
 })
 

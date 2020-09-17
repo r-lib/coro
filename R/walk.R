@@ -1,6 +1,6 @@
 
 walk_blocks <- function(node, fn, which = "expr") {
-  stopifnot(is_pairlist(node))
+  stopifnot(is_node_list(node))
 
   while (!is_null(node)) {
     walk_blocks_expr(node, fn, which = which)

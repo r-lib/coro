@@ -11,6 +11,7 @@ set_returns <- function(expr) {
 poke_returns <- function(expr) {
   node <- as_exprs_node(expr)
   node <- swap_returns(node)
+  walk_poke_next(node)
 
   tail <- node_list_tail(node)
   last <- node_car(tail)
@@ -81,4 +82,34 @@ if_poke_returns <- function(expr) {
   }
 
   expr
+}
+
+walk_poke_next <- function(node) {
+  walk_blocks(node, poke_next, which = c("repeat", "while", "for"))
+}
+
+poke_next <- function(node, type) {
+  expr <- node_car(node)
+
+  body <- switch(type,
+    `repeat` = call_repeat_body(expr),
+    `while` = call_while_body(expr),
+    `for` = call_for_body(expr),
+    stop_internal("poke_next")
+  )
+
+  body <- as_block(body)
+  tail <- node_list_tail(body)
+  if (!identical(node_car(tail), quote(next))) {
+    node_poke_cdr(tail, pairlist(quote(next)))
+  }
+
+  switch(type,
+    `repeat` = call_repeat_poke_body(expr, body),
+    `while` = call_while_poke_body(expr, body),
+    `for` = call_for_poke_body(expr, body),
+    stop_internal("poke_next")
+  )
+
+  NULL
 }

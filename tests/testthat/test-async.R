@@ -156,7 +156,6 @@ test_that("async_collect() collects", {
 })
 
 test_that("for loops support await_each()", {
-  skip("fixme")
   new_stream <- async_generator(function(x) for (elt in x) yield(elt))
 
   f <- async_generator(function(s) for (x in await_each(s)) yield(x * 2))
@@ -173,8 +172,7 @@ test_that("for loops support await_each()", {
     }
   })
   wait_for(async_collect(f(new_stream(1:3), new_stream(11:12))))
-
-  expect_equal(out, list(11, 12))
+  expect_equal(values, c(1, 11, 12, 2, 3))
 
   expect_async_snapshot(function(s1, s2) {
     for (x in await_each(s1)) {

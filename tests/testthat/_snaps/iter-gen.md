@@ -30,6 +30,7 @@
                       flowery::coro_goto("3")
                   }, `3` = {
                       flowery::coro_return(2)
+                      flowery::coro_goto("1")
                   }, `4` = {
                       flowery::coro_return(invisible(NULL))
                   }, `5` = {
