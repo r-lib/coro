@@ -436,7 +436,7 @@ async_collect <- function(x, n = NULL) {
   async_reduce_steps(x, steps, along_builder(list()))
 }
 
-on_load(async_reduce_steps <- async(function(x, steps, builder, init) {
+on_load(async_reduce_steps %<~% async(function(x, steps, builder, init) {
   builder <- as_closure(builder)
 
   if (is_null(steps)) {
@@ -457,7 +457,7 @@ on_load(async_reduce_steps <- async(function(x, steps, builder, init) {
   reducer(result)
 }))
 
-on_load(async_reduce <- async(function(.x, .f, ...) {
+on_load(async_reduce %<~% async(function(.x, .f, ...) {
   while (TRUE) {
     new <- await(.x())
 

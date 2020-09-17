@@ -73,7 +73,7 @@ iter_builder <- function(result, input) {
 #' @usage async_adapt(iter, steps)
 NULL
 
-on_load(async_adapt <- async_generator(function(iter, steps) {
+on_load(async_adapt %<~% async_generator(function(iter, steps) {
   force(iter)
 
   reducer <- steps(iter_builder)

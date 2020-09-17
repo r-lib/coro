@@ -1,4 +1,8 @@
 
+`%<~%` <- function(lhs, rhs, env = caller_env()) {
+  env_bind_lazy(env, !!substitute(lhs) := !!substitute(rhs), .eval_env = env)
+}
+
 on_load <- function(expr, env = topenv(caller_env())) {
   callback <- function() eval_bare(expr, env)
 
