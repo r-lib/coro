@@ -90,13 +90,13 @@ ensure_promises <- function(fn, package) {
 #' @keywords internal
 #' @export
 new_async_generator <- function(fn, step) {
-  body <- fn_block(fn)
+  body <- duplicate(fn_block(fn), shallow = TRUE)
 
   # We make three extra passes for convenience. This will be changed
   # to a single pass later on.
-  body <- walk_poke_await(body)
+  walk_poke_await(node_cdr(body))
   body <- new_call(quote(`{`), set_returns(body))
-  body <- walk_blocks(body, poke_async_return)
+  walk_blocks(node_cdr(body), poke_async_return)
 
   info <- gen0_list(body, fn_env(fn))
   `_env` <- info$env
@@ -159,8 +159,8 @@ async_internal_generator <- function(fn) {
   env_get(fn_env(fn), "info")$expr
 }
 
-walk_poke_await <- function(expr) {
-  walk_blocks(expr, poke_await, which = c("arg", "for"))
+walk_poke_await <- function(node) {
+  walk_blocks(node, poke_await, which = c("expr", "for"))
 }
 
 poke_await <- function(node, type = NULL) {
@@ -189,22 +189,21 @@ poke_await <- function(node, type = NULL) {
 }
 
 poke_async_for <- function(node) {
-  cdr <- node_cdr(node)
-  cddr <- node_cdr(cdr)
-  cdddr <- node_cdr(cddr)
+  expr <- node_car(node)
+  var_node <- node_cdr(expr)
+  iter_node <- node_cdr(var_node)
+  body_node <- node_cdr(iter_node)
 
-  for_iteratee <- node_car(cddr)
+  walk_poke_await(body_node)
 
-  block <- as_block(node_car(cdddr))
-  block <- walk_poke_await(block)
-
-  if (is_call(for_iteratee, "await_each", ns = c("", "flowery"))) {
-    for_var <- node_car(cdr)
-    new_await_loop_call(for_var, node_cadr(for_iteratee), block)
-  } else {
-    node_poke_car(cdddr, block)
-    node
+  iter <- node_car(iter_node)
+  if (is_call(iter, "await_each", ns = c("", "flowery"))) {
+    var <- node_car(var_node)
+    await_loop <- new_await_loop_call(var, node_cadr(iter), node_car(body_node))
+    node_poke_car(node, await_loop)
   }
+
+  NULL
 }
 
 new_await_loop_call <- function(var, iterable, block) {
@@ -217,7 +216,7 @@ new_await_loop_call <- function(var, iterable, block) {
     if (base::is.null(!!var)) {
       break
     }
-    !!!block
+    !!!as_block(block)
   })
 }
 
@@ -226,10 +225,6 @@ poke_async_return <- function(node) {
 
   if (is_coro_return_call(car)) {
     node_poke_car(node, async_return_call(node_cadr(car)))
-  }
-
-  if (is_coro_yield_call(car)) {
-    stop("TODO")
   }
 }
 
