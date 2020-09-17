@@ -211,7 +211,7 @@ new_await_loop_call <- function(var, iterable, block) {
     abort("Can't supply a complex expression to `await_each()`.")
   }
 
-  expr(while (TRUE) {
+  expr(repeat {
     !!var <- !!yield_await_call(call2(iterable))
     if (base::is.null(!!var)) {
       break

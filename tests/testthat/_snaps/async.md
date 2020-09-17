@@ -182,12 +182,7 @@
     Output
       $`1`
       {
-          if (TRUE) {
-              flowery::coro_goto("2")
-          }
-          else {
-              flowery::coro_goto("10")
-          }
+          flowery::coro_goto("2")
       }
       
       $`2`
@@ -199,7 +194,7 @@
       {
           x <- `_next_arg`
           if (base::is.null(x)) {
-              flowery::coro_goto("10")
+              flowery::coro_goto("9")
           }
           flowery::coro_goto("4")
       }
@@ -212,45 +207,35 @@
       
       $`5`
       {
-          if (TRUE) {
-              flowery::coro_goto("6")
-          }
-          else {
-              flowery::coro_goto("9")
-          }
+          flowery::coro_yield("6", `_then`(`_as_promise`(s2()), callback = `_self`))
       }
       
       $`6`
       {
-          flowery::coro_yield("7", `_then`(`_as_promise`(s2()), callback = `_self`))
+          y <- `_next_arg`
+          if (base::is.null(y)) {
+              flowery::coro_goto("8")
+          }
+          flowery::coro_goto("7")
       }
       
       $`7`
-      {
-          y <- `_next_arg`
-          if (base::is.null(y)) {
-              flowery::coro_goto("9")
-          }
-          flowery::coro_goto("8")
-      }
-      
-      $`8`
       {
           values <<- c(values, y)
           flowery::coro_goto("5")
       }
       
-      $`9`
+      $`8`
       {
-          flowery::coro_goto("1")
+          flowery::coro_goto("2")
       }
       
-      $`10`
+      $`9`
       {
           flowery::coro_return(`_as_promise`(invisible(NULL)))
       }
       
-      $`11`
+      $`10`
       {
           base::return(invisible(NULL))
       }
