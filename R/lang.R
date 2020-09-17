@@ -132,6 +132,10 @@ call_for_poke_body <- function(x, body) {
   node_poke_cadr(node_cddr(x), body)
 }
 
+is_yield_call <- function(x) {
+  is_call(x, "yield", ns = c("", "flowery"))
+}
+
 return_sym <- quote(`return`)
 yield_sym <- quote(`yield`)
 

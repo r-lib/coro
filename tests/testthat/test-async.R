@@ -183,3 +183,12 @@ test_that("for loops support await_each()", {
     }
   })
 })
+
+test_that("yield() can't be used in async() functions", {
+  expect_error(async(function() yield(1)), "Can't")
+})
+
+test_that("yield() inside `async_generator()` returns a promise", {
+  new_g <- async_generator(function() yield(1))
+  expect_true(inherits(new_g()(), "promise"))
+})

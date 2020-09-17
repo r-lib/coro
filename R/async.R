@@ -94,7 +94,7 @@ new_async_generator <- function(fn, step) {
 
   # We make three extra passes for convenience. This will be changed
   # to a single pass later on.
-  walk_poke_await(node_cdr(body))
+  walk_poke_await(node_cdr(body), allow_yield = !step)
   body <- new_call(quote(`{`), set_returns(body))
   walk_blocks(node_cdr(body), poke_async_return)
 
@@ -159,42 +159,53 @@ async_internal_generator <- function(fn) {
   env_get(fn_env(fn), "info")$expr
 }
 
-walk_poke_await <- function(node) {
-  walk_blocks(node, poke_await, which = c("expr", "for"))
+walk_poke_await <- function(node, allow_yield) {
+  poke <- function(node, type = NULL) poke_await(node, type = type, allow_yield = allow_yield)
+  walk_blocks(node, poke, which = c("expr", "for"))
 }
 
-poke_await <- function(node, type = NULL) {
+poke_await <- function(node, type, allow_yield) {
   if (identical(type, "for")) {
-    return(poke_async_for(node))
+    return(poke_async_for(node, allow_yield))
   }
 
   car <- node_car(node)
 
-  if (is_await(car)) {
-    node_poke_car(node, yield_await_call(await_arg(car)))
+  # With `yield()` the caller is responsible for calling the generator back
+  if (is_yield_call(car)) {
+    if (!allow_yield) {
+      abort("Can't use `yield()` within an `async()` function.")
+    }
+    node_poke_car(node, async_yield_call(yield_arg(car)))
+    return()
+  }
+
+  # With `await()` the async scheduler calls the generator back
+  if (is_await_call(car)) {
+    node_poke_car(node, async_yield_await_call(await_arg(car)))
     return()
   }
 
   if (is_call(car, "<-")) {
     rhs_node <- node_cddr(car)
     rhs <- node_car(rhs_node)
-    if (is_await(rhs)) {
+    if (is_await_call(rhs)) {
       lhs <- node_cadr(car)
       await_arg <- node_cadr(rhs)
-      new_rhs <- call("<-", lhs, yield_await_call(await_arg))
+      new_rhs <- call("<-", lhs, async_yield_await_call(await_arg))
       node_poke_car(node, new_rhs)
     }
     return()
   }
 }
 
-poke_async_for <- function(node) {
+poke_async_for <- function(node, allow_yield) {
   expr <- node_car(node)
   var_node <- node_cdr(expr)
   iter_node <- node_cdr(var_node)
   body_node <- node_cdr(iter_node)
 
-  walk_poke_await(body_node)
+  walk_poke_await(body_node, allow_yield)
 
   iter <- node_car(iter_node)
   if (is_call(iter, "await_each", ns = c("", "flowery"))) {
@@ -212,7 +223,7 @@ new_await_loop_call <- function(var, iterable, block) {
   }
 
   expr(repeat {
-    !!var <- !!yield_await_call(call2(iterable))
+    !!var <- !!async_yield_await_call(call2(iterable))
     if (base::is.null(!!var)) {
       break
     }
@@ -228,14 +239,20 @@ poke_async_return <- function(node) {
   }
 }
 
-is_await <- function(expr) {
+is_await_call <- function(expr) {
   is_call(expr, "await", ns = c("", "flowery"))
 }
 await_arg <- function(call) {
   node_cadr(call)
 }
+yield_arg <- function(call) {
+  node_cadr(call)
+}
 
-yield_await_call <- function(arg) {
+async_yield_call <- function(arg) {
+  expr(yield(`_as_promise`(!!arg)))
+}
+async_yield_await_call <- function(arg) {
   expr(yield(`_then`(`_as_promise`(!!arg), callback = `_self`)))
 }
 async_return_call <- function(arg) {
