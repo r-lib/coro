@@ -127,17 +127,11 @@
     Output
       [[1]]
       {
-          x <- `_next_arg`
-          flowery::coro_goto("2")
+          "before"
+          flowery::coro_yield("2", 1L)
       }
       
       [[2]]
-      {
-          "before"
-          flowery::coro_yield("3", 1L)
-      }
-      
-      [[3]]
       {
           value <- `_next_arg`
           flowery::coro_return("after")

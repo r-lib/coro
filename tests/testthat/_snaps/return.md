@@ -5,9 +5,9 @@
         "foo"
       })
     Output
-      [[1]]
-      flowery::coro_return("foo")
-      
+      {
+          flowery::coro_return("foo")
+      }
 
 ---
 
@@ -17,21 +17,19 @@
         "bar"
       })
     Output
-      [[1]]
-      [1] "foo"
-      
-      [[2]]
-      flowery::coro_return("bar")
-      
+      {
+          "foo"
+          flowery::coro_return("bar")
+      }
 
 ---
 
     Code
       set_returns(function() { })
     Output
-      [[1]]
-      flowery::coro_return(NULL)
-      
+      {
+          flowery::coro_return(invisible(NULL))
+      }
 
 ---
 
@@ -40,11 +38,11 @@
         { }
         })
     Output
-      [[1]]
       {
-          flowery::coro_return(NULL)
+          {
+              flowery::coro_return(invisible(NULL))
+          }
       }
-      
 
 ---
 
@@ -56,25 +54,26 @@
         }
       })
     Output
-      [[1]]
       {
-          "foo"
-          flowery::coro_return("bar")
+          {
+              "foo"
+              flowery::coro_return("bar")
+          }
       }
-      
 
 # explicit return is added to if else branches
 
     Code
       set_returns(function() if (TRUE) "foo")
     Output
-      [[1]]
-      if (TRUE) {
-          flowery::coro_return("foo")
-      } else {
-          flowery::coro_return(invisible(NULL))
+      {
+          if (TRUE) {
+              flowery::coro_return("foo")
+          }
+          else {
+              flowery::coro_return(invisible(NULL))
+          }
       }
-      
 
 ---
 
@@ -83,13 +82,14 @@
         if (TRUE) "foo" else "bar"
       })
     Output
-      [[1]]
-      if (TRUE) {
-          flowery::coro_return("foo")
-      } else {
-          flowery::coro_return("bar")
+      {
+          if (TRUE) {
+              flowery::coro_return("foo")
+          }
+          else {
+              flowery::coro_return("bar")
+          }
       }
-      
 
 ---
 
@@ -99,21 +99,20 @@
         if (TRUE) if (TRUE) "foo" else "bar" else "baz"
       })
     Output
-      [[1]]
-      [1] "before"
-      
-      [[2]]
-      if (TRUE) {
+      {
+          "before"
           if (TRUE) {
-              flowery::coro_return("foo")
+              if (TRUE) {
+                  flowery::coro_return("foo")
+              }
+              else {
+                  flowery::coro_return("bar")
+              }
           }
           else {
-              flowery::coro_return("bar")
+              flowery::coro_return("baz")
           }
-      } else {
-          flowery::coro_return("baz")
       }
-      
 
 # explicit return is added after loops
 
@@ -123,18 +122,14 @@
         repeat "foo"
       })
     Output
-      [[1]]
-      [1] "before"
-      
-      [[2]]
-      repeat {
-          "foo"
-          next
+      {
+          "before"
+          repeat {
+              "foo"
+              next
+          }
+          flowery::coro_return(invisible(NULL))
       }
-      
-      [[3]]
-      flowery::coro_return(invisible(NULL))
-      
 
 ---
 
@@ -144,42 +139,36 @@
         while (TRUE) "foo"
       })
     Output
-      [[1]]
-      [1] "before"
-      
-      [[2]]
-      while (TRUE) {
-          "foo"
-          next
+      {
+          "before"
+          while (TRUE) {
+              "foo"
+              next
+          }
+          flowery::coro_return(invisible(NULL))
       }
-      
-      [[3]]
-      flowery::coro_return(invisible(NULL))
-      
 
 ---
 
     Code
       set_returns(function() for (i in x) "foo")
     Output
-      [[1]]
-      for (i in x) {
-          "foo"
-          next
+      {
+          for (i in x) {
+              "foo"
+              next
+          }
+          flowery::coro_return(invisible(NULL))
       }
-      
-      [[2]]
-      flowery::coro_return(invisible(NULL))
-      
 
 # explicit returns are swapped
 
     Code
       set_returns(function() return("foo"))
     Output
-      [[1]]
-      flowery::coro_return("foo")
-      
+      {
+          flowery::coro_return("foo")
+      }
 
 ---
 
@@ -189,45 +178,42 @@
         return("bar")
       })
     Output
-      [[1]]
-      [1] "foo"
-      
-      [[2]]
-      flowery::coro_return("bar")
-      
+      {
+          "foo"
+          flowery::coro_return("bar")
+      }
 
 ---
 
     Code
       set_returns(function() list("foo"))
     Output
-      [[1]]
-      flowery::coro_return(list("foo"))
-      
+      {
+          flowery::coro_return(list("foo"))
+      }
 
 # invisible return is added after trailing yield()
 
     Code
       set_returns(function() yield())
     Output
-      [[1]]
-      yield()
-      
-      [[2]]
-      flowery::coro_return(invisible(NULL))
-      
+      {
+          yield()
+          flowery::coro_return(invisible(NULL))
+      }
 
 ---
 
     Code
       set_returns(function() if (TRUE) yield())
     Output
-      [[1]]
-      if (TRUE) {
-          yield()
-          flowery::coro_return(invisible(NULL))
-      } else {
-          flowery::coro_return(invisible(NULL))
+      {
+          if (TRUE) {
+              yield()
+              flowery::coro_return(invisible(NULL))
+          }
+          else {
+              flowery::coro_return(invisible(NULL))
+          }
       }
-      
 

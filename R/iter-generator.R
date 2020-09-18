@@ -145,8 +145,8 @@ gen0 <- function(expr, env) {
 }
 
 gen0_list <- function(expr, env) {
-  node <- set_returns(expr)
-  parts <- generator_parts(node)
+  expr <- set_returns(expr)
+  parts <- generator_parts(expr)
 
   # Add a late return point
   return_call <- call2(quote(base::return), quote(invisible(NULL)))
@@ -176,16 +176,17 @@ gen0_list <- function(expr, env) {
   list(expr = expr, env = env)
 }
 
-generator_parts <- function(node, arg = NULL) {
+generator_parts <- function(block, arg = NULL) {
   reset_state()
   if (!is_null(arg)) {
     poke_state_elt("arg_sym", sym(arg))
   }
 
-  parts <- node_list_parts(node)
+  block <- as_block(block)
+  parts <- node_list_parts(node_cdr(block))
 
   if (is_null(parts)) {
-    pairlist(new_call(block_sym, node))
+    pairlist(block)
   } else {
     parts
   }

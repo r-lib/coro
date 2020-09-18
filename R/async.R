@@ -95,7 +95,7 @@ new_async_generator <- function(fn, step) {
   # We make three extra passes for convenience. This will be changed
   # to a single pass later on.
   walk_poke_await(node_cdr(body), allow_yield = !step)
-  body <- new_call(quote(`{`), set_returns(body))
+  body <- set_returns(body)
   walk_blocks(node_cdr(body), poke_async_return)
 
   info <- gen0_list(body, fn_env(fn))
