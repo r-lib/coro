@@ -1,5 +1,5 @@
 
-expr_parts <- function(expr) {
+expr_parts <- function(expr, refs) {
   if (!is_call(expr)) {
     return(NULL)
   }
@@ -14,7 +14,7 @@ expr_parts <- function(expr) {
     `{` = block_parts(expr),
     `if` = if_parts(expr),
     `repeat` = repeat_parts(expr),
-    `while` = while_parts(expr),
+    `while` = while_parts(expr, refs),
     `for` = for_parts(expr),
     `break` = break_parts(expr),
     `next` = next_parts(expr),

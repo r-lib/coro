@@ -120,13 +120,11 @@ new_async_generator <- function(fn, step) {
   walk_blocks(node_cdr(body), poke_async_return)
 
   info <- gen0_list(body, fn_env(fn))
-  `_env` <- info$env
-
   fmls <- formals(fn)
 
   out <- new_function(fmls, quote({
     # Refresh the state machine environment
-    `_env` <- env_clone(`_env`)
+    `_env` <- info$init()
 
     # Look up lexically defined async operations
     ops <- flowery_ops(caller_env())

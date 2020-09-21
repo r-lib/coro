@@ -66,7 +66,7 @@ repeat_parts <- function(expr) {
   new_node(loop_state, parts)
 }
 
-while_parts <- function(expr) {
+while_parts <- function(expr, refs) {
   old_state <- peek_state()
 
   if (peek_has_past()) {
@@ -87,12 +87,13 @@ while_parts <- function(expr) {
   goto_loop_start <- block(goto_call(loop_state + 1L))
 
   cond <- node_cadr(expr)
+  cond <- new_user_block(pairlist(cond), refs)
   cond_state <- block(if_call(cond, goto_loop_start, goto_loop_end))
   loop_parts <- new_node(cond_state, parts)
 
   # Merge into the current state if there is a past
   if (peek_has_past()) {
-    goto_block <- spliceable(block(goto_call(loop_state)))
+    goto_block <- (block(goto_call(loop_state)))
     loop_parts <- new_node(goto_block, loop_parts)
   }
 

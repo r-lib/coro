@@ -93,13 +93,11 @@ generator <- function(fn) {
   assert_lambda(substitute(fn))
 
   info <- gen0_list(body(fn), fn_env(fn))
-  `_env` <- info$env
-
   fmls <- formals(fn)
 
   out <- new_function(fmls, quote({
     # Refresh the state machine environment
-    `_env` <- env_clone(`_env`)
+    `_env` <- info$init()
 
     # Forward arguments inside the state machine environment
     frame <- environment()
@@ -136,7 +134,7 @@ env_bind_arg <- function(env, arg, frame = caller_env()) {
 
 gen0 <- function(expr, env) {
   info <- gen0_list(expr, env)
-  `_env` <- info$env
+  `_env` <- info$init()
 
   out <- new_function(pairlist2(`_next_arg` = NULL), info$expr)
 
@@ -151,12 +149,6 @@ gen0_list <- function(expr, env) {
   # Add a late return point
   return_call <- call2(quote(base::return), quote(invisible(NULL)))
   parts <- node_list_poke_cdr(parts, pairlist(block(return_call)))
-
-  # Create the persistent closure environment of the generator
-  env <- env(env,
-    `_state` = "1",
-    `_return_state` = as.character(length(parts))
-  )
 
   expr <- expr({
     # Define value sent into the generator inside the state machine.
@@ -173,7 +165,22 @@ gen0_list <- function(expr, env) {
     })
   })
 
-  list(expr = expr, env = env)
+  init <- function() {
+    # Create the persistent closure environment of the generator
+    user_env <- env(env)
+
+    env <- env(env,
+      `_state` = "1",
+      `_return_state` = as.character(length(parts)),
+      `_block` = function(expr) eval_bare(substitute(expr), user_env)
+    )
+
+    env_bind(user_env, `_machine_state_env` = env)
+
+    env
+  }
+
+  list(expr = expr, init = init)
 }
 
 generator_parts <- function(block, arg = NULL) {

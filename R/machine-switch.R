@@ -30,8 +30,9 @@ node_list_enumerate_tags <- function(node) {
 #' @keywords internal
 #' @export
 coro_goto <- function(state, frame = caller_env()) {
-  frame$`_state` <- state
-  eval_bare(call2(next_sym), frame)
+  env <- env_get(frame, "_machine_state_env", default = frame)
+  env$`_state` <- state
+  eval_bare(call2(next_sym), env)
 }
 #' @rdname coro_goto
 #' @export
@@ -45,9 +46,10 @@ coro_yield <- function(state, value = NULL, frame = caller_env()) {
 #' @rdname coro_goto
 #' @export
 coro_return <- function(value, frame = caller_env()) {
+  env <- env_get(frame, "_machine_state_env", default = frame)
   # Goto NULL-return state to terminate iterator
-  frame$`_state` <- env_get(frame, "_return_state")
-  eval_bare(call2(base::return, value), frame)
+  env$`_state` <- env_get(env, "_return_state")
+  eval_bare(call2(base::return, value), env)
 }
 
 is_coro_return_call <- function(x) {
