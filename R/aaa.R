@@ -4,6 +4,7 @@
 }
 
 on_load <- function(expr, env = topenv(caller_env())) {
+  return()
   callback <- function() eval_bare(expr, env)
 
   hook <- env$.__rlang_hook__.
