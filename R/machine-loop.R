@@ -114,10 +114,9 @@ for_init_part <- function(loop_state, expr) {
 }
 
 
-#' Operators for coroutine state machines
-#' @keywords internal
+#' @rdname coro_goto
 #' @export
-coro_advance <- function(elt_sym, iterator, env = caller_env()) {
+coro_for_advance <- function(elt_sym, iterator, env = caller_env()) {
   out <- iterator()
 
   if (is_null(out)) {
@@ -127,8 +126,7 @@ coro_advance <- function(elt_sym, iterator, env = caller_env()) {
     TRUE
   }
 }
-#' @rdname coro_advance
-#' @keywords internal
+#' @rdname coro_goto
 #' @export
 coro_for_init <- function(x) {
   # `base::for()` internally converts factors to character vectors
@@ -144,7 +142,7 @@ for_next_part <- function(loop_state, expr) {
   iter_sym <- for_iter_sym(loop_state)
 
   expr({
-    if (flowery::coro_advance(quote(!!elt_sym), !!iter_sym)) {
+    if (flowery::coro_for_advance(quote(!!elt_sym), !!iter_sym)) {
       !!goto_call(loop_state + 1L)
     } else {
       !!goto_call(peek_state() + 1L)
