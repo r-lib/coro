@@ -41,7 +41,3 @@ print_parts_refs <- function(fn) {
     }
   }
 }
-
-expect_snapshot_refs <- function(fn) {
-  blast(expect_snapshot(print_parts_refs(!!substitute(fn))))
-}
