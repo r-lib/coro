@@ -53,13 +53,45 @@
 
     Code
       print_parts_refs(function() {
+        while (TRUE) `next`()
+        while (TRUE) `break`()
+      })
+    Output
+      <Part 1>
+      [[1]]
+      [[1]][[1]]
+      expr: TRUE
+      ref: while (TRUE) `next`()
+      
+      
+      <Part 3>
+      [[1]]
+      [[1]][[1]]
+      expr: TRUE
+      ref: while (TRUE) `break`()
+      
+      
+      <Part 6>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_return(invisible(NULL))
+      ref: NULL
+      
+      
+
+---
+
+    Code
+      print_parts_refs(function() {
         1
         while (TRUE) {
           2
           `next`()
           3
+          `break`()
+          4
         }
-        4
+        5
       })
     Output
       <Part 1>
@@ -77,6 +109,8 @@
           2
           `next`()
           3
+          `break`()
+          4
         }
       
       
@@ -97,12 +131,23 @@
       expr: 3
       ref: 3
       
+      [[1]][[2]]
+      expr: flowery::coro_goto("7")
+      ref: `break`()
       
-      <Part 6>
+      
+      <Part 5>
       [[1]]
       [[1]][[1]]
-      expr: flowery::coro_return(4)
+      expr: 4
       ref: 4
+      
+      
+      <Part 7>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_return(5)
+      ref: 5
       
       
 

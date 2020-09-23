@@ -14,12 +14,19 @@ test_that("references are propagated with yield", {
 
 test_that("references are propagated in while loops", {
   expect_snapshot_refs(function() {
+    while (TRUE) next
+    while (TRUE) break
+  })
+
+  expect_snapshot_refs(function() {
     1
     while (TRUE) {
       2
       next
       3
+      break
+      4
     }
-    4
+    5
   })
 })

@@ -100,7 +100,7 @@ node_list_parts <- function(node, refs = NULL) {
 
     if (has_past()) {
       if (is_spliceable(pausing_part)) {
-        pausing_part <- node_cdr(pausing_part)
+        pausing_part <- spliceable_part(pausing_part)
         node_poke_cdr(parent, pausing_part)
         block <- new_user_block(node, refs)
       } else {

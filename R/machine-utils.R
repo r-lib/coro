@@ -16,7 +16,7 @@ block_srcref <- function(x) {
   if (is_call(x, "_block")) {
     block <- node_cadr(x)
     args <- node_cdr(block)
-    refs <- attr(block, "srcref")[-1]
+    refs <- attr(block, "srcref")[-1] %||% list(NULL)
     map2(args, refs, new_flowery_ref)
   }
 }
@@ -34,4 +34,15 @@ new_flowery_ref <- function(expr, ref) {
   print(x$ref)
 
   invisible(x)
+}
+
+spliceable_part <- function(x) {
+  cdr <- node_cdr(x)
+  cadr <- node_car(cdr)
+
+  if (is_call(cadr, "_block")) {
+    node_cdr(node_cadr(cadr))
+  } else {
+    cdr
+  }
 }
