@@ -69,10 +69,11 @@ node_list_parts <- function(node, refs = NULL) {
 
       if (has_past()) {
         node_poke_cdr(parent, pause_node)
-        pause_block <- new_block(node)
       } else {
-        pause_block <- new_block(pause_node)
+        node <- pause_node
       }
+
+      pause_block <- new_user_block(node, refs)
       parts <- node_list_poke_cdr(parts, pairlist(pause_block))
 
       rest <- node <- node_cdr(rest)

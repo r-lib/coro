@@ -28,3 +28,20 @@ new_for_parts <- function(state, i, x,
   node_poke_cddr(parts, NULL)
   parts
 }
+
+print_parts_refs <- function(fn) {
+  parts <- machine_parts(fn)
+
+  for (i in seq_along(parts)) {
+    refs <- parts_srcrefs(parts[[i]])
+
+    if (!is_null(refs)) {
+      writeLines(sprintf("<Part %s>", i))
+      print(refs)
+    }
+  }
+}
+
+expect_snapshot_refs <- function(fn) {
+  blast(expect_snapshot(print_parts_refs(!!substitute(fn))))
+}
