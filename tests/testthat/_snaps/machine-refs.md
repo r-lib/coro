@@ -49,6 +49,83 @@
       
       
 
+# references are propagated in repeat loops
+
+    Code
+      print_parts_refs(function() {
+        repeat yield(1)
+      })
+    Output
+      <Part 1>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_goto("2")
+      ref: repeat yield(1)
+      
+      
+      <Part 2>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_yield("3", 1)
+      ref: NULL
+      
+      
+      <Part 4>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_return(invisible(NULL))
+      ref: NULL
+      
+      
+
+---
+
+    Code
+      print_parts_refs(function() {
+        repeat {
+          1
+          `break`()
+          3
+        }
+      })
+    Output
+      <Part 1>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_goto("2")
+      ref: repeat {
+          1
+          `break`()
+          3
+        }
+      
+      
+      <Part 2>
+      [[1]]
+      [[1]][[1]]
+      expr: 1
+      ref: 1
+      
+      [[1]][[2]]
+      expr: flowery::coro_goto("5")
+      ref: `break`()
+      
+      
+      <Part 3>
+      [[1]]
+      [[1]][[1]]
+      expr: 3
+      ref: 3
+      
+      
+      <Part 5>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_return(invisible(NULL))
+      ref: NULL
+      
+      
+
 # references are propagated in while loops
 
     Code

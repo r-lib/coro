@@ -46,3 +46,11 @@ spliceable_part <- function(x) {
     cdr
   }
 }
+
+block_maybe_unwrap <- function(x) {
+  if (is_call(x, "{") && is_call(cadr <- node_cadr(x), "_block")) {
+    cadr
+  } else {
+    x
+  }
+}

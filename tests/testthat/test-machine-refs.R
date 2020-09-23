@@ -12,6 +12,20 @@ test_that("references are propagated with yield", {
   })
 })
 
+test_that("references are propagated in repeat loops", {
+  expect_snapshot(print_parts_refs(function() {
+    repeat yield(1)
+  }))
+
+  expect_snapshot_refs(function() {
+    repeat {
+      1
+      break
+      3
+    }
+  })
+})
+
 test_that("references are propagated in while loops", {
   expect_snapshot_refs(function() {
     while (TRUE) next

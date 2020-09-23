@@ -111,7 +111,13 @@ node_list_parts <- function(node, refs = NULL) {
 
       node_poke_car(nested_parts, block)
     } else {
-      poke_attr(pausing_part, "spliceable", NULL)
+      pausing_part <- block_maybe_unwrap(pausing_part)
+
+      if (is_spliceable(pausing_part) && !is_null(refs)) {
+        pausing_part <- new_user_block(spliceable_part(pausing_part), refs)
+      }
+
+      node_poke_car(nested_parts, as_block(pausing_part))
     }
 
     # Merge nested states

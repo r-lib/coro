@@ -11,9 +11,8 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   body <- as_block(expr)
   push_next(body)
 
-  body <- as_exprs_node(body)
   with_loop_nodes(loop_state, next_node, break_node, {
-    parts <- node_list_parts(body)
+    parts <- block_parts(body)
   })
 
   # Update the `break` gotos and `pause nodes` to point to the next state
