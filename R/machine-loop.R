@@ -9,7 +9,7 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # Add an explicit `next` in the body. Shouldn't be necessary but
   # this helps creating the correct breaking points in nested loops.
   body <- as_block(expr)
-  push_next(body)
+  has_implicit_next <- push_next(body)
 
   with_loop_nodes(loop_state, next_node, break_node, {
     parts <- block_parts(body)
@@ -20,6 +20,35 @@ loop_parts <- function(expr, loop_state = peek_state()) {
 
   if (is_null(parts)) {
     return(NULL)
+  }
+
+  # Suboptimal but will do for now. Remove the explicit `next` that
+  # was added to the user block. This artificial `next` shouldn't be
+  # evaluated within the user block since there is no source reference
+  # to link to.
+  if (has_implicit_next) {
+    last_part <- node_list_tail(parts)
+
+    user_block <- node_cadr(node_car(last_part))
+    block <- node_cadr(user_block)
+
+    but_last <- node_cdr(block)
+    while (!is_null(node_cddr(but_last))) {
+      but_last <- node_cdr(but_last)
+    }
+
+    goto <- node_cadr(but_last)
+    node_poke_cdr(but_last, NULL)
+
+    # Remove extra srcref
+    ref <- attr(block, "srcref")
+    if (!is_null(ref)) {
+      attr(block, "srcref") <- ref[-length(ref)]
+      node_poke_cadr(user_block, block)
+    }
+
+    # Add goto back to outer block
+    node_poke_cdr(node_list_tail(node_car(last_part)), pairlist(goto))
   }
 
   parts

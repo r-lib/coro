@@ -66,11 +66,11 @@
       <Part 2>
       [[1]]
       [[1]][[1]]
-      expr: flowery::coro_yield("3", 1)
+      expr: flowery::coro_yield("2", 1)
       ref: NULL
       
       
-      <Part 4>
+      <Part 3>
       [[1]]
       [[1]][[1]]
       expr: flowery::coro_return(invisible(NULL))
@@ -107,7 +107,7 @@
       ref: 1
       
       [[1]][[2]]
-      expr: flowery::coro_goto("5")
+      expr: flowery::coro_goto("4")
       ref: `break`()
       
       
@@ -118,7 +118,7 @@
       ref: 3
       
       
-      <Part 5>
+      <Part 4>
       [[1]]
       [[1]][[1]]
       expr: flowery::coro_return(invisible(NULL))
@@ -148,7 +148,7 @@
       ref: while (TRUE) `break`()
       
       
-      <Part 6>
+      <Part 5>
       [[1]]
       [[1]][[1]]
       expr: flowery::coro_return(invisible(NULL))
@@ -209,7 +209,7 @@
       ref: 3
       
       [[1]][[2]]
-      expr: flowery::coro_goto("7")
+      expr: flowery::coro_goto("6")
       ref: `break`()
       
       
@@ -220,7 +220,7 @@
       ref: 4
       
       
-      <Part 7>
+      <Part 6>
       [[1]]
       [[1]][[1]]
       expr: flowery::coro_return(5)
