@@ -10,7 +10,6 @@ set_returns <- function(expr) {
   expr <- node_clone(expr)
 
   handle <- pairlist(expr)
-  walk_poke_next(handle)
   poke_returns(handle)
 
   node_car(handle)
@@ -102,36 +101,6 @@ if_poke_returns <- function(node) {
     node_poke_car(else_node, else_expr)
     poke_returns(node_cdr(else_expr))
   }
-
-  NULL
-}
-
-walk_poke_next <- function(node) {
-  walk_blocks(node, poke_next, which = c("repeat", "while", "for"))
-}
-
-poke_next <- function(node, type) {
-  expr <- node_car(node)
-
-  body <- switch(type,
-    `repeat` = call_repeat_body(expr),
-    `while` = call_while_body(expr),
-    `for` = call_for_body(expr),
-    stop_internal("poke_next")
-  )
-
-  body <- as_block(body)
-  tail <- node_list_tail(body)
-  if (!identical(node_car(tail), quote(next))) {
-    node_poke_cdr(tail, pairlist(quote(next)))
-  }
-
-  switch(type,
-    `repeat` = call_repeat_poke_body(expr, body),
-    `while` = call_while_poke_body(expr, body),
-    `for` = call_for_poke_body(expr, body),
-    stop_internal("poke_next")
-  )
 
   NULL
 }

@@ -52,15 +52,10 @@
       
       [[2]]
       {
-          flowery::coro_yield("3", 1L)
+          flowery::coro_yield("2", 1L)
       }
       
       [[3]]
-      {
-          flowery::coro_goto("2")
-      }
-      
-      [[4]]
       {
           flowery::coro_return("after")
       }
@@ -196,21 +191,11 @@
       [[1]]
       {
           "before"
-          flowery::coro_goto("2")
+          repeat NULL
+          flowery::coro_yield("2", 1L)
       }
       
       [[2]]
-      {
-          NULL
-          flowery::coro_goto("2")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_yield("4", 1L)
-      }
-      
-      [[4]]
       {
           flowery::coro_return("after")
       }
@@ -234,22 +219,17 @@
       
       [[2]]
       if (TRUE) {
-          flowery::coro_goto("4")
+          flowery::coro_goto("3")
       } else {
           flowery::coro_goto("2")
       }
       
       [[3]]
       {
-          flowery::coro_goto("2")
+          flowery::coro_yield("4", 1L)
       }
       
       [[4]]
-      {
-          flowery::coro_yield("5", 1L)
-      }
-      
-      [[5]]
       {
           flowery::coro_return("after")
       }
@@ -489,17 +469,12 @@
       [[2]]
       {
           if (TRUE) {
-              flowery::coro_yield("3")
+              flowery::coro_yield("2")
           }
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
           flowery::coro_goto("2")
       }
       
-      [[4]]
+      [[3]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -520,18 +495,13 @@
       [[2]]
       {
           if (TRUE) {
-              flowery::coro_yield("3", 1L)
+              flowery::coro_yield("2", 1L)
           }
           else FALSE
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
           flowery::coro_goto("2")
       }
       
-      [[4]]
+      [[3]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -550,21 +520,16 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("4")
+              flowery::coro_goto("3")
           }
       }
       
       [[2]]
       {
-          flowery::coro_yield("3", 1L)
+          flowery::coro_yield("1", 1L)
       }
       
       [[3]]
-      {
-          flowery::coro_goto("1")
-      }
-      
-      [[4]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -782,74 +747,69 @@
               flowery::coro_goto("3")
           }
           else {
-              flowery::coro_goto("5")
+              flowery::coro_goto("4")
           }
       }
       
       [[3]]
       {
-          flowery::coro_goto("5")
+          flowery::coro_goto("4")
       }
       
       [[4]]
       {
-          flowery::coro_goto("2")
+          if (TRUE) {
+              flowery::coro_goto("5")
+          }
+          else {
+              flowery::coro_goto("11")
+          }
       }
       
       [[5]]
       {
-          if (TRUE) {
-              flowery::coro_goto("6")
-          }
-          else {
-              flowery::coro_goto("12")
-          }
+          "loop-before"
+          flowery::coro_yield("6", 1L)
       }
       
       [[6]]
       {
-          "loop-before"
-          flowery::coro_yield("7", 1L)
+          "loop-after"
+          if (TRUE) {
+              "break-before"
+              flowery::coro_goto("11")
+          }
+          else {
+              "yield-2-before"
+              flowery::coro_yield("8", 2L)
+          }
       }
       
       [[7]]
       {
-          "loop-after"
-          if (TRUE) {
-              "break-before"
-              flowery::coro_goto("12")
-          }
-          else {
-              "yield-2-before"
-              flowery::coro_yield("9", 2L)
-          }
+          "break-after"
+          flowery::coro_goto("9")
       }
       
       [[8]]
       {
-          "break-after"
-          flowery::coro_goto("10")
+          "yield-2-after"
+          flowery::coro_goto("9")
       }
       
       [[9]]
       {
-          "yield-2-after"
-          flowery::coro_goto("10")
+          "next-before"
+          flowery::coro_goto("4")
       }
       
       [[10]]
       {
-          "next-before"
-          flowery::coro_goto("5")
+          "loop-end"
+          flowery::coro_goto("4")
       }
       
       [[11]]
-      {
-          "loop-end"
-          flowery::coro_goto("5")
-      }
-      
-      [[12]]
       {
           flowery::coro_return("after")
       }
@@ -913,21 +873,16 @@
               flowery::coro_goto("3")
           }
           else {
-              flowery::coro_goto("5")
+              flowery::coro_goto("4")
           }
       }
       
       [[3]]
       {
-          flowery::coro_goto("5")
+          flowery::coro_goto("4")
       }
       
       [[4]]
-      {
-          flowery::coro_goto("2")
-      }
-      
-      [[5]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -954,21 +909,16 @@
               flowery::coro_goto("3")
           }
           else {
-              flowery::coro_goto("5")
+              flowery::coro_goto("4")
           }
       }
       
       [[3]]
       {
-          flowery::coro_yield("4", 1L)
+          flowery::coro_yield("2", 1L)
       }
       
       [[4]]
-      {
-          flowery::coro_goto("2")
-      }
-      
-      [[5]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -1095,21 +1045,16 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("4")
+              flowery::coro_goto("3")
           }
       }
       
       [[2]]
       if (TRUE) flowery::coro_return(1L) else {
-          flowery::coro_yield("3", 2L)
+          flowery::coro_yield("1", 2L)
       }
       
       [[3]]
-      {
-          flowery::coro_goto("1")
-      }
-      
-      [[4]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -1321,7 +1266,7 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("6")
+              flowery::coro_goto("7")
           }
       }
       
@@ -1331,7 +1276,7 @@
               flowery::coro_goto("3")
           }
           else {
-              flowery::coro_goto("5")
+              flowery::coro_goto("6")
           }
       }
       
@@ -1342,15 +1287,20 @@
       
       [[4]]
       {
-          flowery::coro_goto("5")
+          flowery::coro_goto("6")
       }
       
       [[5]]
       {
-          flowery::coro_goto("1")
+          flowery::coro_goto("2")
       }
       
       [[6]]
+      {
+          flowery::coro_goto("1")
+      }
+      
+      [[7]]
       {
           flowery::coro_return(invisible(NULL))
       }

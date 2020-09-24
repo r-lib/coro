@@ -12,6 +12,7 @@ test_that("async functions are not sensitive to blocks", {
   fn2 <- async(function() { await("value") })
   expect_equal(async_internal_generator(fn1), async_internal_generator(fn2))
 
+  skip("FIXME?")
   fn1 <- async(function() while (1) if (2) await("value"))
   fn2 <- async(function() while (1) { if (2) { await("value") } })
   expect_equal(async_internal_generator(fn1), async_internal_generator(fn2))
