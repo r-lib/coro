@@ -9,9 +9,9 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # Add an explicit `next` in the body. Shouldn't be necessary but
   # this helps creating the correct breaking points in nested loops.
   body <- as_block(expr)
-  has_implicit_next <- push_next(body)
+  push_next(body)
 
-  body <- as_exprs_node(expr)
+  body <- as_exprs_node(body)
   with_loop_nodes(loop_state, next_node, break_node, {
     parts <- node_list_parts(body)
   })
@@ -23,21 +23,13 @@ loop_parts <- function(expr, loop_state = peek_state()) {
     return(NULL)
   }
 
-  # Add a looping goto as last statement of the loop body unless there
-  # was already an explicit `next` at the end
-  if (has_implicit_next) {
-    goto_node <- pairlist(goto_call(loop_state))
-    parts_tail <- node_list_tail_car(parts)
-    block_push_goto(parts_tail, goto_node)
-  }
-
   parts
 }
 
 push_next <- function(block) {
   tail <- node_list_tail(block)
 
-  if (is_call(node_car(tail), "next")) {
+  if (is_exiting_block(node_car(tail))) {
     return(FALSE)
   }
 

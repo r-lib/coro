@@ -153,7 +153,10 @@ exiting_syms <- list(
   return_sym,
   quote(coro_return),
   quote(coro_yield),
-  quote(coro_goto)
+  quote(coro_goto),
+  quote(`next`),
+  quote(`break`),
+  quote(yield)
 )
 
 utils::globalVariables("_next_arg")

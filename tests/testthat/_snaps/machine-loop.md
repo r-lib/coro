@@ -82,15 +82,10 @@
       
       [[2]]
       {
-          flowery::coro_yield("3", 1L)
+          flowery::coro_yield("2", 1L)
       }
       
       [[3]]
-      {
-          flowery::coro_goto("2")
-      }
-      
-      [[4]]
       {
           flowery::coro_return("after")
       }
@@ -191,11 +186,21 @@
       [[1]]
       {
           "before"
-          repeat NULL
-          flowery::coro_yield("2", 1L)
+          flowery::coro_goto("2")
       }
       
       [[2]]
+      {
+          NULL
+          flowery::coro_goto("2")
+      }
+      
+      [[3]]
+      {
+          flowery::coro_yield("4", 1L)
+      }
+      
+      [[4]]
       {
           flowery::coro_return("after")
       }
@@ -257,15 +262,10 @@
       
       [[3]]
       {
-          flowery::coro_yield("4", 1L)
+          flowery::coro_yield("2", 1L)
       }
       
       [[4]]
-      {
-          flowery::coro_goto("2")
-      }
-      
-      [[5]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -338,20 +338,15 @@
       
       [[2]]
       {
-          flowery::coro_goto("5")
+          flowery::coro_goto("4")
       }
       
       [[3]]
       {
-          flowery::coro_yield("4", 1L)
+          flowery::coro_yield("2", 1L)
       }
       
       [[4]]
-      {
-          flowery::coro_goto("2")
-      }
-      
-      [[5]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -469,12 +464,17 @@
       [[2]]
       {
           if (TRUE) {
-              flowery::coro_yield("2")
+              flowery::coro_yield("3")
           }
-          flowery::coro_goto("2")
+          flowery::coro_goto("3")
       }
       
       [[3]]
+      {
+          flowery::coro_goto("2")
+      }
+      
+      [[4]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -495,13 +495,18 @@
       [[2]]
       {
           if (TRUE) {
-              flowery::coro_yield("2", 1L)
+              flowery::coro_yield("3", 1L)
           }
           else FALSE
-          flowery::coro_goto("2")
+          flowery::coro_goto("3")
       }
       
       [[3]]
+      {
+          flowery::coro_goto("2")
+      }
+      
+      [[4]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -831,22 +836,17 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("4")
+              flowery::coro_goto("3")
           }
       }
       
       [[2]]
       {
           "before-break"
-          flowery::coro_goto("4")
+          flowery::coro_goto("3")
       }
       
       [[3]]
-      {
-          flowery::coro_goto("1")
-      }
-      
-      [[4]]
       {
           flowery::coro_return(invisible(NULL))
       }
@@ -1266,7 +1266,7 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("7")
+              flowery::coro_goto("6")
           }
       }
       
@@ -1276,7 +1276,7 @@
               flowery::coro_goto("3")
           }
           else {
-              flowery::coro_goto("6")
+              flowery::coro_goto("5")
           }
       }
       
@@ -1287,20 +1287,15 @@
       
       [[4]]
       {
-          flowery::coro_goto("6")
+          flowery::coro_goto("5")
       }
       
       [[5]]
       {
-          flowery::coro_goto("2")
-      }
-      
-      [[6]]
-      {
           flowery::coro_goto("1")
       }
       
-      [[7]]
+      [[6]]
       {
           flowery::coro_return(invisible(NULL))
       }

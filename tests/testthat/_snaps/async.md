@@ -89,25 +89,30 @@
               flowery::coro_goto("2")
           }
           else {
-              flowery::coro_goto("3")
+              flowery::coro_goto("4")
           }
       }
       
       $`2`
       {
           if (2) {
-              flowery::coro_yield("1", `_then`(`_as_promise`("value"), 
+              flowery::coro_yield("3", `_then`(`_as_promise`("value"), 
                   callback = `_self`))
           }
-          flowery::coro_goto("1")
+          flowery::coro_goto("3")
       }
       
       $`3`
       {
-          flowery::coro_return(`_as_promise`(invisible(NULL)))
+          flowery::coro_goto("1")
       }
       
       $`4`
+      {
+          flowery::coro_return(`_as_promise`(invisible(NULL)))
+      }
+      
+      $`5`
       {
           base::return(invisible(NULL))
       }
