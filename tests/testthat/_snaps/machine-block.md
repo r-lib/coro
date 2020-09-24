@@ -383,3 +383,45 @@
       }
       
 
+# yield assignment in a loop
+
+    Code
+      machine_parts(function() while (1) var <- yield("value"))
+    Output
+      [[1]]
+      {
+          if ({
+              `_block`({
+                  1
+              })
+          }) {
+              flowery::coro_goto("2")
+          }
+          else {
+              flowery::coro_goto("4")
+          }
+      }
+      
+      [[2]]
+      {
+          `_block`({
+              flowery::coro_yield("3", "value")
+          })
+      }
+      
+      [[3]]
+      {
+          `_block`({
+              var <- `_next_arg`
+          })
+          flowery::coro_goto("1")
+      }
+      
+      [[4]]
+      {
+          `_block`({
+              flowery::coro_return(invisible(NULL))
+          })
+      }
+      
+

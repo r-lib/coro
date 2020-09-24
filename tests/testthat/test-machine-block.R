@@ -134,3 +134,7 @@ test_that("`{` blocks - simple nesting with various continuation states", {
     "after"
   }))
 })
+
+test_that("yield assignment in a loop", {
+  expect_snapshot0(machine_parts(function() while (1) var <- yield("value")))
+})
