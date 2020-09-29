@@ -16,7 +16,7 @@ loop_parts <- function(expr, loop_state = peek_state()) {
 
   # Update the `break` gotos and `pause nodes` to point to the next state
   node_poke_car(break_node, goto_call(peek_state() + 1L))
-  pauses_push_state(pauses, loop_state)
+  pauses_poke_state(pauses, loop_state)
 
   # Add a looping goto at the end
   goto_node <- pairlist(goto_call(loop_state))

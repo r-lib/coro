@@ -95,7 +95,7 @@ node_list_parts <- function(node) {
           state <- poke_state()
         }
         node_poke_car(next_goto, goto_call(state))
-        pauses_push_state(pauses, state)
+        pauses_poke_state(pauses, state)
       }
     } else {
       nested_parts <- expr_parts(expr)

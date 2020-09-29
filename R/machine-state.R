@@ -126,18 +126,18 @@ push_pause_node <- function(node) {
   invisible(pauses)
 }
 
-pauses_push_state <- function(pauses, state) {
+pauses_poke_state <- function(pauses, state) {
   if (is_null_node(pauses)) {
     return(invisible(pauses))
   }
 
-  node_list_walk_car(pauses, pause_poke_state, state)
+  node_list_walk_car(pauses, function(pause) {
+    pause_call <- node_car(pause)
+    node_poke_cadr(pause_call, as.character(state))
+    invisible(pause)
+  })
+
   invisible(pauses)
-}
-pause_poke_state <- function(pause, state) {
-  pause_call <- node_car(pause)
-  node_poke_cadr(pause_call, as.character(state))
-  invisible(pause)
 }
 
 peek_pause_sym <- function() {
