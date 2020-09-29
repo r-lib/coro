@@ -21,7 +21,7 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # Add a looping goto at the end
   goto_node <- pairlist(goto_call(loop_state))
   tail <- node_list_tail_car(parts)
-  push_goto(tail, goto_node)
+  block_push_goto(tail, goto_node)
 
   parts
 }

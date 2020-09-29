@@ -22,7 +22,7 @@ expr_parts <- function(expr) {
   )
 }
 
-push_goto <- function(block, goto_node = NULL) {
+block_push_goto <- function(block, goto_node = NULL) {
   if (is_exiting_block(block)) {
     block
   } else {

@@ -32,11 +32,11 @@ if_parts <- function(expr) {
 
   # Add gotos to continuation states
   if (!is_null(else_parts)) {
-    push_goto(node_list_tail_car(else_parts))
+    block_push_goto(node_list_tail_car(else_parts))
     parts <- node_list_poke_cdr(else_parts, parts)
   }
   if (!is_null(if_parts)) {
-    push_goto(node_list_tail_car(if_parts))
+    block_push_goto(node_list_tail_car(if_parts))
     parts <- node_list_poke_cdr(if_parts, parts)
   }
 
@@ -44,7 +44,7 @@ if_parts <- function(expr) {
   # are non-exiting branches
   if (!is_exiting_block(expr)) {
     expr <- spliceable(block(expr))
-    push_goto(expr)
+    block_push_goto(expr)
   }
 
   new_node(expr, parts)

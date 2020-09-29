@@ -5,7 +5,7 @@ block_parts <- function(expr) {
   if (is_null(parts)) {
     NULL
   } else {
-    push_goto(node_list_tail_car(parts))
+    block_push_goto(node_list_tail_car(parts))
     parts
   }
 }
