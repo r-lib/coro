@@ -1,8 +1,5 @@
 
 loop_parts <- function(expr, loop_state = peek_state()) {
-  # These pausing nodes are used only when there is no continuation after
-  # the pause. It ensures we restart at the start of the loop.
-  pauses <- null_node()
   next_node <- new_node(goto_call(loop_state), NULL)
 
   # We don't know the finishing state until we've obtained all states
@@ -10,13 +7,12 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   break_node <- new_node(goto_call(-1L), NULL)
 
   body <- as_exprs_node(expr)
-  with_loop_nodes(pauses, next_node, break_node, {
+  with_loop_nodes(loop_state, next_node, break_node, {
     parts <- node_list_parts(body)
   })
 
   # Update the `break` gotos and `pause nodes` to point to the next state
   node_poke_car(break_node, goto_call(peek_state() + 1L))
-  pauses_poke_state(pauses, loop_state)
 
   # Add a looping goto at the end
   goto_node <- pairlist(goto_call(loop_state))

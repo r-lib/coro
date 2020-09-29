@@ -86,18 +86,40 @@ local_jump_nodes <- function(goto, pauses, has_past, frame = caller_env()) {
     has_past = has_past
   ))
 }
-with_jump_nodes <- function(goto, pauses, has_past, expr) {
-  local_jump_nodes(goto, pauses, has_past)
-  expr
+with_jump_nodes <- function(has_past, expr) {
+  goto_node <- new_node(goto_call(-1L), NULL)
+  pauses <- null_node()
+
+  local_jump_nodes(goto_node, pauses, has_past)
+  out <- expr
+
+  if (!is_null(out)) {
+    # Empty blocks occur when a translator returns a separate
+    # state that shouldn't be appended to the current past.
+    # In this case, poke state one more time.
+    state <- poke_state()
+    node_poke_car(goto_node, goto_call(state))
+    pauses_poke_state(pauses, state)
+  }
+
+  out
 }
-with_loop_nodes <- function(pauses, loop_next, loop_break, expr) {
+with_loop_nodes <- function(loop_state, loop_next, loop_break, expr) {
+  # These pausing nodes are used only when there is no continuation after
+  # the pause. This ensures we restart at the start of the loop.
+  pauses <- null_node()
+
   local_state_elts(list(
     pauses = pauses,
     goto = loop_next,
     loop_next = loop_next,
     loop_break = loop_break
   ))
-  expr
+
+  out <- expr
+  pauses_poke_state(pauses, loop_state)
+
+  out
 }
 peek_goto_node <- function() {
   current_state$goto

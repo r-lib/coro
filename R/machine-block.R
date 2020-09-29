@@ -79,21 +79,9 @@ node_list_parts <- function(node) {
     # relevant goto and pause nodes. Fill those nodes only when we
     # extracted the parts so they get the right state index.
     if (has_future()) {
-      next_goto <- new_node(goto_call(-1L), NULL)
-      pauses <- null_node()
-
-      with_jump_nodes(next_goto, pauses, has_past(), {
+      with_jump_nodes(has_past(), {
         nested_parts <- expr_parts(expr)
       })
-
-      if (!is_null(nested_parts)) {
-        # Empty blocks occur when a translator returns a separate
-        # state that shouldn't be appended to the current past.
-        # In this case, poke state one more time.
-        state <- poke_state()
-        node_poke_car(next_goto, goto_call(state))
-        pauses_poke_state(pauses, state)
-      }
     } else {
       nested_parts <- expr_parts(expr)
     }
