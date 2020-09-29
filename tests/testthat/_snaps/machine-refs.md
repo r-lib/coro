@@ -141,11 +141,25 @@
       ref: while (TRUE) `next`()
       
       
+      <Part 2>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_goto("1")
+      ref: NULL
+      
+      
       <Part 3>
       [[1]]
       [[1]][[1]]
       expr: TRUE
       ref: while (TRUE) `break`()
+      
+      
+      <Part 4>
+      [[1]]
+      [[1]][[1]]
+      expr: flowery::coro_goto("5")
+      ref: NULL
       
       
       <Part 5>

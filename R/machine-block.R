@@ -113,7 +113,7 @@ node_list_parts <- function(node, refs = NULL) {
     } else {
       pausing_part <- block_maybe_unwrap(pausing_part)
 
-      if (is_spliceable(pausing_part) && !is_null(refs)) {
+      if (is_spliceable(pausing_part)) {
         pausing_part <- new_user_block(spliceable_part(pausing_part), refs)
       }
 
