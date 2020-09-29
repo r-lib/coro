@@ -91,9 +91,6 @@ node_list_parts <- function(node) {
         # state that shouldn't be appended to the current past.
         # In this case, poke state one more time.
         state <- poke_state()
-        if (is_separate_state(nested_parts)) {
-          state <- poke_state()
-        }
         node_poke_car(next_goto, goto_call(state))
         pauses_poke_state(pauses, state)
       }
