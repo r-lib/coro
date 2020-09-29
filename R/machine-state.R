@@ -86,7 +86,11 @@ local_jump_nodes <- function(goto, pauses, has_past, frame = caller_env()) {
     has_past = has_past
   ))
 }
-with_jump_nodes <- function(has_past, expr) {
+with_jump_nodes <- function(has_past, has_future, expr) {
+  if (!has_future) {
+    return(expr)
+  }
+
   goto_node <- new_node(goto_call(-1L), NULL)
   pauses <- null_node()
 

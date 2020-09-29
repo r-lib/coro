@@ -75,16 +75,9 @@ node_list_parts <- function(node) {
       next
     }
 
-    # Extract nested states. If there is a continuation, pass on the
-    # relevant goto and pause nodes. Fill those nodes only when we
-    # extracted the parts so they get the right state index.
-    if (has_future()) {
-      with_jump_nodes(has_past(), {
-        nested_parts <- expr_parts(expr)
-      })
-    } else {
+    with_jump_nodes(has_past(), has_future(), {
       nested_parts <- expr_parts(expr)
-    }
+    })
 
     if (is_null(nested_parts)) {
       parent <- rest
