@@ -24,31 +24,11 @@ loop_parts <- function(expr, loop_state = peek_state()) {
 
 next_parts <- function(expr) {
   next_block <- spliceable(new_block(peek_loop_next_node()))
-  parts <- pairlist(next_block)
-  poke_attr(parts, "loop_control", TRUE)
+  pairlist(next_block)
 }
 break_parts <- function(expr) {
   break_block <- spliceable(new_block(peek_loop_break_node()))
-  parts <- pairlist(break_block)
-  poke_attr(parts, "loop_control", TRUE)
-}
-
-is_loop_control <- function(x) {
-  is_true(attr(x, "loop_control"))
-}
-all_loop_control <- function(node) {
-  if (is_null(node)) {
-    return(FALSE)
-  }
-
-  while (!is_null(node)) {
-    if (!is_loop_control(node)) {
-      return(FALSE)
-    }
-    node <- node_cdr(node)
-  }
-
-  TRUE
+  pairlist(break_block)
 }
 
 repeat_parts <- function(expr) {
