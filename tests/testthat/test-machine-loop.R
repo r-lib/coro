@@ -218,12 +218,14 @@ test_that("`while` - top level break", {
 })
 
 test_that("`for` - top level break (#7)", {
+  skip_spliceable_attribute()
   expect_snapshot0(machine_parts(function() {
     for (i in x) break
   }))
 })
 
 test_that("`for` - one pause with no past or future", {
+  skip_spliceable_attribute()
   expect_snapshot0(machine_parts(function() {
     for (i in x) yield(1L)
   }))
@@ -242,6 +244,7 @@ test_that("`for` - one pause with past and future", {
 })
 
 test_that("`for` - one pause within `if` and one `break` within `else`", {
+  skip_spliceable_attribute()
   expect_snapshot0(machine_parts(function() {
     for (i in x) {
       "for-before"
