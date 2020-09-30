@@ -3,7 +3,7 @@
 \name{async}
 \alias{async}
 \alias{await}
-\title{Construct an async function}
+\title{Make an async function}
 \usage{
 async(fn)
 
@@ -19,5 +19,22 @@ allowed.}
 A function that returns a \code{\link[promises:promise]{promises::promise()}}.
 }
 \description{
-Construct an async function
+\code{async()} functions are the building blocks of cooperative
+concurrency. They suspend themselves with \code{await()} when they
+expect an operation to take a long time to complete. While they
+wait for the result, other async functions can be resumed once they
+are ready to make progress.
 }
+\section{Concurrency framework}{
+
+
+The default scheduler used by \code{async()} functions is provided by
+the \emph{later} package. It currently only supports timers but these
+are sufficient to implement basic cooperative concurrency. Since
+this scheduler normally runs at top level, the async functions are
+called back once all current computations have finished running.
+
+\code{async()} functions can be chained to promises from the \emph{promises}
+package.
+}
+

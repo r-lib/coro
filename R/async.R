@@ -1,8 +1,25 @@
-#' Construct an async function
+#' Make an async function
+#'
+#' `async()` functions are the building blocks of cooperative
+#' concurrency. They suspend themselves with `await()` when they
+#' expect an operation to take a long time to complete. While they
+#' wait for the result, other async functions can be resumed once they
+#' are ready to make progress.
 #'
 #' @param fn An anonymous function within which `await()` calls are
 #'   allowed.
 #' @return A function that returns a [promises::promise()].
+#'
+#' @section Concurrency framework:
+#'
+#' The default scheduler used by `async()` functions is provided by
+#' the _later_ package. It currently only supports timers but these
+#' are sufficient to implement basic cooperative concurrency. Since
+#' this scheduler normally runs at top level, the async functions are
+#' called back once all current computations have finished running.
+#'
+#' `async()` functions can be chained to promises from the _promises_
+#' package.
 #'
 #' @export
 async <- function(fn) {
