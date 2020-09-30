@@ -1,7 +1,15 @@
 
 machine_switch_call <- function(parts) {
   parts <- node_list_enumerate_tags(parts)
-  switch_args <- new_node(quote(`_state`), parts)
+
+  last <- node_list_tail(parts)
+  catch_all_state <- pairlist(block(quote(rlang::abort(
+    base::sprintf("Internal error: Unexpected state `%s`.", `_state`)
+  ))))
+  node_poke_cdr(last, catch_all_state)
+
+  switch_args <- new_node(block(quote(base::as.character(`_state`))), parts)
+
   new_call(switch_sym, switch_args)
 }
 node_list_enumerate_tags <- function(node) {

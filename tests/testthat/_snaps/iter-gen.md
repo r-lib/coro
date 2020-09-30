@@ -14,7 +14,9 @@
       {
           evalq(env, expr = {
               while (TRUE) {
-                  switch(`_state`, `1` = {
+                  switch({
+                      base::as.character(`_state`)
+                  }, `1` = {
                       if (TRUE) {
                         flowery::coro_goto("2")
                       } else {
@@ -31,6 +33,9 @@
                       flowery::coro_return(invisible(NULL))
                   }, `5` = {
                       base::return(invisible(NULL))
+                  }, {
+                      rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+                        `_state`))
                   })
               }
           })

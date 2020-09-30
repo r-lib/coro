@@ -130,7 +130,7 @@ gen0 <- function(expr, env, fmls = NULL) {
   # Create the persistent closure environment of the generator
   env <- env(env,
     `_state` = "1",
-    `_return_state` = length(parts)
+    `_return_state` = as.character(length(parts))
   )
 
   if (is_null(arg)) {
