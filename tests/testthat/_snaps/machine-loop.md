@@ -901,11 +901,7 @@
     Output
       [[1]]
       {
-          `_for_iter_2` <- x
-          if (base::is.factor(`_for_iter_2`)) {
-              `_for_iter_2` <- base::as.character(`_for_iter_2`)
-          }
-          `_for_iter_2` <- flowery::as_iterator(`_for_iter_2`)
+          `_for_iter_2` <- flowery::coro_for_init(x)
           flowery::coro_goto("2")
       }
       attr(,"spliceable")
@@ -913,7 +909,7 @@
       
       [[2]]
       {
-          if (flowery::coro_advance(quote(i), `_for_iter_2`)) {
+          if (flowery::coro_for_advance(quote(i), `_for_iter_2`)) {
               flowery::coro_goto("3")
           }
           else {
@@ -946,11 +942,7 @@
     Output
       [[1]]
       {
-          `_for_iter_2` <- x
-          if (base::is.factor(`_for_iter_2`)) {
-              `_for_iter_2` <- base::as.character(`_for_iter_2`)
-          }
-          `_for_iter_2` <- flowery::as_iterator(`_for_iter_2`)
+          `_for_iter_2` <- flowery::coro_for_init(x)
           flowery::coro_goto("2")
       }
       attr(,"spliceable")
@@ -958,7 +950,7 @@
       
       [[2]]
       {
-          if (flowery::coro_advance(quote(i), `_for_iter_2`)) {
+          if (flowery::coro_for_advance(quote(i), `_for_iter_2`)) {
               flowery::coro_goto("3")
           }
           else {
@@ -998,17 +990,13 @@
       [[1]]
       {
           "before"
-          `_for_iter_2` <- x
-          if (base::is.factor(`_for_iter_2`)) {
-              `_for_iter_2` <- base::as.character(`_for_iter_2`)
-          }
-          `_for_iter_2` <- flowery::as_iterator(`_for_iter_2`)
+          `_for_iter_2` <- flowery::coro_for_init(x)
           flowery::coro_goto("2")
       }
       
       [[2]]
       {
-          if (flowery::coro_advance(quote(i), `_for_iter_2`)) {
+          if (flowery::coro_for_advance(quote(i), `_for_iter_2`)) {
               flowery::coro_goto("3")
           }
           else {
@@ -1049,11 +1037,7 @@
     Output
       [[1]]
       {
-          `_for_iter_2` <- x
-          if (base::is.factor(`_for_iter_2`)) {
-              `_for_iter_2` <- base::as.character(`_for_iter_2`)
-          }
-          `_for_iter_2` <- flowery::as_iterator(`_for_iter_2`)
+          `_for_iter_2` <- flowery::coro_for_init(x)
           flowery::coro_goto("2")
       }
       attr(,"spliceable")
@@ -1061,7 +1045,7 @@
       
       [[2]]
       {
-          if (flowery::coro_advance(quote(i), `_for_iter_2`)) {
+          if (flowery::coro_for_advance(quote(i), `_for_iter_2`)) {
               flowery::coro_goto("3")
           }
           else {

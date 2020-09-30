@@ -108,23 +108,15 @@ for_init_part <- function(loop_state, expr) {
   coll_expr <- node_cadr(node_cdr(expr))
 
   expr({
-    !!iter_sym <- !!coll_expr
-
-    # `base::for()` internally converts factors to character vectors
-    if (base::is.factor(!!iter_sym)) {
-      !!iter_sym <- base::as.character(!!iter_sym)
-    }
-    !!iter_sym <- flowery::as_iterator(!!iter_sym)
-
+    !!iter_sym <- flowery::coro_for_init(!!coll_expr)
     !!goto_call(loop_state)
   })
 }
 
 
-#' Operators for coroutine state machines
-#' @keywords internal
+#' @rdname coro_goto
 #' @export
-coro_advance <- function(elt_sym, iterator, env = caller_env()) {
+coro_for_advance <- function(elt_sym, iterator, env = caller_env()) {
   out <- iterator()
 
   if (is_null(out)) {
@@ -134,13 +126,23 @@ coro_advance <- function(elt_sym, iterator, env = caller_env()) {
     TRUE
   }
 }
+#' @rdname coro_goto
+#' @export
+coro_for_init <- function(x) {
+  # `base::for()` internally converts factors to character vectors
+  if (is.factor(x)) {
+    x <- as.character(x)
+  }
+
+  as_iterator(x)
+}
 
 for_next_part <- function(loop_state, expr) {
   elt_sym <- node_cadr(expr)
   iter_sym <- for_iter_sym(loop_state)
 
   expr({
-    if (flowery::coro_advance(quote(!!elt_sym), !!iter_sym)) {
+    if (flowery::coro_for_advance(quote(!!elt_sym), !!iter_sym)) {
       !!goto_call(loop_state + 1L)
     } else {
       !!goto_call(peek_state() + 1L)
