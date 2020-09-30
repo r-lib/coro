@@ -124,10 +124,7 @@
     Output
       {
           "before"
-          repeat {
-              "foo"
-              next
-          }
+          repeat "foo"
           flowery::coro_return(invisible(NULL))
       }
 
@@ -141,10 +138,7 @@
     Output
       {
           "before"
-          while (TRUE) {
-              "foo"
-              next
-          }
+          while (TRUE) "foo"
           flowery::coro_return(invisible(NULL))
       }
 
@@ -154,10 +148,7 @@
       set_returns(function() for (i in x) "foo")
     Output
       {
-          for (i in x) {
-              "foo"
-              next
-          }
+          for (i in x) "foo"
           flowery::coro_return(invisible(NULL))
       }
 

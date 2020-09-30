@@ -6,7 +6,12 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # nested within the loop
   break_node <- new_node(goto_call(-1L), NULL)
 
-  body <- as_exprs_node(expr)
+  # Add an explicit `next` in the body. Shouldn't be necessary but
+  # this helps creating the correct breaking points in nested loops.
+  body <- as_block(expr)
+  push_next(body)
+
+  body <- as_exprs_node(body)
   with_loop_nodes(loop_state, next_node, break_node, {
     parts <- node_list_parts(body)
   })
@@ -14,12 +19,27 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # Update the `break` gotos and `pause nodes` to point to the next state
   node_poke_car(break_node, goto_call(peek_state() + 1L))
 
-  # Add a looping goto at the end
-  goto_node <- pairlist(goto_call(loop_state))
-  tail <- node_list_tail_car(parts)
-  block_push_goto(tail, goto_node)
+  if (is_null(parts)) {
+    return(NULL)
+  }
 
   parts
+}
+
+push_next <- function(block) {
+  tail <- node_list_tail(block)
+
+  if (is_exiting_block(node_car(tail))) {
+    return(FALSE)
+  }
+
+  node_poke_cdr(tail, pairlist(quote(next)))
+
+  refs <- attr(block, "srcref")
+  refs <- append(refs, list(NULL))
+  attr(block, "srcref") <- refs
+
+  TRUE
 }
 
 next_parts <- function(expr) {
