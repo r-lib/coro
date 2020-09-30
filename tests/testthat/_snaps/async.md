@@ -161,7 +161,7 @@
           base::return(invisible(NULL))
       }
       
-      [[7]]
+      [[6]]
       {
           rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
               `_state`))
@@ -238,6 +238,12 @@
       $`10`
       {
           base::return(invisible(NULL))
+      }
+      
+      [[11]]
+      {
+          rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+              `_state`))
       }
       
 
