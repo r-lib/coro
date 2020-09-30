@@ -1,7 +1,6 @@
 
 # flowery
 
-[![Travis-CI Build Status](https://travis-ci.org/lionel-/flowery.svg?branch=master)](https://travis-ci.org/lionel-/flowery)
 ![](https://img.shields.io/badge/lifecycle-experimental-red.svg)
 
 

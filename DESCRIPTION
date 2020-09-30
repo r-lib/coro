@@ -12,7 +12,6 @@ Imports:
     glue,
     rlang (>= 0.4.7)
 Suggests:
-    covr,
     knitr,
     later (>= 1.1.0),
     promises,
