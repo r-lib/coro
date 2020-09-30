@@ -1,6 +1,6 @@
 
 async_state_machine <- function(fn) {
-  gen <- blast(async_generator(async(!!enexpr(fn))))
+  gen <- blast(async_internal_generator(async(!!enexpr(fn))))
 
   expr <- gen[[3]][[3]][[2]][[3]][[2]][-(1:2)]
   machine <- as.pairlist(as.list(expr))

@@ -1,11 +1,15 @@
 #' Adapt an iterator with transformation steps
 #'
+#' @description
 #' `iter_adapt()` takes an iterator `iter` and a list of
 #' [Transformation steps][steps]. It returns an iterator that returns
 #' transformed values.
 #'
+#' `async_adapt()` does the same for async iterators, i.e. functions
+#' that returns an awaitable value.
+#'
 #' @param iter An [iterator].
-#' @param ... [Transformation steps][steps]. These dots are taken with
+#' @param steps,... [Transformation steps][steps]. These dots are taken with
 #'   implicit splicing of lists and passed to `compose()`.
 #'
 #' @seealso [iterate()] for looping over iterator values with `for`
@@ -66,3 +70,38 @@ iter_builder <- function(result, input) {
     input
   }
 }
+
+#' @rdname iter_adapt
+#' @export
+#' @name async_adapt
+#' @usage async_adapt(iter, steps)
+on_load(async_adapt %<~% async_generator(function(iter, steps) {
+  force(iter)
+
+  reducer <- steps(iter_builder)
+
+  # Initialise the adaptors
+  reducer()
+
+  flag <- "_flowery_iter_adapt_result"
+
+  while (TRUE) {
+    out <- await(iter())
+
+    if (is_null(out)) {
+      # Finalise adaptors and signal exhaustion
+      reducer(NULL)
+      return(NULL)
+    }
+
+    last <- reducer(flag, out)
+
+    # If we get `flag` back, it means a transducer has skipped this
+    # input. Continue until we get an actual result.
+    if (identical(last, flag)) {
+      next
+    }
+
+    yield(last)
+  }
+}))

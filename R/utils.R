@@ -35,3 +35,13 @@ unstructure <- function(x) {
   attributes(x) <- NULL
   x
 }
+
+assert_lambda <- function(call) {
+  if (!is_call(call, "function")) {
+    abort("`fn` must be an anonymous function.")
+  }
+}
+
+stop_internal <- function(fn) {
+  abort(sprintf("Internal error in `%s()`."))
+}

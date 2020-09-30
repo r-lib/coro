@@ -2,20 +2,26 @@
 % Please edit documentation in R/iter-adapt.R
 \name{iter_adapt}
 \alias{iter_adapt}
+\alias{async_adapt}
 \title{Adapt an iterator with transformation steps}
 \usage{
 iter_adapt(iter, ...)
+
+async_adapt(iter, steps)
 }
 \arguments{
 \item{iter}{An \link{iterator}.}
 
-\item{...}{\link[=steps]{Transformation steps}. These dots are taken with
+\item{steps, ...}{\link[=steps]{Transformation steps}. These dots are taken with
 implicit splicing of lists and passed to \code{compose()}.}
 }
 \description{
 \code{iter_adapt()} takes an iterator \code{iter} and a list of
 \link[=steps]{Transformation steps}. It returns an iterator that returns
 transformed values.
+
+\code{async_adapt()} does the same for async iterators, i.e. functions
+that returns an awaitable value.
 }
 \examples{
 # Let's create a simple iterator:

@@ -10,11 +10,11 @@ test_that("async functions construct a generator", {
 test_that("async functions are not sensitive to blocks", {
   fn1 <- async(function() await("value"))
   fn2 <- async(function() { await("value") })
-  expect_equal(async_generator(fn1), async_generator(fn2))
+  expect_equal(async_internal_generator(fn1), async_internal_generator(fn2))
 
   fn1 <- async(function() while (1) if (2) await("value"))
   fn2 <- async(function() while (1) { if (2) { await("value") } })
-  expect_equal(async_generator(fn1), async_generator(fn2))
+  expect_equal(async_internal_generator(fn1), async_internal_generator(fn2))
 })
 
 test_that("async() takes anonymous functions", {
@@ -76,4 +76,119 @@ test_that("state of async() functions are independent", {
   expect_equal(async_state(fn), "1")
   fn()
   expect_equal(async_state(fn), "1")
+})
+
+test_that("async_generator() creates streams", {
+  produced <- NULL
+  new_stream <- async_generator(function(x) {
+    for (elt in x) {
+      await(async_sleep(0))
+      produced <<- c(produced, elt)
+      yield(elt)
+    }
+  })
+
+  s <- new_stream(1:3)
+  out <- wait_for(s())
+  expect_equal(out, 1L)
+
+  consumed <- NULL
+  async_obs <- async(function(i) {
+    while (TRUE) {
+      x <- await(i())
+      consumed <<- c(consumed, x)
+
+      if (is_null(x)) {
+        return("done")
+      }
+    }
+  })
+
+  out <- wait_for(async_obs(s))
+  expect_equal(out, "done")
+
+  expect_equal(produced, 1:3)
+  expect_equal(consumed, 2:3)
+})
+
+test_that("can adapt async streams", {
+  new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+
+  consumed <- NULL
+  async_obs <- async(function(i) {
+    while (TRUE) {
+      x <- await(i())
+      consumed <<- c(consumed, x)
+
+      if (is_null(x)) {
+        return("done")
+      }
+    }
+  })
+
+  s1 <- new_stream(1:3)
+  s2 <- async_adapt(s1, iter_map(`*`, 3L))
+  wait_for(async_obs(s2))
+
+  expect_identical(consumed, 1:3 * 3L)
+})
+
+test_that("async() functions can take dots", {
+  fn <- async(function(...) list(...))
+  expect_equal(wait_for(fn(x = 1)), list(x = 1))
+})
+
+test_that("async_collect() collects", {
+  new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+
+  s1 <- new_stream(1:5)
+  s2 <- async_adapt(s1, iter_map(`*`, 3))
+
+  out <- wait_for(async_collect(s2))
+  expect_equal(out, as.list(1:5 * 3))
+
+
+  s1 <- new_stream(1:5)
+  s2 <- async_adapt(s1, iter_map(`*`, 3))
+
+  out <- wait_for(async_collect(s2, n = 3))
+  expect_equal(out, as.list(1:3 * 3))
+})
+
+test_that("for loops support await_each()", {
+  new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+
+  f <- async_generator(function(s) for (x in await_each(s)) yield(x * 2))
+  out <- wait_for(async_collect(f(new_stream(1:3))))
+  expect_equal(out, list(2, 4, 6))
+
+  values <- NULL
+  f <- async_generator(function(s1, s2) {
+    for (x in await_each(s1)) {
+      values <<- c(values, x)
+      for (y in await_each(s2)) {
+        values <<- c(values, y)
+      }
+    }
+  })
+  wait_for(async_collect(f(new_stream(1:3), new_stream(11:12))))
+  expect_equal(values, c(1, 11, 12, 2, 3))
+
+  expect_async_snapshot(function(s1, s2) {
+    for (x in await_each(s1)) {
+      values <<- c(values, x)
+      for (y in await_each(s2)) {
+        values <<- c(values, y)
+      }
+    }
+  })
+})
+
+test_that("yield() can't be used in async() functions", {
+  expect_error(async(function() yield(1)), "Can't")
+})
+
+test_that("yield() inside `async_generator()` returns a promise", {
+  new_g <- async_generator(function() yield(1))
+  expect_true(inherits(new_g()(), "promise"))
 })

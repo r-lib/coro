@@ -90,25 +90,23 @@
 #' tally(2)
 #' tally(10)
 generator <- function(fn) {
-  call <- substitute(fn)
-  if (!is_call(call, "function")) {
-    abort("`fn` must be an anonymous function.")
-  }
+  assert_lambda(substitute(fn))
 
   info <- gen0_list(body(fn), fn_env(fn))
   `_env` <- info$env
 
   fmls <- formals(fn)
 
-  out <- new_function(fmls, expr({
+  out <- new_function(fmls, quote({
     # Refresh the state machine environment
     `_env` <- env_clone(`_env`)
 
     # Forward arguments inside the state machine environment
-    !!!forward_args_calls(fmls)
+    frame <- environment()
+    lapply(names(fmls), function(arg) env_bind_arg(`_env`, arg, frame = frame))
 
     # Create function around the state machine
-    gen <- function(`_next_arg` = NULL) !!info$expr
+    gen <- blast(function(`_next_arg` = NULL) !!info$expr)
 
     # Zap source references so we can see the state machine
     unstructure(gen)
@@ -121,18 +119,20 @@ generator <- function(fn) {
 print.flowery_generator <- function(x, ...) {
   writeLines("<generator>")
   print(unstructure(x))
+
+  writeLines("State machine:")
+  print(env_get(fn_env(x), "info")$expr)
+
+  invisible(x)
 }
 
-forward_args_calls <- function(fmls) {
-  lapply(names(fmls), function(nm) {
-    if (identical(nm, "...")) {
-      quote(delayedAssign("...", get("..."), assign.env = `_env`))
-    } else {
-      expr(delayedAssign(!!nm, !!sym(nm), assign.env = `_env`))
-    }
-  })
+env_bind_arg <- function(env, arg, frame = caller_env()) {
+  if (identical(arg, "...")) {
+    env$... <- env_get(frame, "...", inherit = TRUE, default = missing_arg())
+  } else {
+    env_bind_lazy(env, !!arg := !!sym(arg), .eval_env = frame)
+  }
 }
-utils::globalVariables("_env")
 
 gen0 <- function(expr, env) {
   info <- gen0_list(expr, env)
@@ -145,8 +145,8 @@ gen0 <- function(expr, env) {
 }
 
 gen0_list <- function(expr, env) {
-  node <- set_returns(expr)
-  parts <- generator_parts(node)
+  expr <- set_returns(expr)
+  parts <- generator_parts(expr)
 
   # Add a late return point
   return_call <- call2(quote(base::return), quote(invisible(NULL)))
@@ -176,16 +176,17 @@ gen0_list <- function(expr, env) {
   list(expr = expr, env = env)
 }
 
-generator_parts <- function(node, arg = NULL) {
+generator_parts <- function(block, arg = NULL) {
   reset_state()
   if (!is_null(arg)) {
     poke_state_elt("arg_sym", sym(arg))
   }
 
-  parts <- node_list_parts(node)
+  block <- as_block(block)
+  parts <- node_list_parts(node_cdr(block))
 
   if (is_null(parts)) {
-    pairlist(new_call(block_sym, node))
+    pairlist(block)
   } else {
     parts
   }

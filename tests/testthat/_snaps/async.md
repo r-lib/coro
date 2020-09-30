@@ -5,9 +5,6 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
-          }
           flowery::coro_return(`_as_promise`("value"))
       }
       
@@ -30,9 +27,6 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
-          }
           flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
               callback = `_self`))
       }
@@ -60,17 +54,11 @@
       async_state_machine(function() if (1) await("value") else "else")
     Output
       $`1`
-      {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
-          }
-          if (1) {
-              flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
-                  callback = `_self`))
-          }
-          else {
-              flowery::coro_return(`_as_promise`("else"))
-          }
+      if (1) {
+          flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
+              callback = `_self`))
+      } else {
+          flowery::coro_return(`_as_promise`("else"))
       }
       
       $`2`
@@ -97,29 +85,26 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
-          }
-          flowery::coro_goto("2")
-      }
-      
-      $`2`
-      {
           if (1) {
-              flowery::coro_goto("3")
+              flowery::coro_goto("2")
           }
           else {
               flowery::coro_goto("4")
           }
       }
       
-      $`3`
+      $`2`
       {
           if (2) {
-              flowery::coro_yield("2", `_then`(`_as_promise`("value"), 
+              flowery::coro_yield("3", `_then`(`_as_promise`("value"), 
                   callback = `_self`))
           }
-          flowery::coro_goto("2")
+          flowery::coro_goto("3")
+      }
+      
+      $`3`
+      {
+          flowery::coro_goto("1")
       }
       
       $`4`
@@ -146,45 +131,116 @@
     Output
       $`1`
       {
-          if (!rlang::is_installed(c("promises", "later"))) {
-              rlang::abort("The {later} and {promises} packages must be installed.")
+          if (1) {
+              flowery::coro_goto("2")
           }
+          else {
+              flowery::coro_goto("4")
+          }
+      }
+      
+      $`2`
+      {
+          flowery::coro_yield("3", `_then`(`_as_promise`("value"), 
+              callback = `_self`))
+      }
+      
+      $`3`
+      {
+          foo <- `_next_arg`
+          flowery::coro_goto("1")
+      }
+      
+      $`4`
+      {
+          flowery::coro_return(`_as_promise`(invisible(NULL)))
+      }
+      
+      $`5`
+      {
+          base::return(invisible(NULL))
+      }
+      
+      [[6]]
+      {
+          rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+              `_state`))
+      }
+      
+
+# for loops support await_each()
+
+    Code
+      async_state_machine(function(s1, s2) {
+        for (x in await_each(s1)) {
+          values <<- c(values, x)
+          for (y in await_each(s2)) {
+            values <<- c(values, y)
+          }
+        }
+      })
+    Output
+      $`1`
+      {
           flowery::coro_goto("2")
       }
       
       $`2`
       {
-          if (1) {
-              flowery::coro_goto("3")
-          }
-          else {
-              flowery::coro_goto("5")
-          }
+          flowery::coro_yield("3", `_then`(`_as_promise`(s1()), callback = `_self`))
       }
       
       $`3`
       {
-          flowery::coro_yield("4", `_then`(`_as_promise`("value"), 
-              callback = `_self`))
+          x <- `_next_arg`
+          if (base::is.null(x)) {
+              flowery::coro_goto("9")
+          }
+          flowery::coro_goto("4")
       }
       
       $`4`
       {
-          foo <- `_next_arg`
-          flowery::coro_goto("2")
+          values <<- c(values, x)
+          flowery::coro_goto("5")
       }
       
       $`5`
       {
-          flowery::coro_return(`_as_promise`(invisible(NULL)))
+          flowery::coro_yield("6", `_then`(`_as_promise`(s2()), callback = `_self`))
       }
       
       $`6`
       {
+          y <- `_next_arg`
+          if (base::is.null(y)) {
+              flowery::coro_goto("8")
+          }
+          flowery::coro_goto("7")
+      }
+      
+      $`7`
+      {
+          values <<- c(values, y)
+          flowery::coro_goto("5")
+      }
+      
+      $`8`
+      {
+          flowery::coro_goto("2")
+      }
+      
+      $`9`
+      {
+          flowery::coro_return(`_as_promise`(invisible(NULL)))
+      }
+      
+      $`10`
+      {
           base::return(invisible(NULL))
       }
       
-      [[7]]
+      [[11]]
       {
           rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
               `_state`))

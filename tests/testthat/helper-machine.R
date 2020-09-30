@@ -7,8 +7,8 @@ machine_parts <- function(expr, state = NULL) {
     poke_state_elt("arg_sym", sym(names(fmls)))
   }
 
-  node <- set_returns(expr)
-  node_list_parts(node)
+  expr <- set_returns(expr)
+  generator_parts(expr)
 }
 
 return_invisible_call <- return_state_call(rlang::call2("invisible", NULL))

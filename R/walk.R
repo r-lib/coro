@@ -1,56 +1,48 @@
 
-walk_blocks <- function(expr, fn) {
-  walk_blocks_switch(expr, cflow_type(expr), fn)
+walk_blocks <- function(node, fn, which = "expr") {
+  stopifnot(is_node_list(node))
+
+  while (!is_null(node)) {
+    walk_blocks_expr(node, fn, which = which)
+    node <- node_cdr(node)
+  }
+
+  NULL
 }
 
-walk_blocks_switch <- function(expr, type, fn) {
+walk_blocks_expr <- function(node, fn, which) {
+  expr <- node_car(node)
+  type <- cflow_type(expr)
+
   if (is_null(type)) {
-    return(expr)
+    if ("expr" %in%  which) {
+      fn(node)
+    }
+    return()
   }
 
+  # Only shallow-duplicate when we descend one level in the tree,
+  # i.e. when we take the CAR
   expr <- duplicate(expr, shallow = TRUE)
+  node_poke_car(node, expr)
 
-  if (is_string(type, "{")) {
-    node <- node_cdr(expr)
-
-    while (!is_null(node)) {
-      car <- node_car(node)
-      type <- cflow_type(car)
-
-      if (is_null(type)) {
-        # Apply function and end recursion
-        fn(node)
-      } else {
-        node_poke_car(node, walk_blocks_switch(car, type, fn))
-      }
-
-      node <- node_cdr(node)
-    }
-
-    return(expr)
+  if (type %in% which) {
+    fn(node, type = type)
+    return()
   }
 
-  if (is_string(type, "if")) {
-    cddr <- node_cddr(expr)
-
-    node_poke_car(cddr, walk_blocks(as_block(node_car(cddr)), fn))
-
-    else_expr <- node_cadr(cddr)
-    if (!is_null(else_expr)) {
-      node_poke_cadr(cddr, walk_blocks(as_block(else_expr), fn))
-    }
-
-    return(expr)
-  }
+  recurse <- function(node) walk_blocks(node, fn = fn, which = which)
 
   switch(type,
-    `repeat` = node_poke_cadr(expr, walk_blocks(as_block(node_cadr(expr)), fn)),
-    `while` = node_poke_car(node_cddr(expr), walk_blocks(as_block(node_car(node_cddr(expr))), fn)),
-    `for` = node_poke_cadr(node_cddr(expr), walk_blocks(as_block(node_cadr(node_cddr(expr))), fn)),
+    `{` = recurse(node_cdr(expr)),
+    `if` = recurse(node_cdr(expr)),
+    `repeat` = recurse(node_cdr(expr)),
+    `while` = recurse(node_cddr(expr)),
+    `for` = recurse(node_cdr(node_cddr(expr))),
     abort("Unexpected state in `walk_blocks_switch()`.")
   )
 
-  expr
+  NULL
 }
 
 cflow_type <- function(expr) {

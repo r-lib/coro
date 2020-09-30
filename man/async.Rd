@@ -38,3 +38,6 @@ called back once all current computations have finished running.
 package.
 }
 
+\seealso{
+\code{\link[=async_generator]{async_generator()}} and \code{\link[=await_each]{await_each()}}.
+}

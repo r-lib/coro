@@ -21,22 +21,11 @@
 #' `async()` functions can be chained to promises from the _promises_
 #' package.
 #'
+#' @seealso [async_generator()] and [await_each()].
 #' @export
 async <- function(fn) {
-  call <- substitute(fn)
-  if (!is_call(call, "function")) {
-    abort("`fn` must be an anonymous function.")
-  }
-
-  body(fn) <- expr({
-    if (!rlang::is_installed(c("promises", "later"))) {
-      rlang::abort("The {later} and {promises} packages must be installed.")
-    }
-
-    !!!fn_body(fn)
-  })
-
-  new_async(fn)
+  assert_lambda(substitute(fn))
+  new_async_generator(fn, step = TRUE)
 }
 #' @rdname async
 #' @param x An awaitable value, i.e. a [promise][promises::promise].
@@ -45,53 +34,132 @@ await <- function(x) {
   abort("`await()` can't be called directly or within function arguments.")
 }
 
+#' Construct an async generator
+#'
+#' An async generator constructs iterable functions that are also
+#' awaitables. They support both the `yield()` and `await()` syntax.
+#' An async iterator can be looped within async functions and
+#' iterators using `await_each()` on the input of a `for` loop.
+#'
+#' @param fn An anonymous function describing an async generator
+#'   within which `await()` calls are allowed.
+#' @return A generator factory. Generators constructed with this
+#'   factory always return [promises::promise()].
+#'
+#' @seealso [async()] for creating awaitable functions and
+#'   [async_collect()] for collecting the values of an async iterator.
+#' @examples
+#' # Creates awaitable functions that transform their inputs into a stream
+#' new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+#'
+#' # Maps a function to a stream
+#' async_map <- async_generator(function(.i, .fn, ...) {
+#'   for (elt in await_each(.i)) {
+#'     yield(.fn(elt, ...))
+#'   }
+#' })
+#'
+#' # new_stream(1:3) %>% async_map(`*`, 2) %>% async_collect()
+#' @export
+async_generator <- function(fn) {
+  assert_lambda(substitute(fn))
+  new_async_generator(fn, step = FALSE)
+}
+#' @rdname async_generator
+#' @inheritParams await
+#' @export
+await_each <- function(x) {
+  abort("`await_each()` must be called within a `for` loop.")
+}
+
+# Customisation point for the {async} package or any concurrency
+# framework that defines a "then" operation
+flowery_ops <- function(env) {
+  ops <- env_get(env, ".__flowery_async_ops__.", inherit = TRUE, default = NULL)
+
+  ops %||% list(
+    package = "promises",
+    `_then` = function(x, callback) promises::then(x, onFulfilled = callback),
+    `_as_promise` = function(x) as_promise(x)
+  )
+}
+
+ensure_promises <- function(fn, package) {
+  stopifnot(is_string(package))
+
+  body(fn) <- expr({
+
+    !!!fn_body(fn)
+  })
+
+  fn
+}
+
 #' Low-level constructor for async functions
 #'
 #' Unlike [async()] which uses concurrency based on
-#' [promises](https://rstudio.github.io/promises/), [new_async()]
-#' allows constructing async-await functions for other concurrency
-#' frameworks.
+#' [promises](https://rstudio.github.io/promises/),
+#' `new_async_generator()` allows constructing async-await functions
+#' and async generators for other concurrency frameworks.
+#'
+#' @param step If `TRUE`, the async generator is immediately stepped
+#'   in after creation. This returns a promise. If `FALSE`, the async
+#'   generator is returned instead. Set `step` to `TRUE` when you
+#'   create an [async()] variant and to `FALSE` when you create an
+#'   [async_generator()] variant.
 #'
 #' @keywords internal
 #' @export
-new_async <- function(fn, ops = NULL) {
-  body <- fn_block(fn)
+new_async_generator <- function(fn, step) {
+  body <- duplicate(fn_block(fn), shallow = TRUE)
 
   # We make three extra passes for convenience. This will be changed
   # to a single pass later on.
-  body <- walk_blocks(body, poke_await)
-  body <- new_call(quote(`{`), set_returns(body))
-  body <- walk_blocks(body, poke_async_return)
+  walk_poke_await(node_cdr(body), allow_yield = !step)
+  body <- set_returns(body)
+  walk_blocks(node_cdr(body), poke_async_return)
 
   info <- gen0_list(body, fn_env(fn))
   `_env` <- info$env
 
-  ops <- ops %||% list(
-    `_then` = function(x, callback) promises::then(x, onFulfilled = callback),
-    `_as_promise` = function(x) as_promise(x)
-  )
-  env_bind(`_env`, !!!ops)
-
   fmls <- formals(fn)
 
-  out <- new_function(fmls, expr({
+  out <- new_function(fmls, quote({
     # Refresh the state machine environment
     `_env` <- env_clone(`_env`)
 
+    # Look up lexically defined async operations
+    ops <- flowery_ops(caller_env())
+
+    if (!is_installed(ops$package)) {
+      abort(sprintf("The %s package must be installed.", ops$package))
+    }
+
+    # Define async operations in the state machine environment
+    env_bind(`_env`, !!!ops)
+
     # Forward arguments inside the state machine environment
-    !!!forward_args_calls(fmls)
+    frame <- environment()
+    lapply(names(fmls), function(arg) env_bind_arg(`_env`, arg, frame = frame))
 
     # Create function around the state machine
-    gen <- function(`_next_arg` = NULL) !!info$expr
+    generator <- blast(function(`_next_arg` = NULL) !!info$expr)
 
     # Bind generator to `_self`. This binding can be hooked as callback.
-    env_bind(`_env`, `_self` = gen)
+    env_bind(`_env`, `_self` = generator)
 
-    # Step in the async function
-    gen(NULL)
+    if (step) {
+      generator(NULL)
+    } else {
+      generator
+    }
   }))
 
-  structure(out, class = c("flowery_async", "function"))
+  if (step) {
+    structure(out, class = c("flowery_async", "function"))
+  } else {
+    structure(out, class = c("flowery_generator", "function"))
+  }
 }
 
 #' @export
@@ -103,34 +171,85 @@ print.flowery_async <- function(x, ...) {
   print(unclass(x), ...)
 
   writeLines("State machine:")
-  print(async_generator(x), ...)
+  print(async_internal_generator(x), ...)
 
   invisible(x)
 }
 
-async_generator <- function(fn) {
+async_internal_generator <- function(fn) {
   env_get(fn_env(fn), "info")$expr
 }
 
-poke_await <- function(node) {
+walk_poke_await <- function(node, allow_yield) {
+  poke <- function(node, type = NULL) poke_await(node, type = type, allow_yield = allow_yield)
+  walk_blocks(node, poke, which = c("expr", "for"))
+}
+
+poke_await <- function(node, type, allow_yield) {
+  if (identical(type, "for")) {
+    return(poke_async_for(node, allow_yield))
+  }
+
   car <- node_car(node)
 
-  if (is_await(car)) {
-    node_poke_car(node, yield_await_call(await_arg(car)))
+  # With `yield()` the caller is responsible for calling the generator back
+  if (is_yield_call(car)) {
+    if (!allow_yield) {
+      abort("Can't use `yield()` within an `async()` function.")
+    }
+    node_poke_car(node, async_yield_call(yield_arg(car)))
+    return()
+  }
+
+  # With `await()` the async scheduler calls the generator back
+  if (is_await_call(car)) {
+    node_poke_car(node, async_yield_await_call(await_arg(car)))
     return()
   }
 
   if (is_call(car, "<-")) {
     rhs_node <- node_cddr(car)
     rhs <- node_car(rhs_node)
-    if (is_await(rhs)) {
+    if (is_await_call(rhs)) {
       lhs <- node_cadr(car)
       await_arg <- node_cadr(rhs)
-      new_rhs <- call("<-", lhs, yield_await_call(await_arg))
+      new_rhs <- call("<-", lhs, async_yield_await_call(await_arg))
       node_poke_car(node, new_rhs)
     }
     return()
   }
+}
+
+poke_async_for <- function(node, allow_yield) {
+  expr <- node_car(node)
+  var_node <- node_cdr(expr)
+  iter_node <- node_cdr(var_node)
+  body_node <- node_cdr(iter_node)
+
+  walk_poke_await(body_node, allow_yield)
+
+  iter <- node_car(iter_node)
+  if (is_call(iter, "await_each", ns = c("", "flowery"))) {
+    var <- node_car(var_node)
+    await_loop <- new_await_loop_call(var, node_cadr(iter), node_car(body_node))
+    node_poke_car(node, await_loop)
+  }
+
+  NULL
+}
+
+new_await_loop_call <- function(var, iterable, block) {
+  if (!is_symbol(iterable)) {
+    abort("Can't supply a complex expression to `await_each()`.")
+  }
+
+  expr(repeat {
+    !!var <- !!async_yield_await_call(call2(iterable))
+    if (base::is.null(!!var)) {
+      break
+    }
+    !!!as_block(block)
+  })
 }
 
 poke_async_return <- function(node) {
@@ -139,20 +258,22 @@ poke_async_return <- function(node) {
   if (is_coro_return_call(car)) {
     node_poke_car(node, async_return_call(node_cadr(car)))
   }
-
-  if (is_coro_yield_call(car)) {
-    stop("TODO")
-  }
 }
 
-is_await <- function(expr) {
+is_await_call <- function(expr) {
   is_call(expr, "await", ns = c("", "flowery"))
 }
 await_arg <- function(call) {
   node_cadr(call)
 }
+yield_arg <- function(call) {
+  node_cadr(call)
+}
 
-yield_await_call <- function(arg) {
+async_yield_call <- function(arg) {
+  expr(yield(`_as_promise`(!!arg)))
+}
+async_yield_await_call <- function(arg) {
   expr(yield(`_then`(`_as_promise`(!!arg), callback = `_self`)))
 }
 async_return_call <- function(arg) {
@@ -166,5 +287,3 @@ as_promise <- function(x) {
     promises::promise_resolve(x)
   }
 }
-
-utils::globalVariables(c("_self", "_as_promise", "_then"))

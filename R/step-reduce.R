@@ -355,7 +355,7 @@ reduce <- function(.x, .f, ..., .init) {
 
 reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   if (is_closure(.x)) {
-    return(iter_reduce_impl(.x, .f, ..., .init = .init, .left = .left))
+    return(iter_reduce_impl(.x, .f, ..., .left = .left))
   }
 
   result <- reduce_init(.x, .init, left = .left)
@@ -406,12 +406,13 @@ reduce_index <- function(x, init, left = TRUE) {
 
 iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   if (!.left) {
-    abort("Can't right-reduce with an iterator")
+    abort("Can't right-reduce with an iterator.")
   }
 
   .f <- as_function(.f)
 
   out <- NULL
+
   while (!is_null(new <- .x())) {
     out <- .f(out, new, ...)
 
@@ -423,3 +424,61 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
 
   out
 }
+
+
+#' Collect output of an asynchronous iterator
+#'
+#' `async_collect()` takes an asynchronous iterator, i.e. an iterable
+#' function that is also awaitable. `async_collect()` returns an
+#' awaitable that eventually resolves to a list containing the values
+#' returned by the iterator. The values are collected until exhaustion
+#' unless `n` is supplied. The collection is grown geometrically for
+#' performance.
+#'
+#' @inheritParams take
+#'
+#' @export
+async_collect <- function(x, n = NULL) {
+  steps <- n %&&% iter_take(n)
+  async_reduce_steps(x, steps, along_builder(list()))
+}
+
+on_load(async_reduce_steps %<~% async(function(x, steps, builder, init) {
+  builder <- as_closure(builder)
+
+  if (is_null(steps)) {
+    reducer <- builder
+  } else {
+    reducer <- steps(builder)
+  }
+  stopifnot(is_closure(reducer))
+
+  if (missing(init)) {
+    identity <- reducer()
+  } else {
+    identity <- init
+  }
+
+  result <- await(async_reduce(x, reducer))
+
+  reducer(result)
+}))
+
+on_load(async_reduce %<~% async(function(.x, .f, ...) {
+  while (TRUE) {
+    new <- await(.x())
+
+    if (is_null(new)) {
+      break
+    }
+
+    out <- .f(out, new, ...)
+
+    # Return early if we get a reduced result
+    if (is_done_box(out)) {
+      return(unbox(out))
+    }
+  }
+
+  out
+}))
