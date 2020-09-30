@@ -34,6 +34,12 @@
           base::return(invisible(NULL))
       }
       
+      [[6]]
+      {
+          rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+              `_state`))
+      }
+      
 
 ---
 
@@ -75,6 +81,12 @@
       $`6`
       {
           base::return(invisible(NULL))
+      }
+      
+      [[7]]
+      {
+          rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+              `_state`))
       }
       
 
@@ -132,6 +144,12 @@
       $`8`
       {
           base::return(invisible(NULL))
+      }
+      
+      [[9]]
+      {
+          rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+              `_state`))
       }
       
 
@@ -202,6 +220,12 @@
           base::return(invisible(NULL))
       }
       
+      [[10]]
+      {
+          rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+              `_state`))
+      }
+      
 
 ---
 
@@ -265,6 +289,12 @@
       $`9`
       {
           base::return(invisible(NULL))
+      }
+      
+      [[10]]
+      {
+          rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
+              `_state`))
       }
       
 
