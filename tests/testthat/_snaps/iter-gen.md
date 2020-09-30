@@ -12,7 +12,7 @@
     Output
       function () 
       {
-          evalq(env, expr = {
+          evalq(`_env`, expr = {
               while (TRUE) {
                   switch({
                       base::as.character(`_state`)

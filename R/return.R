@@ -15,7 +15,7 @@ poke_returns <- function(expr) {
   tail <- node_list_tail(node)
   last <- node_car(tail)
 
-  if (is_call(last, "coro_return", ns = "flowery")) {
+  if (is_coro_return_call(last)) {
     last <- last
   } else if (!is_call(last) || !is_symbol(node_car(last))) {
     last <- return_state_call(last)

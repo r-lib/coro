@@ -35,3 +35,7 @@ add_attributes <- function(.x, ...) {
 blast <- function(expr, env = caller_env()) {
   eval_bare(enexpr(expr), env)
 }
+
+fn_block <- function(fn) {
+  as_block(body(fn))
+}

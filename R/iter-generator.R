@@ -119,6 +119,16 @@ generator <- function(fn) {
 }
 
 gen0 <- function(expr, env, fmls = NULL) {
+  info <- gen0_list(expr, env, fmls = fmls)
+  `_env` <- info$env
+
+  out <- new_function(fmls, info$expr)
+
+  # Zap source references so you can see the state machine
+  unstructure(out)
+}
+
+gen0_list <- function(expr, env, fmls = NULL) {
   node <- set_returns(expr)
   arg <- names(fmls)[[1]]
   parts <- generator_parts(node, arg = arg)
@@ -136,25 +146,23 @@ gen0 <- function(expr, env, fmls = NULL) {
   if (is_null(arg)) {
     next_arg <- NULL
   } else {
-    next_arg <- exprs(env$`_next_arg` <- !!sym(arg))
+    next_arg <- exprs(`_env`$`_next_arg` <- !!sym(arg))
   }
 
-  out <- new_function(fmls, expr({
+  expr <- expr({
     !!!next_arg
 
     # Evaluate in the persistent environment
-    evalq(env, expr = {
+    evalq(`_env`, expr = {
       while (TRUE) {
         !!machine_switch_call(parts)
       }
     })
-  }))
+  })
 
-  formals(out) <- fmls
-
-  # Zap source references so you can see the state machine
-  unstructure(out)
+  list(expr = expr, env = env)
 }
+
 generator_parts <- function(node, arg = NULL) {
   reset_state()
   if (!is_null(arg)) {

@@ -49,3 +49,10 @@ coro_return <- function(value, frame = caller_env()) {
   frame$`_state` <- env_get(frame, "_return_state")
   eval_bare(call2(base::return, value), frame)
 }
+
+is_coro_return_call <- function(x) {
+  is_call(x, "coro_return", ns = "flowery")
+}
+is_coro_yield_call <- function(x) {
+  is_call(x, "coro_yield", ns = "flowery")
+}

@@ -1,6 +1,9 @@
 
 # flowery 0.0.1.9000
 
+* The `async()` function operator creates functions for cooperative
+  concurrency using the _later_ and _promises_ framework.
+
 * `generator()` now accepts functions of one argument. The first time
   a generator is called the argument is defined in the suspendable
   function. On subsequent invokations, the argument is returned from
