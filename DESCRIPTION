@@ -14,6 +14,7 @@ Imports:
 Suggests:
     knitr,
     later (>= 1.1.0),
+    magrittr,
     promises,
     purrr,
     rmarkdown,

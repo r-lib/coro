@@ -1,8 +1,12 @@
 #' Adapt an iterator with transformation steps
 #'
+#' @description
 #' `iter_adapt()` takes an iterator `iter` and a list of
 #' [Transformation steps][steps]. It returns an iterator that returns
 #' transformed values.
+#'
+#' `async_adapt()` does the same for async iterators, i.e. functions
+#' that returns an awaitable value.
 #'
 #' @param iter An [iterator].
 #' @param steps,... [Transformation steps][steps]. These dots are taken with
@@ -71,8 +75,6 @@ iter_builder <- function(result, input) {
 #' @export
 #' @name async_adapt
 #' @usage async_adapt(iter, steps)
-NULL
-
 on_load(async_adapt %<~% async_generator(function(iter, steps) {
   force(iter)
 

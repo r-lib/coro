@@ -428,6 +428,13 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
 
 #' Collect output of an asynchronous iterator
 #'
+#' `async_collect()` takes an asynchronous iterator, i.e. an iterable
+#' function that is also awaitable. `async_collect()` returns an
+#' awaitable that eventually resolves to a list containing the values
+#' returned by the iterator. The values are collected until exhaustion
+#' unless `n` is supplied. The collection is grown geometrically for
+#' performance.
+#'
 #' @inheritParams take
 #'
 #' @export

@@ -19,6 +19,9 @@ implicit splicing of lists and passed to \code{compose()}.}
 \code{iter_adapt()} takes an iterator \code{iter} and a list of
 \link[=steps]{Transformation steps}. It returns an iterator that returns
 transformed values.
+
+\code{async_adapt()} does the same for async iterators, i.e. functions
+that returns an awaitable value.
 }
 \examples{
 # Let's create a simple iterator:

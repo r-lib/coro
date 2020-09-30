@@ -21,6 +21,7 @@
 #' `async()` functions can be chained to promises from the _promises_
 #' package.
 #'
+#' @seealso [async_generator()] and [await_each()].
 #' @export
 async <- function(fn) {
   assert_lambda(substitute(fn))
@@ -32,23 +33,43 @@ async <- function(fn) {
 await <- function(x) {
   abort("`await()` can't be called directly or within function arguments.")
 }
-#' @rdname async
-#' @export
-await_each <- function(x) {
-  abort("`await_each()` must be called within a `for` loop.")
-}
 
 #' Construct an async generator
+#'
+#' An async generator constructs iterable functions that are also
+#' awaitables. They support both the `yield()` and `await()` syntax.
+#' An async iterator can be looped within async functions and
+#' iterators using `await_each()` on the input of a `for` loop.
 #'
 #' @param fn An anonymous function describing an async generator
 #'   within which `await()` calls are allowed.
 #' @return A generator factory. Generators constructed with this
 #'   factory always return [promises::promise()].
 #'
+#' @seealso [async()] for creating awaitable functions and
+#'   [async_collect()] for collecting the values of an async iterator.
+#' @examples
+#' # Creates awaitable functions that transform their inputs into a stream
+#' new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+#'
+#' # Maps a function to a stream
+#' async_map <- async_generator(function(.i, .fn, ...) {
+#'   for (elt in await_each(.i)) {
+#'     yield(.fn(elt, ...))
+#'   }
+#' })
+#'
+#' # new_stream(1:3) %>% async_map(`*`, 2) %>% async_collect()
 #' @export
 async_generator <- function(fn) {
   assert_lambda(substitute(fn))
   new_async_generator(fn, step = FALSE)
+}
+#' @rdname async_generator
+#' @inheritParams await
+#' @export
+await_each <- function(x) {
+  abort("`await_each()` must be called within a `for` loop.")
 }
 
 # Customisation point for the {async} package or any concurrency

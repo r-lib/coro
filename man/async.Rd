@@ -3,14 +3,11 @@
 \name{async}
 \alias{async}
 \alias{await}
-\alias{await_each}
 \title{Make an async function}
 \usage{
 async(fn)
 
 await(x)
-
-await_each(x)
 }
 \arguments{
 \item{fn}{An anonymous function within which \code{await()} calls are
@@ -41,3 +38,6 @@ called back once all current computations have finished running.
 package.
 }
 
+\seealso{
+\code{\link[=async_generator]{async_generator()}} and \code{\link[=await_each]{await_each()}}.
+}

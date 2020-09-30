@@ -14,6 +14,9 @@
 * The `async()` function operator creates functions for cooperative
   concurrency using the _later_ and _promises_ framework.
 
+  `async_generator()` creates iterable functions that are also
+  awaitable.
+
 * The iterator abstraction has been removed from flowery. It is
   replaced with the following protocol:
 

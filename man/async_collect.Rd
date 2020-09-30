@@ -12,5 +12,10 @@ async_collect(x, n = NULL)
 \item{n}{The number of elements to take from \code{x}.}
 }
 \description{
-Collect output of an asynchronous iterator
+\code{async_collect()} takes an asynchronous iterator, i.e. an iterable
+function that is also awaitable. \code{async_collect()} returns an
+awaitable that eventually resolves to a list containing the values
+returned by the iterator. The values are collected until exhaustion
+unless \code{n} is supplied. The collection is grown geometrically for
+performance.
 }
