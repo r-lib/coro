@@ -48,12 +48,15 @@ node_list_parts <- function(node) {
 
     if (is_pause(expr)) {
       # If pause has no future we don't know which state it should
-      # resume to. We register it so the state can be adjusted later.
+      # resume to. This is not always `peek_state() + 1` because there
+      # might be intervening states, e.g. with `if (foo) yield(1) else
+      # yield(2)`. To work around this we register the pause node so
+      # the state can be adjusted later.
       if (has_future()) {
         pause_call <- new_pause(poke_state(), node_cdr(expr))
         pause_node <- pairlist(pause_call)
       } else {
-        pause_call <- new_pause(peek_state(), node_cdr(expr))
+        pause_call <- new_pause(-1, node_cdr(expr))
         pause_node <- pairlist(pause_call)
         push_pause_node(pause_node)
       }
