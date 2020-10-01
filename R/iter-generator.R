@@ -182,8 +182,7 @@ generator_parts <- function(block, arg = NULL) {
     poke_state_elt("arg_sym", sym(arg))
   }
 
-  block <- as_block(block)
-  parts <- node_list_parts(node_cdr(block))
+  parts <- expr_parts(block)
 
   if (is_null(parts)) {
     pairlist(block)
