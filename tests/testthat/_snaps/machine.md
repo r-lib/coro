@@ -93,8 +93,53 @@
     Code
       generator_body(function() {
         "foo"
+        return("value")
+      })
+    Output
+      repeat switch(state[[1]], `1` = {
+          user({
+              "foo"
+              "value"
+          })
+          kill()
+          return(last_value())
+      }, final = {
+          return(invisible(NULL))
+      })
+
+---
+
+    Code
+      generator_body(function() {
+        "foo"
         yield("value")
         "bar"
+      })
+    Output
+      repeat switch(state[[1]], `1` = {
+          user({
+              "foo"
+              "value"
+          })
+          suspend_to(2L)
+          return(last_value())
+      }, `2` = {
+          user({
+              "bar"
+          })
+          kill()
+          return(last_value())
+      }, final = {
+          return(invisible(NULL))
+      })
+
+---
+
+    Code
+      generator_body(function() {
+        "foo"
+        yield("value")
+        return("bar")
       })
     Output
       repeat switch(state[[1]], `1` = {

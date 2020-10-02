@@ -22,7 +22,18 @@ test_that("generators support blocks", {
 
   expect_snapshot0(generator_body(function() {
     "foo"
+    return("value")
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    "foo"
     yield("value")
     "bar"
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    "foo"
+    yield("value")
+    return("bar")
   }))
 })
