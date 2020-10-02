@@ -42,6 +42,6 @@ assert_lambda <- function(call) {
   }
 }
 
-stop_internal <- function(fn) {
-  abort(sprintf("Internal error in `%s()`."))
+stop_internal <- function(fn, msg) {
+  abort(sprintf("Internal error in `%s()`: %s.", fn, msg))
 }

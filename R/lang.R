@@ -63,6 +63,10 @@ as_block <- function(x) {
   }
 }
 
+user_block <- function(expr) {
+  call("user", expr)
+}
+
 new_user_block <- function(x, refs = NULL) {
   block <- new_call(block_sym, x)
 

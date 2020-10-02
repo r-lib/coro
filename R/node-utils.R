@@ -177,3 +177,26 @@ call_tree_walk <- function(x, fn) {
 
   invisible(NULL)
 }
+
+node_reverse <- function(node) {
+  if (is_null(node)) {
+    return(NULL)
+  }
+
+  prev <- NULL
+  tail <- node
+
+  while (!is_null(tail)) {
+    rest <- node_cdr(tail);
+
+    if (is_reference(rest, node)) {
+      stop_internal("node_reverse", "Cycle detected.")
+    }
+
+    node_poke_cdr(tail, prev);
+    prev <- tail;
+    tail <- rest
+  }
+
+  prev
+}
