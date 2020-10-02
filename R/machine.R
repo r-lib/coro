@@ -19,18 +19,8 @@ walk_states <- function(expr) {
 }
 
 expr_states <- function(expr, counter, return = FALSE) {
-  type <- expr_type(expr)
-
-  if (is_null(type)) {
-    if (return) {
-      state <- return_state(expr, counter)
-    } else {
-      stop("TODO")
-    }
-    return(state)
-  }
-
-  switch(type,
+  switch(expr_type(expr),
+    `expr` = expr_state(expr, counter, return = return),
     `return` = return_state(expr, counter),
     `yield` = yield_state(expr, counter, return = return),
     `{` = ,
@@ -47,8 +37,10 @@ expr_states <- function(expr, counter, return = FALSE) {
 }
 
 expr_type <- function(expr) {
+  default <- "expr"
+
   if (!is_call(expr)) {
-    return(NULL)
+    return(default)
   }
 
   head <- node_car(expr)
@@ -56,7 +48,7 @@ expr_type <- function(expr) {
     if (is_call(expr, "yield", ns = c("", "flowery"))) {
       return("yield")
     } else {
-      return(NULL)
+      return(default)
     }
   }
 
@@ -73,8 +65,16 @@ expr_type <- function(expr) {
     `next` = ,
     `tryCatch` = ,
     `on.exit` = head,
-    NULL
+    default
   )
+}
+
+expr_state <- function(expr, counter, return = FALSE) {
+  if (return) {
+    return_state(expr, counter)
+  } else {
+    stop("TODO")
+  }
 }
 
 return_state <- function(expr, counter) {
