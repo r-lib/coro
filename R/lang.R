@@ -63,7 +63,7 @@ as_block <- function(x) {
   }
 }
 
-user_block <- function(expr) {
+user_call <- function(expr) {
   call("user", expr)
 }
 

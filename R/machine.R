@@ -153,7 +153,7 @@ return_state <- function(expr, counter) {
   expr <- strip_explicit_return(expr)
 
   block <- expr({
-    !!user_block(expr)
+    !!user_call(expr)
     kill()
     return(last_value())
   })
@@ -184,7 +184,7 @@ yield_state <- function(expr, counter, return = FALSE) {
   }
 
   block <- expr({
-    !!user_block(expr)
+    !!user_call(expr)
     !!suspend_call
     return(last_value())
   })
