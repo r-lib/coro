@@ -147,3 +147,33 @@ node_clone <- function(node) {
 
   out
 }
+
+call_tree_walk <- function(x, fn) {
+  to_visit <- pairlist(x)
+
+  while (!is_null(to_visit)) {
+    x <- node_car(to_visit)
+    to_visit <- node_cdr(to_visit)
+
+    # Visit the node
+    fn(x)
+
+    if (!is_call(x)) {
+      next
+    }
+
+    # Only add CAR to nodes to visit if it is a call
+    if (is_call(node_car(x))) {
+      x <- duplicate(x, shallow = TRUE)
+    } else {
+      x <- duplicate(node_cdr(x), shallow = TRUE)
+    }
+
+    if (!is_null(x)) {
+      node_poke_cdr(node_list_tail(x), to_visit)
+      to_visit <- x
+    }
+  }
+
+  invisible(NULL)
+}

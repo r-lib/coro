@@ -9,11 +9,10 @@ loop_parts <- function(expr, loop_state = peek_state()) {
   # Add an explicit `next` in the body. Shouldn't be necessary but
   # this helps creating the correct breaking points in nested loops.
   body <- as_block(expr)
-  push_next(body)
+  has_implicit_next <- push_next(body)
 
-  body <- as_exprs_node(body)
   with_loop_nodes(loop_state, next_node, break_node, {
-    parts <- node_list_parts(body)
+    parts <- block_parts(body)
   })
 
   # Update the `break` gotos and `pause nodes` to point to the next state
@@ -21,6 +20,35 @@ loop_parts <- function(expr, loop_state = peek_state()) {
 
   if (is_null(parts)) {
     return(NULL)
+  }
+
+  # Suboptimal but will do for now. Remove the explicit `next` that
+  # was added to the user block. This artificial `next` shouldn't be
+  # evaluated within the user block since there is no source reference
+  # to link to.
+  if (has_implicit_next) {
+    last_part <- node_list_tail(parts)
+
+    user_block <- node_cadr(node_car(last_part))
+    block <- node_cadr(user_block)
+
+    but_last <- node_cdr(block)
+    while (!is_null(node_cddr(but_last))) {
+      but_last <- node_cdr(but_last)
+    }
+
+    goto <- node_cadr(but_last)
+    node_poke_cdr(but_last, NULL)
+
+    # Remove extra srcref
+    ref <- attr(block, "srcref")
+    if (!is_null(ref)) {
+      attr(block, "srcref") <- ref[-length(ref)]
+      node_poke_cadr(user_block, block)
+    }
+
+    # Add goto back to outer block
+    node_poke_cdr(node_list_tail(node_car(last_part)), pairlist(goto))
   }
 
   parts
@@ -66,7 +94,7 @@ repeat_parts <- function(expr) {
   new_node(loop_state, parts)
 }
 
-while_parts <- function(expr) {
+while_parts <- function(expr, refs) {
   old_state <- peek_state()
 
   if (peek_has_past()) {
@@ -87,12 +115,13 @@ while_parts <- function(expr) {
   goto_loop_start <- block(goto_call(loop_state + 1L))
 
   cond <- node_cadr(expr)
+  cond <- new_user_block(pairlist(cond), refs)
   cond_state <- block(if_call(cond, goto_loop_start, goto_loop_end))
   loop_parts <- new_node(cond_state, parts)
 
   # Merge into the current state if there is a past
   if (peek_has_past()) {
-    goto_block <- spliceable(block(goto_call(loop_state)))
+    goto_block <- (block(goto_call(loop_state)))
     loop_parts <- new_node(goto_block, loop_parts)
   }
 

@@ -1,6 +1,11 @@
 
+block_refs <- function(block) {
+  node_cdr(as.pairlist(attr(block, "srcref")))
+}
+
 block_parts <- function(expr) {
-  parts <- node_list_parts(node_cdr(expr))
+  refs <- block_refs(expr)
+  parts <- node_list_parts(node_cdr(expr), refs = refs)
 
   if (is_null(parts)) {
     NULL
@@ -10,8 +15,9 @@ block_parts <- function(expr) {
   }
 }
 
-node_list_parts <- function(node) {
+node_list_parts <- function(node, refs = NULL) {
   rest <- node
+  rest_refs <- refs
   parts <- NULL
   parent <- NULL
 
@@ -63,48 +69,62 @@ node_list_parts <- function(node) {
 
       if (has_past()) {
         node_poke_cdr(parent, pause_node)
-        pause_block <- new_block(node)
       } else {
-        pause_block <- new_block(pause_node)
+        node <- pause_node
       }
+
+      pause_block <- new_user_block(node, refs)
       parts <- node_list_poke_cdr(parts, pairlist(pause_block))
 
       rest <- node <- node_cdr(rest)
+      rest_refs <- refs <- node_cdr(rest_refs)
       parent <- NULL
       next
     }
 
     with_jump_nodes(has_past(), has_future(), {
-      nested_parts <- expr_parts(expr)
+      nested_parts <- expr_parts(expr, rest_refs)
     })
 
     if (is_null(nested_parts)) {
       parent <- rest
       rest <- node_cdr(rest)
+      rest_refs <- node_cdr(rest_refs)
       next
     }
 
     # If we found nested states, check if there are any past
-    # expressions to add them before the pausing block.
+    # expressions to add them before the pausing block. `nested_parts`
+    # always starts with a pausing expression.
     pausing_part <- node_car(nested_parts)
 
     if (has_past()) {
       if (is_spliceable(pausing_part)) {
-        pausing_part <- node_cdr(pausing_part)
+        pausing_part <- spliceable_part(pausing_part)
+        node_poke_cdr(parent, pausing_part)
+        block <- new_user_block(node, refs)
       } else {
-        pausing_part <- pairlist(pausing_part)
+        node_poke_cdr(parent, NULL)
+        block <- new_user_block(node, refs)
+        node_list_poke_cdr(block, node_cdr(pausing_part))
       }
 
-      node_poke_cdr(parent, pausing_part)
-      node_poke_car(nested_parts, new_block(node))
+      node_poke_car(nested_parts, block)
     } else {
-      poke_attr(pausing_part, "spliceable", NULL)
+      pausing_part <- block_maybe_unwrap(pausing_part)
+
+      if (is_spliceable(pausing_part)) {
+        pausing_part <- new_user_block(spliceable_part(pausing_part), refs)
+      }
+
+      node_poke_car(nested_parts, as_block(pausing_part))
     }
 
     # Merge nested states
     parts <- node_list_poke_cdr(parts, nested_parts)
 
     rest <- node <- node_cdr(rest)
+    rest_refs <- refs <- node_cdr(rest_refs)
     parent <- NULL
     next
   }
@@ -115,7 +135,7 @@ node_list_parts <- function(node) {
 
   # `node` may be NULL if there is no expression after a pause
   if (!is_null(node)) {
-    remaining <- new_block(node)
+    remaining <- new_user_block(node, refs)
     node_list_poke_cdr(parts, pairlist(remaining))
   }
 
@@ -144,6 +164,7 @@ is_exiting_block <- function(x) {
       is_exiting_block(if_branch_else(x))
     },
 
+    `_block` = ,
     `{`  = {
       last <- node_car(node_list_tail(x))
       is_exiting_block(last)
