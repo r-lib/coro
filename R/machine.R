@@ -3,19 +3,27 @@ generator_body <- function(fn) {
   walk_states(body(fn))
 }
 
+new_counter <- function() {
+  i <- 1L
+  function(inc = 0L) {
+    i <<- i + inc
+    i
+  }
+}
+
 walk_states <- function(expr) {
-  states <- expr_states(expr, 1L, return = TRUE)
+  states <- expr_states(expr, new_counter(), return = TRUE)
 
   states <- node_reverse(states)
   expr(repeat switch(state[[1]], !!!states, final = { return(invisible(NULL)) }))
 }
 
-expr_states <- function(expr, state, return = FALSE) {
+expr_states <- function(expr, counter, return = FALSE) {
   type <- expr_type(expr)
 
   if (is_null(type)) {
     if (return) {
-      state <- return_state(expr, state)
+      state <- return_state(expr, counter)
     } else {
       stop("TODO")
     }
@@ -23,8 +31,8 @@ expr_states <- function(expr, state, return = FALSE) {
   }
 
   switch(type,
-    `return` = return_state(expr, state),
-    `yield` = yield_state(expr, state, return = return),
+    `return` = return_state(expr, counter),
+    `yield` = yield_state(expr, counter, return = return),
     `{` = ,
     `if` = ,
     `repeat` = ,
@@ -69,7 +77,7 @@ expr_type <- function(expr) {
   )
 }
 
-return_state <- function(expr, state) {
+return_state <- function(expr, counter) {
   expr <- strip_explicit_return(expr)
 
   block <- expr({
@@ -77,7 +85,7 @@ return_state <- function(expr, state) {
     kill()
     return(last_value())
   })
-  new_state(block, NULL, tag = state)
+  new_state(block, NULL, tag = counter())
 }
 
 strip_explicit_return <- function(expr) {
@@ -94,7 +102,8 @@ strip_explicit_return <- function(expr) {
   expr
 }
 
-yield_state <- function(expr, i, return = FALSE) {
+yield_state <- function(expr, counter, return = FALSE) {
+  i <- counter()
   expr <- node_cadr(expr)
 
   if (return) {
