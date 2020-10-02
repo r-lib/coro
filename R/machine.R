@@ -24,7 +24,7 @@ expr_states <- function(expr, state, return = FALSE) {
 
   switch(type,
     `return` = return_state(expr, state),
-    `yield` = ,
+    `yield` = yield_state(expr, state, return = return),
     `{` = ,
     `if` = ,
     `repeat` = ,
@@ -45,11 +45,17 @@ expr_type <- function(expr) {
 
   head <- node_car(expr)
   if (!is_symbol(head)) {
-    return(NULL)
+    if (is_call(expr, "yield", ns = c("", "flowery"))) {
+      return("yield")
+    } else {
+      return(NULL)
+    }
   }
 
   head <- as_string(head)
   switch(head,
+    `return` = ,
+    `yield` = ,
     `{` = ,
     `if` = ,
     `repeat` = ,
@@ -57,18 +63,10 @@ expr_type <- function(expr) {
     `for` = ,
     `break` = ,
     `next` = ,
-    `return` =
-      return(head),
     `tryCatch` = ,
-    `on.exit` =
-      stop_internal("expr_type", sprintf("Unimplemented operation `%s`", head))
+    `on.exit` = head,
+    NULL
   )
-
-  if (is_call(expr, "yield", ns = c("", "flowery"))) {
-    return("yield")
-  }
-
-  NULL
 }
 
 return_state <- function(expr, state) {
@@ -94,6 +92,23 @@ strip_explicit_return <- function(expr) {
   }
 
   expr
+}
+
+yield_state <- function(expr, i, return = FALSE) {
+  expr <- node_cadr(expr)
+
+  if (return) {
+    suspend_call <- expr(kill())
+  } else {
+    suspend_call <- expr(suspend_to(!!(i + 1L)))
+  }
+
+  block <- expr({
+    !!user_block(expr)
+    !!suspend_call
+    return(last_value())
+  })
+  new_state(block, NULL, tag = i)
 }
 
 new_state <- function(car, cdr, tag) {
