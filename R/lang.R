@@ -67,12 +67,12 @@ user_block <- function(expr) {
   call("user", expr)
 }
 
-new_user_block <- function(x, refs = NULL) {
-  block <- new_call(block_sym, x)
+new_refd_block <- function(node, refs = NULL) {
+  block <- new_call(block_sym, node)
 
   if (!is_null(refs)) {
     # Implicit coercion from pairlist to list
-    refs <- refs[seq_along(x)]
+    refs <- refs[seq_along(node)]
 
     # Add empty reference for `{`
     refs <- c(list(NULL), refs)
@@ -80,7 +80,7 @@ new_user_block <- function(x, refs = NULL) {
     attr(block, "srcref") <- refs
   }
 
-  call("{", call("_block", block))
+  block
 }
 
 spliceable <- function(x) {

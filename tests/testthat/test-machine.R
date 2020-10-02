@@ -8,3 +8,21 @@ test_that("generators have yield states", {
   expect_snapshot0(generator_body(function() yield("foo")))
   expect_snapshot0(generator_body(function() flowery::yield("foo")))
 })
+
+test_that("generators support blocks", {
+  expect_snapshot0(generator_body(function() {
+    "foo"
+    "bar"
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    "foo"
+    yield("value")
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    "foo"
+    yield("value")
+    "bar"
+  }))
+})

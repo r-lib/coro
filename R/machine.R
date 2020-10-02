@@ -13,17 +13,15 @@ new_counter <- function() {
 
 walk_states <- function(expr) {
   states <- expr_states(expr, new_counter(), return = TRUE)
-
-  states <- node_reverse(states)
   expr(repeat switch(state[[1]], !!!states, final = { return(invisible(NULL)) }))
 }
 
 expr_states <- function(expr, counter, return = FALSE) {
   switch(expr_type(expr),
+    `{` = block_states(expr, counter, return = return),
     `expr` = expr_state(expr, counter, return = return),
+    `yield` = yield_state(strip_yield(expr), counter, return = return),
     `return` = return_state(expr, counter),
-    `yield` = yield_state(expr, counter, return = return),
-    `{` = ,
     `if` = ,
     `repeat` = ,
     `while` = ,
@@ -54,9 +52,9 @@ expr_type <- function(expr) {
 
   head <- as_string(head)
   switch(head,
-    `return` = ,
-    `yield` = ,
     `{` = ,
+    `yield` = ,
+    `return` = ,
     `if` = ,
     `repeat` = ,
     `while` = ,
@@ -67,6 +65,75 @@ expr_type <- function(expr) {
     `on.exit` = head,
     default
   )
+}
+
+block_states <- function(block, counter, return = FALSE) {
+  # Only the last expression of `block` is returnable
+  saved_return <- return
+  return <- FALSE
+
+  node <- duplicate(node_cdr(block), shallow = TRUE)
+  refs <- block_refs(block)
+  states <- NULL
+
+  curr_node <- node
+  curr_refs <- refs
+
+  accum <- function(go) {
+    node <<- node_cdr(node)
+    refs <<- node_cdr(refs)
+    go
+  }
+  collect <- function() {
+    next_node <- node_cdr(node)
+    next_refs <- node_cdr(refs)
+
+    node <<- node_poke_cdr(node, NULL)
+    refs <<- node_poke_cdr(node, NULL)
+
+    out <- new_refd_block(curr_node, curr_refs)
+
+    node <<- curr_node <<- next_node
+    refs <<- curr_refs <<- next_refs
+
+    out
+  }
+
+  # Collect as many user expressions as possible
+  while (!is_null(node)) {
+    # Set last expression of `block` as returnable
+    if (is_null(node_cdr(node))) {
+      return <- saved_return
+    }
+
+    expr <- node_car(node)
+    type <- expr_type(expr)
+
+    if (identical(type, "expr")) {
+      accum(next)
+    }
+
+    if (identical(type, "yield")) {
+      node_poke_car(node, strip_yield(expr))
+      user_block <- collect()
+
+      state <- yield_state(user_block, counter, return = return)
+      states <- node_list_poke_cdr(states, state)
+
+      counter(inc = 1L)
+      next
+    }
+
+    stop("TODO")
+  }
+
+  if (!is_null(curr_node)) {
+    block <- new_refd_block(curr_node, curr_refs)
+    state <- finishing_state(block, counter, return = return)
+    states <- node_list_poke_cdr(states, state)
+  }
+
+  states
 }
 
 expr_state <- function(expr, counter, return = FALSE) {
@@ -93,7 +160,7 @@ strip_explicit_return <- function(expr) {
     return(node_cadr(expr))
   }
 
-  if (is_call(expr, "{") && is_call(node_list_tail(expr, "return"))) {
+  if (is_call(expr, "{") && is_call(node_list_tail(expr), "return")) {
     expr <- duplicate(expr, shallow = TRUE)
     tail <- node_list_tail(expr)
     node_poke_car(tail, strip_explicit_return(node_car(tail)))
@@ -104,7 +171,6 @@ strip_explicit_return <- function(expr) {
 
 yield_state <- function(expr, counter, return = FALSE) {
   i <- counter()
-  expr <- node_cadr(expr)
 
   if (return) {
     suspend_call <- expr(kill())
@@ -118,6 +184,17 @@ yield_state <- function(expr, counter, return = FALSE) {
     return(last_value())
   })
   new_state(block, NULL, tag = i)
+}
+strip_yield <- function(expr) {
+  node_cadr(expr)
+}
+
+finishing_state <- function(expr, counter, return = FALSE) {
+  if (return) {
+    return_state(expr, counter)
+  } else {
+    stop("TODO")
+  }
 }
 
 new_state <- function(car, cdr, tag) {
