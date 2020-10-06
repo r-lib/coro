@@ -3,7 +3,7 @@
     Code
       generator_body(function() "foo")
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user("foo")
           kill()
           return(last_value())
@@ -16,7 +16,7 @@
     Code
       generator_body(function() return("foo"))
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user("foo")
           kill()
           return(last_value())
@@ -29,7 +29,7 @@
     Code
       generator_body(function() yield("foo"))
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user("foo")
           kill()
           return(last_value())
@@ -42,7 +42,7 @@
     Code
       generator_body(function() flowery::yield("foo"))
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user("foo")
           kill()
           return(last_value())
@@ -58,7 +58,7 @@
         "bar"
       })
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user({
               "foo"
               "bar"
@@ -77,7 +77,7 @@
         yield("value")
       })
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user({
               "foo"
               "value"
@@ -96,7 +96,7 @@
         return("value")
       })
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user({
               "foo"
               "value"
@@ -116,7 +116,7 @@
         "bar"
       })
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user({
               "foo"
               "value"
@@ -142,7 +142,7 @@
         return("bar")
       })
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user({
               "foo"
               "value"
@@ -195,7 +195,7 @@
         body4()
       })
     Output
-      repeat switch(state[[1]], `1` = {
+      repeat switch(state[[1L]], `1` = {
           user({
               body1()
               "repeat"

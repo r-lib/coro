@@ -23,7 +23,7 @@ walk_states <- function(expr) {
     }
   }
   states <- expr_states(expr, new_counter(1L), continue = continue, last = TRUE)
-  expr(repeat switch(state[[1]], !!!states, final = { return(invisible(NULL)) }))
+  expr(repeat switch(state[[1L]], !!!states, final = { return(invisible(NULL)) }))
 }
 walk_nested_states <- function(expr, counter) {
   continue <- function(expr, counter, last = FALSE) {
