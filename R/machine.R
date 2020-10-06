@@ -120,7 +120,7 @@ block_states <- function(block, counter, continue, last) {
     out
   }
 
-  push_state <- function(state) {
+  push_states <- function(state) {
     states <<- node_list_poke_cdr(states, state)
     counter(inc = 1L)
   }
@@ -141,17 +141,17 @@ block_states <- function(block, counter, continue, last) {
       },
       `yield` = {
         node_poke_car(node, strip_yield(expr))
-        push_state(yield_state(collect(), counter, continue = continue, last = last))
+        push_states(yield_state(collect(), counter, continue = continue, last = last))
         next
       },
       `return` = {
         node_poke_car(node, strip_explicit_return(expr))
-        push_state(return_state(collect(), counter))
+        push_states(return_state(collect(), counter))
         next
       },
       `repeat` = {
         node_poke_car(node, "repeat")
-        push_state(repeat_states(collect(), node_cadr(expr), counter, continue = continue, last = last))
+        push_states(repeat_states(collect(), node_cadr(expr), counter, continue = continue, last = last))
         next
       }
     )
@@ -161,7 +161,7 @@ block_states <- function(block, counter, continue, last) {
 
   if (!is_null(curr_node)) {
     block <- new_refd_block(curr_node, curr_refs)
-    push_state(continue(block, counter, last = saved_last))
+    push_states(continue(block, counter, last = saved_last))
   }
 
   states
