@@ -151,7 +151,14 @@ block_states <- function(block, counter, continue, last) {
       },
       `repeat` = {
         node_poke_car(node, "repeat")
-        push_states(repeat_states(collect(), node_cadr(expr), counter, continue = continue, last = last))
+        push_states(loop_states(
+          preamble = collect(),
+          body = node_cadr(expr),
+          condition = NULL,
+          counter = counter,
+          continue = continue,
+          last = last
+        ))
         next
       }
     )
@@ -221,22 +228,33 @@ strip_yield <- function(expr) {
   node_cadr(expr)
 }
 
-repeat_states <- function(preamble, body, counter, continue, last) {
+loop_states <- function(preamble, condition, body, counter, continue, last) {
   i <- counter()
   next_i <- counter(inc = 1L)
 
-  block <- expr({
+  preamble_block <- expr({
     !!user_call(preamble)
     push_machine(loop = TRUE)
     goto(!!next_i)
   })
+  states <- new_state(preamble_block, NULL, i)
+
+  i <- next_i
+  tail <- states
+
+  if (!is_null(condition)) {
+    condition_state <- new_state(block(condition), NULL, i)
+    node_poke_cdr(tail, condition_state)
+
+    i <- counter(inc = 1L)
+    tail <- condition_state
+  }
 
   nested_machine_block <- block(walk_nested_states(body, counter))
+  nested_machine_state <- new_state(nested_machine_block, NULL, i)
+  node_poke_cdr(tail, nested_machine_state)
 
-  pairlist2(
-    !!as.character(i) := block,
-    !!as.character(next_i) := nested_machine_block
-  )
+  states
 }
 
 next_state <- function(expr, counter) {
