@@ -3,12 +3,15 @@ generator_body <- function(fn) {
   walk_states(body(fn))
 }
 
-new_counter <- function() {
+new_counter <- function(machine_i) {
   i <- 1L
   function(inc = 0L) {
     i <<- i + inc
     i
   }
+}
+machine_count <- function(counter) {
+  env_get(fn_env(counter), "machine_i")
 }
 
 walk_states <- function(expr) {
@@ -19,8 +22,19 @@ walk_states <- function(expr) {
       continue_state(expr, counter)
     }
   }
-  states <- expr_states(expr, new_counter(), continue = continue, last = TRUE)
+  states <- expr_states(expr, new_counter(1L), continue = continue, last = TRUE)
   expr(repeat switch(state[[1]], !!!states, final = { return(invisible(NULL)) }))
+}
+walk_nested_states <- function(expr, counter) {
+  continue <- function(expr, counter, last = FALSE) {
+    next_state(expr, counter)
+  }
+
+  i <- machine_count(counter) + 1L
+  nested_counter <- new_counter(i)
+
+  states <- expr_states(expr, nested_counter, continue = continue, last = FALSE)
+  expr(repeat switch(state[[!!i]], !!!states))
 }
 
 expr_states <- function(expr, counter, continue, last) {
@@ -134,6 +148,11 @@ block_states <- function(block, counter, continue, last) {
         node_poke_car(node, strip_explicit_return(expr))
         push_state(return_state(collect(), counter))
         next
+      },
+      `repeat` = {
+        node_poke_car(node, "repeat")
+        push_state(repeat_states(collect(), node_cadr(expr), counter, continue = continue, last = last))
+        next
       }
     )
 
@@ -142,7 +161,7 @@ block_states <- function(block, counter, continue, last) {
 
   if (!is_null(curr_node)) {
     block <- new_refd_block(curr_node, curr_refs)
-    push_state(continue(block, counter, last = last))
+    push_state(continue(block, counter, last = saved_last))
   }
 
   states
@@ -200,6 +219,36 @@ yield_state <- function(expr, counter, continue, last) {
 }
 strip_yield <- function(expr) {
   node_cadr(expr)
+}
+
+repeat_states <- function(preamble, body, counter, continue, last) {
+  i <- counter()
+  next_i <- counter(inc = 1L)
+
+  block <- expr({
+    !!user_call(preamble)
+    push_machine(loop = TRUE)
+    goto(!!next_i)
+  })
+
+  nested_machine_block <- block(walk_nested_states(body, counter))
+
+  pairlist2(
+    !!as.character(i) := block,
+    !!as.character(next_i) := nested_machine_block
+  )
+}
+
+next_state <- function(expr, counter) {
+  block <- expr({
+    !!user_call(expr)
+    goto(1)
+  })
+  new_state(block, NULL, tag = counter())
+}
+
+states <- function(...) {
+  pairlist2(...)
 }
 
 new_state <- function(car, cdr, tag) {

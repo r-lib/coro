@@ -37,3 +37,19 @@ test_that("generators support blocks", {
     return("bar")
   }))
 })
+
+test_that("generators support repeat loops", {
+  expect_snapshot0(generator_body(function() {
+    repeat yield("value")
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    body1()
+    repeat {
+      body2()
+      yield("value")
+      body3()
+    }
+    body4()
+  }))
+})
