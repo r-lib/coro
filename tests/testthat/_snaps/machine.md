@@ -214,7 +214,7 @@
               user({
                   body3()
               })
-              goto(1)
+              goto(1L)
           })
       }, `3` = {
           user({
@@ -260,7 +260,7 @@
               user({
                   body3()
               })
-              goto(1)
+              goto(1L)
           })
       }, final = {
           return(invisible(NULL))

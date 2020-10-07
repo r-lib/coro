@@ -313,7 +313,7 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
 next_state <- function(expr, counter) {
   block <- expr({
     !!user_call(expr)
-    goto(1)
+    goto(1L)
   })
   new_state(block, NULL, tag = counter())
 }
