@@ -15,19 +15,20 @@ machine_count <- function(counter) {
 }
 
 walk_states <- function(expr) {
-  continue <- function(expr, counter, last = FALSE) {
-    if (last) {
-      return_state(expr, counter)
-    } else {
-      continue_state(expr, counter)
-    }
+  continue <- function(counter, last) {
+    counter() + 1L
   }
-  states <- expr_states(expr, new_counter(1L), continue = continue, last = TRUE)
+  states <- expr_states(expr, new_counter(1L), continue = continue, last = TRUE, return = TRUE)
   expr(repeat switch(state[[1L]], !!!states, final = { return(invisible(NULL)) }))
 }
 walk_loop_states <- function(body, condition, counter) {
-  continue <- function(body, counter, last = FALSE) {
-    next_state(body, counter)
+  continue <- function(counter, last) {
+    if (last) {
+      # Loop to start of block
+      1L
+    } else {
+      counter() + 1L
+    }
   }
 
   machine_i <- machine_count(counter) + 1L
@@ -49,17 +50,17 @@ walk_loop_states <- function(body, condition, counter) {
     states <- NULL
   }
 
-  nested_states <- expr_states(body, nested_counter, continue = continue, last = FALSE)
+  nested_states <- expr_states(body, nested_counter, continue = continue, last = TRUE, return = FALSE)
   states <- node_list_poke_cdr(states, nested_states)
 
   expr(repeat switch(state[[!!machine_i]], !!!states))
 }
 
-expr_states <- function(expr, counter, continue, last) {
+expr_states <- function(expr, counter, continue, last, return) {
   switch(expr_type(expr),
-    `{` = block_states(expr, counter, continue = continue, last = last),
-    `expr` = continue(expr, counter, last = last),
-    `yield` = yield_state(strip_yield(expr), counter, continue = continue, last = last),
+    `{` = block_states(expr, counter, continue = continue, last = last, return = return),
+    `expr` = continue_state(expr, counter, continue = continue, last = last, return = return),
+    `yield` = yield_state(strip_yield(expr), counter, continue = continue, last = last, return = return),
     `return` = return_state(expr, counter),
     `if` = ,
     `repeat` = ,
@@ -106,7 +107,7 @@ expr_type <- function(expr) {
   )
 }
 
-block_states <- function(block, counter, continue, last) {
+block_states <- function(block, counter, continue, last, return) {
   # Only the last expression of `block` is returnable
   saved_last <- last
   last <- FALSE
@@ -189,7 +190,13 @@ block_states <- function(block, counter, continue, last) {
       },
       `yield` = {
         node_poke_car(node, strip_yield(expr))
-        push_states(yield_state(collect(), counter, continue = continue, last = last))
+        push_states(yield_state(
+          collect(),
+          counter,
+          continue = continue,
+          last = last,
+          return = return
+        ))
         next
       },
       `return` = {
@@ -204,8 +211,7 @@ block_states <- function(block, counter, continue, last) {
           body = node_cadr(expr),
           condition = NULL,
           counter = counter,
-          continue = continue,
-          last = last
+          continue = continue
         ))
         next
       },
@@ -216,8 +222,7 @@ block_states <- function(block, counter, continue, last) {
           body = node_cadr(node_cdr(expr)),
           condition = user_call(refd_block(node_cadr(expr), ref)),
           counter = counter,
-          continue = continue,
-          last = last
+          continue = continue
         ))
         next
       }
@@ -226,9 +231,11 @@ block_states <- function(block, counter, continue, last) {
     stop("TODO")
   }
 
+  last <- saved_last
+
   if (!is_null(curr_node)) {
     block <- new_refd_block(curr_node, curr_refs)
-    push_states(continue(block, counter, last = saved_last))
+    push_states(continue_state(block, counter, continue = continue, last = last, return = return))
   }
 
   states
@@ -258,28 +265,32 @@ strip_explicit_return <- function(expr) {
   expr
 }
 
-continue_state <- function(expr, counter) {
-  stop("TODO: Is this reachable?")
+continue_state <- function(expr, counter, continue, last, return) {
+  if (return) {
+    return(return_state(expr, counter))
+  }
 
   i <- counter()
+  next_i <- continue(counter, last)
 
   block <- expr({
     !!user_call(expr)
-    goto(!!(i + 1L))
+    goto(!!next_i)
   })
   new_state(block, NULL, tag = i)
 }
 
-yield_state <- function(expr, counter, continue, last) {
-  if (last) {
-    return(continue(expr, counter, last = TRUE))
+yield_state <- function(expr, counter, continue, last = FALSE, return = FALSE) {
+  if (last && return) {
+    return(return_state(expr, counter))
   }
 
   i <- counter()
+  next_i <- continue(counter, last)
 
   block <- expr({
     !!user_call(expr)
-    suspend_to(!!(i + 1L))
+    suspend_to(!!next_i)
     return(last_value())
   })
   new_state(block, NULL, tag = i)
@@ -288,7 +299,7 @@ strip_yield <- function(expr) {
   node_cadr(expr)
 }
 
-loop_states <- function(preamble, condition, body, counter, continue, last) {
+loop_states <- function(preamble, condition, body, counter, continue) {
   i <- counter()
   states <- NULL
 

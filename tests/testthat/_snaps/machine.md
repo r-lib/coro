@@ -175,7 +175,7 @@
       }, `2` = {
           repeat switch(state[[2L]], `1` = {
               user("value")
-              suspend_to(2L)
+              suspend_to(1L)
               return(last_value())
           })
       }, final = {
