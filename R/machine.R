@@ -25,16 +25,34 @@ walk_states <- function(expr) {
   states <- expr_states(expr, new_counter(1L), continue = continue, last = TRUE)
   expr(repeat switch(state[[1L]], !!!states, final = { return(invisible(NULL)) }))
 }
-walk_nested_states <- function(expr, counter) {
-  continue <- function(expr, counter, last = FALSE) {
-    next_state(expr, counter)
+walk_loop_states <- function(body, condition, counter) {
+  continue <- function(body, counter, last = FALSE) {
+    next_state(body, counter)
   }
 
-  i <- machine_count(counter) + 1L
-  nested_counter <- new_counter(i)
+  machine_i <- machine_count(counter) + 1L
+  nested_counter <- new_counter(machine_i)
 
-  states <- expr_states(expr, nested_counter, continue = continue, last = FALSE)
-  expr(repeat switch(state[[!!i]], !!!states))
+  if (!is_null(condition)) {
+    nested_counter(inc = 1L)
+
+    condition_block <- block(expr(
+      if (!!user_call(condition)) {
+        goto(!!2L)
+      } else {
+        break
+      }
+    ))
+
+    states <- new_state(condition_block, NULL, 1L)
+  } else {
+    states <- NULL
+  }
+
+  nested_states <- expr_states(body, nested_counter, continue = continue, last = FALSE)
+  states <- node_list_poke_cdr(states, nested_states)
+
+  expr(repeat switch(state[[!!machine_i]], !!!states))
 }
 
 expr_states <- function(expr, counter, continue, last) {
@@ -93,19 +111,35 @@ block_states <- function(block, counter, continue, last) {
   saved_last <- last
   last <- FALSE
 
-  node <- duplicate(node_cdr(block), shallow = TRUE)
+  block <- duplicate(block, shallow = TRUE)
   refs <- block_refs(block)
   states <- NULL
 
+  node <- node_cdr(block)
+
+  # Handle to previous node so we can pop `node` from the current
+  # pairlist
+  prev_node <- NULL
+  prev_refs <- NULL
+
+  # Handle to the current head of pairlists of expressions. New user
+  # blocks are created starting from this handle.
   curr_node <- node
   curr_refs <- refs
 
   accum <- function(go) {
+    prev_node <<- node
+    prev_refs <<- refs
     node <<- node_cdr(node)
     refs <<- node_cdr(refs)
+
     go
   }
   collect <- function() {
+    if (is_null(node)) {
+      return()
+    }
+
     next_node <- node_cdr(node)
     next_refs <- node_cdr(refs)
 
@@ -114,10 +148,23 @@ block_states <- function(block, counter, continue, last) {
 
     out <- new_refd_block(curr_node, curr_refs)
 
+    prev_node <<- NULL
+    prev_refs <<- NULL
     node <<- curr_node <<- next_node
     refs <<- curr_refs <<- next_refs
 
     out
+  }
+  skip <- function() {
+    if (is_null(prev_node)) {
+      node <<- curr_node <<- NULL
+      refs <<- curr_refs <<- NULL
+    } else {
+      node <<- node_cdr(node)
+      refs <<- node_cdr(refs)
+      node_poke_cdr(prev_node, node)
+      node_poke_cdr(prev_refs, refs)
+    }
   }
 
   push_states <- function(state) {
@@ -133,6 +180,7 @@ block_states <- function(block, counter, continue, last) {
     }
 
     expr <- node_car(node)
+    ref <- node_car(refs)
     type <- expr_type(expr)
 
     switch(type,
@@ -155,6 +203,18 @@ block_states <- function(block, counter, continue, last) {
           preamble = collect(),
           body = node_cadr(expr),
           condition = NULL,
+          counter = counter,
+          continue = continue,
+          last = last
+        ))
+        next
+      },
+      `while` = {
+        skip()
+        push_states(loop_states(
+          preamble = collect(),
+          body = node_cadr(node_cdr(expr)),
+          condition = user_call(refd_block(node_cadr(expr), ref)),
           counter = counter,
           continue = continue,
           last = last
@@ -230,29 +290,22 @@ strip_yield <- function(expr) {
 
 loop_states <- function(preamble, condition, body, counter, continue, last) {
   i <- counter()
+  states <- NULL
+
   next_i <- counter(inc = 1L)
 
   preamble_block <- expr({
-    !!user_call(preamble)
+    !!!preamble %&&% list(user_call(preamble))
     push_machine(loop = TRUE)
     goto(!!next_i)
   })
-  states <- new_state(preamble_block, NULL, i)
 
+  states <- node_list_poke_cdr(states, new_state(preamble_block, NULL, i))
   i <- next_i
-  tail <- states
 
-  if (!is_null(condition)) {
-    condition_state <- new_state(block(condition), NULL, i)
-    node_poke_cdr(tail, condition_state)
-
-    i <- counter(inc = 1L)
-    tail <- condition_state
-  }
-
-  nested_machine_block <- block(walk_nested_states(body, counter))
+  nested_machine_block <- block(walk_loop_states(body, condition, counter))
   nested_machine_state <- new_state(nested_machine_block, NULL, i)
-  node_poke_cdr(tail, nested_machine_state)
+  states <- node_list_poke_cdr(states, nested_machine_state)
 
   states
 }

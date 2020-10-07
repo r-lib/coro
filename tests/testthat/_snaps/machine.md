@@ -226,3 +226,43 @@
           return(invisible(NULL))
       })
 
+# generators support while loops
+
+    Code
+      generator_body(function() {
+        while (loop_condition) {
+          body2()
+          yield("value")
+          body3()
+        }
+      })
+    Output
+      repeat switch(state[[1L]], `1` = {
+          push_machine(loop = TRUE)
+          goto(2L)
+      }, `2` = {
+          repeat switch(state[[2L]], `1` = {
+              if (user({
+                  loop_condition
+              })) {
+                  goto(2L)
+              } else {
+                  break
+              }
+          }, `2` = {
+              user({
+                  body2()
+                  "value"
+              })
+              suspend_to(3L)
+              return(last_value())
+          }, `3` = {
+              user({
+                  body3()
+              })
+              goto(1)
+          })
+      }, final = {
+          return(invisible(NULL))
+      })
+

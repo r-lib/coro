@@ -64,7 +64,11 @@ as_block <- function(x) {
 }
 
 user_call <- function(expr) {
-  call("user", expr)
+  if (is_call(expr, "user")) {
+    expr
+  } else {
+    call("user", expr)
+  }
 }
 
 new_refd_block <- function(node, refs = NULL) {
@@ -81,6 +85,9 @@ new_refd_block <- function(node, refs = NULL) {
   }
 
   block
+}
+refd_block <- function(expr, ref = NULL) {
+  new_refd_block(new_node(expr), new_node(ref))
 }
 
 spliceable <- function(x) {
