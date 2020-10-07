@@ -314,7 +314,11 @@ loop_states <- function(preamble, condition, body, counter, continue) {
   states <- node_list_poke_cdr(states, new_state(preamble_block, NULL, i))
   i <- next_i
 
-  nested_machine_block <- block(walk_loop_states(body, condition, counter))
+  nested_machine_block <- expr({
+    !!walk_loop_states(body, condition, counter)
+    pop_machine()
+    goto(!!(i + 1L))
+  })
   nested_machine_state <- new_state(nested_machine_block, NULL, i)
   states <- node_list_poke_cdr(states, nested_machine_state)
 

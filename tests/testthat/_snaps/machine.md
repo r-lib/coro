@@ -178,6 +178,8 @@
               suspend_to(1L)
               return(last_value())
           })
+          pop_machine()
+          goto(3L)
       }, final = {
           return(invisible(NULL))
       })
@@ -216,6 +218,8 @@
               })
               goto(1L)
           })
+          pop_machine()
+          goto(3L)
       }, `3` = {
           user({
               body4()
@@ -262,6 +266,8 @@
               })
               goto(1L)
           })
+          pop_machine()
+          goto(3L)
       }, final = {
           return(invisible(NULL))
       })
