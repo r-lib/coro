@@ -318,7 +318,7 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
 
   preamble_block <- expr({
     !!!preamble %&&% list(user_call(preamble))
-    push_machine(loop = TRUE)
+    push_machine("loop")
     goto(!!next_i)
   })
 

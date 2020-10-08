@@ -219,7 +219,7 @@
               user({
                   "repeat"
               })
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
@@ -255,7 +255,7 @@
                   body1()
                   "repeat"
               })
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
@@ -306,7 +306,7 @@
                   body1()
                   "repeat"
               })
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
@@ -351,7 +351,7 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
@@ -399,14 +399,14 @@
               user({
                   "repeat"
               })
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine(loop = TRUE)
+                  push_machine("loop")
                   goto(2L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
@@ -442,14 +442,14 @@
               user({
                   "repeat"
               })
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine(loop = TRUE)
+                  push_machine("loop")
                   goto(2L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
@@ -490,14 +490,14 @@
               user({
                   "repeat"
               })
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine(loop = TRUE)
+                  push_machine("loop")
                   goto(2L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
@@ -539,14 +539,14 @@
               user({
                   "repeat"
               })
-              push_machine(loop = TRUE)
+              push_machine("loop")
               goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine(loop = TRUE)
+                  push_machine("loop")
                   goto(2L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
