@@ -240,6 +240,56 @@
       generator_body(function() {
         body1()
         repeat {
+          yield("value")
+          `break`()
+        }
+        body2()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+                  "repeat"
+              })
+              push_machine(loop = TRUE)
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "value"
+                  })
+                  suspend_to(2L)
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "break"
+                  })
+                  pop_to_loop()
+                  break
+              })
+              pop_machine()
+              goto(3L)
+          }, `3` = {
+              user({
+                  body2()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        body1()
+        repeat {
           body2()
           yield("value")
           body3()
@@ -414,6 +464,103 @@
                       "after"
                   })
                   goto(1L)
+              })
+              pop_machine()
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        repeat {
+          repeat yield("foo")
+          `break`()
+        }
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine(loop = TRUE)
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "repeat"
+                  })
+                  push_machine(loop = TRUE)
+                  goto(2L)
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user("foo")
+                      suspend_to(1L)
+                      return(last_value())
+                  })
+                  pop_machine()
+                  goto(3L)
+              }, `3` = {
+                  user({
+                      "break"
+                  })
+                  pop_to_loop()
+                  break
+              })
+              pop_machine()
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        repeat {
+          repeat `break`()
+          `break`()
+        }
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine(loop = TRUE)
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "repeat"
+                  })
+                  push_machine(loop = TRUE)
+                  goto(2L)
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      pop_to_loop()
+                      break
+                  })
+                  pop_machine()
+                  goto(3L)
+              }, `3` = {
+                  user({
+                      "break"
+                  })
+                  pop_to_loop()
+                  break
               })
               pop_machine()
               break

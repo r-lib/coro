@@ -46,6 +46,15 @@ test_that("generators support repeat loops", {
   expect_snapshot0(generator_body(function() {
     body1()
     repeat {
+      yield("value")
+      break
+    }
+    body2()
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    body1()
+    repeat {
       body2()
       yield("value")
       body3()
@@ -73,6 +82,20 @@ test_that("generators support nested loops", {
     repeat {
       repeat yield("foo")
       "after"
+    }
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    repeat {
+      repeat yield("foo")
+      break
+    }
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    repeat {
+      repeat break
+      break
     }
   }))
 })

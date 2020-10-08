@@ -66,11 +66,11 @@ expr_states <- function(expr, counter, continue, last, return) {
     `expr` = continue_state(expr, counter, continue = continue, last = last, return = return),
     `yield` = yield_state(strip_yield(expr), counter, continue = continue, last = last, return = return),
     `return` = return_state(expr, counter),
+    `break` = break_state(NULL, counter),
     `if` = ,
     `repeat` = ,
     `while` = ,
     `for` = ,
-    `break` = ,
     `next` = ,
     `tryCatch` = ,
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
@@ -231,6 +231,11 @@ block_states <- function(block, counter, continue, last, return) {
           last = last
         ))
         next
+      },
+      `break` = {
+        node_poke_car(node, "break")
+        push_states(break_state(collect(), counter))
+        next
       }
     )
 
@@ -331,6 +336,19 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
   states <- node_list_poke_cdr(states, nested_machine_state)
 
   states
+}
+
+break_state <- function(preamble, counter) {
+  # `pop_to_loop()` is a no-op if there is no intervening state
+  # machines. Otherwise, it shortens the state vector up to (but not
+  # including) the next loop state.
+
+  block <- expr({
+    !!!preamble %&&% list(user_call(preamble))
+    pop_to_loop()
+    break
+  })
+  new_state(block, NULL, counter())
 }
 
 continue_call <- function(next_i) {
