@@ -63,3 +63,16 @@ test_that("generators support while loops", {
     }
   }))
 })
+
+test_that("generators support nested loops", {
+  expect_snapshot0(generator_body(function() {
+    repeat { repeat yield("foo") }
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    repeat {
+      repeat yield("foo")
+      "after"
+    }
+  }))
+})

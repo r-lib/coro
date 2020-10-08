@@ -3,52 +3,72 @@
     Code
       generator_body(function() "foo")
     Output
-      repeat switch(state[[1L]], `1` = {
-          user("foo")
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user("foo")
+              kill()
+              return(last_value())
+          })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 ---
 
     Code
       generator_body(function() return("foo"))
     Output
-      repeat switch(state[[1L]], `1` = {
-          user("foo")
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user("foo")
+              kill()
+              return(last_value())
+          })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 # generators have yield states
 
     Code
       generator_body(function() yield("foo"))
     Output
-      repeat switch(state[[1L]], `1` = {
-          user("foo")
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user("foo")
+              kill()
+              return(last_value())
+          })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 ---
 
     Code
       generator_body(function() flowery::yield("foo"))
     Output
-      repeat switch(state[[1L]], `1` = {
-          user("foo")
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user("foo")
+              kill()
+              return(last_value())
+          })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 # generators support blocks
 
@@ -58,16 +78,21 @@
         "bar"
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          user({
-              "foo"
-              "bar"
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "foo"
+                  "bar"
+              })
+              kill()
+              return(last_value())
           })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 ---
 
@@ -77,16 +102,21 @@
         yield("value")
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          user({
-              "foo"
-              "value"
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "foo"
+                  "value"
+              })
+              kill()
+              return(last_value())
           })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 ---
 
@@ -96,16 +126,21 @@
         return("value")
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          user({
-              "foo"
-              "value"
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "foo"
+                  "value"
+              })
+              kill()
+              return(last_value())
           })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 ---
 
@@ -116,22 +151,27 @@
         "bar"
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          user({
-              "foo"
-              "value"
-          })
-          suspend_to(2L)
-          return(last_value())
-      }, `2` = {
-          user({
-              "bar"
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "foo"
+                  "value"
+              })
+              suspend_to(2L)
+              return(last_value())
+          }, `2` = {
+              user({
+                  "bar"
+              })
+              kill()
+              return(last_value())
           })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 ---
 
@@ -142,22 +182,27 @@
         return("bar")
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          user({
-              "foo"
-              "value"
-          })
-          suspend_to(2L)
-          return(last_value())
-      }, `2` = {
-          user({
-              "bar"
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "foo"
+                  "value"
+              })
+              suspend_to(2L)
+              return(last_value())
+          }, `2` = {
+              user({
+                  "bar"
+              })
+              kill()
+              return(last_value())
           })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 # generators support repeat loops
 
@@ -166,23 +211,28 @@
         repeat yield("value")
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          user({
-              "repeat"
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine(loop = TRUE)
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user("value")
+                  suspend_to(1L)
+                  return(last_value())
+              })
+              pop_machine()
+              break
           })
-          push_machine(loop = TRUE)
-          goto(2L)
-      }, `2` = {
-          repeat switch(state[[2L]], `1` = {
-              user("value")
-              suspend_to(1L)
-              return(last_value())
-          })
-          pop_machine()
-          goto(3L)
-      }, final = {
-          return(invisible(NULL))
-      })
+          kill()
+          invisible(NULL)
+      }
 
 ---
 
@@ -197,38 +247,43 @@
         body4()
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          user({
-              body1()
-              "repeat"
-          })
-          push_machine(loop = TRUE)
-          goto(2L)
-      }, `2` = {
-          repeat switch(state[[2L]], `1` = {
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
               user({
-                  body2()
-                  "value"
+                  body1()
+                  "repeat"
               })
-              suspend_to(2L)
-              return(last_value())
+              push_machine(loop = TRUE)
+              goto(2L)
           }, `2` = {
-              user({
-                  body3()
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      body2()
+                      "value"
+                  })
+                  suspend_to(2L)
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      body3()
+                  })
+                  goto(1L)
               })
-              goto(1L)
-          })
-          pop_machine()
-          goto(3L)
-      }, `3` = {
-          user({
-              body4()
+              pop_machine()
+              goto(3L)
+          }, `3` = {
+              user({
+                  body4()
+              })
+              kill()
+              return(last_value())
           })
           kill()
-          return(last_value())
-      }, final = {
-          return(invisible(NULL))
-      })
+          invisible(NULL)
+      }
 
 # generators support while loops
 
@@ -241,34 +296,129 @@
         }
       })
     Output
-      repeat switch(state[[1L]], `1` = {
-          push_machine(loop = TRUE)
-          goto(2L)
-      }, `2` = {
-          repeat switch(state[[2L]], `1` = {
-              if (user({
-                  loop_condition
-              })) {
-                  goto(2L)
-              } else {
-                  break
-              }
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              push_machine(loop = TRUE)
+              goto(2L)
           }, `2` = {
-              user({
-                  body2()
-                  "value"
+              repeat switch(state[[2L]], `1` = {
+                  if (user({
+                      loop_condition
+                  })) {
+                      goto(2L)
+                  } else {
+                      break
+                  }
+              }, `2` = {
+                  user({
+                      body2()
+                      "value"
+                  })
+                  suspend_to(3L)
+                  return(last_value())
+              }, `3` = {
+                  user({
+                      body3()
+                  })
+                  goto(1L)
               })
-              suspend_to(3L)
-              return(last_value())
-          }, `3` = {
-              user({
-                  body3()
-              })
-              goto(1L)
+              pop_machine()
+              break
           })
-          pop_machine()
-          goto(3L)
-      }, final = {
-          return(invisible(NULL))
+          kill()
+          invisible(NULL)
+      }
+
+# generators support nested loops
+
+    Code
+      generator_body(function() {
+        repeat {
+          repeat yield("foo")
+        }
       })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine(loop = TRUE)
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "repeat"
+                  })
+                  push_machine(loop = TRUE)
+                  goto(2L)
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user("foo")
+                      suspend_to(1L)
+                      return(last_value())
+                  })
+                  pop_machine()
+                  break
+              })
+              pop_machine()
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        repeat {
+          repeat yield("foo")
+          "after"
+        }
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine(loop = TRUE)
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "repeat"
+                  })
+                  push_machine(loop = TRUE)
+                  goto(2L)
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user("foo")
+                      suspend_to(1L)
+                      return(last_value())
+                  })
+                  pop_machine()
+                  goto(3L)
+              }, `3` = {
+                  user({
+                      "after"
+                  })
+                  goto(1L)
+              })
+              pop_machine()
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
 

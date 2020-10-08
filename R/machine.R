@@ -16,19 +16,23 @@ machine_count <- function(counter) {
 
 walk_states <- function(expr) {
   continue <- function(counter, last) {
-    counter() + 1L
+    # Break if last
+    if (last) 0L else counter() + 1L
   }
   states <- expr_states(expr, new_counter(1L), continue = continue, last = TRUE, return = TRUE)
-  expr(repeat switch(state[[1L]], !!!states, final = { return(invisible(NULL)) }))
+  expr({
+    if (killed()) {
+      return(invisible(NULL))
+    }
+    repeat switch(state[[1L]], !!!states)
+    kill()
+    invisible(NULL)
+  })
 }
 walk_loop_states <- function(body, condition, counter) {
   continue <- function(counter, last) {
-    if (last) {
-      # Loop to start of block
-      1L
-    } else {
-      counter() + 1L
-    }
+    # Go back to state 1 of loop body if last
+    if (last) 1L else counter() + 1L
   }
 
   machine_i <- machine_count(counter) + 1L
@@ -211,7 +215,8 @@ block_states <- function(block, counter, continue, last, return) {
           body = node_cadr(expr),
           condition = NULL,
           counter = counter,
-          continue = continue
+          continue = continue,
+          last = last
         ))
         next
       },
@@ -222,7 +227,8 @@ block_states <- function(block, counter, continue, last, return) {
           body = node_cadr(node_cdr(expr)),
           condition = user_call(refd_block(node_cadr(expr), ref)),
           counter = counter,
-          continue = continue
+          continue = continue,
+          last = last
         ))
         next
       }
@@ -275,7 +281,7 @@ continue_state <- function(expr, counter, continue, last, return) {
 
   block <- expr({
     !!user_call(expr)
-    goto(!!next_i)
+    !!continue_call(next_i)
   })
   new_state(block, NULL, tag = i)
 }
@@ -299,7 +305,7 @@ strip_yield <- function(expr) {
   node_cadr(expr)
 }
 
-loop_states <- function(preamble, condition, body, counter, continue) {
+loop_states <- function(preamble, condition, body, counter, continue, last) {
   i <- counter()
   states <- NULL
 
@@ -312,17 +318,27 @@ loop_states <- function(preamble, condition, body, counter, continue) {
   })
 
   states <- node_list_poke_cdr(states, new_state(preamble_block, NULL, i))
+
   i <- next_i
+  next_i <- if (last) 0L else i + 1L
 
   nested_machine_block <- expr({
     !!walk_loop_states(body, condition, counter)
     pop_machine()
-    goto(!!(i + 1L))
+    !!continue_call(next_i)
   })
   nested_machine_state <- new_state(nested_machine_block, NULL, i)
   states <- node_list_poke_cdr(states, nested_machine_state)
 
   states
+}
+
+continue_call <- function(next_i) {
+  if (next_i) {
+    expr(goto(!!next_i))
+  } else {
+    quote(break)
+  }
 }
 
 next_state <- function(expr, counter) {
