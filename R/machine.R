@@ -341,18 +341,6 @@ continue_call <- function(next_i) {
   }
 }
 
-next_state <- function(expr, counter) {
-  block <- expr({
-    !!user_call(expr)
-    goto(1L)
-  })
-  new_state(block, NULL, tag = counter())
-}
-
-states <- function(...) {
-  pairlist2(...)
-}
-
 new_state <- function(car, cdr, tag) {
   node <- new_node(car, cdr)
 
