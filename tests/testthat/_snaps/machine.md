@@ -569,3 +569,278 @@
           invisible(NULL)
       }
 
+# generators support if-else branches
+
+    Code
+      generator_body(function() {
+        body1()
+        if (condition) {
+          yield("then")
+        }
+        body2()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+              })
+              push_machine("if")
+              if (user({
+                  condition
+              })) {
+                  goto(2L)
+              } else {
+                  goto(3L)
+              }
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "then"
+                  })
+                  suspend_to(2L)
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  goto(3L)
+              }
+          }, `3` = {
+              user({
+                  body2()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        body1()
+        if (condition) {
+          yield("then")
+        } else {
+          yield("else")
+        }
+        body2()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+              })
+              push_machine("if")
+              if (user({
+                  condition
+              })) {
+                  goto(2L)
+              } else {
+                  goto(3L)
+              }
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "then"
+                  })
+                  suspend_to(2L)
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  goto(4L)
+              }
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "else"
+                  })
+                  suspend_to(2L)
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  goto(4L)
+              }
+          }, `4` = {
+              user({
+                  body2()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        body1()
+        if (condition) {
+          then1()
+          yield("then")
+          then2()
+        } else {
+          else1()
+          yield("else")
+          else2()
+        }
+        body2()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+              })
+              push_machine("if")
+              if (user({
+                  condition
+              })) {
+                  goto(2L)
+              } else {
+                  goto(3L)
+              }
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      then1()
+                      "then"
+                  })
+                  suspend_to(2L)
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      then2()
+                  })
+                  goto(3L)
+              }, `3` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  goto(4L)
+              }
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      else1()
+                      "else"
+                  })
+                  suspend_to(2L)
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      else2()
+                  })
+                  goto(3L)
+              }, `3` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  goto(4L)
+              }
+          }, `4` = {
+              user({
+                  body2()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        if (condition) {
+          yield("then")
+        } else {
+          "else"
+        }
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              push_machine("if")
+              if (user({
+                  condition
+              })) {
+                  goto(2L)
+              } else {
+                  goto(3L)
+              }
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "then"
+                  })
+                  kill()
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  break
+              }
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "else"
+                  })
+                  kill()
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  break
+              }
+          })
+          kill()
+          invisible(NULL)
+      }
+

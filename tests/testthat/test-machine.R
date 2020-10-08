@@ -99,3 +99,45 @@ test_that("generators support nested loops", {
     }
   }))
 })
+
+test_that("generators support if-else branches", {
+  expect_snapshot0(generator_body(function() {
+    body1()
+    if (condition) {
+      yield("then")
+    }
+    body2()
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    body1()
+    if (condition) {
+      yield("then")
+    } else {
+      yield("else")
+    }
+    body2()
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    body1()
+    if (condition) {
+      then1()
+      yield("then")
+      then2()
+    } else {
+      else1()
+      yield("else")
+      else2()
+    }
+    body2()
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    if (condition) {
+      yield("then")
+    } else {
+      "else"
+    }
+  }))
+})
