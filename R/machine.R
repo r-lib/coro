@@ -73,8 +73,8 @@ expr_states <- function(expr, counter, continue, last, return) {
     `break` = ,
     `next` = ,
     `tryCatch` = ,
-    `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", type)),
-    stop_internal("expr_states", sprintf("Unexpected operation `%s`", type))
+    `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
+    stop_internal("expr_states", sprintf("Unexpected operation `%s`", expr_type(expr)))
   )
 }
 
@@ -234,7 +234,7 @@ block_states <- function(block, counter, continue, last, return) {
       }
     )
 
-    stop("TODO")
+    abort(sprintf("TODO in `block_states()`: %s", type))
   }
 
   last <- saved_last
