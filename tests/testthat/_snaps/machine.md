@@ -839,6 +839,111 @@
                   pop_machine()
                   break
               }
+          }, `4` = {
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+# break within if
+
+    Code
+      generator_body(function() {
+        body1()
+        if (condition) {
+          `break`()
+        }
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+              })
+              push_machine("if")
+              if (user({
+                  condition
+              })) {
+                  goto(2L)
+              } else {
+                  goto(3L)
+              }
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "break"
+                  })
+                  pop_to_loop()
+                  break
+              }, `2` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  break
+              }
+          }, `3` = {
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        body1()
+        if (condition) {
+          `break`()
+        }
+        body2()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+              })
+              push_machine("if")
+              if (user({
+                  condition
+              })) {
+                  goto(2L)
+              } else {
+                  goto(3L)
+              }
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "break"
+                  })
+                  pop_to_loop()
+                  break
+              }, `2` = {
+                  break
+              })
+              if (length(state) < 2L) {
+                  break
+              } else {
+                  pop_machine()
+                  goto(3L)
+              }
+          }, `3` = {
+              user({
+                  body2()
+              })
+              kill()
+              return(last_value())
           })
           kill()
           invisible(NULL)

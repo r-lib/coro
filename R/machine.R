@@ -362,7 +362,6 @@ if_states <- function(preamble, condition, then_body, else_body, counter, contin
     i_else <- counter(inc = 1L)
   }
 
-  i_after <- counter() + 1L
   i_machine <- machine_count(counter)
 
   if_block <- expr({
@@ -382,6 +381,12 @@ if_states <- function(preamble, condition, then_body, else_body, counter, contin
   if (!is_null(else_body)) {
     else_machine <- walk_branch_states(else_body, counter, continue, last, return)
     states <- node_list_poke_cdr(states, new_state(else_machine, NULL, i_else))
+  }
+
+  if (last) {
+    i_after <- counter() + 1L
+    after_block <- block(quote(break))
+    states <- node_list_poke_cdr(states, new_state(after_block, NULL, i_after))
   }
 
   states

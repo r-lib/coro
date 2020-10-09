@@ -141,3 +141,20 @@ test_that("generators support if-else branches", {
     }
   }))
 })
+
+test_that("break within if", {
+  expect_snapshot0(generator_body(function() {
+    body1()
+    if (condition) {
+      break
+    }
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    body1()
+    if (condition) {
+      break
+    }
+    body2()
+  }))
+})
