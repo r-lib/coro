@@ -158,3 +158,26 @@ test_that("break within if", {
     body2()
   }))
 })
+
+test_that("generators support if within loops", {
+  expect_snapshot0(generator_body(function() {
+    repeat {
+      if (TRUE) {
+        break
+      }
+    }
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    repeat {
+      body1()
+      if (TRUE) {
+        break
+      } else {
+        # next
+      }
+      body2()
+    }
+    body3()
+  }))
+})

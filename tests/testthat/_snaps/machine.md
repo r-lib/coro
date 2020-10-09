@@ -949,3 +949,142 @@
           invisible(NULL)
       }
 
+# generators support if within loops
+
+    Code
+      generator_body(function() {
+        repeat {
+          if (TRUE) {
+            `break`()
+          }
+        }
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine("loop")
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  push_machine("if")
+                  if (user({
+                      TRUE
+                  })) {
+                      goto(2L)
+                  } else {
+                      goto(3L)
+                  }
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user({
+                        "break"
+                      })
+                      pop_to_loop()
+                      break
+                  }, `2` = {
+                      break
+                  })
+                  if (length(state) < 3L) {
+                      break
+                  } else {
+                      pop_machine()
+                      goto(1L)
+                  }
+              }, `3` = {
+                  break
+              })
+              pop_machine()
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        repeat {
+          body1()
+          if (TRUE) {
+            `break`()
+          } else { }
+            body2()
+          }
+          body3()
+        })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine("loop")
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      body1()
+                  })
+                  push_machine("if")
+                  if (user({
+                      TRUE
+                  })) {
+                      goto(2L)
+                  } else {
+                      goto(3L)
+                  }
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user({
+                        "break"
+                      })
+                      pop_to_loop()
+                      break
+                  }, `2` = {
+                      break
+                  })
+                  if (length(state) < 3L) {
+                      break
+                  } else {
+                      pop_machine()
+                      goto(4L)
+                  }
+              }, `3` = {
+                  repeat switch(state[[3L]], `1` = {
+                      break
+                  })
+                  if (length(state) < 3L) {
+                      break
+                  } else {
+                      pop_machine()
+                      goto(4L)
+                  }
+              }, `4` = {
+                  user({
+                      body2()
+                  })
+                  goto(1L)
+              })
+              pop_machine()
+              goto(3L)
+          }, `3` = {
+              user({
+                  body3()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+
