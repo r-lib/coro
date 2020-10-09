@@ -61,6 +61,20 @@ test_that("generators support repeat loops", {
     }
     body4()
   }))
+
+  expect_snapshot0(generator_body(function() {
+    repeat next
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    body1()
+    repeat {
+      body2()
+      next
+      body3()
+    }
+    body4()
+  }))
 })
 
 test_that("generators support while loops", {

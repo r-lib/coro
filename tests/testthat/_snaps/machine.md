@@ -335,6 +335,84 @@
           invisible(NULL)
       }
 
+---
+
+    Code
+      generator_body(function() {
+        repeat `next`()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine("loop")
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  goto(1L)
+              })
+              pop_machine()
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        body1()
+        repeat {
+          body2()
+          `next`()
+          body3()
+        }
+        body4()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+                  "repeat"
+              })
+              push_machine("loop")
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      body2()
+                      "next"
+                  })
+                  goto(1L)
+              }, `2` = {
+                  user({
+                      body3()
+                  })
+                  goto(1L)
+              })
+              pop_machine()
+              goto(3L)
+          }, `3` = {
+              user({
+                  body4()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+
 # generators support while loops
 
     Code

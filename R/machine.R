@@ -97,11 +97,11 @@ expr_states <- function(expr, counter, continue, last, return) {
     `yield` = yield_state(strip_yield(expr), counter, continue = continue, last = last, return = return),
     `return` = return_state(expr, counter),
     `break` = break_state(NULL, counter),
+    `next` = next_state(NULL, counter),
     `if` = ,
     `repeat` = ,
     `while` = ,
     `for` = ,
-    `next` = ,
     `tryCatch` = ,
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
     stop_internal("expr_states", sprintf("Unexpected operation `%s`", expr_type(expr)))
@@ -278,6 +278,11 @@ block_states <- function(block, counter, continue, last, return) {
         node_poke_car(node, "break")
         push_states(break_state(collect(), counter))
         next
+      },
+      `next` = {
+        node_poke_car(node, "next")
+        push_states(next_state(collect(), counter))
+        next
       }
     )
 
@@ -429,6 +434,14 @@ break_state <- function(preamble, counter) {
     !!!preamble %&&% list(user_call(preamble))
     pop_to_loop()
     break
+  })
+  new_state(block, NULL, counter())
+}
+
+next_state <- function(preamble, counter) {
+  block <- expr({
+    !!!preamble %&&% list(user_call(preamble))
+    goto(1L)
   })
   new_state(block, NULL, counter())
 }
