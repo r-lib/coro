@@ -227,7 +227,7 @@
                   suspend_to(1L)
                   return(last_value())
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -268,10 +268,9 @@
                   user({
                       "break"
                   })
-                  pop_to_loop()
                   break
               })
-              pop_machine()
+              set_depth(1L)
               goto(3L)
           }, `3` = {
               user({
@@ -322,7 +321,7 @@
                   })
                   goto(1L)
               })
-              pop_machine()
+              set_depth(1L)
               goto(3L)
           }, `3` = {
               user({
@@ -356,7 +355,7 @@
               repeat switch(state[[2L]], `1` = {
                   goto(1L)
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -400,7 +399,7 @@
                   })
                   goto(1L)
               })
-              pop_machine()
+              set_depth(1L)
               goto(3L)
           }, `3` = {
               user({
@@ -453,7 +452,7 @@
                   })
                   goto(1L)
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -492,10 +491,10 @@
                       suspend_to(1L)
                       return(last_value())
                   })
-                  pop_machine()
+                  set_depth(2L)
                   break
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -535,7 +534,7 @@
                       suspend_to(1L)
                       return(last_value())
                   })
-                  pop_machine()
+                  set_depth(2L)
                   goto(3L)
               }, `3` = {
                   user({
@@ -543,7 +542,7 @@
                   })
                   goto(1L)
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -583,16 +582,15 @@
                       suspend_to(1L)
                       return(last_value())
                   })
-                  pop_machine()
+                  set_depth(2L)
                   goto(3L)
               }, `3` = {
                   user({
                       "break"
                   })
-                  pop_to_loop()
                   break
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -628,19 +626,17 @@
                   goto(2L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      pop_to_loop()
                       break
                   })
-                  pop_machine()
+                  set_depth(2L)
                   goto(3L)
               }, `3` = {
                   user({
                       "break"
                   })
-                  pop_to_loop()
                   break
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -684,12 +680,11 @@
               }, `2` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  goto(3L)
-              }
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              goto(3L)
           }, `3` = {
               user({
                   body2()
@@ -740,12 +735,11 @@
               }, `2` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  goto(4L)
-              }
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              goto(4L)
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -756,12 +750,11 @@
               }, `2` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  goto(4L)
-              }
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              goto(4L)
           }, `4` = {
               user({
                   body2()
@@ -822,12 +815,11 @@
               }, `3` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  goto(4L)
-              }
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              goto(4L)
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -844,12 +836,11 @@
               }, `3` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  goto(4L)
-              }
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              goto(4L)
           }, `4` = {
               user({
                   body2()
@@ -895,12 +886,11 @@
               }, `2` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  break
-              }
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              break
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -911,12 +901,11 @@
               }, `2` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  break
-              }
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              break
           }, `4` = {
               break
           })
@@ -929,8 +918,10 @@
     Code
       generator_body(function() {
         body1()
-        if (condition) {
-          `break`()
+        repeat {
+          if (condition) {
+            `break`()
+          }
         }
       })
     Output
@@ -941,32 +932,39 @@
           repeat switch(state[[1L]], `1` = {
               user({
                   body1()
+                  "repeat"
               })
-              push_machine("if")
-              if (user({
-                  condition
-              })) {
-                  goto(2L)
-              } else {
-                  goto(3L)
-              }
+              push_machine("loop")
+              goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
-                      "break"
-                  })
-                  pop_to_loop()
-                  break
+                  push_machine("if")
+                  if (user({
+                      condition
+                  })) {
+                      goto(2L)
+                  } else {
+                      goto(3L)
+                  }
               }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user({
+                        "break"
+                      })
+                      set_depth(1L)
+                      break
+                  }, `2` = {
+                      break
+                  })
+                  n <- depth()
+                  if (n < 2L) break
+                  if (n == 2L) goto(1L)
+                  set_depth(2L)
+                  goto(1L)
+              }, `3` = {
                   break
               })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
-                  break
-              }
-          }, `3` = {
+              set_depth(1L)
               break
           })
           kill()
@@ -978,10 +976,12 @@
     Code
       generator_body(function() {
         body1()
-        if (condition) {
-          `break`()
+        repeat {
+          if (condition) {
+            `break`()
+          }
+          body2()
         }
-        body2()
       })
     Output
       {
@@ -991,37 +991,43 @@
           repeat switch(state[[1L]], `1` = {
               user({
                   body1()
+                  "repeat"
               })
-              push_machine("if")
-              if (user({
-                  condition
-              })) {
-                  goto(2L)
-              } else {
-                  goto(3L)
-              }
+              push_machine("loop")
+              goto(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
-                      "break"
-                  })
-                  pop_to_loop()
-                  break
+                  push_machine("if")
+                  if (user({
+                      condition
+                  })) {
+                      goto(2L)
+                  } else {
+                      goto(3L)
+                  }
               }, `2` = {
-                  break
-              })
-              if (length(state) < 2L) {
-                  break
-              } else {
-                  pop_machine()
+                  repeat switch(state[[3L]], `1` = {
+                      user({
+                        "break"
+                      })
+                      set_depth(1L)
+                      break
+                  }, `2` = {
+                      break
+                  })
+                  n <- depth()
+                  if (n < 2L) break
+                  if (n == 2L) goto(1L)
+                  set_depth(2L)
                   goto(3L)
-              }
-          }, `3` = {
-              user({
-                  body2()
+              }, `3` = {
+                  user({
+                      body2()
+                  })
+                  goto(1L)
               })
-              kill()
-              return(last_value())
+              set_depth(1L)
+              break
           })
           kill()
           invisible(NULL)
@@ -1063,21 +1069,20 @@
                       user({
                         "break"
                       })
-                      pop_to_loop()
+                      set_depth(1L)
                       break
                   }, `2` = {
                       break
                   })
-                  if (length(state) < 3L) {
-                      break
-                  } else {
-                      pop_machine()
-                      goto(1L)
-                  }
+                  n <- depth()
+                  if (n < 2L) break
+                  if (n == 2L) goto(1L)
+                  set_depth(2L)
+                  goto(1L)
               }, `3` = {
                   break
               })
-              pop_machine()
+              set_depth(1L)
               break
           })
           kill()
@@ -1092,11 +1097,13 @@
           body1()
           if (TRUE) {
             `break`()
-          } else { }
-            body2()
+          } else {
+            `next`()
           }
-          body3()
-        })
+          body2()
+        }
+        body3()
+      })
     Output
       {
           if (killed()) {
@@ -1126,38 +1133,146 @@
                       user({
                         "break"
                       })
-                      pop_to_loop()
+                      set_depth(1L)
                       break
                   }, `2` = {
                       break
                   })
-                  if (length(state) < 3L) {
-                      break
-                  } else {
-                      pop_machine()
-                      goto(4L)
-                  }
+                  n <- depth()
+                  if (n < 2L) break
+                  if (n == 2L) goto(1L)
+                  set_depth(2L)
+                  goto(4L)
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
+                      user({
+                        "next"
+                      })
+                      set_depth(2L)
+                      break
+                  }, `2` = {
                       break
                   })
-                  if (length(state) < 3L) {
-                      break
-                  } else {
-                      pop_machine()
-                      goto(4L)
-                  }
+                  n <- depth()
+                  if (n < 2L) break
+                  if (n == 2L) goto(1L)
+                  set_depth(2L)
+                  goto(4L)
               }, `4` = {
                   user({
                       body2()
                   })
                   goto(1L)
               })
-              pop_machine()
+              set_depth(1L)
               goto(3L)
           }, `3` = {
               user({
                   body3()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+
+# next and break within two layers of if-else
+
+    Code
+      generator_body(function() {
+        repeat {
+          body1()
+          if (TRUE) {
+            if (TRUE) `next`() else `break`()
+            body2()
+          }
+          body3()
+        }
+        body4()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine("loop")
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      body1()
+                  })
+                  push_machine("if")
+                  if (user({
+                      TRUE
+                  })) {
+                      goto(2L)
+                  } else {
+                      goto(3L)
+                  }
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      push_machine("if")
+                      if (user({
+                        TRUE
+                      })) {
+                        goto(2L)
+                      } else {
+                        goto(3L)
+                      }
+                  }, `2` = {
+                      repeat switch(state[[4L]], `1` = {
+                        set_depth(2L)
+                        break
+                      }, `1` = {
+                        break
+                      })
+                      n <- depth()
+                      if (n < 3L) break
+                      if (n == 3L) goto(1L)
+                      set_depth(3L)
+                      goto(4L)
+                  }, `3` = {
+                      repeat switch(state[[4L]], `1` = {
+                        set_depth(1L)
+                        break
+                      }, `1` = {
+                        break
+                      })
+                      n <- depth()
+                      if (n < 3L) break
+                      if (n == 3L) goto(1L)
+                      set_depth(3L)
+                      goto(4L)
+                  }, `4` = {
+                      user({
+                        body2()
+                      })
+                      goto(5L)
+                  }, `5` = {
+                      break
+                  })
+                  n <- depth()
+                  if (n < 2L) break
+                  if (n == 2L) goto(1L)
+                  set_depth(2L)
+                  goto(3L)
+              }, `3` = {
+                  user({
+                      body3()
+                  })
+                  goto(1L)
+              })
+              set_depth(1L)
+              goto(3L)
+          }, `3` = {
+              user({
+                  body4()
               })
               kill()
               return(last_value())

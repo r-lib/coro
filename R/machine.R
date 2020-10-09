@@ -3,15 +3,24 @@ generator_body <- function(fn) {
   walk_states(body(fn))
 }
 
-new_counter <- function(machine_i) {
+new_counter <- function(machine_depth, loop_depth = 0L) {
   i <- 1L
   function(inc = 0L) {
     i <<- i + inc
     i
   }
 }
-machine_count <- function(counter) {
-  env_get(fn_env(counter), "machine_i")
+machine_depth <- function(counter) {
+  env_get(fn_env(counter), "machine_depth")
+}
+loop_depth <- function(counter, check = TRUE) {
+  depth <- env_get(fn_env(counter), "loop_depth")
+
+  if (check && !depth) {
+    abort("Must use `next` and `break` within a loop.")
+  }
+
+  depth
 }
 
 walk_states <- function(expr) {
@@ -35,8 +44,8 @@ walk_loop_states <- function(body, condition, counter) {
     if (last) 1L else counter() + 1L
   }
 
-  machine_i <- machine_count(counter) + 1L
-  nested_counter <- new_counter(machine_i)
+  machine_depth <- machine_depth(counter) + 1L
+  nested_counter <- new_counter(machine_depth, loop_depth = machine_depth)
 
   if (!is_null(condition)) {
     nested_counter(inc = 1L)
@@ -57,7 +66,7 @@ walk_loop_states <- function(body, condition, counter) {
   nested_states <- expr_states(body, nested_counter, continue = continue, last = TRUE, return = FALSE)
   states <- node_list_poke_cdr(states, nested_states)
 
-  expr(repeat switch(state[[!!machine_i]], !!!states))
+  expr(repeat switch(state[[!!machine_depth]], !!!states))
 }
 walk_branch_states <- function(body, counter, continue, last, return) {
   nested_continue <- function(counter, last) {
@@ -65,8 +74,10 @@ walk_branch_states <- function(body, counter, continue, last, return) {
     counter() + 1L
   }
 
-  machine_i <- machine_count(counter) + 1L
-  nested_counter <- new_counter(machine_i)
+  prev_depth <- machine_depth(counter)
+  machine_depth <- prev_depth + 1L
+  loop_depth <- loop_depth(counter, check = FALSE)
+  nested_counter <- new_counter(machine_depth, loop_depth = loop_depth)
 
   states <- expr_states(
     body,
@@ -80,13 +91,12 @@ walk_branch_states <- function(body, counter, continue, last, return) {
   states <- node_list_poke_cdr(states, breaking_state)
 
   expr({
-    repeat switch(state[[!!machine_i]], !!!states)
-    if (length(state) < !!machine_i) {
-      break
-    } else {
-      pop_machine()
-      !!continue_call(continue(counter, last))
-    }
+    repeat switch(state[[!!machine_depth]], !!!states)
+    n <- depth()
+    if (n < !!prev_depth) break
+    if (n == !!prev_depth) goto(1L)
+    set_depth(!!prev_depth)
+    !!continue_call(continue(counter, last))
   })
 }
 
@@ -171,7 +181,10 @@ block_states <- function(block, counter, continue, last, return) {
     go
   }
   collect <- function() {
-    if (is_null(node)) {
+    if (is_null(curr_node)) {
+      # Happens on skip
+      curr_node <<- node
+      curr_refs <<- refs
       return()
     }
 
@@ -192,8 +205,10 @@ block_states <- function(block, counter, continue, last, return) {
   }
   skip <- function() {
     if (is_null(prev_node)) {
-      node <<- curr_node <<- NULL
-      refs <<- curr_refs <<- NULL
+      curr_node <<- NULL
+      curr_refs <<- NULL
+      node <<- node_cdr(node)
+      refs <<- node_cdr(refs)
     } else {
       node_poke_cdr(prev_node, NULL)
       node_poke_cdr(prev_refs, NULL)
@@ -367,7 +382,7 @@ if_states <- function(preamble, condition, then_body, else_body, counter, contin
     i_else <- counter(inc = 1L)
   }
 
-  i_machine <- machine_count(counter)
+  i_machine <- machine_depth(counter)
 
   if_block <- expr({
     !!!preamble %&&% list(user_call(preamble))
@@ -416,7 +431,7 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
 
   nested_machine_block <- expr({
     !!walk_loop_states(body, condition, counter)
-    pop_machine()
+    set_depth(!!machine_depth(counter))
     !!continue_call(next_i)
   })
   nested_machine_state <- new_state(nested_machine_block, NULL, i)
@@ -426,22 +441,39 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
 }
 
 break_state <- function(preamble, counter) {
-  # `pop_to_loop()` is a no-op if there is no intervening state
-  # machines. Otherwise, it shortens the state vector up to (but not
-  # including) the next loop state.
+  loop_depth <- loop_depth(counter)
+
+  if (loop_depth == machine_depth(counter)) {
+    continue <- expr({ break })
+  } else {
+    continue <- expr({
+      set_depth(!!(loop_depth - 1L))
+      break
+    })
+  }
 
   block <- expr({
     !!!preamble %&&% list(user_call(preamble))
-    pop_to_loop()
-    break
+    !!!continue
   })
   new_state(block, NULL, counter())
 }
 
 next_state <- function(preamble, counter) {
+  loop_depth <- loop_depth(counter)
+
+  if (loop_depth == machine_depth(counter)) {
+    continue <- expr({ goto(1L) })
+  } else {
+    continue <- expr({
+      set_depth(!!loop_depth)
+      break
+    })
+  }
+
   block <- expr({
     !!!preamble %&&% list(user_call(preamble))
-    goto(1L)
+    !!!continue
   })
   new_state(block, NULL, counter())
 }

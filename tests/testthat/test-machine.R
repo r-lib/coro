@@ -159,17 +159,21 @@ test_that("generators support if-else branches", {
 test_that("break within if", {
   expect_snapshot0(generator_body(function() {
     body1()
-    if (condition) {
-      break
+    repeat {
+      if (condition) {
+        break
+      }
     }
   }))
 
   expect_snapshot0(generator_body(function() {
     body1()
-    if (condition) {
-      break
+    repeat {
+      if (condition) {
+        break
+      }
+      body2()
     }
-    body2()
   }))
 })
 
@@ -188,10 +192,41 @@ test_that("generators support if within loops", {
       if (TRUE) {
         break
       } else {
-        # next
+        next
       }
       body2()
     }
     body3()
+  }))
+})
+
+test_that("can't use break and next outside loop", {
+  expect_error(
+    generator_body(function() {
+      next
+    }),
+    "within a loop"
+  )
+  expect_error(
+    generator_body(function() {
+      if (condition) {
+        break
+      }
+    }),
+    "within a loop"
+  )
+})
+
+test_that("next and break within two layers of if-else", {
+  expect_snapshot0(generator_body(function() {
+    repeat {
+      body1()
+      if (TRUE) {
+        if (TRUE) next else break
+        body2()
+      }
+      body3()
+    }
+    body4()
   }))
 })
