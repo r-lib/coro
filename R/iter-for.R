@@ -19,33 +19,17 @@ iterate <- function(loop) {
     abort("`loop` must be a `for` loop")
   }
 
-  args <- node_cdr(loop)
-  elt <- node_car(args)
-  coll <- node_cadr(args)
-  expr <- node_cadr(node_cdr(args))
-
-  # Translate `for` loop to machine state
-  reset_state()
-  call <- for_call(elt, coll, expr)
-  node <- as_exprs_node(call)
-  parts <- node_list_parts(node)
-
-  # Add breaking state to state machine
-  node_list_poke_cdr(parts, pairlist(block(break_call())))
-
-  # Wrap `while` in parens to disable JIT in case `env` is GlobalEnv
-  call <- rlang::expr({
-    (`while`)(TRUE, {
-      !!machine_switch_call(parts)
-    })
-  })
-
   env <- caller_env()
 
-  # Put machine state operators in scope temporarily
-  local_bindings(.env = env, `_state` = 1L)
+  args <- node_cdr(loop)
+  var <- as_string(node_car(args))
+  iterator <- as_iterator(eval_bare(node_cadr(args), env))
+  body <- node_cadr(node_cdr(args))
 
-  invisible(eval_bare(call, env))
+  while (!is_null(elt <- iterator())) {
+    env[[var]] <- elt
+    eval_bare(body, env)
+  }
 }
 
 #' Iterable functions
