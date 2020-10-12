@@ -271,7 +271,7 @@
                   break
               })
               set_depth(1L)
-              goto(3L)
+              set_state(3L)
           }, `3` = {
               user({
                   body2()
@@ -319,10 +319,10 @@
                   user({
                       body3()
                   })
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
-              goto(3L)
+              set_state(3L)
           }, `3` = {
               user({
                   body4()
@@ -353,7 +353,7 @@
               set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
               break
@@ -392,15 +392,15 @@
                       body2()
                       "next"
                   })
-                  goto(1L)
+                  set_state(1L)
               }, `2` = {
                   user({
                       body3()
                   })
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
-              goto(3L)
+              set_state(3L)
           }, `3` = {
               user({
                   body4()
@@ -435,7 +435,7 @@
                   if (user({
                       loop_condition
                   })) {
-                      goto(2L)
+                      set_state(2L)
                   } else {
                       break
                   }
@@ -450,7 +450,7 @@
                   user({
                       body3()
                   })
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
               break
@@ -562,7 +562,7 @@
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       if (user(TRUE)) {
-                        goto(2L)
+                        set_state(2L)
                       } else {
                         break
                       }
@@ -615,12 +615,12 @@
                       return(last_value())
                   })
                   set_depth(2L)
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   user({
                       "after"
                   })
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
               break
@@ -663,7 +663,7 @@
                       return(last_value())
                   })
                   set_depth(2L)
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   user({
                       "break"
@@ -709,7 +709,7 @@
                       break
                   })
                   set_depth(2L)
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   user({
                       "break"
@@ -762,9 +762,12 @@
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
-              goto(3L)
+              set_state(3L)
           }, `3` = {
               user({
                   body2()
@@ -817,9 +820,12 @@
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
-              goto(4L)
+              set_state(4L)
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -832,9 +838,12 @@
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
-              goto(4L)
+              set_state(4L)
           }, `4` = {
               user({
                   body2()
@@ -891,15 +900,18 @@
                   user({
                       then2()
                   })
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   break
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
-              goto(4L)
+              set_state(4L)
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -912,15 +924,18 @@
                   user({
                       else2()
                   })
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   break
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
-              goto(4L)
+              set_state(4L)
           }, `4` = {
               user({
                   body2()
@@ -968,7 +983,10 @@
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
               break
           }, `3` = {
@@ -983,7 +1001,10 @@
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
               break
           }, `4` = {
@@ -1038,9 +1059,12 @@
                   })
                   n <- depth()
                   if (n < 2L) break
-                  if (n == 2L) goto(1L)
+                  if (n == 2L) {
+                      set_state(1L)
+                      next
+                  }
                   set_depth(2L)
-                  goto(1L)
+                  set_state(1L)
               }, `3` = {
                   break
               })
@@ -1097,14 +1121,17 @@
                   })
                   n <- depth()
                   if (n < 2L) break
-                  if (n == 2L) goto(1L)
+                  if (n == 2L) {
+                      set_state(1L)
+                      next
+                  }
                   set_depth(2L)
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   user({
                       body2()
                   })
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
               break
@@ -1156,17 +1183,23 @@
                   })
                   n <- depth()
                   if (n < 2L) break
-                  if (n == 2L) goto(1L)
+                  if (n == 2L) {
+                      set_state(1L)
+                      next
+                  }
                   set_depth(2L)
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   break
               })
               n <- depth()
               if (n < 1L) break
-              if (n == 1L) goto(1L)
+              if (n == 1L) {
+                  set_state(1L)
+                  next
+              }
               set_depth(1L)
-              goto(3L)
+              set_state(3L)
           }, `3` = {
               user({
                   body2()
@@ -1221,9 +1254,12 @@
                   })
                   n <- depth()
                   if (n < 2L) break
-                  if (n == 2L) goto(1L)
+                  if (n == 2L) {
+                      set_state(1L)
+                      next
+                  }
                   set_depth(2L)
-                  goto(1L)
+                  set_state(1L)
               }, `3` = {
                   break
               })
@@ -1285,9 +1321,12 @@
                   })
                   n <- depth()
                   if (n < 2L) break
-                  if (n == 2L) goto(1L)
+                  if (n == 2L) {
+                      set_state(1L)
+                      next
+                  }
                   set_depth(2L)
-                  goto(4L)
+                  set_state(4L)
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
@@ -1300,17 +1339,20 @@
                   })
                   n <- depth()
                   if (n < 2L) break
-                  if (n == 2L) goto(1L)
+                  if (n == 2L) {
+                      set_state(1L)
+                      next
+                  }
                   set_depth(2L)
-                  goto(4L)
+                  set_state(4L)
               }, `4` = {
                   user({
                       body2()
                   })
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
-              goto(3L)
+              set_state(3L)
           }, `3` = {
               user({
                   body3()
@@ -1379,9 +1421,12 @@
                       })
                       n <- depth()
                       if (n < 3L) break
-                      if (n == 3L) goto(1L)
+                      if (n == 3L) {
+                        set_state(1L)
+                        next
+                      }
                       set_depth(3L)
-                      goto(4L)
+                      set_state(4L)
                   }, `3` = {
                       repeat switch(state[[4L]], `1` = {
                         set_depth(1L)
@@ -1391,30 +1436,36 @@
                       })
                       n <- depth()
                       if (n < 3L) break
-                      if (n == 3L) goto(1L)
+                      if (n == 3L) {
+                        set_state(1L)
+                        next
+                      }
                       set_depth(3L)
-                      goto(4L)
+                      set_state(4L)
                   }, `4` = {
                       user({
                         body2()
                       })
-                      goto(5L)
+                      set_state(5L)
                   }, `5` = {
                       break
                   })
                   n <- depth()
                   if (n < 2L) break
-                  if (n == 2L) goto(1L)
+                  if (n == 2L) {
+                      set_state(1L)
+                      next
+                  }
                   set_depth(2L)
-                  goto(3L)
+                  set_state(3L)
               }, `3` = {
                   user({
                       body3()
                   })
-                  goto(1L)
+                  set_state(1L)
               })
               set_depth(1L)
-              goto(3L)
+              set_state(3L)
           }, `3` = {
               user({
                   body4()

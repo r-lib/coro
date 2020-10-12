@@ -52,7 +52,7 @@ walk_loop_states <- function(body, condition, counter) {
 
     condition_block <- block(expr(
       if (!!user_call(condition)) {
-        goto(!!2L)
+        set_state(!!2L)
       } else {
         break
       }
@@ -100,7 +100,7 @@ walk_branch_states <- function(body, offset, counter, continue, last, return) {
     repeat switch(state[[!!machine_depth]], !!!states)
     n <- depth()
     if (n < !!prev_depth) break
-    if (n == !!prev_depth) goto(1L)
+    if (n == !!prev_depth) { set_state(1L); next }
     set_depth(!!prev_depth)
     !!continue_call(next_i)
   })
@@ -530,7 +530,7 @@ next_state <- function(preamble, counter) {
   loop_depth <- loop_depth(counter)
 
   if (loop_depth == machine_depth(counter)) {
-    continue <- expr({ goto(1L) })
+    continue <- expr({ set_state(1L) })
   } else {
     continue <- expr({
       set_depth(!!loop_depth)
@@ -548,9 +548,10 @@ next_state <- function(preamble, counter) {
   state
 }
 
+# Must be trailing or before a `next` statement
 continue_call <- function(next_i) {
   if (next_i) {
-    expr(goto(!!next_i))
+    expr(set_state(!!next_i))
   } else {
     quote(break)
   }
