@@ -512,7 +512,7 @@ if_states <- function(preamble, condition, then_body, else_body, counter, contin
   }
 
   if (last) {
-    after_block <- block(quote(break))
+    after_block <- block(continue_call(continue(counter, last), depth))
     after_state <- new_state(after_block, NULL, counter())
     states <- node_list_poke_cdr(states, after_state)
     counter(inc = 1L)

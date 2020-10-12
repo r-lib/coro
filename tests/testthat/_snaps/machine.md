@@ -1098,7 +1098,7 @@
                   length(state) <- 2L
                   state[[2L]] <- 1L
               }, `3` = {
-                  break
+                  state[[2L]] <- 1L
               })
               length(state) <- 1L
               break
@@ -1302,7 +1302,7 @@
                   length(state) <- 2L
                   state[[2L]] <- 1L
               }, `3` = {
-                  break
+                  state[[2L]] <- 1L
               })
               length(state) <- 1L
               break
