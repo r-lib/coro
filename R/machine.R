@@ -28,13 +28,21 @@ walk_states <- function(expr) {
     # Break if last
     if (last) 0L else counter() + 1L
   }
-  states <- expr_states(expr, new_counter(1L), continue = continue, last = TRUE, return = TRUE)
+  states <- expr_states(
+    expr,
+    counter = new_counter(1L),
+    continue = continue,
+    last = TRUE,
+    return = TRUE
+  )
+
   expr({
-    if (killed()) {
+    if (exhausted) {
       return(invisible(NULL))
     }
     repeat switch(state[[1L]], !!!states)
-    kill()
+
+    exhausted <- TRUE
     invisible(NULL)
   })
 }
@@ -400,7 +408,7 @@ return_state <- function(expr, counter) {
 
   block <- expr({
     !!user_call(expr)
-    kill()
+    exhausted <- TRUE
     return(last_value())
   })
   state <- new_state(block, NULL, tag = counter())

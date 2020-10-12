@@ -4,15 +4,15 @@
       generator_body(function() "foo")
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
               user("foo")
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -22,15 +22,15 @@
       generator_body(function() return("foo"))
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
               user("foo")
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -40,15 +40,15 @@
       generator_body(function() yield("foo"))
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
               user("foo")
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -58,15 +58,15 @@
       generator_body(function() flowery::yield("foo"))
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
               user("foo")
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -79,7 +79,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -87,10 +87,10 @@
                   "foo"
                   "bar"
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -103,7 +103,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -111,10 +111,10 @@
                   "foo"
                   "value"
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -127,7 +127,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -135,10 +135,10 @@
                   "foo"
                   "value"
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -152,7 +152,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -166,10 +166,10 @@
               user({
                   "bar"
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -183,7 +183,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -197,10 +197,10 @@
               user({
                   "bar"
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -212,7 +212,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -230,7 +230,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -247,7 +247,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -276,10 +276,10 @@
               user({
                   body2()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -297,7 +297,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -327,10 +327,10 @@
               user({
                   body4()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -342,7 +342,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -358,7 +358,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -376,7 +376,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -405,10 +405,10 @@
               user({
                   body4()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -424,7 +424,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -455,7 +455,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -469,7 +469,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -497,7 +497,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -509,7 +509,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -534,7 +534,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -546,7 +546,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -577,7 +577,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -592,7 +592,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -625,7 +625,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -640,7 +640,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -673,7 +673,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -688,7 +688,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -719,7 +719,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -735,7 +735,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -772,10 +772,10 @@
               user({
                   body2()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -793,7 +793,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -848,10 +848,10 @@
               user({
                   body2()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -873,7 +873,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -940,10 +940,10 @@
               user({
                   body2()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -959,7 +959,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -976,7 +976,7 @@
                   user({
                       "then"
                   })
-                  kill()
+                  exhausted <- TRUE
                   return(last_value())
               }, `2` = {
                   break
@@ -994,7 +994,7 @@
                   user({
                       "else"
                   })
-                  kill()
+                  exhausted <- TRUE
                   return(last_value())
               }, `2` = {
                   break
@@ -1010,7 +1010,7 @@
           }, `4` = {
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1027,7 +1027,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1071,7 +1071,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1089,7 +1089,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1136,7 +1136,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1150,7 +1150,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1204,10 +1204,10 @@
               user({
                   body2()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1223,7 +1223,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1266,7 +1266,7 @@
               set_depth(1L)
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1287,7 +1287,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1357,10 +1357,10 @@
               user({
                   body3()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1380,7 +1380,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1470,10 +1470,10 @@
               user({
                   body4()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1483,7 +1483,7 @@
       generator_body(function() for (x in 1:3) yield(x))
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1514,7 +1514,7 @@
               iterators[[2L]] <- NULL
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1524,7 +1524,7 @@
       generator_body(function() for (x in 1:3) for (y in 2:4) yield(list(x, y)))
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1578,7 +1578,7 @@
               iterators[[2L]] <- NULL
               break
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
@@ -1592,7 +1592,7 @@
       })
     Output
       {
-          if (killed()) {
+          if (exhausted) {
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
@@ -1629,10 +1629,10 @@
               user({
                   body2()
               })
-              kill()
+              exhausted <- TRUE
               return(last_value())
           })
-          kill()
+          exhausted <- TRUE
           invisible(NULL)
       }
 
