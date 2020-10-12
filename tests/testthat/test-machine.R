@@ -184,7 +184,6 @@ test_that("break within if", {
     }
   }))
 
-  # FIXME
   expect_snapshot0(generator_body(function() {
     body1()
     if (truth1) if (truth2) yield("value")

@@ -1151,7 +1151,7 @@
                       user("value")
                       suspend_to(2L)
                       return(last_value())
-                  }, `1` = {
+                  }, `2` = {
                       break
                   })
                   n <- depth()
@@ -1159,7 +1159,7 @@
                   if (n == 2L) goto(1L)
                   set_depth(2L)
                   goto(3L)
-              }, `2` = {
+              }, `3` = {
                   break
               })
               n <- depth()
@@ -1374,7 +1374,7 @@
                       repeat switch(state[[4L]], `1` = {
                         set_depth(2L)
                         break
-                      }, `1` = {
+                      }, `2` = {
                         break
                       })
                       n <- depth()
@@ -1386,7 +1386,7 @@
                       repeat switch(state[[4L]], `1` = {
                         set_depth(1L)
                         break
-                      }, `1` = {
+                      }, `2` = {
                         break
                       })
                       n <- depth()

@@ -68,9 +68,8 @@ walk_loop_states <- function(body, condition, counter) {
 
   expr(repeat switch(state[[!!machine_depth]], !!!states))
 }
-walk_branch_states <- function(body, counter, continue, last, return) {
+walk_branch_states <- function(body, offset, counter, continue, last, return) {
   nested_continue <- function(counter, last) {
-    # Go to the breaking state if last
     counter() + 1L
   }
 
@@ -89,6 +88,13 @@ walk_branch_states <- function(body, counter, continue, last, return) {
 
   breaking_state <- new_state(quote({ break }), NULL, nested_counter())
   states <- node_list_poke_cdr(states, breaking_state)
+  nested_counter(inc = 1L)
+
+  # Don't add offset if state is breaking
+  next_i <- continue(counter, last)
+  if (next_i) {
+    next_i <- next_i + offset
+  }
 
   expr({
     repeat switch(state[[!!machine_depth]], !!!states)
@@ -96,7 +102,7 @@ walk_branch_states <- function(body, counter, continue, last, return) {
     if (n < !!prev_depth) break
     if (n == !!prev_depth) goto(1L)
     set_depth(!!prev_depth)
-    !!continue_call(continue(counter, last))
+    !!continue_call(next_i)
   })
 }
 
@@ -264,7 +270,6 @@ block_states <- function(block, counter, continue, last, return) {
 
   push_states <- function(state) {
     states <<- node_list_poke_cdr(states, state)
-    counter(inc = 1L)
   }
 
   # Collect as many user expressions as possible
@@ -369,7 +374,10 @@ return_state <- function(expr, counter) {
     kill()
     return(last_value())
   })
-  new_state(block, NULL, tag = counter())
+  state <- new_state(block, NULL, tag = counter())
+  counter(inc = 1L)
+
+  state
 }
 strip_explicit_return <- function(expr) {
   if (is_call(expr, "return")) {
@@ -397,7 +405,10 @@ continue_state <- function(expr, counter, continue, last, return) {
     !!user_call(expr)
     !!continue_call(next_i)
   })
-  new_state(block, NULL, tag = i)
+  state <- new_state(block, NULL, tag = i)
+  counter(inc = 1L)
+
+  state
 }
 
 yield_state <- function(expr, counter, continue, last = FALSE, return = FALSE) {
@@ -413,7 +424,10 @@ yield_state <- function(expr, counter, continue, last = FALSE, return = FALSE) {
     suspend_to(!!next_i)
     return(last_value())
   })
-  new_state(block, NULL, tag = i)
+  state <- new_state(block, NULL, tag = i)
+  counter(inc = 1L)
+
+  state
 }
 strip_yield <- function(expr) {
   node_cadr(expr)
@@ -421,13 +435,8 @@ strip_yield <- function(expr) {
 
 if_states <- function(preamble, condition, then_body, else_body, counter, continue, last, return) {
   i <- counter()
-  i_then <- counter(inc = 1L)
-
-  if (is_null(else_body)) {
-    i_else <- i_then + 1L
-  } else {
-    i_else <- counter(inc = 1L)
-  }
+  i_then <- i + 1L
+  i_else <- i_then + 1L
 
   i_machine <- machine_depth(counter)
 
@@ -441,29 +450,35 @@ if_states <- function(preamble, condition, then_body, else_body, counter, contin
     }
   })
   states <- new_state(if_block, NULL, i)
+  counter(inc = 1L)
 
-  then_machine <- walk_branch_states(then_body, counter, continue, last, return)
-  states <- node_list_poke_cdr(states, new_state(then_machine, NULL, i_then))
+  offset <- if (is_null(else_body)) 0L else 1L
+  then_machine <- walk_branch_states(then_body, offset, counter, continue, last, return)
+  then_state <- new_state(then_machine, NULL, i_then)
+  states <- node_list_poke_cdr(states, then_state)
+  counter(inc = 1L)
 
   if (!is_null(else_body)) {
-    else_machine <- walk_branch_states(else_body, counter, continue, last, return)
-    states <- node_list_poke_cdr(states, new_state(else_machine, NULL, i_else))
+    else_machine <- walk_branch_states(else_body, 0L, counter, continue, last, return)
+    else_state <- new_state(else_machine, NULL, i_else)
+    states <- node_list_poke_cdr(states, else_state)
+    counter(inc = 1L)
   }
 
   if (last) {
-    i_after <- counter() + 1L
     after_block <- block(quote(break))
-    states <- node_list_poke_cdr(states, new_state(after_block, NULL, i_after))
+    after_state <- new_state(after_block, NULL, counter())
+    states <- node_list_poke_cdr(states, after_state)
+    counter(inc = 1L)
   }
 
   states
 }
 
 loop_states <- function(preamble, condition, body, counter, continue, last) {
-  i <- counter()
   states <- NULL
-
-  next_i <- counter(inc = 1L)
+  i <- counter()
+  next_i <- i + 1L
 
   preamble_block <- expr({
     !!!preamble %&&% list(user_call(preamble))
@@ -471,9 +486,9 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
     goto(!!next_i)
   })
 
-  states <- node_list_poke_cdr(states, new_state(preamble_block, NULL, i))
-
-  i <- next_i
+  preamble_state <- new_state(preamble_block, NULL, i)
+  states <- node_list_poke_cdr(states, preamble_state)
+  i <- counter(inc = 1L)
   next_i <- if (last) 0L else i + 1L
 
   nested_machine_block <- expr({
@@ -483,6 +498,7 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
   })
   nested_machine_state <- new_state(nested_machine_block, NULL, i)
   states <- node_list_poke_cdr(states, nested_machine_state)
+  counter(inc = 1L)
 
   states
 }
@@ -503,7 +519,10 @@ break_state <- function(preamble, counter) {
     !!!preamble %&&% list(user_call(preamble))
     !!!continue
   })
-  new_state(block, NULL, counter())
+  state <- new_state(block, NULL, counter())
+  counter(inc = 1L)
+
+  state
 }
 
 next_state <- function(preamble, counter) {
@@ -522,7 +541,10 @@ next_state <- function(preamble, counter) {
     !!!preamble %&&% list(user_call(preamble))
     !!!continue
   })
-  new_state(block, NULL, counter())
+  state <- new_state(block, NULL, counter())
+  counter(inc = 1L)
+
+  state
 }
 
 continue_call <- function(next_i) {
