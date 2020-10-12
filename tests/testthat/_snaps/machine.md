@@ -219,8 +219,8 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user("value")
@@ -255,8 +255,8 @@
                   body1()
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -305,8 +305,8 @@
                   body1()
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -349,8 +349,8 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   goto(1L)
@@ -384,8 +384,8 @@
                   body1()
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -428,8 +428,8 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if (user({
@@ -476,15 +476,15 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine("loop")
-                  goto(2L)
+                  set_state(2L)
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
@@ -516,12 +516,12 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  push_machine("loop")
-                  goto(2L)
+                  set_state(2L)
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
@@ -553,12 +553,12 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  push_machine("loop")
-                  goto(2L)
+                  set_state(2L)
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       if (user(TRUE)) {
@@ -599,15 +599,15 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine("loop")
-                  goto(2L)
+                  set_state(2L)
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
@@ -647,15 +647,15 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine("loop")
-                  goto(2L)
+                  set_state(2L)
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
@@ -695,15 +695,15 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  push_machine("loop")
-                  goto(2L)
+                  set_state(2L)
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       break
@@ -742,14 +742,14 @@
               user({
                   body1()
               })
-              push_machine("if")
               if (user({
                   condition
               })) {
-                  goto(2L)
+                  set_state(2L)
               } else {
-                  goto(3L)
+                  set_state(3L)
               }
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -797,14 +797,14 @@
               user({
                   body1()
               })
-              push_machine("if")
               if (user({
                   condition
               })) {
-                  goto(2L)
+                  set_state(2L)
               } else {
-                  goto(3L)
+                  set_state(3L)
               }
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -871,14 +871,14 @@
               user({
                   body1()
               })
-              push_machine("if")
               if (user({
                   condition
               })) {
-                  goto(2L)
+                  set_state(2L)
               } else {
-                  goto(3L)
+                  set_state(3L)
               }
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -948,14 +948,14 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              push_machine("if")
               if (user({
                   condition
               })) {
-                  goto(2L)
+                  set_state(2L)
               } else {
-                  goto(3L)
+                  set_state(3L)
               }
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -1014,18 +1014,18 @@
                   body1()
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  push_machine("if")
                   if (user({
                       condition
                   })) {
-                      goto(2L)
+                      set_state(2L)
                   } else {
-                      goto(3L)
+                      set_state(3L)
                   }
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
@@ -1073,18 +1073,18 @@
                   body1()
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  push_machine("if")
                   if (user({
                       condition
                   })) {
-                      goto(2L)
+                      set_state(2L)
                   } else {
-                      goto(3L)
+                      set_state(3L)
                   }
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
@@ -1130,22 +1130,22 @@
               user({
                   body1()
               })
-              push_machine("if")
               if (user({
                   truth1
               })) {
-                  goto(2L)
+                  set_state(2L)
               } else {
-                  goto(3L)
+                  set_state(3L)
               }
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  push_machine("if")
                   if (user(truth2)) {
-                      goto(2L)
+                      set_state(2L)
                   } else {
-                      goto(3L)
+                      set_state(3L)
                   }
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("value")
@@ -1197,18 +1197,18 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  push_machine("if")
                   if (user({
                       TRUE
                   })) {
-                      goto(2L)
+                      set_state(2L)
                   } else {
-                      goto(3L)
+                      set_state(3L)
                   }
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
@@ -1258,21 +1258,21 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       body1()
                   })
-                  push_machine("if")
                   if (user({
                       TRUE
                   })) {
-                      goto(2L)
+                      set_state(2L)
                   } else {
-                      goto(3L)
+                      set_state(3L)
                   }
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
@@ -1345,31 +1345,31 @@
               user({
                   "repeat"
               })
-              push_machine("loop")
-              goto(2L)
+              set_state(2L)
+              set_depth(2L)
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       body1()
                   })
-                  push_machine("if")
                   if (user({
                       TRUE
                   })) {
-                      goto(2L)
+                      set_state(2L)
                   } else {
-                      goto(3L)
+                      set_state(3L)
                   }
+                  set_depth(3L)
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      push_machine("if")
                       if (user({
                         TRUE
                       })) {
-                        goto(2L)
+                        set_state(2L)
                       } else {
-                        goto(3L)
+                        set_state(3L)
                       }
+                      set_depth(4L)
                   }, `2` = {
                       repeat switch(state[[4L]], `1` = {
                         set_depth(2L)

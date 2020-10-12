@@ -442,12 +442,12 @@ if_states <- function(preamble, condition, then_body, else_body, counter, contin
 
   if_block <- expr({
     !!!preamble %&&% list(user_call(preamble))
-    push_machine("if")
     if (!!condition) {
-      goto(!!i_then)
+      set_state(!!i_then)
     } else {
-      goto(!!i_else)
+      set_state(!!i_else)
     }
+    set_depth(!!(i_machine + 1L))
   })
   states <- new_state(if_block, NULL, i)
   counter(inc = 1L)
@@ -479,11 +479,12 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
   states <- NULL
   i <- counter()
   next_i <- i + 1L
+  depth <- machine_depth(counter)
 
   preamble_block <- expr({
     !!!preamble %&&% list(user_call(preamble))
-    push_machine("loop")
-    goto(!!next_i)
+    set_state(!!next_i)
+    set_depth(!!(depth + 1L))
   })
 
   preamble_state <- new_state(preamble_block, NULL, i)
@@ -493,7 +494,7 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
 
   nested_machine_block <- expr({
     !!walk_loop_states(body, condition, counter)
-    set_depth(!!machine_depth(counter))
+    set_depth(!!depth)
     !!continue_call(next_i)
   })
   nested_machine_state <- new_state(nested_machine_block, NULL, i)
