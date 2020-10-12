@@ -92,6 +92,14 @@ test_that("generators support nested loops", {
     repeat { repeat yield("foo") }
   }))
 
+  # No srcrefs for inner loops
+  expect_snapshot0(generator_body(function() {
+    repeat repeat yield("foo")
+  }))
+  expect_snapshot0(generator_body(function() {
+    repeat while (TRUE) yield("foo")
+  }))
+
   expect_snapshot0(generator_body(function() {
     repeat {
       repeat yield("foo")
@@ -174,6 +182,13 @@ test_that("break within if", {
       }
       body2()
     }
+  }))
+
+  # FIXME
+  expect_snapshot0(generator_body(function() {
+    body1()
+    if (truth1) if (truth2) yield("value")
+    body2()
   }))
 })
 

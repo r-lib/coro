@@ -505,6 +505,86 @@
 
     Code
       generator_body(function() {
+        repeat repeat yield("foo")
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine("loop")
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  push_machine("loop")
+                  goto(2L)
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user("foo")
+                      suspend_to(1L)
+                      return(last_value())
+                  })
+                  set_depth(2L)
+                  break
+              })
+              set_depth(1L)
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        repeat while (TRUE) yield("foo")
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "repeat"
+              })
+              push_machine("loop")
+              goto(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  push_machine("loop")
+                  goto(2L)
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      if (user(TRUE)) {
+                        goto(2L)
+                      } else {
+                        break
+                      }
+                  }, `2` = {
+                      user("foo")
+                      suspend_to(1L)
+                      return(last_value())
+                  })
+                  set_depth(2L)
+                  break
+              })
+              set_depth(1L)
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
         repeat {
           repeat yield("foo")
           "after"
@@ -1028,6 +1108,71 @@
               })
               set_depth(1L)
               break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        body1()
+        if (truth1) if (truth2) yield("value")
+        body2()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+              })
+              push_machine("if")
+              if (user({
+                  truth1
+              })) {
+                  goto(2L)
+              } else {
+                  goto(3L)
+              }
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  push_machine("if")
+                  if (user(truth2)) {
+                      goto(2L)
+                  } else {
+                      goto(3L)
+                  }
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      user("value")
+                      suspend_to(2L)
+                      return(last_value())
+                  }, `1` = {
+                      break
+                  })
+                  n <- depth()
+                  if (n < 2L) break
+                  if (n == 2L) goto(1L)
+                  set_depth(2L)
+                  goto(3L)
+              }, `2` = {
+                  break
+              })
+              n <- depth()
+              if (n < 1L) break
+              if (n == 1L) goto(1L)
+              set_depth(1L)
+              goto(3L)
+          }, `3` = {
+              user({
+                  body2()
+              })
+              kill()
+              return(last_value())
           })
           kill()
           invisible(NULL)

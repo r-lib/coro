@@ -102,15 +102,62 @@ walk_branch_states <- function(body, counter, continue, last, return) {
 
 expr_states <- function(expr, counter, continue, last, return) {
   switch(expr_type(expr),
-    `{` = block_states(expr, counter, continue = continue, last = last, return = return),
-    `expr` = continue_state(expr, counter, continue = continue, last = last, return = return),
-    `yield` = yield_state(strip_yield(expr), counter, continue = continue, last = last, return = return),
-    `return` = return_state(expr, counter),
-    `break` = break_state(NULL, counter),
+    `{` = block_states(
+      block = expr,
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return
+    ),
+    `expr` = continue_state(
+      expr = expr,
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return
+    ),
+    `yield` = yield_state(
+      expr = strip_yield(expr),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return
+    ),
+    `return` = return_state(
+      expr = expr,
+      counter = counter
+    ),
+    `if` = if_states(
+      preamble = NULL,
+      condition = user_call(node_cadr(expr)),
+      then_body = node_cadr(node_cdr(expr)),
+      else_body = node_cadr(node_cddr(expr)),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return
+    ),
+    `break` = break_state(
+      preamble = NULL,
+      counter = counter
+    ),
     `next` = next_state(NULL, counter),
-    `if` = ,
-    `repeat` = ,
-    `while` = ,
+    `repeat` = loop_states(
+      preamble = NULL,
+      body = node_cadr(expr),
+      condition = NULL,
+      counter = counter,
+      continue = continue,
+      last = last
+    ),
+    `while` = loop_states(
+      preamble = NULL,
+      body = node_cadr(node_cdr(expr)),
+      condition = user_call(node_cadr(expr)),
+      counter = counter,
+      continue = continue,
+      last = last
+    ),
     `for` = ,
     `tryCatch` = ,
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
@@ -254,7 +301,7 @@ block_states <- function(block, counter, continue, last, return) {
       `if` = {
         skip()
         push_states(if_states(
-          collect(),
+          preamble = collect(),
           condition = user_call(refd_block(node_cadr(expr), ref)),
           then_body = node_cadr(node_cdr(expr)),
           else_body = node_cadr(node_cddr(expr)),
