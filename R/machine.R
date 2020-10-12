@@ -51,7 +51,7 @@ walk_loop_states <- function(body, condition, counter) {
     nested_counter(inc = 1L)
 
     condition_block <- block(expr(
-      if (!!user_call(condition)) {
+      if (!!condition) {
         set_state(!!2L)
       } else {
         break
@@ -150,21 +150,33 @@ expr_states <- function(expr, counter, continue, last, return) {
     `next` = next_state(NULL, counter),
     `repeat` = loop_states(
       preamble = NULL,
-      body = node_cadr(expr),
+      init = NULL,
       condition = NULL,
+      body = node_cadr(expr),
+      cleanup = NULL,
       counter = counter,
       continue = continue,
       last = last
     ),
     `while` = loop_states(
       preamble = NULL,
-      body = node_cadr(node_cdr(expr)),
+      init = NULL,
       condition = user_call(node_cadr(expr)),
+      body = node_cadr(node_cdr(expr)),
+      cleanup = NULL,
       counter = counter,
       continue = continue,
       last = last
     ),
-    `for` = ,
+    `for` = for_states(
+      preamble = NULL,
+      var = node_cadr(expr),
+      iterator = node_cadr(node_cdr(expr)),
+      body = node_cadr(node_cddr(expr)),
+      counter = counter,
+      continue = continue,
+      last = last
+    ),
     `tryCatch` = ,
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
     stop_internal("expr_states", sprintf("Unexpected operation `%s`", expr_type(expr)))
@@ -321,8 +333,10 @@ block_states <- function(block, counter, continue, last, return) {
         node_poke_car(node, "repeat")
         push_states(loop_states(
           preamble = collect(),
-          body = node_cadr(expr),
+          init = NULL,
           condition = NULL,
+          body = node_cadr(expr),
+          cleanup = NULL,
           counter = counter,
           continue = continue,
           last = last
@@ -333,8 +347,23 @@ block_states <- function(block, counter, continue, last, return) {
         skip()
         push_states(loop_states(
           preamble = collect(),
-          body = node_cadr(node_cdr(expr)),
+          init = NULL,
           condition = user_call(refd_block(node_cadr(expr), ref)),
+          body = node_cadr(node_cdr(expr)),
+          cleanup = NULL,
+          counter = counter,
+          continue = continue,
+          last = last
+        ))
+        next
+      },
+      `for` = {
+        skip()
+        push_states(for_states(
+          preamble = collect(),
+          var = node_cadr(expr),
+          iterator = node_cadr(node_cdr(expr)),
+          body = node_cadr(node_cddr(expr)),
           counter = counter,
           continue = continue,
           last = last
@@ -475,7 +504,7 @@ if_states <- function(preamble, condition, then_body, else_body, counter, contin
   states
 }
 
-loop_states <- function(preamble, condition, body, counter, continue, last) {
+loop_states <- function(preamble, init, condition, body, cleanup, counter, continue, last) {
   states <- NULL
   i <- counter()
   next_i <- i + 1L
@@ -483,6 +512,7 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
 
   preamble_block <- expr({
     !!!preamble %&&% list(user_call(preamble))
+    !!!init %&&% list(init)
     set_state(!!next_i)
     set_depth(!!(depth + 1L))
   })
@@ -495,6 +525,7 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
   nested_machine_block <- expr({
     !!walk_loop_states(body, condition, counter)
     set_depth(!!depth)
+    !!!cleanup %&&% list(cleanup)
     !!continue_call(next_i)
   })
   nested_machine_state <- new_state(nested_machine_block, NULL, i)
@@ -502,6 +533,37 @@ loop_states <- function(preamble, condition, body, counter, continue, last) {
   counter(inc = 1L)
 
   states
+}
+
+for_states <- function(preamble, var, iterator, body, counter, continue, last) {
+  loop_depth <- machine_depth(counter) + 1L
+
+  init <- expr(
+    iterators[[!!loop_depth]] <- as_iterator(!!user_call(iterator))
+  )
+  condition <- expr({
+    iterator <- iterators[[!!loop_depth]]
+    if (is_null(elt <- iterator())) {
+      FALSE
+    } else {
+      user_env[[!!as.character(var)]] <- elt
+      TRUE
+    }
+  })
+  cleanup <- expr(
+    iterators[[!!loop_depth]] <- NULL
+  )
+
+  loop_states(
+    preamble = preamble,
+    init = init,
+    condition = condition,
+    body = body,
+    cleanup = cleanup,
+    counter = counter,
+    continue = continue,
+    last = last
+  )
 }
 
 break_state <- function(preamble, counter) {

@@ -1477,3 +1477,162 @@
           invisible(NULL)
       }
 
+# handle for loops
+
+    Code
+      generator_body(function() for (x in 1:3) yield(x))
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              iterators[[2L]] <- as_iterator(user(1:3))
+              set_state(2L)
+              set_depth(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  if ({
+                      iterator <- iterators[[2L]]
+                      if (is_null(elt <- iterator())) {
+                        FALSE
+                      } else {
+                        user_env[["x"]] <- elt
+                        TRUE
+                      }
+                  }) {
+                      set_state(2L)
+                  } else {
+                      break
+                  }
+              }, `2` = {
+                  user(x)
+                  suspend_to(1L)
+                  return(last_value())
+              })
+              set_depth(1L)
+              iterators[[2L]] <- NULL
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() for (x in 1:3) for (y in 2:4) yield(list(x, y)))
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              iterators[[2L]] <- as_iterator(user(1:3))
+              set_state(2L)
+              set_depth(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  if ({
+                      iterator <- iterators[[2L]]
+                      if (is_null(elt <- iterator())) {
+                        FALSE
+                      } else {
+                        user_env[["x"]] <- elt
+                        TRUE
+                      }
+                  }) {
+                      set_state(2L)
+                  } else {
+                      break
+                  }
+              }, `2` = {
+                  iterators[[3L]] <- as_iterator(user(2:4))
+                  set_state(3L)
+                  set_depth(3L)
+              }, `3` = {
+                  repeat switch(state[[3L]], `1` = {
+                      if ({
+                        iterator <- iterators[[3L]]
+                        if (is_null(elt <- iterator())) {
+                          FALSE
+                        } else {
+                          user_env[["y"]] <- elt
+                          TRUE
+                        }
+                      }) {
+                        set_state(2L)
+                      } else {
+                        break
+                      }
+                  }, `2` = {
+                      user(list(x, y))
+                      suspend_to(1L)
+                      return(last_value())
+                  })
+                  set_depth(2L)
+                  iterators[[3L]] <- NULL
+                  break
+              })
+              set_depth(1L)
+              iterators[[2L]] <- NULL
+              break
+          })
+          kill()
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function() {
+        body1()
+        for (x in 1:3) yield(x)
+        body2()
+      })
+    Output
+      {
+          if (killed()) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  body1()
+              })
+              iterators[[2L]] <- as_iterator(user(1:3))
+              set_state(2L)
+              set_depth(2L)
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  if ({
+                      iterator <- iterators[[2L]]
+                      if (is_null(elt <- iterator())) {
+                        FALSE
+                      } else {
+                        user_env[["x"]] <- elt
+                        TRUE
+                      }
+                  }) {
+                      set_state(2L)
+                  } else {
+                      break
+                  }
+              }, `2` = {
+                  user(x)
+                  suspend_to(1L)
+                  return(last_value())
+              })
+              set_depth(1L)
+              iterators[[2L]] <- NULL
+              set_state(3L)
+          }, `3` = {
+              user({
+                  body2()
+              })
+              kill()
+              return(last_value())
+          })
+          kill()
+          invisible(NULL)
+      }
+

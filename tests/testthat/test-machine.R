@@ -244,3 +244,14 @@ test_that("next and break within two layers of if-else", {
     body4()
   }))
 })
+
+test_that("handle for loops", {
+  expect_snapshot0(generator_body(function() for (x in 1:3) yield(x)))
+  expect_snapshot0(generator_body(function() for (x in 1:3) for (y in 2:4) yield(list(x, y))))
+
+  expect_snapshot0(generator_body(function() {
+    body1()
+    for (x in 1:3) yield(x)
+    body2()
+  }))
+})
