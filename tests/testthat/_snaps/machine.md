@@ -160,7 +160,8 @@
                   "foo"
                   "value"
               })
-              suspend_to(2L)
+              state[[1L]] <- 2L
+              suspend()
               return(last_value())
           }, `2` = {
               user({
@@ -191,7 +192,8 @@
                   "foo"
                   "value"
               })
-              suspend_to(2L)
+              state[[1L]] <- 2L
+              suspend()
               return(last_value())
           }, `2` = {
               user({
@@ -219,15 +221,16 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user("value")
-                  suspend_to(1L)
+                  state[[2L]] <- 1L
+                  suspend()
                   return(last_value())
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -255,14 +258,15 @@
                   body1()
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "value"
                   })
-                  suspend_to(2L)
+                  state[[2L]] <- 2L
+                  suspend()
                   return(last_value())
               }, `2` = {
                   user({
@@ -270,8 +274,8 @@
                   })
                   break
               })
-              set_depth(1L)
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body2()
@@ -305,24 +309,25 @@
                   body1()
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       body2()
                       "value"
                   })
-                  suspend_to(2L)
+                  state[[2L]] <- 2L
+                  suspend()
                   return(last_value())
               }, `2` = {
                   user({
                       body3()
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body4()
@@ -349,13 +354,13 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -384,23 +389,23 @@
                   body1()
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       body2()
                       "next"
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               }, `2` = {
                   user({
                       body3()
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body4()
@@ -428,14 +433,14 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if (user({
                       loop_condition
                   })) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
                       break
                   }
@@ -444,15 +449,16 @@
                       body2()
                       "value"
                   })
-                  suspend_to(3L)
+                  state[[2L]] <- 3L
+                  suspend()
                   return(last_value())
               }, `3` = {
                   user({
                       body3()
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -476,25 +482,26 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  set_state(2L)
-                  set_depth(3L)
+                  state[[2L]] <- 2L
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
-                      suspend_to(1L)
+                      state[[3L]] <- 1L
+                      suspend()
                       return(last_value())
                   })
-                  set_depth(2L)
+                  length(state) <- 2L
                   break
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -516,22 +523,23 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  set_state(2L)
-                  set_depth(3L)
+                  state[[2L]] <- 2L
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
-                      suspend_to(1L)
+                      state[[3L]] <- 1L
+                      suspend()
                       return(last_value())
                   })
-                  set_depth(2L)
+                  length(state) <- 2L
                   break
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -553,28 +561,29 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  set_state(2L)
-                  set_depth(3L)
+                  state[[2L]] <- 2L
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       if (user(TRUE)) {
-                        set_state(2L)
+                        state[[3L]] <- 2L
                       } else {
                         break
                       }
                   }, `2` = {
                       user("foo")
-                      suspend_to(1L)
+                      state[[3L]] <- 1L
+                      suspend()
                       return(last_value())
                   })
-                  set_depth(2L)
+                  length(state) <- 2L
                   break
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -599,30 +608,31 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  set_state(2L)
-                  set_depth(3L)
+                  state[[2L]] <- 2L
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
-                      suspend_to(1L)
+                      state[[3L]] <- 1L
+                      suspend()
                       return(last_value())
                   })
-                  set_depth(2L)
-                  set_state(3L)
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
               }, `3` = {
                   user({
                       "after"
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -647,30 +657,31 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  set_state(2L)
-                  set_depth(3L)
+                  state[[2L]] <- 2L
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("foo")
-                      suspend_to(1L)
+                      state[[3L]] <- 1L
+                      suspend()
                       return(last_value())
                   })
-                  set_depth(2L)
-                  set_state(3L)
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
               }, `3` = {
                   user({
                       "break"
                   })
                   break
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -695,28 +706,28 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "repeat"
                   })
-                  set_state(2L)
-                  set_depth(3L)
+                  state[[2L]] <- 2L
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       break
                   })
-                  set_depth(2L)
-                  set_state(3L)
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
               }, `3` = {
                   user({
                       "break"
                   })
                   break
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -745,29 +756,32 @@
               if (user({
                   condition
               })) {
-                  set_state(2L)
+                  state[[1L]] <- 2L
               } else {
-                  set_state(3L)
+                  state[[1L]] <- 3L
               }
-              set_depth(2L)
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "then"
                   })
-                  suspend_to(2L)
+                  state[[2L]] <- 2L
+                  suspend()
                   return(last_value())
               }, `2` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body2()
@@ -803,47 +817,53 @@
               if (user({
                   condition
               })) {
-                  set_state(2L)
+                  state[[1L]] <- 2L
               } else {
-                  set_state(3L)
+                  state[[1L]] <- 3L
               }
-              set_depth(2L)
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "then"
                   })
-                  suspend_to(2L)
+                  state[[2L]] <- 2L
+                  suspend()
                   return(last_value())
               }, `2` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
-              set_state(4L)
+              length(state) <- 1L
+              state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       "else"
                   })
-                  suspend_to(2L)
+                  state[[2L]] <- 2L
+                  suspend()
                   return(last_value())
               }, `2` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
-              set_state(4L)
+              length(state) <- 1L
+              state[[1L]] <- 4L
           }, `4` = {
               user({
                   body2()
@@ -883,59 +903,65 @@
               if (user({
                   condition
               })) {
-                  set_state(2L)
+                  state[[1L]] <- 2L
               } else {
-                  set_state(3L)
+                  state[[1L]] <- 3L
               }
-              set_depth(2L)
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       then1()
                       "then"
                   })
-                  suspend_to(2L)
+                  state[[2L]] <- 2L
+                  suspend()
                   return(last_value())
               }, `2` = {
                   user({
                       then2()
                   })
-                  set_state(3L)
+                  state[[2L]] <- 3L
               }, `3` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
-              set_state(4L)
+              length(state) <- 1L
+              state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
                   user({
                       else1()
                       "else"
                   })
-                  suspend_to(2L)
+                  state[[2L]] <- 2L
+                  suspend()
                   return(last_value())
               }, `2` = {
                   user({
                       else2()
                   })
-                  set_state(3L)
+                  state[[2L]] <- 3L
               }, `3` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
-              set_state(4L)
+              length(state) <- 1L
+              state[[1L]] <- 4L
           }, `4` = {
               user({
                   body2()
@@ -966,11 +992,11 @@
               if (user({
                   condition
               })) {
-                  set_state(2L)
+                  state[[1L]] <- 2L
               } else {
-                  set_state(3L)
+                  state[[1L]] <- 3L
               }
-              set_depth(2L)
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -981,13 +1007,15 @@
               }, `2` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
+              length(state) <- 1L
               break
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
@@ -999,13 +1027,15 @@
               }, `2` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
+              length(state) <- 1L
               break
           }, `4` = {
               break
@@ -1035,40 +1065,42 @@
                   body1()
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if (user({
                       condition
                   })) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
-                      set_state(3L)
+                      state[[2L]] <- 3L
                   }
-                  set_depth(3L)
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
                         "break"
                       })
-                      set_depth(1L)
+                      length(state) <- 1L
                       break
                   }, `2` = {
                       break
                   })
-                  n <- depth()
-                  if (n < 2L) break
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
                   if (n == 2L) {
-                      set_state(1L)
+                      state[[2L]] <- 1L
                       next
                   }
-                  set_depth(2L)
-                  set_state(1L)
+                  length(state) <- 2L
+                  state[[2L]] <- 1L
               }, `3` = {
                   break
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -1097,43 +1129,45 @@
                   body1()
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if (user({
                       condition
                   })) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
-                      set_state(3L)
+                      state[[2L]] <- 3L
                   }
-                  set_depth(3L)
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
                         "break"
                       })
-                      set_depth(1L)
+                      length(state) <- 1L
                       break
                   }, `2` = {
                       break
                   })
-                  n <- depth()
-                  if (n < 2L) break
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
                   if (n == 2L) {
-                      set_state(1L)
+                      state[[2L]] <- 1L
                       next
                   }
-                  set_depth(2L)
-                  set_state(3L)
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
               }, `3` = {
                   user({
                       body2()
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -1160,46 +1194,51 @@
               if (user({
                   truth1
               })) {
-                  set_state(2L)
+                  state[[1L]] <- 2L
               } else {
-                  set_state(3L)
+                  state[[1L]] <- 3L
               }
-              set_depth(2L)
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if (user(truth2)) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
-                      set_state(3L)
+                      state[[2L]] <- 3L
                   }
-                  set_depth(3L)
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user("value")
-                      suspend_to(2L)
+                      state[[3L]] <- 2L
+                      suspend()
                       return(last_value())
                   }, `2` = {
                       break
                   })
-                  n <- depth()
-                  if (n < 2L) break
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
                   if (n == 2L) {
-                      set_state(1L)
+                      state[[2L]] <- 1L
                       next
                   }
-                  set_depth(2L)
-                  set_state(3L)
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
               }, `3` = {
                   break
               })
-              n <- depth()
-              if (n < 1L) break
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
               if (n == 1L) {
-                  set_state(1L)
+                  state[[1L]] <- 1L
                   next
               }
-              set_depth(1L)
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body2()
@@ -1230,40 +1269,42 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if (user({
                       TRUE
                   })) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
-                      set_state(3L)
+                      state[[2L]] <- 3L
                   }
-                  set_depth(3L)
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
                         "break"
                       })
-                      set_depth(1L)
+                      length(state) <- 1L
                       break
                   }, `2` = {
                       break
                   })
-                  n <- depth()
-                  if (n < 2L) break
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
                   if (n == 2L) {
-                      set_state(1L)
+                      state[[2L]] <- 1L
                       next
                   }
-                  set_depth(2L)
-                  set_state(1L)
+                  length(state) <- 2L
+                  state[[2L]] <- 1L
               }, `3` = {
                   break
               })
-              set_depth(1L)
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -1294,8 +1335,8 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -1304,55 +1345,59 @@
                   if (user({
                       TRUE
                   })) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
-                      set_state(3L)
+                      state[[2L]] <- 3L
                   }
-                  set_depth(3L)
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
                         "break"
                       })
-                      set_depth(1L)
+                      length(state) <- 1L
                       break
                   }, `2` = {
                       break
                   })
-                  n <- depth()
-                  if (n < 2L) break
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
                   if (n == 2L) {
-                      set_state(1L)
+                      state[[2L]] <- 1L
                       next
                   }
-                  set_depth(2L)
-                  set_state(4L)
+                  length(state) <- 2L
+                  state[[2L]] <- 4L
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
                         "next"
                       })
-                      set_depth(2L)
+                      length(state) <- 2L
                       break
                   }, `2` = {
                       break
                   })
-                  n <- depth()
-                  if (n < 2L) break
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
                   if (n == 2L) {
-                      set_state(1L)
+                      state[[2L]] <- 1L
                       next
                   }
-                  set_depth(2L)
-                  set_state(4L)
+                  length(state) <- 2L
+                  state[[2L]] <- 4L
               }, `4` = {
                   user({
                       body2()
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body3()
@@ -1387,8 +1432,8 @@
               user({
                   "repeat"
               })
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   user({
@@ -1397,75 +1442,81 @@
                   if (user({
                       TRUE
                   })) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
-                      set_state(3L)
+                      state[[2L]] <- 3L
                   }
-                  set_depth(3L)
+                  state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
                       if (user({
                         TRUE
                       })) {
-                        set_state(2L)
+                        state[[3L]] <- 2L
                       } else {
-                        set_state(3L)
+                        state[[3L]] <- 3L
                       }
-                      set_depth(4L)
+                      state[[4L]] <- 1L
                   }, `2` = {
                       repeat switch(state[[4L]], `1` = {
-                        set_depth(2L)
+                        length(state) <- 2L
                         break
                       }, `2` = {
                         break
                       })
-                      n <- depth()
-                      if (n < 3L) break
+                      n <- length(state)
+                      if (n < 3L) {
+                        break
+                      }
                       if (n == 3L) {
-                        set_state(1L)
+                        state[[3L]] <- 1L
                         next
                       }
-                      set_depth(3L)
-                      set_state(4L)
+                      length(state) <- 3L
+                      state[[3L]] <- 4L
                   }, `3` = {
                       repeat switch(state[[4L]], `1` = {
-                        set_depth(1L)
+                        length(state) <- 1L
                         break
                       }, `2` = {
                         break
                       })
-                      n <- depth()
-                      if (n < 3L) break
+                      n <- length(state)
+                      if (n < 3L) {
+                        break
+                      }
                       if (n == 3L) {
-                        set_state(1L)
+                        state[[3L]] <- 1L
                         next
                       }
-                      set_depth(3L)
-                      set_state(4L)
+                      length(state) <- 3L
+                      state[[3L]] <- 4L
                   }, `4` = {
                       user({
                         body2()
                       })
-                      set_state(5L)
+                      state[[3L]] <- 5L
                   }, `5` = {
                       break
                   })
-                  n <- depth()
-                  if (n < 2L) break
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
                   if (n == 2L) {
-                      set_state(1L)
+                      state[[2L]] <- 1L
                       next
                   }
-                  set_depth(2L)
-                  set_state(3L)
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
               }, `3` = {
                   user({
                       body3()
                   })
-                  set_state(1L)
+                  state[[2L]] <- 1L
               })
-              set_depth(1L)
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body4()
@@ -1488,8 +1539,8 @@
           }
           repeat switch(state[[1L]], `1` = {
               iterators[[2L]] <- as_iterator(user(1:3))
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if ({
@@ -1501,17 +1552,18 @@
                         TRUE
                       }
                   }) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
                       break
                   }
               }, `2` = {
                   user(x)
-                  suspend_to(1L)
+                  state[[2L]] <- 1L
+                  suspend()
                   return(last_value())
               })
-              set_depth(1L)
               iterators[[2L]] <- NULL
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -1529,8 +1581,8 @@
           }
           repeat switch(state[[1L]], `1` = {
               iterators[[2L]] <- as_iterator(user(1:3))
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if ({
@@ -1542,14 +1594,14 @@
                         TRUE
                       }
                   }) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
                       break
                   }
               }, `2` = {
                   iterators[[3L]] <- as_iterator(user(2:4))
-                  set_state(3L)
-                  set_depth(3L)
+                  state[[2L]] <- 3L
+                  state[[3L]] <- 1L
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
                       if ({
@@ -1561,21 +1613,22 @@
                           TRUE
                         }
                       }) {
-                        set_state(2L)
+                        state[[3L]] <- 2L
                       } else {
                         break
                       }
                   }, `2` = {
                       user(list(x, y))
-                      suspend_to(1L)
+                      state[[3L]] <- 1L
+                      suspend()
                       return(last_value())
                   })
-                  set_depth(2L)
                   iterators[[3L]] <- NULL
+                  length(state) <- 2L
                   break
               })
-              set_depth(1L)
               iterators[[2L]] <- NULL
+              length(state) <- 1L
               break
           })
           exhausted <- TRUE
@@ -1600,8 +1653,8 @@
                   body1()
               })
               iterators[[2L]] <- as_iterator(user(1:3))
-              set_state(2L)
-              set_depth(2L)
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   if ({
@@ -1613,18 +1666,19 @@
                         TRUE
                       }
                   }) {
-                      set_state(2L)
+                      state[[2L]] <- 2L
                   } else {
                       break
                   }
               }, `2` = {
                   user(x)
-                  suspend_to(1L)
+                  state[[2L]] <- 1L
+                  suspend()
                   return(last_value())
               })
-              set_depth(1L)
               iterators[[2L]] <- NULL
-              set_state(3L)
+              length(state) <- 1L
+              state[[1L]] <- 3L
           }, `3` = {
               user({
                   body2()
