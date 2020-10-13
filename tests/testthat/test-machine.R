@@ -255,3 +255,8 @@ test_that("handle for loops", {
     body2()
   }))
 })
+
+test_that("handle yield-assign", {
+  expect_snapshot0(generator_body(function(x) x <- yield(x)))
+  expect_snapshot0(generator_body(function(x) { x <- yield(x) }))
+})

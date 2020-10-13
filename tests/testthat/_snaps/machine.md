@@ -1690,3 +1690,51 @@
           invisible(NULL)
       }
 
+# handle yield-assign
+
+    Code
+      generator_body(function(x) x <- yield(x))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user(x))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user_env[["x"]] <- arg
+              break
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
+
+---
+
+    Code
+      generator_body(function(x) {
+        x <- yield(x)
+      })
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  x
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user_env[["x"]] <- arg
+              break
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
+

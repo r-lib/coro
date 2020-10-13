@@ -372,7 +372,7 @@ block_states <- function(block, counter, continue, last, return, info) {
       },
       `yield_assign` = {
         node_poke_car(node, strip_yield(expr[[3]]))
-        yield_assign_states(
+        push_states(yield_assign_states(
           arg = collect(),
           var = as_string(expr[[2]]),
           counter = counter,
@@ -380,7 +380,7 @@ block_states <- function(block, counter, continue, last, return, info) {
           last = last,
           return = return,
           info = info
-        )
+        ))
         next
       },
       `return` = {
