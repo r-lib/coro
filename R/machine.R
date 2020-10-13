@@ -144,6 +144,14 @@ expr_states <- function(expr, counter, continue, last, return) {
       last = last,
       return = return
     ),
+    `yield_assign` = yield_assign_states(
+      expr = strip_yield(expr[[3]]),
+      var = as_string(expr[[2]]),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return
+    ),
     `return` = return_state(
       expr = expr,
       counter = counter
@@ -207,7 +215,7 @@ expr_type <- function(expr) {
 
   head <- node_car(expr)
   if (!is_symbol(head)) {
-    if (is_call(expr, "yield", ns = c("", "flowery"))) {
+    if (is_yield_call(expr)) {
       return("yield")
     } else {
       return(default)
@@ -215,6 +223,16 @@ expr_type <- function(expr) {
   }
 
   head <- as_string(head)
+
+  if (is_string(head, "<-")) {
+    rhs <- node_cadr(node_cdr(expr))
+    if (is_yield_call(rhs)) {
+      return("yield_assign")
+    } else {
+      return(default)
+    }
+  }
+
   switch(head,
     `{` = ,
     `yield` = ,
@@ -323,6 +341,18 @@ block_states <- function(block, counter, continue, last, return) {
           last = last,
           return = return
         ))
+        next
+      },
+      `yield_assign` = {
+        node_poke_car(node, strip_yield(expr[[3]]))
+        yield_assign_states(
+          expr = collect(),
+          var = as_string(expr[[2]]),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return
+        )
         next
       },
       `return` = {
@@ -455,7 +485,7 @@ continue_state <- function(expr, counter, continue, last, return) {
   state
 }
 
-yield_state <- function(expr, counter, continue, last = FALSE, return = FALSE) {
+yield_state <- function(expr, counter, continue, last, return) {
   if (last && return) {
     return(return_state(expr, counter))
   }
@@ -477,6 +507,22 @@ yield_state <- function(expr, counter, continue, last = FALSE, return = FALSE) {
 }
 strip_yield <- function(expr) {
   node_cadr(expr)
+}
+
+yield_assign_states <- function(expr, var, counter, continue, last, return) {
+  # Hard-code `last` to `FALSE` because we are inserting an assignment
+  # state after the yielding state
+  states <- yield_state(expr, counter, continue, last = FALSE, return = return)
+
+  assign_block <- expr({
+    user_env[[!!var]] <- arg
+    !!continue_call(continue(counter, last), machine_depth(counter))
+  })
+  assign_state <- new_state(assign_block, NULL, counter())
+  node_list_poke_cdr(states, assign_state)
+  counter(inc = 1L)
+
+  states
 }
 
 if_states <- function(preamble, condition, then_body, else_body, counter, continue, last, return) {

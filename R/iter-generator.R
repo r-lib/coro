@@ -115,6 +115,10 @@ generator0 <- function(fn) {
 
     # Create function around the state machine
     gen <- function(arg = NULL) {
+      # Forward generator argument inside the state machine environment
+      delayedAssign("arg", arg, assign.env = env)
+
+      # Resume state machine
       evalq(envir = env, !!machine_body)
     }
 
