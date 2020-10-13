@@ -106,12 +106,19 @@ generator0 <- function(fn, type = "generator") {
   env <- environment(fn)
 
   out <- new_function(fmls, quote({
+    info <- machine_info(type, env = caller_env())
+
     # Generate the state machine lazily at runtime
     if (is_null(state_machine)) {
-      state_machine <<- walk_states(body(fn), type = type)
+      state_machine <<- walk_states(body(fn), info = info)
     }
 
-    env <- new_generator_env(env)
+    ops <- info$async_ops
+    if (!is_null(ops) && !is_installed(ops$package)) {
+      abort(sprintf("The %s package must be installed.", ops$package))
+    }
+
+    env <- new_generator_env(env, info)
     user_env <- env$user_env
 
     # Forward arguments inside the user space of the state machine
@@ -127,11 +134,18 @@ generator0 <- function(fn, type = "generator") {
       evalq(envir = env, !!state_machine)
     })
 
-    # Zap source references so we can see the state machine
-    unstructure(gen)
+    env$.self <- gen
+
+    if (is_string(type, "async")) {
+      # Step into the generator right away
+      gen(NULL)
+    } else {
+      # Zap source references so we can see the state machine
+      unstructure(gen)
+    }
   }))
 
-  structure(out, class = c("flowery_generator", "function"))
+  structure(out, class = c(paste0("flowery_", type), "function"))
 }
 
 #' @export
@@ -139,10 +153,10 @@ print.flowery_generator <- function(x, ...) {
   writeLines("<generator>")
   print(unstructure(x))
 
-  machine <- with(
-    fn_env(x),
-    state_machine %||% walk_states(body(fn))
-  )
+  machine <- with(env(fn_env(x)), {
+    info <- machine_info(type, env = global_env())
+    state_machine %||% walk_states(body(fn), info = info)
+  })
 
   writeLines("State machine:")
   print(machine)
@@ -150,7 +164,7 @@ print.flowery_generator <- function(x, ...) {
   invisible(x)
 }
 
-new_generator_env <- function(parent) {
+new_generator_env <- function(parent, info) {
   env <- env(ns_env("flowery"))
   user_env <- env(parent)
 
@@ -169,6 +183,11 @@ new_generator_env <- function(parent) {
       .last_value
     }
   })
+
+  if (!is_null(info$async_ops)) {
+    env$then <- info$async_ops$`_then`
+    env$as_promise <- info$async_ops$`_as_promise`
+  }
 
   env
 }

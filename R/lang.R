@@ -162,6 +162,9 @@ call_for_poke_body <- function(x, body) {
 is_yield_call <- function(x) {
   is_call(x, "yield", ns = c("", "flowery"))
 }
+is_await_call <- function(x) {
+  is_call(x, "await", ns = c("", "flowery"))
+}
 
 return_sym <- quote(`return`)
 yield_sym <- quote(`yield`)

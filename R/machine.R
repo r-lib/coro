@@ -1,8 +1,4 @@
 
-generator_body <- function(fn) {
-  walk_states(body(fn), type = "generator")
-}
-
 new_counter <- function(machine_depth, loop_depth = 0L) {
   i <- 1L
   function(inc = 0L) {
@@ -23,10 +19,23 @@ loop_depth <- function(counter, check = TRUE) {
   depth
 }
 
-walk_states <- function(expr, type) {
+machine_info <- function(type, env) {
   type <- arg_match0(type, c("generator", "async", "async_generator"))
-  info <- list(type = type)
 
+  if (type %in% c("async", "async_generator")) {
+    # Look up lexically defined async operations
+    async_ops <- flowery_ops(env)
+  } else {
+    async_ops <- NULL
+  }
+
+  list(
+    type = type,
+    async_ops = async_ops
+  )
+}
+
+walk_states <- function(expr, info) {
   continue <- function(counter, last) {
     # Break if last
     if (last) 0L else counter() + 1L
@@ -152,7 +161,15 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield` = yield_state(
-      arg = user_call(strip_yield(expr)),
+      expr = user_call(expr[[2]]),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return,
+      info = info
+    ),
+    `await` = await_state(
+      expr = user_call(expr[[2]]),
       counter = counter,
       continue = continue,
       last = last,
@@ -160,7 +177,16 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield_assign` = yield_assign_states(
-      arg = user_call(strip_yield(expr[[3]])),
+      expr = user_call(expr[[3]][[2]]),
+      var = as_string(expr[[2]]),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return,
+      info = info
+    ),
+    `await_assign` = await_assign_states(
+      expr = user_call(expr[[3]][[2]]),
       var = as_string(expr[[2]]),
       counter = counter,
       continue = continue,
@@ -240,21 +266,24 @@ expr_type <- function(expr) {
   }
 
   head <- node_car(expr)
-  if (!is_symbol(head)) {
-    if (is_yield_call(expr)) {
-      return("yield")
-    } else {
+  if (is_call(head, "::") && identical(head[[2]], quote(flowery))) {
+    head <- head[[3]]
+    if (!as_string(head) %in% c("yield", "await", "await_each")) {
       return(default)
     }
   }
 
+  if (!is_symbol(head)) {
+    return(default)
+  }
   head <- as_string(head)
 
   if (is_string(head, "<-")) {
     rhs <- node_cadr(node_cdr(expr))
     if (is_yield_call(rhs)) {
       return("yield_assign")
-    } else {
+    } else if (is_await_call(rhs)) {
+      return("await_assign")
       return(default)
     }
   }
@@ -262,6 +291,7 @@ expr_type <- function(expr) {
   switch(head,
     `{` = ,
     `yield` = ,
+    `await` = ,
     `return` = ,
     `if` = ,
     `repeat` = ,
@@ -359,9 +389,9 @@ block_states <- function(block, counter, continue, last, return, info) {
         accum(next)
       },
       `yield` = {
-        node_poke_car(node, strip_yield(expr))
+        node_poke_car(node, expr[[2]])
         push_states(yield_state(
-          arg = collect(),
+          expr = collect(),
           counter = counter,
           continue = continue,
           last = last,
@@ -371,9 +401,34 @@ block_states <- function(block, counter, continue, last, return, info) {
         next
       },
       `yield_assign` = {
-        node_poke_car(node, strip_yield(expr[[3]]))
+        node_poke_car(node, expr[[3]][[2]])
         push_states(yield_assign_states(
-          arg = collect(),
+          expr = collect(),
+          var = as_string(expr[[2]]),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        ))
+        next
+      },
+      `await` = {
+        node_poke_car(node, expr[[2]])
+        push_states(await_state(
+          expr = collect(),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        ))
+        next
+      },
+      `await_assign` = {
+        node_poke_car(node, expr[[3]][[2]])
+        push_states(await_assign_states(
+          expr = collect(),
           var = as_string(expr[[2]]),
           counter = counter,
           continue = continue,
@@ -495,7 +550,7 @@ return_state <- function(expr, counter, info) {
   block <- expr({
     !!expr
     exhausted <- TRUE
-    return(last_value())
+    !!return_call(info)
   })
   state <- new_state(block, NULL, tag = counter())
   counter(inc = 1L)
@@ -515,10 +570,17 @@ strip_explicit_return <- function(expr) {
 
   expr
 }
+return_call <- function(info) {
+  if (is_null(info$async_ops)) {
+    quote(return(last_value()))
+  } else {
+    quote(return(as_promise(last_value())))
+  }
+}
 
 continue_state <- function(expr, counter, continue, last, return, info) {
   if (last && return) {
-    return(return_state(expr, counter))
+    return(return_state(expr, counter, info))
   }
 
   i <- counter()
@@ -534,11 +596,20 @@ continue_state <- function(expr, counter, continue, last, return, info) {
   state
 }
 
-yield_state <- function(arg, counter, continue, last, return, info) {
-  expr <- expr(validate_yield(!!arg))
+yield_state <- function(expr, counter, continue, last, return, info) {
+  assert_can_yield(info)
+  expr <- expr(validate_yield(!!expr))
+  suspend_state(expr, counter, continue, last, return, info)
+}
+assert_can_yield <- function(info) {
+  if (is_string(info$type, "async")) {
+    abort("Can't yield within an `async()` function.")
+  }
+}
 
+suspend_state <- function(expr, counter, continue, last, return, info) {
   if (last && return) {
-    return(return_state(expr, counter))
+    return(return_state(expr, counter, info))
   }
 
   i <- counter()
@@ -556,20 +627,29 @@ yield_state <- function(arg, counter, continue, last, return, info) {
 
   state
 }
-strip_yield <- function(expr) {
-  node_cadr(expr)
-}
 
-yield_assign_states <- function(arg,
+yield_assign_states <- function(expr,
                                 var,
                                 counter,
                                 continue,
                                 last,
                                 return,
                                 info) {
+  assert_can_yield(info)
+  expr <- expr(validate_yield(!!expr))
+  suspend_assign_states(expr, var, counter, continue, last, return, info)
+}
+
+suspend_assign_states <- function(expr,
+                                  var,
+                                  counter,
+                                  continue,
+                                  last,
+                                  return,
+                                  info) {
   # Hard-code `last` to `FALSE` because we are inserting an assignment
   # state after the yielding state
-  states <- yield_state(arg, counter, continue, last = FALSE, return = return)
+  states <- suspend_state(expr, counter, continue, last = FALSE, return = return)
 
   assign_block <- expr({
     user_env[[!!var]] <- arg
@@ -580,6 +660,29 @@ yield_assign_states <- function(arg,
   counter(inc = 1L)
 
   states
+}
+
+await_state <- function(expr, counter, continue, last, return, info) {
+  expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
+  suspend_state(
+    expr = expr,
+    counter = counter,
+    continue = continue,
+    last = last,
+    return = return,
+    info = info
+  )
+}
+
+await_assign_states <- function(expr,
+                                var,
+                                counter,
+                                continue,
+                                last,
+                                return,
+                                info) {
+  expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
+  suspend_assign_states(expr, var, counter, continue, last, return, info)
 }
 
 if_states <- function(preamble,
