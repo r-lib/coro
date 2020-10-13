@@ -101,11 +101,16 @@ gen <- function(expr) {
   generator0(fn)()
 }
 generator0 <- function(fn) {
-  machine_body <- walk_states(body(fn))
+  state_machine <- NULL
   fmls <- formals(fn)
   env <- environment(fn)
 
-  out <- new_function(fmls, expr({
+  out <- new_function(fmls, quote({
+    # Generate the state machine lazily at runtime
+    if (is_null(state_machine)) {
+      state_machine <<- walk_states(body(fn))
+    }
+
     env <- new_generator_env(env)
     user_env <- env$user_env
 
@@ -114,13 +119,13 @@ generator0 <- function(fn) {
     lapply(names(fmls), function(arg) env_bind_arg(user_env, arg, frame = frame))
 
     # Create function around the state machine
-    gen <- function(arg = NULL) {
+    gen <- blast(function(arg = NULL) {
       # Forward generator argument inside the state machine environment
       delayedAssign("arg", arg, assign.env = env)
 
       # Resume state machine
-      evalq(envir = env, !!machine_body)
-    }
+      evalq(envir = env, !!state_machine)
+    })
 
     # Zap source references so we can see the state machine
     unstructure(gen)
@@ -134,8 +139,13 @@ print.flowery_generator <- function(x, ...) {
   writeLines("<generator>")
   print(unstructure(x))
 
+  machine <- with(
+    fn_env(x),
+    state_machine %||% walk_states(body(fn))
+  )
+
   writeLines("State machine:")
-  print(env_get(fn_env(x), "machine_body"))
+  print(machine)
 
   invisible(x)
 }
