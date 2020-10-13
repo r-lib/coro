@@ -440,11 +440,12 @@ block_states <- function(block, counter, continue, last, return) {
   states
 }
 
-return_state <- function(expr, counter) {
+return_state <- function(expr, counter, yield = NULL) {
   expr <- strip_explicit_return(expr)
 
   block <- expr({
     !!user_call(expr)
+    !!!yield %&&% expr({ validate_yield(last_value()) })
     exhausted <- TRUE
     return(last_value())
   })
@@ -487,7 +488,7 @@ continue_state <- function(expr, counter, continue, last, return) {
 
 yield_state <- function(expr, counter, continue, last, return) {
   if (last && return) {
-    return(return_state(expr, counter))
+    return(return_state(expr, counter, yield = TRUE))
   }
 
   i <- counter()
@@ -496,6 +497,7 @@ yield_state <- function(expr, counter, continue, last, return) {
 
   block <- expr({
     !!user_call(expr)
+    validate_yield(last_value())
     state[[!!depth]] <- !!next_i
     suspend()
     return(last_value())
@@ -507,6 +509,11 @@ yield_state <- function(expr, counter, continue, last, return) {
 }
 strip_yield <- function(expr) {
   node_cadr(expr)
+}
+validate_yield <- function(x) {
+  if (is_null(x)) {
+    abort("Can't yield `NULL`.")
+  }
 }
 
 yield_assign_states <- function(expr, var, counter, continue, last, return) {
