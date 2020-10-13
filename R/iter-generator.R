@@ -206,3 +206,11 @@ yield <- function(x) {
 
 # Currently a no-op but will disable exit expressions in the future
 suspend <- function() NULL
+
+validate_yield <- function(x) {
+  if (is_null(x)) {
+    abort("Can't yield `NULL`.")
+  }
+
+  x
+}

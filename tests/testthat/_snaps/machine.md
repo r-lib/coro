@@ -44,8 +44,7 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              user("foo")
-              validate_yield(last_value())
+              validate_yield(user("foo"))
               exhausted <- TRUE
               return(last_value())
           })
@@ -63,8 +62,7 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              user("foo")
-              validate_yield(last_value())
+              validate_yield(user("foo"))
               exhausted <- TRUE
               return(last_value())
           })
@@ -109,11 +107,10 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              user({
+              validate_yield(user({
                   "foo"
                   "value"
-              })
-              validate_yield(last_value())
+              }))
               exhausted <- TRUE
               return(last_value())
           })
@@ -159,11 +156,10 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              user({
+              validate_yield(user({
                   "foo"
                   "value"
-              })
-              validate_yield(last_value())
+              }))
               state[[1L]] <- 2L
               suspend()
               return(last_value())
@@ -192,11 +188,10 @@
               return(invisible(NULL))
           }
           repeat switch(state[[1L]], `1` = {
-              user({
+              validate_yield(user({
                   "foo"
                   "value"
-              })
-              validate_yield(last_value())
+              }))
               state[[1L]] <- 2L
               suspend()
               return(last_value())
@@ -230,8 +225,7 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user("value")
-                  validate_yield(last_value())
+                  validate_yield(user("value"))
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -268,10 +262,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       "value"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -320,11 +313,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       body2()
                       "value"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -453,11 +445,10 @@
                       break
                   }
               }, `2` = {
-                  user({
+                  validate_yield(user({
                       body2()
                       "value"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 3L
                   suspend()
                   return(last_value())
@@ -502,8 +493,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      user("foo")
-                      validate_yield(last_value())
+                      validate_yield(user("foo"))
                       state[[3L]] <- 1L
                       suspend()
                       return(last_value())
@@ -541,8 +531,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      user("foo")
-                      validate_yield(last_value())
+                      validate_yield(user("foo"))
                       state[[3L]] <- 1L
                       suspend()
                       return(last_value())
@@ -586,8 +575,7 @@
                         break
                       }
                   }, `2` = {
-                      user("foo")
-                      validate_yield(last_value())
+                      validate_yield(user("foo"))
                       state[[3L]] <- 1L
                       suspend()
                       return(last_value())
@@ -631,8 +619,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      user("foo")
-                      validate_yield(last_value())
+                      validate_yield(user("foo"))
                       state[[3L]] <- 1L
                       suspend()
                       return(last_value())
@@ -681,8 +668,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      user("foo")
-                      validate_yield(last_value())
+                      validate_yield(user("foo"))
                       state[[3L]] <- 1L
                       suspend()
                       return(last_value())
@@ -777,10 +763,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       "then"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -839,10 +824,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       "then"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -861,10 +845,9 @@
               state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       "else"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -927,11 +910,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       then1()
                       "then"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -955,11 +937,10 @@
               state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       else1()
                       "else"
-                  })
-                  validate_yield(last_value())
+                  }))
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -1018,10 +999,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  user({
+                  validate_yield(user({
                       "then"
-                  })
-                  validate_yield(last_value())
+                  }))
                   exhausted <- TRUE
                   return(last_value())
               }, `2` = {
@@ -1229,8 +1209,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      user("value")
-                      validate_yield(last_value())
+                      validate_yield(user("value"))
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -1578,8 +1557,7 @@
                       break
                   }
               }, `2` = {
-                  user(x)
-                  validate_yield(last_value())
+                  validate_yield(user(x))
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -1640,8 +1618,7 @@
                         break
                       }
                   }, `2` = {
-                      user(list(x, y))
-                      validate_yield(last_value())
+                      validate_yield(user(list(x, y)))
                       state[[3L]] <- 1L
                       suspend()
                       return(last_value())
@@ -1694,8 +1671,7 @@
                       break
                   }
               }, `2` = {
-                  user(x)
-                  validate_yield(last_value())
+                  validate_yield(user(x))
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())

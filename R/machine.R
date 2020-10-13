@@ -152,7 +152,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield` = yield_state(
-      expr = user_call(strip_yield(expr)),
+      arg = user_call(strip_yield(expr)),
       counter = counter,
       continue = continue,
       last = last,
@@ -160,7 +160,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield_assign` = yield_assign_states(
-      expr = user_call(strip_yield(expr[[3]])),
+      arg = user_call(strip_yield(expr[[3]])),
       var = as_string(expr[[2]]),
       counter = counter,
       continue = continue,
@@ -361,7 +361,7 @@ block_states <- function(block, counter, continue, last, return, info) {
       `yield` = {
         node_poke_car(node, strip_yield(expr))
         push_states(yield_state(
-          expr = collect(),
+          arg = collect(),
           counter = counter,
           continue = continue,
           last = last,
@@ -373,7 +373,7 @@ block_states <- function(block, counter, continue, last, return, info) {
       `yield_assign` = {
         node_poke_car(node, strip_yield(expr[[3]]))
         yield_assign_states(
-          expr = collect(),
+          arg = collect(),
           var = as_string(expr[[2]]),
           counter = counter,
           continue = continue,
@@ -491,10 +491,9 @@ block_states <- function(block, counter, continue, last, return, info) {
   states
 }
 
-return_state <- function(expr, counter, info, yield = NULL) {
+return_state <- function(expr, counter, info) {
   block <- expr({
     !!expr
-    !!!yield %&&% expr({ validate_yield(last_value()) })
     exhausted <- TRUE
     return(last_value())
   })
@@ -535,9 +534,11 @@ continue_state <- function(expr, counter, continue, last, return, info) {
   state
 }
 
-yield_state <- function(expr, counter, continue, last, return, info) {
+yield_state <- function(arg, counter, continue, last, return, info) {
+  expr <- expr(validate_yield(!!arg))
+
   if (last && return) {
-    return(return_state(expr, counter, yield = TRUE))
+    return(return_state(expr, counter))
   }
 
   i <- counter()
@@ -546,7 +547,6 @@ yield_state <- function(expr, counter, continue, last, return, info) {
 
   block <- expr({
     !!expr
-    validate_yield(last_value())
     state[[!!depth]] <- !!next_i
     suspend()
     return(last_value())
@@ -559,13 +559,8 @@ yield_state <- function(expr, counter, continue, last, return, info) {
 strip_yield <- function(expr) {
   node_cadr(expr)
 }
-validate_yield <- function(x) {
-  if (is_null(x)) {
-    abort("Can't yield `NULL`.")
-  }
-}
 
-yield_assign_states <- function(expr,
+yield_assign_states <- function(arg,
                                 var,
                                 counter,
                                 continue,
@@ -574,7 +569,7 @@ yield_assign_states <- function(expr,
                                 info) {
   # Hard-code `last` to `FALSE` because we are inserting an assignment
   # state after the yielding state
-  states <- yield_state(expr, counter, continue, last = FALSE, return = return)
+  states <- yield_state(arg, counter, continue, last = FALSE, return = return)
 
   assign_block <- expr({
     user_env[[!!var]] <- arg
