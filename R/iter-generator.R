@@ -100,7 +100,7 @@ gen <- function(expr) {
   fn <- new_function(NULL, substitute(expr), caller_env())
   generator0(fn)()
 }
-generator0 <- function(fn) {
+generator0 <- function(fn, type = "generator") {
   state_machine <- NULL
   fmls <- formals(fn)
   env <- environment(fn)
@@ -108,7 +108,7 @@ generator0 <- function(fn) {
   out <- new_function(fmls, quote({
     # Generate the state machine lazily at runtime
     if (is_null(state_machine)) {
-      state_machine <<- walk_states(body(fn))
+      state_machine <<- walk_states(body(fn), type = type)
     }
 
     env <- new_generator_env(env)
