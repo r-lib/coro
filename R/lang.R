@@ -84,7 +84,7 @@ new_refd_block <- function(node, refs = NULL) {
     attr(block, "srcref") <- refs
   }
 
-  block
+  user_call(block)
 }
 refd_block <- function(expr, ref = NULL) {
   new_refd_block(new_node(expr), new_node(ref))

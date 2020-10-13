@@ -144,7 +144,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `expr` = continue_state(
-      expr = expr,
+      expr = user_call(expr),
       counter = counter,
       continue = continue,
       last = last,
@@ -152,7 +152,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield` = yield_state(
-      expr = strip_yield(expr),
+      expr = user_call(strip_yield(expr)),
       counter = counter,
       continue = continue,
       last = last,
@@ -160,7 +160,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield_assign` = yield_assign_states(
-      expr = strip_yield(expr[[3]]),
+      expr = user_call(strip_yield(expr[[3]])),
       var = as_string(expr[[2]]),
       counter = counter,
       continue = continue,
@@ -169,7 +169,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `return` = return_state(
-      expr = expr,
+      expr = user_call(strip_explicit_return(expr)),
       counter = counter,
       info = info
     ),
@@ -361,8 +361,8 @@ block_states <- function(block, counter, continue, last, return, info) {
       `yield` = {
         node_poke_car(node, strip_yield(expr))
         push_states(yield_state(
-          collect(),
-          counter,
+          expr = collect(),
+          counter = counter,
           continue = continue,
           last = last,
           return = return,
@@ -492,10 +492,8 @@ block_states <- function(block, counter, continue, last, return, info) {
 }
 
 return_state <- function(expr, counter, info, yield = NULL) {
-  expr <- strip_explicit_return(expr)
-
   block <- expr({
-    !!user_call(expr)
+    !!expr
     !!!yield %&&% expr({ validate_yield(last_value()) })
     exhausted <- TRUE
     return(last_value())
@@ -528,7 +526,7 @@ continue_state <- function(expr, counter, continue, last, return, info) {
   next_i <- continue(counter, last)
 
   block <- expr({
-    !!user_call(expr)
+    !!expr
     !!continue_call(next_i, machine_depth(counter))
   })
   state <- new_state(block, NULL, tag = i)
@@ -547,7 +545,7 @@ yield_state <- function(expr, counter, continue, last, return, info) {
   depth <- machine_depth(counter)
 
   block <- expr({
-    !!user_call(expr)
+    !!expr
     validate_yield(last_value())
     state[[!!depth]] <- !!next_i
     suspend()
