@@ -491,7 +491,7 @@ block_states <- function(block, counter, continue, last, return, info) {
       }
     )
 
-    abort(sprintf("TODO in `block_states()`: %s", type))
+    stop_internal("block_states", sprintf("Unexpected operation `%s`", type))
   }
 
   last <- saved_last
