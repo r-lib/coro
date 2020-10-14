@@ -306,7 +306,7 @@ block_states <- function(block, counter, continue, last, return, info) {
     next_refs <- node_cdr(refs)
 
     node <<- node_poke_cdr(node, NULL)
-    refs <<- node_poke_cdr(node, NULL)
+    refs <<- refs %&&% node_poke_cdr(refs, NULL)
 
     out <- new_refd_block(curr_node, curr_refs)
 
@@ -325,7 +325,7 @@ block_states <- function(block, counter, continue, last, return, info) {
       refs <<- node_cdr(refs)
     } else {
       node_poke_cdr(prev_node, NULL)
-      node_poke_cdr(prev_refs, NULL)
+      prev_refs %&&% node_poke_cdr(prev_refs, NULL)
     }
   }
 

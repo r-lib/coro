@@ -260,3 +260,18 @@ test_that("handle yield-assign", {
   expect_snapshot0(generator_body(function(x) x <- yield(x)))
   expect_snapshot0(generator_body(function(x) { x <- yield(x) }))
 })
+
+test_that("can parse generators without source references", {
+  # This reaches both `collect()` and `skip()` in `block_states()`
+  src <- "
+    generator_body(function() {
+      body1()
+      while (TRUE) {
+        yield('value')
+      }
+    })"
+  expect_error(
+    regexp = NA,
+    eval(parse(text = src, keep.source = FALSE))
+  )
+})
