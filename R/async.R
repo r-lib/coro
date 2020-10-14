@@ -69,7 +69,7 @@ async_generator <- function(fn) {
 #' @inheritParams await
 #' @export
 await_each <- function(x) {
-  abort("`await_each()` must be called within a `for` loop.")
+  abort("`await_each()` must be called within a `for` loop of an async function.")
 }
 
 #' @export

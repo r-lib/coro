@@ -161,6 +161,10 @@ test_that("for loops support await_each()", {
   })
 })
 
+test_that("await_each() can't be used in generators", {
+  expect_error(generator(function() for (x in await_each(i)) NULL)()(), "must be called")
+})
+
 test_that("yield() can't be used in async() functions", {
   expect_error(async(function() yield(1))(), "Can't")
 })
