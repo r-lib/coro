@@ -161,7 +161,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield` = yield_state(
-      expr = user_call(expr[[2]]),
+      expr = user_call(node_get(expr, 2)),
       counter = counter,
       continue = continue,
       last = last,
@@ -169,7 +169,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `await` = await_state(
-      expr = user_call(expr[[2]]),
+      expr = user_call(node_get(expr, 2)),
       counter = counter,
       continue = continue,
       last = last,
@@ -177,8 +177,8 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `yield_assign` = yield_assign_states(
-      expr = user_call(expr[[3]][[2]]),
-      var = as_string(expr[[2]]),
+      expr = user_call(node_get(node_get(expr, 3), 2)),
+      var = as_string(node_get(expr, 2)),
       counter = counter,
       continue = continue,
       last = last,
@@ -186,8 +186,8 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `await_assign` = await_assign_states(
-      expr = user_call(expr[[3]][[2]]),
-      var = as_string(expr[[2]]),
+      expr = user_call(node_get(node_get(expr, 3), 2)),
+      var = as_string(node_get(expr, 2)),
       counter = counter,
       continue = continue,
       last = last,
@@ -389,7 +389,7 @@ block_states <- function(block, counter, continue, last, return, info) {
         accum(next)
       },
       `yield` = {
-        node_poke_car(node, expr[[2]])
+        node_poke_car(node, node_get(expr, 2))
         push_states(yield_state(
           expr = collect(),
           counter = counter,
@@ -401,10 +401,10 @@ block_states <- function(block, counter, continue, last, return, info) {
         next
       },
       `yield_assign` = {
-        node_poke_car(node, expr[[3]][[2]])
+        node_poke_car(node, node_get(node_get(expr, 3), 2))
         push_states(yield_assign_states(
           expr = collect(),
-          var = as_string(expr[[2]]),
+          var = as_string(node_get(expr, 2)),
           counter = counter,
           continue = continue,
           last = last,
@@ -414,7 +414,7 @@ block_states <- function(block, counter, continue, last, return, info) {
         next
       },
       `await` = {
-        node_poke_car(node, expr[[2]])
+        node_poke_car(node, node_get(expr, 2))
         push_states(await_state(
           expr = collect(),
           counter = counter,
@@ -426,10 +426,10 @@ block_states <- function(block, counter, continue, last, return, info) {
         next
       },
       `await_assign` = {
-        node_poke_car(node, expr[[3]][[2]])
+        node_poke_car(node, node_get(node_get(expr, 3), 2))
         push_states(await_assign_states(
           expr = collect(),
-          var = as_string(expr[[2]]),
+          var = as_string(node_get(expr, 2)),
           counter = counter,
           continue = continue,
           last = last,

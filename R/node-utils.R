@@ -200,3 +200,15 @@ node_reverse <- function(node) {
 
   prev
 }
+
+# Unlike `[[` this returns `NULL` when OOB
+node_get <- function(node, i) {
+  if (node < 1L) {
+    abort("`i` must be an integer greater than 0.")
+  }
+  while (i > 1L) {
+    node <- node_cdr(node)
+    i <- i - 1L
+  }
+  node_car(node)
+}
