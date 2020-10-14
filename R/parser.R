@@ -76,11 +76,11 @@ walk_branch_states <- function(body, offset, counter, continue, last, return, in
     repeat switch(state[[!!machine_depth]], !!!states)
     n <- length(state)
     if (n < !!prev_depth) {
-      break
+      !!break_call()
     }
     if (n == !!prev_depth) {
       state[[!!prev_depth]] <- 1L
-      next
+      !!next_call()
     }
     length(state) <- !!prev_depth
 
@@ -856,7 +856,7 @@ condition_state <- function(condition, counter) {
     if (!!condition) {
       state[[!!loop_depth]] <- !!next_i
     } else {
-      break
+      !!break_call()
     }
   ))
   state <- new_state(block, NULL, i)
@@ -870,12 +870,12 @@ break_state <- function(preamble, counter, info) {
 
   if (loop_depth == machine_depth(counter)) {
     continue <- expr({
-      break
+      !!break_call()
     })
   } else {
     continue <- expr({
       length(state) <- !!(loop_depth - 1L)
-      break
+      !!break_call()
     })
   }
 
@@ -899,7 +899,7 @@ next_state <- function(preamble, counter, info) {
   } else {
     continue <- expr({
       length(state) <- !!loop_depth
-      break
+      !!break_call()
     })
   }
 
