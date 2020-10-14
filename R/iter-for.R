@@ -27,47 +27,19 @@ iterate <- function(loop) {
   body <- node_cadr(node_cdr(args))
 
   loop_env <- current_env()
-  body <- set_loop_ops(body, loop_env)
 
-  while (!is_null(elt <- iterator())) {
-    env[[var]] <- elt
-    eval_bare(body, env)
-  }
-}
+  elt <- NULL
+  advance <- function() !is_null(elt <<- iterator())
+  update <- function() env[[var]] <- elt
 
-# Replace `next` and `break` calls by thunks that evaluate in
-# `env`. This assumes `expr` will be called inside a loop inside an
-# execution env identical to `env`.
-set_loop_ops <- function(expr, env) {
-  if (!is_call(expr)) {
-    return(expr)
-  }
-  expr <- duplicate(expr, shallow = TRUE)
-
-  node <- expr
-  while (!is_null(node)) {
-    car <- node_car(node)
-
-    if (!is_call(car)) {
-      node <- node_cdr(node)
-      next
+  loop <- expr(
+    while (!!call2(advance)) {
+      !!call2(update)
+      !!body
     }
+  )
 
-    fn <- node_car(car)
-
-    if (identical(fn, quote(`next`))) {
-      car <- call2(function() eval_bare(quote(next), env))
-    } else if (identical(fn, quote(`break`))) {
-      car <- call2(function() eval_bare(quote(break), env))
-    } else {
-      car <- set_loop_ops(car, env)
-    }
-    node_poke_car(node, car)
-
-    node <- node_cdr(node)
-  }
-
-  expr
+  invisible(eval_bare(loop, env))
 }
 
 #' Iterable functions
