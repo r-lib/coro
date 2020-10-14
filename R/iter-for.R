@@ -15,7 +15,7 @@
 #' })
 iterate <- function(loop) {
   loop <- substitute(loop)
-  if (!is_call(loop, for_sym)) {
+  if (!is_call(loop, "for")) {
     abort("`loop` must be a `for` loop")
   }
 

@@ -1,15 +1,19 @@
 
-vec_last <- function(x) {
-  x[[length(x)]]
-}
-`vec_last<-` <- function(x, value) {
-  x[[length(x)]] <- value
+unstructure <- function(x) {
+  attributes(x) <- NULL
   x
 }
 
-map_last <- function(.x, .f, ...) {
-  vec_last(.x) <- .f(vec_last(.x), ...)
-  .x
+blast <- function(expr, env = caller_env()) {
+  eval_bare(enexpr(expr), env)
+}
+
+`%&&%` <- function(x, y) {
+  if (is_null(x)) {
+    x
+  } else {
+    y
+  }
 }
 
 compose <- function(...) {
@@ -26,14 +30,6 @@ compose <- function(...) {
     }
     out
   }
-}
-negate <- function(.p) {
-  function(...) !.p(...)
-}
-
-unstructure <- function(x) {
-  attributes(x) <- NULL
-  x
 }
 
 assert_lambda <- function(call) {
