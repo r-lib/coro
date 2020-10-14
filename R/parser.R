@@ -29,12 +29,10 @@ walk_loop_states <- function(body, condition, counter, info) {
     if (last) 1L else counter() + 1L
   }
 
-  depth <- machine_depth(counter)
-  loop_depth <- depth + 1L
-  nested_counter <- new_counter(loop_depth, loop_depth = loop_depth)
+  loop_depth <- machine_depth(counter)
 
   if (!is_null(condition)) {
-    nested_counter(inc = 1L)
+    counter(inc = 1L)
 
     condition_block <- block(expr(
       if (!!condition) {
@@ -51,7 +49,7 @@ walk_loop_states <- function(body, condition, counter, info) {
 
   nested_states <- expr_states(
     body,
-    nested_counter,
+    counter,
     continue = continue,
     last = TRUE,
     return = FALSE,
@@ -746,8 +744,11 @@ loop_states <- function(preamble,
   i <- counter(inc = 1L)
   next_i <- if (last) 0L else i + 1L
 
+  loop_depth <- depth + 1L
+  nested_counter <- new_counter(loop_depth, loop_depth = loop_depth)
+
   nested_machine_block <- expr({
-    !!walk_loop_states(body, condition, counter, info = info)
+    !!walk_loop_states(body, condition, nested_counter, info = info)
     !!!cleanup %&&% list(cleanup)
     length(state) <- !!depth
     !!continue_call(next_i, depth)
