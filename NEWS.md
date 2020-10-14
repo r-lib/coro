@@ -1,6 +1,9 @@
 
 # flowery 0.0.1.9000
 
+* Generators and async functions now support stepping with
+  `browser()`.
+
 * `generator()` now accepts functions of one argument. The first time
   a generator is called the argument is defined in the suspendable
   function. On subsequent invokations, the argument is returned from
