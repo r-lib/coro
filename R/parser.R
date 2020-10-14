@@ -564,6 +564,11 @@ continue_state <- function(expr, counter, continue, last, return, info) {
 yield_state <- function(expr, counter, continue, last, return, info) {
   assert_can_yield(info)
   expr <- expr(validate_yield(!!expr))
+
+  if (is_string(info$type, "async_generator")) {
+    expr <- expr(.last_value <- as_promise(!!expr))
+  }
+
   suspend_state(expr, counter, continue, last, return, info)
 }
 assert_can_yield <- function(info) {
@@ -777,22 +782,52 @@ for_states <- function(preamble,
                        info) {
   loop_depth <- machine_depth(counter) + 1L
 
+  async <- is_call(iterator, "await_each", ns = c("", "flowery"))
+  if (async) {
+    if (is_string(info$type, "generator")) {
+      abort(c(
+        "Can't use `await_each()` in a non-async generator.",
+        i = "Do you need `async_generator()`?"
+      ))
+    }
+    iterator <- iterator[[2]]
+  }
+
   init <- expr(
     iterators[[!!loop_depth]] <- as_iterator(!!user_call(iterator))
   )
 
   nested_counter <- new_loop_counter(counter)
 
-  condition <- expr({
-    iterator <- iterators[[!!loop_depth]]
-    if (is_null(elt <- iterator())) {
-      FALSE
-    } else {
-      user_env[[!!as.character(var)]] <- elt
-      TRUE
-    }
-  })
-  nested_states <- condition_state(condition, nested_counter)
+  if (async) {
+    await_block <- expr({
+      iterator <- iterators[[!!loop_depth]]
+      iterator()
+    })
+    nested_states <- await_state(await_block, nested_counter, continue, FALSE, FALSE, info)
+
+    condition <- expr({
+      if (is_null(arg)) {
+        FALSE
+      } else {
+        user_env[[!!as.character(var)]] <- arg
+        TRUE
+      }
+    })
+    condition_state <- condition_state(condition, nested_counter)
+    nested_states <- node_list_poke_cdr(nested_states, condition_state)
+  } else {
+    condition <- expr({
+      iterator <- iterators[[!!loop_depth]]
+      if (is_null(elt <- iterator())) {
+        FALSE
+      } else {
+        user_env[[!!as.character(var)]] <- elt
+        TRUE
+      }
+    })
+    nested_states <- condition_state(condition, nested_counter)
+  }
 
   cleanup <- expr(
     iterators[[!!loop_depth]] <- NULL
@@ -813,16 +848,18 @@ for_states <- function(preamble,
 }
 
 condition_state <- function(condition, counter) {
+  i <- counter()
+  next_i <- i + 1L
   loop_depth <- machine_depth(counter)
 
   block <- block(expr(
     if (!!condition) {
-      state[[!!loop_depth]] <- 2L
+      state[[!!loop_depth]] <- !!next_i
     } else {
       break
     }
   ))
-  state <- new_state(block, NULL, counter())
+  state <- new_state(block, NULL, i)
   counter(inc = 1L)
 
   state
