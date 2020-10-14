@@ -80,6 +80,17 @@ print.flowery_async <- function(x, ...) {
   writeLines("<async>")
   print(unclass(x), ...)
 
+  print_state_machine(x, ...)
+
+  invisible(x)
+}
+#' @export
+print.flowery_async_generator <- function(x, ...) {
+  writeLines("<async/generator>")
+  print(unclass(x), ...)
+
+  print_state_machine(x, ...)
+
   invisible(x)
 }
 
