@@ -94,22 +94,55 @@ print.flowery_async_generator <- function(x, ...) {
   invisible(x)
 }
 
-# Customisation point for the {async} package or any concurrency
-# framework that defines a "then" operation
-flowery_ops <- function(env) {
-  ops <- env_get(env, ".__flowery_async_ops__.", inherit = TRUE, default = NULL)
 
-  ops %||% list(
-    package = "promises",
-    `_then` = function(x, callback) promises::then(x, onFulfilled = callback),
-    `_as_promise` = function(x) as_promise(x)
+#' Async operations
+#'
+#' @description
+#'
+#' Customisation point for the _async_ package or any concurrency
+#' framework that defines a "then" operation. Assign the result of
+#' `async_ops()` to the `.__flowery_async_ops__.` symbol in your
+#' namespace.
+#'
+#' @param package The package name of the framework as a
+#'   string. `async()` and `async_generator()` check that the package
+#'   is installed at runtime.
+#' @param then A function of two arguments. The first argument is a
+#'   promise object (as created by `as_promise`). The second argument
+#'   is a callback function that must be called once the promise
+#'   object is resolved.
+#' @param as_promise A function of one argument. It should be a no-op
+#'   when passed a promise object, and otherwise wrap the value in a
+#'   resolved promise.
+#'
+#' @keywords internal
+#' @export
+async_ops <- function(package, then, as_promise) {
+  stopifnot(
+    is_string(package),
+    is_function(then),
+    is_function(as_promise)
+  )
+  structure(
+    list(
+      package = package,
+      then = then,
+      as_promise = as_promise
+    ),
+    class = "flowery_async_ops"
   )
 }
 
-as_promise <- function(x) {
-  if (promises::is.promise(x)) {
-    x
-  } else {
-    promises::promise_resolve(x)
+get_async_ops <- function(env) {
+  ops <- env_get(env, ".__flowery_async_ops__.", inherit = TRUE, default = NULL)
+
+  if (!is_null(ops)) {
+    return(ops)
   }
+
+  async_ops(
+    package = "promises",
+    then = function(x, callback) promises::then(x, onFulfilled = callback),
+    as_promise = function(x) if (promises::is.promise(x)) x else promises::promise_resolve(x)
+  )
 }

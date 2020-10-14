@@ -962,7 +962,7 @@ machine_info <- function(type, env) {
 
   if (type %in% c("async", "async_generator")) {
     # Look up lexically defined async operations
-    async_ops <- flowery_ops(env)
+    async_ops <- get_async_ops(env)
   } else {
     async_ops <- NULL
   }

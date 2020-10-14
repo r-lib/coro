@@ -189,8 +189,8 @@ new_generator_env <- function(parent, info) {
   })
 
   if (!is_null(info$async_ops)) {
-    env$then <- info$async_ops$`_then`
-    env$as_promise <- info$async_ops$`_as_promise`
+    env$then <- info$async_ops$then
+    env$as_promise <- info$async_ops$as_promise
   }
 
   env
