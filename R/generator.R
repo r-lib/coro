@@ -91,39 +91,109 @@
 #' tally(10)
 generator <- function(fn) {
   assert_lambda(substitute(fn))
-
-  info <- gen0_list(body(fn), fn_env(fn))
-  `_env` <- info$env
-
+  generator0(fn)
+}
+#' @rdname generator
+#' @param expr A yielding expression.
+#' @export
+gen <- function(expr) {
+  fn <- new_function(NULL, substitute(expr), caller_env())
+  generator0(fn)()
+}
+generator0 <- function(fn, type = "generator") {
+  state_machine <- NULL
   fmls <- formals(fn)
+  env <- environment(fn)
 
   out <- new_function(fmls, quote({
-    # Refresh the state machine environment
-    `_env` <- env_clone(`_env`)
+    info <- machine_info(type, env = caller_env())
 
-    # Forward arguments inside the state machine environment
+    # Generate the state machine lazily at runtime
+    if (is_null(state_machine)) {
+      state_machine <<- walk_states(body(fn), info = info)
+    }
+
+    ops <- info$async_ops
+    if (!is_null(ops) && !is_installed(ops$package)) {
+      abort(sprintf("The %s package must be installed.", ops$package))
+    }
+
+    env <- new_generator_env(env, info)
+    user_env <- env$user_env
+
+    # Forward arguments inside the user space of the state machine
     frame <- environment()
-    lapply(names(fmls), function(arg) env_bind_arg(`_env`, arg, frame = frame))
+    lapply(names(fmls), function(arg) env_bind_arg(user_env, arg, frame = frame))
 
     # Create function around the state machine
-    gen <- blast(function(`_next_arg` = NULL) !!info$expr)
+    gen <- blast(function(arg = NULL) {
+      # Forward generator argument inside the state machine environment
+      delayedAssign("arg", arg, assign.env = env)
 
-    # Zap source references so we can see the state machine
-    unstructure(gen)
+      # Resume state machine
+      evalq(envir = env, !!state_machine)
+    })
+
+    env$.self <- gen
+
+    if (is_string(type, "async")) {
+      # Step into the generator right away
+      gen(NULL)
+    } else {
+      # Zap source references so we can see the state machine
+      unstructure(gen)
+    }
   }))
 
-  structure(out, class = c("flowery_generator", "function"))
+  structure(out, class = c(paste0("flowery_", type), "function"))
 }
 
 #' @export
 print.flowery_generator <- function(x, ...) {
   writeLines("<generator>")
-  print(unstructure(x))
+  print(unstructure(x), ...)
 
-  writeLines("State machine:")
-  print(env_get(fn_env(x), "info")$expr)
+  print_state_machine(x, ...)
 
   invisible(x)
+}
+
+print_state_machine <- function(x, ...) {
+  machine <- with(env(fn_env(x)), {
+    info <- machine_info(type, env = global_env())
+    state_machine %||% walk_states(body(fn), info = info)
+  })
+
+  writeLines("State machine:")
+  print(machine, ...)
+}
+
+new_generator_env <- function(parent, info) {
+  env <- env(ns_env("flowery"))
+  user_env <- env(parent)
+
+  env$user_env <- user_env
+  env$exhausted <- FALSE
+  env$state <- 1L
+  env$iterators <- list()
+
+  with(env, {
+    .last_value <- NULL
+
+    user <- function(expr) {
+      .last_value <<- eval_bare(substitute(expr), user_env)
+    }
+    last_value <- function() {
+      .last_value
+    }
+  })
+
+  if (!is_null(info$async_ops)) {
+    env$then <- info$async_ops$`_then`
+    env$as_promise <- info$async_ops$`_as_promise`
+  }
+
+  env
 }
 
 env_bind_arg <- function(env, arg, frame = caller_env()) {
@@ -132,70 +202,6 @@ env_bind_arg <- function(env, arg, frame = caller_env()) {
   } else {
     env_bind_lazy(env, !!arg := !!sym(arg), .eval_env = frame)
   }
-}
-
-gen0 <- function(expr, env) {
-  info <- gen0_list(expr, env)
-  `_env` <- info$env
-
-  out <- new_function(pairlist2(`_next_arg` = NULL), info$expr)
-
-  # Zap source references so you can see the state machine
-  unstructure(out)
-}
-
-gen0_list <- function(expr, env) {
-  expr <- set_returns(expr)
-  parts <- generator_parts(expr)
-
-  # Add a late return point
-  return_call <- call2(quote(base::return), quote(invisible(NULL)))
-  parts <- node_list_poke_cdr(parts, pairlist(block(return_call)))
-
-  # Create the persistent closure environment of the generator
-  env <- env(env,
-    `_state` = "1",
-    `_return_state` = as.character(length(parts))
-  )
-
-  expr <- expr({
-    # Define value sent into the generator inside the state machine.
-    # TODO: This should happen lazily inside the relevant state. This
-    # way, interrupts and errors can be sent into the generator for
-    # clean up.
-    `_env`$`_next_arg` <- `_next_arg`
-
-    # Evaluate in the persistent environment
-    evalq(`_env`, expr = {
-      while (TRUE) {
-        !!machine_switch_call(parts)
-      }
-    })
-  })
-
-  list(expr = expr, env = env)
-}
-
-generator_parts <- function(block, arg = NULL) {
-  reset_state()
-  if (!is_null(arg)) {
-    poke_state_elt("arg_sym", sym(arg))
-  }
-
-  parts <- expr_parts(block)
-
-  if (is_null(parts)) {
-    pairlist(block)
-  } else {
-    parts
-  }
-}
-
-#' @rdname generator
-#' @param expr A yielding expression.
-#' @export
-gen <- function(expr) {
-  gen0(substitute(expr), env = caller_env())
 }
 
 #' Yield a value from a generator
@@ -220,3 +226,23 @@ gen <- function(expr) {
 yield <- function(x) {
   abort("`yield()` can't be called directly or within function arguments")
 }
+
+# Currently a no-op but will disable exit expressions in the future
+suspend <- function() NULL
+
+validate_yield <- function(x) {
+  if (is_null(x)) {
+    abort("Can't yield `NULL`.")
+  }
+
+  x
+}
+
+utils::globalVariables(c(
+  "last_value",
+  "state",
+  "arg",
+  ".self",
+  "then",
+  "as_promise"
+))

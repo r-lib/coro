@@ -1,21 +1,10 @@
 
 test_that("async functions construct a generator", {
-  expect_async_snapshot(function() "value")
-  expect_async_snapshot(function() await("value"))
-  expect_async_snapshot(function() if (1) await("value") else "else")
-  expect_async_snapshot(function() while (1) if (2) await("value"))
-  expect_async_snapshot(function() while (1) foo <- await("value"))
-})
-
-test_that("async functions are not sensitive to blocks", {
-  fn1 <- async(function() await("value"))
-  fn2 <- async(function() { await("value") })
-  expect_equal(async_internal_generator(fn1), async_internal_generator(fn2))
-
-  skip("FIXME?")
-  fn1 <- async(function() while (1) if (2) await("value"))
-  fn2 <- async(function() while (1) { if (2) { await("value") } })
-  expect_equal(async_internal_generator(fn1), async_internal_generator(fn2))
+  expect_snapshot0(async_body(function() "value"))
+  expect_snapshot0(async_body(function() await("value")))
+  expect_snapshot0(async_body(function() if (1) await("value") else "else"))
+  expect_snapshot0(async_body(function() while (1) if (2) await("value")))
+  expect_snapshot0(async_body(function() while (1) foo <- await("value")))
 })
 
 test_that("async() takes anonymous functions", {
@@ -64,19 +53,6 @@ test_that("await() yields", {
   })
   wait_for(fn())
   expect_equal(out, 1:3)
-})
-
-test_that("state of async() functions are independent", {
-  fn <- async(function() "value")
-
-  async_state <- function(fn) {
-    machine_state_env <- env_get(fn_env(fn), "_env", inherit = TRUE)
-    machine_state_env$`_state`
-  }
-
-  expect_equal(async_state(fn), "1")
-  fn()
-  expect_equal(async_state(fn), "1")
 })
 
 test_that("async_generator() creates streams", {
@@ -175,18 +151,22 @@ test_that("for loops support await_each()", {
   wait_for(async_collect(f(new_stream(1:3), new_stream(11:12))))
   expect_equal(values, c(1, 11, 12, 2, 3))
 
-  expect_async_snapshot(function(s1, s2) {
+  expect_snapshot0(async_body(function(s1, s2) {
     for (x in await_each(s1)) {
       values <<- c(values, x)
       for (y in await_each(s2)) {
         values <<- c(values, y)
       }
     }
-  })
+  }))
+})
+
+test_that("await_each() can't be used in generators", {
+  expect_error(generator(function() for (x in await_each(i)) NULL)()(), "non-async generator")
 })
 
 test_that("yield() can't be used in async() functions", {
-  expect_error(async(function() yield(1)), "Can't")
+  expect_error(async(function() yield(1))(), "Can't")
 })
 
 test_that("yield() inside `async_generator()` returns a promise", {

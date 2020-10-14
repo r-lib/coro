@@ -89,3 +89,17 @@ test_that("generators can take missing arguments", {
   expect_true(new_gen()())
   expect_false(new_gen(1)())
 })
+
+test_that("yield within if within for loops properly", {
+  new_gen <- generator(function() {
+    x <- 1:10
+    for (elt in x) {
+      if (elt < 5) {
+        yield(elt)
+      } else {
+        return(100L)
+      }
+    }
+  })
+  expect_identical(drain_int(new_gen()), c(1:4, 100L))
+})

@@ -223,7 +223,7 @@ Note that generators (and iterators in general) are one-shot. Once iteration is 
 drain_chr(iter)
 ```
 
-From that point on, reentering the iterator is an error:
+From that point on, reentering the iterator yields the exhaustion sentinel, invisibly:
 
 ```{r, error = TRUE}
 iter()
