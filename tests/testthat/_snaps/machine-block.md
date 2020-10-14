@@ -1,25 +1,29 @@
 # `{` blocks - one pause with no past or future
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         yield(1L)
       })
     Output
-      [[1]]
       {
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  1L
+              }))
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_return(invisible(NULL))
-      }
-      
 
 # `{` blocks - one pause
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before1"
         "before2"
         yield(1L)
@@ -27,43 +31,65 @@
         "after2"
       })
     Output
-      [[1]]
       {
-          "before1"
-          "before2"
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before1"
+                  "before2"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user({
+                  "after1"
+                  "after2"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "after1"
-          flowery::coro_return("after2")
-      }
-      
 
 # `{` blocks - no preamble
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         yield(1L)
         "after"
       })
     Output
-      [[1]]
       {
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `{` blocks - multiple pauses
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         yield(1L)
         "during"
@@ -71,119 +97,168 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              validate_yield(user({
+                  "during"
+                  2L
+              }))
+              state[[1L]] <- 3L
+              suspend()
+              return(last_value())
+          }, `3` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "during"
-          flowery::coro_yield("3", 2L)
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `{` blocks - consecutive pauses
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         yield(1L)
         yield(2L)
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              validate_yield(user({
+                  2L
+              }))
+              state[[1L]] <- 3L
+              suspend()
+              return(last_value())
+          }, `3` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_yield("3", 2L)
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `{` blocks - return value from pause
 
     Code
-      machine_parts(function(x) {
+      generator_body(function(x) {
         "before"
         value <- yield(1L)
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user_env[["value"]] <- arg
+              state[[1L]] <- 3L
+          }, `3` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          value <- `_next_arg`
-          flowery::coro_return("after")
-      }
-      
 
 # `{` blocks - no return value
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         yield(1L)
       })
     Output
-      [[1]]
       {
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  1L
+              }))
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_return(invisible(NULL))
-      }
-      
 
 ---
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         yield(1L)
         yield(2L)
       })
     Output
-      [[1]]
       {
-          flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              validate_yield(user({
+                  2L
+              }))
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_yield("3", 2L)
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return(invisible(NULL))
-      }
-      
 
 # `{` blocks - nested
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before1"
         "before2"
         {
@@ -194,34 +269,13 @@
         "after1"
         "after2"
       })
-    Output
-      [[1]]
-      {
-          "before1"
-          "before2"
-          {
-              "before-inner"
-              flowery::coro_yield("2", 1L)
-          }
-      }
-      
-      [[2]]
-      {
-          "after-inner"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          "after1"
-          flowery::coro_return("after2")
-      }
-      
+    Error <rlang_error>
+      TODO in `block_states()`: {
 
 # `{` blocks - nested and no past before pause
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         {
           "before-inner"
           yield(1L)
@@ -230,30 +284,13 @@
         "after1"
         "after2"
       })
-    Output
-      [[1]]
-      {
-          "before-inner"
-          flowery::coro_yield("2", 1L)
-      }
-      
-      [[2]]
-      {
-          "after-inner"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          "after1"
-          flowery::coro_return("after2")
-      }
-      
+    Error <rlang_error>
+      TODO in `block_states()`: {
 
 # `{` blocks - nested and goto after pause
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         {
           "before-inner"
           yield(1L)
@@ -261,24 +298,13 @@
         "after1"
         "after2"
       })
-    Output
-      [[1]]
-      {
-          "before-inner"
-          flowery::coro_yield("2", 1L)
-      }
-      
-      [[2]]
-      {
-          "after1"
-          flowery::coro_return("after2")
-      }
-      
+    Error <rlang_error>
+      TODO in `block_states()`: {
 
 # `{` blocks - complex nesting
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         {
           "before-inner"
@@ -291,42 +317,13 @@
         }
         "after"
       })
-    Output
-      [[1]]
-      {
-          "before"
-          {
-              "before-inner"
-              flowery::coro_yield("2", 1L)
-          }
-      }
-      
-      [[2]]
-      {
-          flowery::coro_yield("3", 2L)
-      }
-      
-      [[3]]
-      {
-          flowery::coro_yield("4", 3L)
-      }
-      
-      [[4]]
-      {
-          "after-inner"
-          flowery::coro_goto("5")
-      }
-      
-      [[5]]
-      {
-          flowery::coro_return("after")
-      }
-      
+    Error <rlang_error>
+      TODO in `block_states()`: {
 
 # `{` blocks - simple nesting with various continuation states
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         {
           {
             yield(1L)
@@ -335,28 +332,13 @@
         }
         "after"
       })
-    Output
-      [[1]]
-      {
-          flowery::coro_yield("2", 1L)
-      }
-      
-      [[2]]
-      {
-          "after-inner-inner"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
+    Error <rlang_error>
+      TODO in `block_states()`: {
 
 ---
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         {
           {
             yield(1L)
@@ -365,63 +347,41 @@
         }
         "after"
       })
-    Output
-      [[1]]
-      {
-          flowery::coro_yield("2", 1L)
-      }
-      
-      [[2]]
-      {
-          "after-inner"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
+    Error <rlang_error>
+      TODO in `block_states()`: {
 
 # yield assignment in a loop
 
     Code
-      machine_parts(function() while (1) var <- yield("value"))
+      generator_body(function() while (1) var <- yield("value"))
     Output
-      [[1]]
       {
-          if ({
-              `_block`({
-                  1
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  if (user(1)) {
+                      state[[2L]] <- 2L
+                  } else {
+                      break
+                  }
+              }, `2` = {
+                  validate_yield(user("value"))
+                  state[[2L]] <- 3L
+                  suspend()
+                  return(last_value())
+              }, `3` = {
+                  user_env[["var"]] <- arg
+                  state[[2L]] <- 1L
               })
-          }) {
-              flowery::coro_goto("2")
-          }
-          else {
-              flowery::coro_goto("4")
-          }
-      }
-      
-      [[2]]
-      {
-          `_block`({
-              flowery::coro_yield("3", "value")
+              length(state) <- 1L
+              break
           })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[3]]
-      {
-          `_block`({
-              var <- `_next_arg`
-          })
-          flowery::coro_goto("1")
-      }
-      
-      [[4]]
-      {
-          `_block`({
-              flowery::coro_return(invisible(NULL))
-          })
-      }
-      
 

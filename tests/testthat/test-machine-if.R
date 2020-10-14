@@ -1,6 +1,6 @@
 
 test_that("`if` blocks - one pause", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"
@@ -14,7 +14,7 @@ test_that("`if` blocks - one pause", {
 })
 
 test_that("`else` blocks - one pause", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (FALSE) {
       FALSE
@@ -28,7 +28,7 @@ test_that("`else` blocks - one pause", {
 })
 
 test_that("`if` blocks - inner block", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"
@@ -46,7 +46,7 @@ test_that("`if` blocks - inner block", {
 })
 
 test_that("`if` blocks - nested", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"
@@ -59,7 +59,7 @@ test_that("`if` blocks - nested", {
 })
 
 test_that("`if` blocks - nested and trailing pause", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"
@@ -71,7 +71,7 @@ test_that("`if` blocks - nested and trailing pause", {
 })
 
 test_that("`if` blocks - multiply nested and all trailing", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"
@@ -89,7 +89,7 @@ test_that("`if` blocks - multiply nested and all trailing", {
 })
 
 test_that("`if`-`else` blocks - trailing", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"
@@ -104,7 +104,7 @@ test_that("`if`-`else` blocks - trailing", {
 })
 
 test_that("`if`-`else` blocks - non trailing", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"
@@ -120,7 +120,7 @@ test_that("`if`-`else` blocks - non trailing", {
 })
 
 test_that("`if`-`else` blocks - same continuation", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       yield(1L)
@@ -132,7 +132,7 @@ test_that("`if`-`else` blocks - same continuation", {
 })
 
 test_that("`if`-`else` blocks - continuation in `if`", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       yield(1L)
@@ -145,7 +145,7 @@ test_that("`if`-`else` blocks - continuation in `if`", {
 })
 
 test_that("`if`-`else` blocks - continuation in `else`", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       yield(1L)
@@ -158,7 +158,7 @@ test_that("`if`-`else` blocks - continuation in `else`", {
 })
 
 test_that("`if` blocks - doubly nested with continuation", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     if (TRUE) {
       if (TRUE) {
         yield(1L)
@@ -170,7 +170,7 @@ test_that("`if` blocks - doubly nested with continuation", {
 })
 
 test_that("`if`-`else` blocks - multiply nested and not trailing", {
-  expect_snapshot0(machine_parts(function() {
+  expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {
       "if-before"

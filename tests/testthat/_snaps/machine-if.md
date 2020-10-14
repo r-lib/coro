@@ -1,7 +1,7 @@
 # `if` blocks - one pause
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -13,35 +13,83 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              "if-before"
-              flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              FALSE
-          }
-          flowery::coro_goto("3")
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      "if-before"
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "if-after"
+                  })
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      FALSE
+                  })
+                  state[[2L]] <- 2L
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "if-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `else` blocks - one pause
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (FALSE) {
           FALSE
@@ -53,35 +101,83 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          if (FALSE) {
-              FALSE
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              "else-before"
-              flowery::coro_yield("2", 1L)
-          }
-          flowery::coro_goto("3")
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  FALSE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      FALSE
+                  })
+                  state[[2L]] <- 2L
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      "else-before"
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "else-after"
+                  })
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "else-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `if` blocks - inner block
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -96,45 +192,13 @@
         }
         "after"
       })
-    Output
-      [[1]]
-      {
-          "before"
-          if (TRUE) {
-              "if-before"
-              {
-                  "inner-before"
-                  flowery::coro_yield("2", 1L)
-              }
-          }
-          else {
-              FALSE
-          }
-          flowery::coro_goto("4")
-      }
-      
-      [[2]]
-      {
-          "inner-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          "if-after"
-          flowery::coro_goto("4")
-      }
-      
-      [[4]]
-      {
-          flowery::coro_return("after")
-      }
-      
+    Error <rlang_error>
+      TODO in `block_states()`: {
 
 # `if` blocks - nested
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -145,31 +209,104 @@
         }
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              "if-before"
-              if (FALSE) {
-                  flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
               }
-              flowery::coro_goto("2")
-          }
-          else {
-              flowery::coro_return("foo")
-          }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "if-before"
+                  })
+                  if (user({
+                      FALSE
+                  })) {
+                      state[[2L]] <- 2L
+                  } else {
+                      state[[2L]] <- 3L
+                  }
+                  state[[3L]] <- 1L
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      validate_yield(user(1L))
+                      state[[3L]] <- 2L
+                      suspend()
+                      return(last_value())
+                  }, `2` = {
+                      break
+                  })
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
+                  if (n == 2L) {
+                      state[[2L]] <- 1L
+                      next
+                  }
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  user({
+                      "if-after"
+                  })
+                  exhausted <- TRUE
+                  return(last_value())
+              }, `4` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              break
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "foo"
+                  })
+                  exhausted <- TRUE
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              break
+          }, `4` = {
+              break
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_return("if-after")
-      }
-      
 
 # `if` blocks - nested and trailing pause
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -179,33 +316,99 @@
         }
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              "if-before"
-              if (FALSE) {
-                  flowery::coro_yield("2", 1L)
-              }
-              else {
-                  flowery::coro_return(invisible(NULL))
-              }
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              flowery::coro_return("foo")
-          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "if-before"
+                  })
+                  if (user({
+                      FALSE
+                  })) {
+                      state[[2L]] <- 2L
+                  } else {
+                      state[[2L]] <- 3L
+                  }
+                  state[[3L]] <- 1L
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      validate_yield(user(1L))
+                      exhausted <- TRUE
+                      return(last_value())
+                  }, `2` = {
+                      break
+                  })
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
+                  if (n == 2L) {
+                      state[[2L]] <- 1L
+                      next
+                  }
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  state[[2L]] <- 4L
+              }, `4` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              break
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "foo"
+                  })
+                  exhausted <- TRUE
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              break
+          }, `4` = {
+              break
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_return(invisible(NULL))
-      }
-      
 
 # `if` blocks - multiply nested and all trailing
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -221,42 +424,136 @@
         }
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              "if-before"
-              if (FALSE) {
-                  if (FALSE) {
-                      flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "if-before"
+                  })
+                  if (user({
+                      FALSE
+                  })) {
+                      state[[2L]] <- 2L
+                  } else {
+                      state[[2L]] <- 3L
                   }
-                  flowery::coro_goto("3")
+                  state[[3L]] <- 1L
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      if (user({
+                        FALSE
+                      })) {
+                        state[[3L]] <- 2L
+                      } else {
+                        state[[3L]] <- 3L
+                      }
+                      state[[4L]] <- 1L
+                  }, `2` = {
+                      repeat switch(state[[4L]], `1` = {
+                        validate_yield(user({
+                          1L
+                        }))
+                        state[[4L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        user({
+                          "if-3-after"
+                        })
+                        state[[4L]] <- 3L
+                      }, `3` = {
+                        break
+                      })
+                      n <- length(state)
+                      if (n < 3L) {
+                        break
+                      }
+                      if (n == 3L) {
+                        state[[3L]] <- 1L
+                        next
+                      }
+                      length(state) <- 3L
+                      state[[3L]] <- 3L
+                  }, `3` = {
+                      user({
+                        "if-2-after"
+                      })
+                      exhausted <- TRUE
+                      return(last_value())
+                  }, `4` = {
+                      break
+                  })
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
+                  if (n == 2L) {
+                      state[[2L]] <- 1L
+                      next
+                  }
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  state[[2L]] <- 4L
+              }, `4` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
               }
-              else {
-                  flowery::coro_return(invisible(NULL))
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
               }
-          }
-          else {
-              flowery::coro_return(FALSE)
-          }
+              length(state) <- 1L
+              break
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      FALSE
+                  })
+                  exhausted <- TRUE
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              break
+          }, `4` = {
+              break
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "if-3-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("if-2-after")
-      }
-      
 
 # `if`-`else` blocks - trailing
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -269,34 +566,89 @@
         }
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              "if-before"
-              flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              "else-before"
-              flowery::coro_yield("3", 2L)
-          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      "if-before"
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "if-after"
+                  })
+                  exhausted <- TRUE
+                  return(last_value())
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              break
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      "else-before"
+                      2L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "else-after"
+                  })
+                  exhausted <- TRUE
+                  return(last_value())
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              break
+          }, `4` = {
+              break
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_return("if-after")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("else-after")
-      }
-      
 
 # `if`-`else` blocks - non trailing
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -310,41 +662,91 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              "if-before"
-              flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              "else-before"
-              flowery::coro_yield("3", 2L)
-          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      "if-before"
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "if-after"
+                  })
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      "else-before"
+                      2L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "else-after"
+                  })
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "if-after"
-          flowery::coro_goto("4")
-      }
-      
-      [[3]]
-      {
-          "else-after"
-          flowery::coro_goto("4")
-      }
-      
-      [[4]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `if`-`else` blocks - same continuation
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           yield(1L)
@@ -354,27 +756,79 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              flowery::coro_yield("2", 2L)
-          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      2L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `if`-`else` blocks - continuation in `if`
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           yield(1L)
@@ -385,33 +839,84 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              flowery::coro_yield("2", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              flowery::coro_yield("3", 2L)
-          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "if-after"
+                  })
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      2L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "if-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `if`-`else` blocks - continuation in `else`
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           yield(1L)
@@ -422,33 +927,84 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              flowery::coro_yield("3", 1L)
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          else {
-              flowery::coro_yield("2", 2L)
-          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      2L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "else-after"
+                  })
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "else-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `if` blocks - doubly nested with continuation
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         if (TRUE) {
           if (TRUE) {
             yield(1L)
@@ -458,33 +1014,83 @@
         "after"
       })
     Output
-      [[1]]
       {
-          if (TRUE) {
-              if (TRUE) {
-                  flowery::coro_yield("2", 1L)
-              }
-              flowery::coro_goto("3")
+          if (exhausted) {
+              return(invisible(NULL))
           }
-          flowery::coro_goto("3")
+          repeat switch(state[[1L]], `1` = {
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[2L]] <- 2L
+                  } else {
+                      state[[2L]] <- 3L
+                  }
+                  state[[3L]] <- 1L
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      validate_yield(user({
+                        1L
+                      }))
+                      state[[3L]] <- 2L
+                      suspend()
+                      return(last_value())
+                  }, `2` = {
+                      user({
+                        "if-3-after"
+                      })
+                      state[[3L]] <- 3L
+                  }, `3` = {
+                      break
+                  })
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
+                  if (n == 2L) {
+                      state[[2L]] <- 1L
+                      next
+                  }
+                  length(state) <- 2L
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 3L
+          }, `3` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "if-3-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          flowery::coro_return("after")
-      }
-      
 
 # `if`-`else` blocks - multiply nested and not trailing
 
     Code
-      machine_parts(function() {
+      generator_body(function() {
         "before"
         if (TRUE) {
           "if-before"
@@ -507,48 +1113,192 @@
         "after"
       })
     Output
-      [[1]]
       {
-          "before"
-          if (TRUE) {
-              "if-before"
-              if (TRUE) {
-                  if (TRUE) {
-                      flowery::coro_yield("2", 1L)
-                  }
-                  flowery::coro_goto("3")
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
               }
-              else {
-                  if (FALSE) {
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      "if-before"
+                  })
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[2L]] <- 2L
+                  } else {
+                      state[[2L]] <- 3L
+                  }
+                  state[[3L]] <- 1L
+              }, `2` = {
+                  repeat switch(state[[3L]], `1` = {
+                      if (user({
+                        TRUE
+                      })) {
+                        state[[3L]] <- 2L
+                      } else {
+                        state[[3L]] <- 3L
+                      }
+                      state[[4L]] <- 1L
+                  }, `2` = {
+                      repeat switch(state[[4L]], `1` = {
+                        validate_yield(user({
+                          1L
+                        }))
+                        state[[4L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        user({
+                          "if-3-after"
+                        })
+                        state[[4L]] <- 3L
+                      }, `3` = {
+                        break
+                      })
+                      n <- length(state)
+                      if (n < 3L) {
+                        break
+                      }
+                      if (n == 3L) {
+                        state[[3L]] <- 1L
+                        next
+                      }
+                      length(state) <- 3L
+                      state[[3L]] <- 3L
+                  }, `3` = {
+                      user({
+                        "if-2-after"
+                      })
+                      state[[3L]] <- 4L
+                  }, `4` = {
+                      break
+                  })
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
+                  if (n == 2L) {
+                      state[[2L]] <- 1L
+                      next
+                  }
+                  length(state) <- 2L
+                  state[[2L]] <- 4L
+              }, `3` = {
+                  repeat switch(state[[3L]], `1` = {
+                      if (user({
+                        FALSE
+                      })) {
+                        state[[3L]] <- 2L
+                      } else {
+                        state[[3L]] <- 3L
+                      }
+                      state[[4L]] <- 1L
+                  }, `2` = {
+                      repeat switch(state[[4L]], `1` = {
+                        user({
+                          FALSE
+                        })
+                        state[[4L]] <- 2L
+                      }, `2` = {
+                        break
+                      })
+                      n <- length(state)
+                      if (n < 3L) {
+                        break
+                      }
+                      if (n == 3L) {
+                        state[[3L]] <- 1L
+                        next
+                      }
+                      length(state) <- 3L
+                      state[[3L]] <- 4L
+                  }, `3` = {
+                      repeat switch(state[[4L]], `1` = {
+                        validate_yield(user({
+                          2L
+                        }))
+                        state[[4L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        break
+                      })
+                      n <- length(state)
+                      if (n < 3L) {
+                        break
+                      }
+                      if (n == 3L) {
+                        state[[3L]] <- 1L
+                        next
+                      }
+                      length(state) <- 3L
+                      state[[3L]] <- 4L
+                  }, `4` = {
+                      break
+                  })
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
+                  if (n == 2L) {
+                      state[[2L]] <- 1L
+                      next
+                  }
+                  length(state) <- 2L
+                  state[[2L]] <- 4L
+              }, `4` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
                       FALSE
-                  }
-                  else {
-                      flowery::coro_yield("4", 2L)
-                  }
-                  flowery::coro_goto("4")
+                  })
+                  state[[2L]] <- 2L
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
               }
-          }
-          else {
-              FALSE
-          }
-          flowery::coro_goto("4")
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
       }
-      
-      [[2]]
-      {
-          "if-3-after"
-          flowery::coro_goto("3")
-      }
-      
-      [[3]]
-      {
-          "if-2-after"
-          flowery::coro_goto("4")
-      }
-      
-      [[4]]
-      {
-          flowery::coro_return("after")
-      }
-      
 

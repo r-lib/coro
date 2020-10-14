@@ -10,35 +10,67 @@
         }
       })))
     Output
-      function (`_next_arg` = NULL) 
+      function (arg = NULL) 
       {
-          `_env`$`_next_arg` <- `_next_arg`
-          evalq(`_env`, expr = {
-              while (TRUE) {
-                  switch({
-                      base::as.character(`_state`)
-                  }, `1` = {
-                      if (TRUE) {
-                        flowery::coro_goto("2")
+          delayedAssign("arg", arg, assign.env = env)
+          evalq(envir = env, {
+              if (exhausted) {
+                  return(invisible(NULL))
+              }
+              repeat switch(state[[1L]], `1` = {
+                  state[[1L]] <- 2L
+                  state[[2L]] <- 1L
+              }, `2` = {
+                  repeat switch(state[[2L]], `1` = {
+                      if (user({
+                        TRUE
+                      })) {
+                        state[[2L]] <- 2L
                       } else {
-                        flowery::coro_goto("4")
+                        break
                       }
                   }, `2` = {
-                      if (TRUE) {
-                        flowery::coro_yield("3", 1)
+                      if (user({
+                        TRUE
+                      })) {
+                        state[[2L]] <- 3L
+                      } else {
+                        state[[2L]] <- 4L
                       }
-                      flowery::coro_goto("3")
+                      state[[3L]] <- 1L
                   }, `3` = {
-                      flowery::coro_return(2)
+                      repeat switch(state[[3L]], `1` = {
+                        validate_yield(user({
+                          1
+                        }))
+                        state[[3L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        break
+                      })
+                      n <- length(state)
+                      if (n < 2L) {
+                        break
+                      }
+                      if (n == 2L) {
+                        state[[2L]] <- 1L
+                        next
+                      }
+                      length(state) <- 2L
+                      state[[2L]] <- 4L
                   }, `4` = {
-                      flowery::coro_return(invisible(NULL))
-                  }, `5` = {
-                      base::return(invisible(NULL))
-                  }, {
-                      rlang::abort(base::sprintf("Internal error: Unexpected state `%s`.", 
-                        `_state`))
+                      user({
+                        2
+                      })
+                      exhausted <- TRUE
+                      return(last_value())
                   })
-              }
+                  length(state) <- 1L
+                  break
+              })
+              exhausted <- TRUE
+              invisible(NULL)
           })
       }
 
