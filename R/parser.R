@@ -1,40 +1,4 @@
 
-new_counter <- function(machine_depth, loop_depth = 0L) {
-  i <- 1L
-  function(inc = 0L) {
-    i <<- i + inc
-    i
-  }
-}
-machine_depth <- function(counter) {
-  env_get(fn_env(counter), "machine_depth")
-}
-loop_depth <- function(counter, check = TRUE) {
-  depth <- env_get(fn_env(counter), "loop_depth")
-
-  if (check && !depth) {
-    abort("Must use `next` and `break` within a loop.")
-  }
-
-  depth
-}
-
-machine_info <- function(type, env) {
-  type <- arg_match0(type, c("generator", "async", "async_generator"))
-
-  if (type %in% c("async", "async_generator")) {
-    # Look up lexically defined async operations
-    async_ops <- flowery_ops(env)
-  } else {
-    async_ops <- NULL
-  }
-
-  list(
-    type = type,
-    async_ops = async_ops
-  )
-}
-
 walk_states <- function(expr, info) {
   continue <- function(counter, last) {
     # Break if last
@@ -901,38 +865,38 @@ new_state <- function(car, cdr, tag) {
   node
 }
 
-expr_parts <- function(expr, refs) {
-  if (!is_call(expr)) {
-    return(NULL)
+new_counter <- function(machine_depth, loop_depth = 0L) {
+  i <- 1L
+  function(inc = 0L) {
+    i <<- i + inc
+    i
+  }
+}
+machine_depth <- function(counter) {
+  env_get(fn_env(counter), "machine_depth")
+}
+loop_depth <- function(counter, check = TRUE) {
+  depth <- env_get(fn_env(counter), "loop_depth")
+
+  if (check && !depth) {
+    abort("Must use `next` and `break` within a loop.")
   }
 
-  head <- node_car(expr)
-  if (!is_symbol(head)) {
-    return(NULL)
-  }
-
-  head <- as_string(head)
-  switch(head,
-    `{` = block_parts(expr),
-    `if` = if_parts(expr),
-    `repeat` = repeat_parts(expr),
-    `while` = while_parts(expr, refs),
-    `for` = for_parts(expr),
-    `break` = break_parts(expr),
-    `next` = next_parts(expr),
-    NULL
-  )
+  depth
 }
 
-block_push_goto <- function(block, goto_node = NULL) {
-  if (is_exiting_block(block)) {
-    block
+machine_info <- function(type, env) {
+  type <- arg_match0(type, c("generator", "async", "async_generator"))
+
+  if (type %in% c("async", "async_generator")) {
+    # Look up lexically defined async operations
+    async_ops <- flowery_ops(env)
   } else {
-    goto_node <- goto_node %||% peek_goto_node()
-    node_list_poke_cdr(block, goto_node)
+    async_ops <- NULL
   }
-}
 
-is_pause <- function(x) {
-  is_call(x, peek_pause_sym())
+  list(
+    type = type,
+    async_ops = async_ops
+  )
 }
