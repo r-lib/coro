@@ -362,7 +362,7 @@
                       next
                   }
                   length(state) <- 2L
-                  state[[2L]] <- 2L
+                  state[[2L]] <- 1L
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
                       length(state) <- 2L
@@ -793,7 +793,7 @@
                       next
                   }
                   length(state) <- 2L
-                  state[[2L]] <- 2L
+                  state[[2L]] <- 1L
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
                       user(FALSE)
@@ -1601,7 +1601,7 @@
                       next
                   }
                   length(state) <- 2L
-                  state[[2L]] <- 2L
+                  state[[2L]] <- 1L
               }, `4` = {
                   repeat switch(state[[3L]], `1` = {
                       validate_yield(user(2L))

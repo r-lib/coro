@@ -66,9 +66,9 @@ walk_branch_states <- function(body, offset, counter, continue, last, return, in
   states <- node_list_poke_cdr(states, breaking_state)
   nested_counter(inc = 1L)
 
-  # Don't add offset if state is breaking
+  # Don't add offset if state is breaking or looping
   next_i <- continue(counter, last)
-  if (next_i) {
+  if (next_i > 1L) {
     next_i <- next_i + offset
   }
 
