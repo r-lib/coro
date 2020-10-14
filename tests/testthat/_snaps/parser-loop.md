@@ -1914,7 +1914,7 @@
                       state[[3L]] <- 1L
                   })
                   length(state) <- 2L
-                  break
+                  state[[2L]] <- 1L
               })
               length(state) <- 1L
               state[[1L]] <- 3L
@@ -1983,7 +1983,7 @@
                       break
                   })
                   length(state) <- 2L
-                  break
+                  state[[2L]] <- 1L
               })
               length(state) <- 1L
               break

@@ -499,7 +499,7 @@
                       return(last_value())
                   })
                   length(state) <- 2L
-                  break
+                  state[[2L]] <- 1L
               })
               length(state) <- 1L
               break
@@ -537,7 +537,7 @@
                       return(last_value())
                   })
                   length(state) <- 2L
-                  break
+                  state[[2L]] <- 1L
               })
               length(state) <- 1L
               break
@@ -581,7 +581,7 @@
                       return(last_value())
                   })
                   length(state) <- 2L
-                  break
+                  state[[2L]] <- 1L
               })
               length(state) <- 1L
               break
@@ -1625,7 +1625,7 @@
                   })
                   iterators[[3L]] <- NULL
                   length(state) <- 2L
-                  break
+                  state[[2L]] <- 1L
               })
               iterators[[2L]] <- NULL
               length(state) <- 1L

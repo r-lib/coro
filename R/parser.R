@@ -730,7 +730,7 @@ loop_states <- function(preamble,
   preamble_state <- new_state(preamble_block, NULL, i)
   states <- node_list_poke_cdr(states, preamble_state)
   i <- counter(inc = 1L)
-  next_i <- if (last) 0L else i + 1L
+  next_i <- continue(counter, last)
 
   loop_depth <- depth + 1L
   nested_counter <- nested_counter %||% new_counter(loop_depth, loop_depth = loop_depth)
