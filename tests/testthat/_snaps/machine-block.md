@@ -269,8 +269,33 @@
         "after1"
         "after2"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before1"
+                  "before2"
+                  "before-inner"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user({
+                  "after-inner"
+                  "after1"
+                  "after2"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 # `{` blocks - nested and no past before pause
 
@@ -284,8 +309,31 @@
         "after1"
         "after2"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before-inner"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user({
+                  "after-inner"
+                  "after1"
+                  "after2"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 # `{` blocks - nested and goto after pause
 
@@ -298,8 +346,30 @@
         "after1"
         "after2"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before-inner"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user({
+                  "after1"
+                  "after2"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 # `{` blocks - complex nesting
 
@@ -317,8 +387,45 @@
         }
         "after"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  "before"
+                  "before-inner"
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              validate_yield(user({
+                  2L
+              }))
+              state[[1L]] <- 3L
+              suspend()
+              return(last_value())
+          }, `3` = {
+              validate_yield(user({
+                  3L
+              }))
+              state[[1L]] <- 4L
+              suspend()
+              return(last_value())
+          }, `4` = {
+              user({
+                  "after-inner"
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 # `{` blocks - simple nesting with various continuation states
 
@@ -332,8 +439,29 @@
         }
         "after"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user({
+                  "after-inner-inner"
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 ---
 
@@ -347,8 +475,29 @@
         }
         "after"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              validate_yield(user({
+                  1L
+              }))
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              user({
+                  "after-inner"
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 # yield assignment in a loop
 

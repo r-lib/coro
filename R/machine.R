@@ -334,6 +334,21 @@ block_states <- function(block, counter, continue, last, return, info) {
 
     go
   }
+  splice <- function(nested_node, nested_refs) {
+    node_list_poke_cdr(nested_node, node_cdr(node))
+    node_list_poke_cdr(nested_refs, node_cdr(refs))
+
+    if (is_null(prev_node)) {
+      curr_node <<- nested_node
+      curr_refs <<- nested_refs
+    } else {
+      node_poke_cdr(prev_node, nested_node)
+      node_poke_cdr(prev_refs, nested_refs)
+    }
+
+    node <<- nested_node
+    refs <<- nested_refs
+  }
   collect <- function() {
     if (is_null(curr_node)) {
       # Happens on skip
@@ -387,6 +402,12 @@ block_states <- function(block, counter, continue, last, return, info) {
     switch(type,
       `expr` = {
         accum(next)
+      },
+      `{` = {
+        nested_node <- node_cdr(expr)
+        nested_refs <- block_refs(expr)
+        splice(nested_node, nested_refs)
+        next
       },
       `yield` = {
         node_poke_car(node, node_get(expr, 2))

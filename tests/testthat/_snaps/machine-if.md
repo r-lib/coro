@@ -192,8 +192,81 @@
         }
         "after"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+              })
+              if (user({
+                  TRUE
+              })) {
+                  state[[1L]] <- 2L
+              } else {
+                  state[[1L]] <- 3L
+              }
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      "if-before"
+                      "inner-before"
+                      1L
+                  }))
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  user({
+                      "inner-after"
+                      "if-after"
+                  })
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `3` = {
+              repeat switch(state[[2L]], `1` = {
+                  user({
+                      FALSE
+                  })
+                  state[[2L]] <- 2L
+              }, `2` = {
+                  break
+              })
+              n <- length(state)
+              if (n < 1L) {
+                  break
+              }
+              if (n == 1L) {
+                  state[[1L]] <- 1L
+                  next
+              }
+              length(state) <- 1L
+              state[[1L]] <- 4L
+          }, `4` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 # `if` blocks - nested
 

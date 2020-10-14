@@ -102,8 +102,39 @@
         }
         "after"
       })
-    Error <rlang_error>
-      TODO in `block_states()`: {
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "before"
+                  "repeat"
+              })
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  validate_yield(user({
+                      1L
+                  }))
+                  state[[2L]] <- 1L
+                  suspend()
+                  return(last_value())
+              })
+              length(state) <- 1L
+              state[[1L]] <- 3L
+          }, `3` = {
+              user({
+                  "after"
+              })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
 
 # `repeat` - pause within `if`
 
