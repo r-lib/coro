@@ -23,29 +23,13 @@ walk_states <- function(expr, info) {
     invisible(NULL)
   })
 }
-walk_loop_states <- function(body, condition, counter, info) {
+walk_loop_states <- function(body, states, counter, info) {
   continue <- function(counter, last) {
     # Go back to state 1 of loop body if last
     if (last) 1L else counter() + 1L
   }
 
   loop_depth <- machine_depth(counter)
-
-  if (!is_null(condition)) {
-    counter(inc = 1L)
-
-    condition_block <- block(expr(
-      if (!!condition) {
-        state[[!!loop_depth]] <- 2L
-      } else {
-        break
-      }
-    ))
-
-    states <- new_state(condition_block, NULL, 1L)
-  } else {
-    states <- NULL
-  }
 
   nested_states <- expr_states(
     body,
@@ -185,20 +169,19 @@ expr_states <- function(expr, counter, continue, last, return, info) {
     `repeat` = loop_states(
       preamble = NULL,
       init = NULL,
-      condition = NULL,
       body = node_cadr(expr),
       cleanup = NULL,
       counter = counter,
+      nested_counter = NULL,
+      nested_states = NULL,
       continue = continue,
       last = last,
       info = info
     ),
-    `while` = loop_states(
+    `while` = while_states(
       preamble = NULL,
-      init = NULL,
       condition = user_call(node_cadr(expr)),
       body = node_cadr(node_cdr(expr)),
-      cleanup = NULL,
       counter = counter,
       continue = continue,
       last = last,
@@ -450,10 +433,11 @@ block_states <- function(block, counter, continue, last, return, info) {
         push_states(loop_states(
           preamble = collect(),
           init = NULL,
-          condition = NULL,
           body = node_cadr(expr),
           cleanup = NULL,
           counter = counter,
+          nested_counter = NULL,
+          nested_states = NULL,
           continue = continue,
           last = last,
           info = info
@@ -462,12 +446,10 @@ block_states <- function(block, counter, continue, last, return, info) {
       },
       `while` = {
         skip()
-        push_states(loop_states(
+        push_states(while_states(
           preamble = collect(),
-          init = NULL,
           condition = user_call(refd_block(node_cadr(expr), ref)),
           body = node_cadr(node_cdr(expr)),
-          cleanup = NULL,
           counter = counter,
           continue = continue,
           last = last,
@@ -720,10 +702,11 @@ if_states <- function(preamble,
 
 loop_states <- function(preamble,
                         init,
-                        condition,
                         body,
                         cleanup,
                         counter,
+                        nested_counter,
+                        nested_states,
                         continue,
                         last,
                         info) {
@@ -745,10 +728,10 @@ loop_states <- function(preamble,
   next_i <- if (last) 0L else i + 1L
 
   loop_depth <- depth + 1L
-  nested_counter <- new_counter(loop_depth, loop_depth = loop_depth)
+  nested_counter <- nested_counter %||% new_counter(loop_depth, loop_depth = loop_depth)
 
   nested_machine_block <- expr({
-    !!walk_loop_states(body, condition, nested_counter, info = info)
+    !!walk_loop_states(body, nested_states, nested_counter, info = info)
     !!!cleanup %&&% list(cleanup)
     length(state) <- !!depth
     !!continue_call(next_i, depth)
@@ -758,6 +741,30 @@ loop_states <- function(preamble,
   counter(inc = 1L)
 
   states
+}
+
+while_states <- function(preamble,
+                         condition,
+                         body,
+                         counter,
+                         continue,
+                         last,
+                         info) {
+  nested_counter <- new_loop_counter(counter)
+  nested_states <- condition_state(condition, nested_counter)
+
+  loop_states(
+    preamble = preamble,
+    init = NULL,
+    body = body,
+    cleanup = NULL,
+    counter = counter,
+    nested_counter = nested_counter,
+    nested_states = nested_states,
+    continue = continue,
+    last = last,
+    info = info
+  )
 }
 
 for_states <- function(preamble,
@@ -773,6 +780,9 @@ for_states <- function(preamble,
   init <- expr(
     iterators[[!!loop_depth]] <- as_iterator(!!user_call(iterator))
   )
+
+  nested_counter <- new_loop_counter(counter)
+
   condition <- expr({
     iterator <- iterators[[!!loop_depth]]
     if (is_null(elt <- iterator())) {
@@ -782,6 +792,8 @@ for_states <- function(preamble,
       TRUE
     }
   })
+  nested_states <- condition_state(condition, nested_counter)
+
   cleanup <- expr(
     iterators[[!!loop_depth]] <- NULL
   )
@@ -789,14 +801,31 @@ for_states <- function(preamble,
   loop_states(
     preamble = preamble,
     init = init,
-    condition = condition,
     body = body,
     cleanup = cleanup,
     counter = counter,
+    nested_counter = nested_counter,
+    nested_states = nested_states,
     continue = continue,
     last = last,
     info = info
   )
+}
+
+condition_state <- function(condition, counter) {
+  loop_depth <- machine_depth(counter)
+
+  block <- block(expr(
+    if (!!condition) {
+      state[[!!loop_depth]] <- 2L
+    } else {
+      break
+    }
+  ))
+  state <- new_state(block, NULL, counter())
+  counter(inc = 1L)
+
+  state
 }
 
 break_state <- function(preamble, counter, info) {
@@ -873,6 +902,11 @@ new_counter <- function(machine_depth, loop_depth = 0L) {
     i
   }
 }
+new_loop_counter <- function(counter) {
+  loop_depth <- machine_depth(counter) + 1L
+  new_counter(loop_depth, loop_depth = loop_depth)
+}
+
 machine_depth <- function(counter) {
   env_get(fn_env(counter), "machine_depth")
 }
