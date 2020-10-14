@@ -32,6 +32,10 @@ compose <- function(...) {
   }
 }
 
+negate <- function(.p) {
+  function(...) !.p(...)
+}
+
 assert_lambda <- function(call) {
   if (!is_call(call, "function")) {
     abort("`fn` must be an anonymous function.")
