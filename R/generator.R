@@ -237,3 +237,12 @@ validate_yield <- function(x) {
 
   x
 }
+
+utils::globalVariables(c(
+  "last_value",
+  "state",
+  "arg",
+  ".self",
+  "then",
+  "as_promise"
+))
