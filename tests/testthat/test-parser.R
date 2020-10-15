@@ -275,3 +275,11 @@ test_that("can parse generators without source references", {
     eval(parse(text = src, keep.source = FALSE))
   )
 })
+
+test_that("tryCatch() expressions are treated as normal expressions if possible", {
+  expect_equal(try_catch_type(quote(tryCatch(error = hnd, foo()))), "expr")
+  expect_equal(try_catch_type(quote(tryCatch(error = hnd, yield()))), "tryCatch")
+  expect_equal(try_catch_type(quote(tryCatch(error = hnd, { foo() }))), "tryCatch")
+
+  expect_snapshot0(generator_body(function() tryCatch(foo())))
+})

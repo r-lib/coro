@@ -244,10 +244,22 @@ expr_type <- function(expr) {
     `for` = ,
     `break` = ,
     `next` = ,
-    `tryCatch` = ,
     `on.exit` = head,
+    `tryCatch` = try_catch_type(expr),
     default
   )
+}
+
+# `tryCatch()` is treated as a simple expression unless the argument
+# is a potentially yielding control flow expression
+try_catch_type <- function(expr) {
+  call <- match.call(tryCatch, expr)
+
+  if (is_string(expr_type(call$expr), "expr")) {
+    "expr"
+  } else {
+    "tryCatch"
+  }
 }
 
 block_states <- function(block, counter, continue, last, return, info) {

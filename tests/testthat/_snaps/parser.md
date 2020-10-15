@@ -1738,3 +1738,21 @@
           invisible(NULL)
       }
 
+# tryCatch() expressions are treated as normal expressions if possible
+
+    Code
+      generator_body(function() tryCatch(foo()))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user(tryCatch(foo()))
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
+
