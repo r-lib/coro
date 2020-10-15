@@ -322,7 +322,7 @@
     Code
       generator_body(function() {
         "before"
-        repeat if (TRUE) `break`() else `next`()
+        repeat if (TRUE) break else next
         yield(1L)
         "after"
       })
@@ -408,7 +408,7 @@
     Code
       generator_body(function() {
         repeat {
-          `next`()
+          next
           yield(1L)
         }
       })
@@ -452,7 +452,7 @@
           "loop-before"
           yield(1L)
           "loop-after"
-          `next`()
+          next
           "next-after"
           yield(2L)
           "loop-final"
@@ -510,7 +510,7 @@
     Code
       generator_body(function() {
         repeat {
-          `break`()
+          break
           yield(1L)
         }
       })
@@ -552,7 +552,7 @@
       generator_body(function() {
         repeat {
           "loop-after"
-          if (TRUE) `break`() else `next`()
+          if (TRUE) break else next
           "next-after"
         }
       })
@@ -635,9 +635,9 @@
           "loop-before"
           yield(1L)
           "loop-after"
-          `break`()
+          break
           "break-after"
-          `next`()
+          next
           "next-after"
           yield(2L)
           "loop-final"
@@ -1103,14 +1103,14 @@
     Code
       generator_body(function() {
         "before"
-        while (TRUE) `break`()
+        while (TRUE) break
         while (TRUE) {
           "loop-before"
           yield(1L)
           "loop-after"
           if (TRUE) {
             "break-before"
-            `break`()
+            break
             "break-after"
           } else {
             "yield-2-before"
@@ -1118,7 +1118,7 @@
             "yield-2-after"
           }
           "next-before"
-          `next`()
+          next
           "loop-end"
         }
         "after"
@@ -1264,7 +1264,7 @@
       generator_body(function() {
         while (TRUE) {
           "before-break"
-          `break`()
+          break
         }
       })
     Output
@@ -1302,7 +1302,7 @@
 
     Code
       generator_body(function() {
-        for (i in x) `break`()
+        for (i in x) break
       })
     Output
       {
@@ -1456,9 +1456,9 @@
       generator_body(function() {
         for (i in x) {
           "for-before"
-          if (TRUE) yield(1L) else `break`()
+          if (TRUE) yield(1L) else break
           "if-after"
-          `next`()
+          next
           "for-after"
         }
       })
@@ -1640,14 +1640,14 @@
           "while before if"
           if (i > 3) {
             "while-if before break"
-            `break`()
+            break
           }
           "while after if"
           while (TRUE) {
             "while-while before if"
             if (j > 3) {
               "while-while-if before break"
-              `break`()
+              break
             }
             "while-while after if"
           }
@@ -1792,14 +1792,14 @@
           "while before if"
           if (i > 3) {
             "while-if before break"
-            `break`()
+            break
           }
           "while after if"
           while (TRUE) {
             "while-while before if"
             if (j > 3) {
               "while-while-if before break"
-              `break`()
+              break
             }
             "while-while after if"
           }
@@ -1936,7 +1936,7 @@
         while (1) {
           while (2) {
             yield(1)
-            `break`()
+            break
           }
         }
       })

@@ -244,7 +244,7 @@
         body1()
         repeat {
           yield("value")
-          `break`()
+          break
         }
         body2()
       })
@@ -343,7 +343,7 @@
 
     Code
       generator_body(function() {
-        repeat `next`()
+        repeat next
       })
     Output
       {
@@ -374,7 +374,7 @@
         body1()
         repeat {
           body2()
-          `next`()
+          next
           body3()
         }
         body4()
@@ -645,7 +645,7 @@
       generator_body(function() {
         repeat {
           repeat yield("foo")
-          `break`()
+          break
         }
       })
     Output
@@ -693,8 +693,8 @@
     Code
       generator_body(function() {
         repeat {
-          repeat `break`()
-          `break`()
+          repeat break
+          break
         }
       })
     Output
@@ -1051,7 +1051,7 @@
         body1()
         repeat {
           if (condition) {
-            `break`()
+            break
           }
         }
       })
@@ -1114,7 +1114,7 @@
         body1()
         repeat {
           if (condition) {
-            `break`()
+            break
           }
           body2()
         }
@@ -1256,7 +1256,7 @@
       generator_body(function() {
         repeat {
           if (TRUE) {
-            `break`()
+            break
           }
         }
       })
@@ -1318,9 +1318,9 @@
         repeat {
           body1()
           if (TRUE) {
-            `break`()
+            break
           } else {
-            `next`()
+            next
           }
           body2()
         }
@@ -1416,7 +1416,7 @@
         repeat {
           body1()
           if (TRUE) {
-            if (TRUE) `next`() else `break`()
+            if (TRUE) next else break
             body2()
           }
           body3()
