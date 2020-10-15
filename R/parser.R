@@ -271,13 +271,11 @@ block_states <- function(block, counter, continue, last, return, info) {
   curr_node <- node
   curr_refs <- refs
 
-  accum <- function(go) {
+  accum <- function() {
     prev_node <<- node
     prev_refs <<- refs
     node <<- node_cdr(node)
     refs <<- node_cdr(refs)
-
-    go
   }
   splice <- function(nested_node, nested_refs) {
     node_list_poke_cdr(nested_node, node_cdr(node))
@@ -333,7 +331,6 @@ block_states <- function(block, counter, continue, last, return, info) {
     states <<- node_list_poke_cdr(states, state)
   }
 
-  # Collect as many user expressions as possible
   while (!is_null(node)) {
     # Set last expression of `block` as returnable
     if (is_null(node_cdr(node))) {
@@ -345,8 +342,10 @@ block_states <- function(block, counter, continue, last, return, info) {
     type <- expr_type(expr)
 
     switch(type,
+      # Collect as many user expressions as possible
       `expr` = {
-        accum(next)
+        accum()
+        next
       },
       `{` = {
         nested_node <- node_cdr(expr)
