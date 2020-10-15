@@ -21,7 +21,8 @@
 #' `async()` functions can be chained to promises from the _promises_
 #' package.
 #'
-#' @seealso [async_generator()] and [await_each()].
+#' @seealso [async_generator()] and [await_each()];
+#'   [flowery_debug()] for step-debugging.
 #' @export
 async <- function(fn) {
   assert_lambda(substitute(fn))
@@ -46,8 +47,9 @@ await <- function(x) {
 #' @return A generator factory. Generators constructed with this
 #'   factory always return [promises::promise()].
 #'
-#' @seealso [async()] for creating awaitable functions and
-#'   [async_collect()] for collecting the values of an async iterator.
+#' @seealso [async()] for creating awaitable functions;
+#'   [async_collect()] for collecting the values of an async iterator;
+#'   [flowery_debug()] for step-debugging.
 #' @examples
 #' # Creates awaitable functions that transform their inputs into a stream
 #' new_stream <- async_generator(function(x) for (elt in x) yield(elt))

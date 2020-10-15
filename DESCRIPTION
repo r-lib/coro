@@ -10,7 +10,7 @@ Depends:
     R (>= 3.1.0)
 Imports:
     glue,
-    rlang (>= 0.4.7)
+    rlang (>= 0.4.8.9000)
 Suggests:
     knitr,
     later (>= 1.1.0),
@@ -22,6 +22,7 @@ Suggests:
 VignetteBuilder:
     knitr
 Remotes:
+    r-lib/rlang,
     r-lib/testthat
 License: GPL-3
 Encoding: UTF-8

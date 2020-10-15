@@ -13,6 +13,14 @@
       function (arg = NULL) 
       {
           delayedAssign("arg", arg, assign.env = env)
+          if (!undebugged && (debugged || is_true(peek_option("flowery_debug")))) {
+              env_browse(user_env)
+              on.exit(add = TRUE, {
+                  if (!env_is_browsed(user_env)) {
+                      undebugged <<- TRUE
+                  }
+              })
+          }
           evalq(envir = env, {
               if (exhausted) {
                   return(invisible(NULL))

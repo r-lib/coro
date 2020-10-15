@@ -29,6 +29,7 @@
 #' suspendable function. On subsequent invokations, the argument is
 #' returned from `yield()`.
 #'
+#' @seealso [flowery_debug()] for step-debugging.
 #' @export
 #' @examples
 #' # A generator statement creates a generator constructor:
@@ -105,6 +106,11 @@ generator0 <- function(fn, type = "generator") {
   fmls <- formals(fn)
   env <- environment(fn)
 
+  # Flipped when `flowery_debug()` is applied on a generator factory
+  debugged <- FALSE
+
+  # Create the generator factory (returned by `generator()` and
+  # entered by `async()`)
   out <- new_function(fmls, quote({
     info <- machine_info(type, env = caller_env())
 
@@ -125,10 +131,24 @@ generator0 <- function(fn, type = "generator") {
     frame <- environment()
     lapply(names(fmls), function(arg) env_bind_arg(user_env, arg, frame = frame))
 
-    # Create function around the state machine
+    # Flipped when `f` is pressed in the browser
+    undebugged <- FALSE
+
+    # Create the generator. This is a function that resumes a state machine.
     gen <- blast(function(arg = NULL) {
       # Forward generator argument inside the state machine environment
       delayedAssign("arg", arg, assign.env = env)
+
+      if (!undebugged && (debugged || is_true(peek_option("flowery_debug")))) {
+        env_browse(user_env)
+
+        on.exit(add = TRUE, {
+          # `f` was pressed, disable debugging for this generator
+          if (!env_is_browsed(user_env)) {
+            undebugged <<- TRUE
+          }
+        })
+      }
 
       # Resume state machine
       evalq(envir = env, !!state_machine)
@@ -226,6 +246,38 @@ env_bind_arg <- function(env, arg, frame = caller_env()) {
 yield <- function(x) {
   abort("`yield()` can't be called directly or within function arguments")
 }
+
+#' Debug a generator or async function
+#'
+#' @description
+#'
+#' * Call `flowery_debug()` on a [generator()], [async()], or
+#'   [async_generator()] function to enable step-debugging.
+#'
+#' * Alternatively, set `options(flowery_debug = TRUE)` for
+#' step-debugging through all functions created with flowery.
+#'
+#' @param fn A generator factory or an async function created by
+#'   flowery.
+#' @param value Whether to debug the function.
+#'
+#' @export
+flowery_debug <- function(fn, value = TRUE) {
+  if (!is_generator_factory(fn)) {
+    abort("`fn` must be a `generator()`, `async()`, or `async_generator()` function.")
+  }
+
+  env_poke(fn_env(fn), "debugged", value, create = FALSE)
+}
+
+is_generator_factory <- function(x) {
+  inherits_any(x, c(
+    "flowery_generator",
+    "flowery_async",
+    "flowery_async_generator"
+  ))
+}
+
 
 # Currently a no-op but will disable exit expressions in the future
 suspend <- function() NULL

@@ -39,6 +39,7 @@ async_map <- async_generator(function(.i, .fn, ...) {
 # new_stream(1:3) \%>\% async_map(`*`, 2) \%>\% async_collect()
 }
 \seealso{
-\code{\link[=async]{async()}} for creating awaitable functions and
-\code{\link[=async_collect]{async_collect()}} for collecting the values of an async iterator.
+\code{\link[=async]{async()}} for creating awaitable functions;
+\code{\link[=async_collect]{async_collect()}} for collecting the values of an async iterator;
+\code{\link[=flowery_debug]{flowery_debug()}} for step-debugging.
 }

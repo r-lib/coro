@@ -2,7 +2,9 @@
 # flowery 0.0.1.9000
 
 * Generators and async functions now support stepping with
-  `browser()`.
+  `browser()`. Set `options(flowery_debug = TRUE)` for browsing all
+  functions created with flowery. Use `flowery_debug()` for browsing
+  specific functions.
 
 * `generator()` now accepts functions of one argument. The first time
   a generator is called the argument is defined in the suspendable

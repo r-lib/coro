@@ -102,3 +102,6 @@ tally(1)
 tally(2)
 tally(10)
 }
+\seealso{
+\code{\link[=flowery_debug]{flowery_debug()}} for step-debugging.
+}
