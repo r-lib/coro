@@ -21,7 +21,11 @@
                   }
               })
           }
-          evalq(envir = env, {
+          if (is_true(env$jumped)) {
+              abort("This function has been disabled because of an unexpected exit.")
+          }
+          env$jumped <- TRUE
+          out <- evalq(envir = env, {
               if (exhausted) {
                   return(invisible(NULL))
               }
@@ -80,5 +84,7 @@
               exhausted <- TRUE
               invisible(NULL)
           })
+          env$jumped <- FALSE
+          out
       }
 

@@ -103,3 +103,16 @@ test_that("yield within if within for loops properly", {
   })
   expect_identical(drain_int(new_gen()), c(1:4, 100L))
 })
+
+test_that("unexpected exits disable generators", {
+  g <- gen({
+    invokeRestart("foo")
+    yield("foo")
+  })
+
+  withRestarts(
+    foo = function() NULL,
+    g()
+  )
+  expect_error(g(), "disabled because of an unexpected exit")
+})

@@ -150,8 +150,19 @@ generator0 <- function(fn, type = "generator") {
         })
       }
 
+      # Disable generator on error, interrupt, debugger quit, etc.
+      # There is no safe way of resuming a generator that didn't
+      # suspend normally.
+      if (is_true(env$jumped)) {
+        abort("This function has been disabled because of an unexpected exit.")
+      }
+
       # Resume state machine
-      evalq(envir = env, !!state_machine)
+      env$jumped <- TRUE
+      out <- evalq(envir = env, !!state_machine)
+      env$jumped <- FALSE
+
+      out
     })
 
     env$.self <- gen

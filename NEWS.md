@@ -1,6 +1,10 @@
 
 # flowery 0.0.1.9000
 
+* Generators and async functions are now disabled when an unexpected
+  exit occurs (error, interrupt, restart invokation, debugger exit,
+  etc.). Reentering the generator is an error.
+
 * Generators and async functions now support stepping with
   `browser()`. Set `options(flowery_debug = TRUE)` for browsing all
   functions created with flowery. Use `flowery_debug()` for browsing
