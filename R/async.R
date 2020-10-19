@@ -148,3 +148,13 @@ get_async_ops <- function(env) {
     as_promise = function(x) if (promises::is.promise(x)) x else promises::promise_resolve(x)
   )
 }
+
+#' Sleep asynchronously
+#' @param seconds The number of second to sleep.
+#' @return A chainable promise.
+#' @export
+async_sleep <- function(seconds) {
+  promises::promise(function(resolve, reject) {
+    later::later(~ resolve(NULL) , delay = seconds)
+  })
+}

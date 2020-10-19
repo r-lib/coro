@@ -32,9 +32,3 @@ prom_impl <- function(prom) {
   stopifnot(promises::is.promise(prom))
   attr(prom, "promise_impl", exact = TRUE)
 }
-
-async_sleep <- function(seconds) {
-  promises::promise(function(resolve, reject) {
-    later::later(~ resolve(NULL) , delay = seconds)
-  })
-}
