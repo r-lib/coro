@@ -347,6 +347,15 @@ drain_raw <- function(x, n) {
   reduce_steps(x, NULL, along_builder(raw(0)))
 }
 
+# TODO: replace all of the above by `collect()`
+
+#' @rdname take
+#' @export
+collect <- function(x, n = NULL) {
+  steps <- n %&&% iter_take(n)
+  reduce_steps(x, steps, along_builder(list()))
+}
+
 # From purrr. The only change is that this reduce() function supports
 # reduced objects for early termination of reducing.
 reduce <- function(.x, .f, ..., .init) {

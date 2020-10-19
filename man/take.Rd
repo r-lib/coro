@@ -15,6 +15,7 @@
 \alias{drain_cpl}
 \alias{drain_chr}
 \alias{drain_raw}
+\alias{collect}
 \title{Take n or all elements from a vector or iterator}
 \usage{
 take(x, n)
@@ -44,6 +45,8 @@ drain_cpl(x)
 drain_chr(x)
 
 drain_raw(x, n)
+
+collect(x, n = NULL)
 }
 \arguments{
 \item{x}{A reducible object.}
