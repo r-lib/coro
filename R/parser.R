@@ -207,7 +207,15 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       last = last,
       info = info
     ),
-    `tryCatch` = ,
+    `tryCatch` = try_catch_states(
+      preamble = NULL,
+      expr = expr,
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return,
+      info = info
+    ),
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
     stop_internal("expr_states", sprintf("Unexpected operation `%s`", expr_type(expr)))
   )
