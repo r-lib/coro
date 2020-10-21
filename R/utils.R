@@ -46,6 +46,13 @@ stop_internal <- function(fn, msg) {
   abort(sprintf("Internal error in `%s()`: %s.", fn, msg))
 }
 
+stop_unimplemented <- function(what) {
+  abort(c(
+    sprintf("%s is not implemented yet.", what),
+    i = "Please send a feature request if you are interested."
+  ))
+}
+
 try_catch_arg <- function(call) {
   i <- match("expr", names(call))
   if (!is_na(i)) {

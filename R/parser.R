@@ -961,6 +961,11 @@ try_catch_states <- function(preamble,
   body <- expr[[i]]
   handlers_exprs <- as.list(expr[-c(1, i)])
 
+  finally <- handlers_exprs$finally
+  if (!is_null(finally)) {
+    stop_unimplemented("`tryCatch(finally = )`")
+  }
+
   state_i <- counter()
   depth <- machine_depth(counter)
   try_catch_depth <- depth + 1L

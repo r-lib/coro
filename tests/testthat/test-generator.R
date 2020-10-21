@@ -152,3 +152,19 @@ test_that("can use tryCatch()", {
     regexp = "error"
   )
 })
+
+test_that("tryCatch(finally = ) is handled", {
+  expect_error(
+    gen({
+      tryCatch(
+        error = function(...) "handled", {
+          stop("error")
+          yield("yield")
+        },
+        finally = return("finally")
+      )
+      "value"
+    })(),
+    regexp = "not implemented"
+  )
+})
