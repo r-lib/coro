@@ -216,6 +216,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       return = return,
       info = info
     ),
+    `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`"),
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
     stop_internal("expr_states", sprintf("Unexpected operation `%s`", expr_type(expr)))
   )
@@ -263,20 +264,27 @@ expr_type <- function(expr) {
     `break` = ,
     `next` = ,
     `on.exit` = head,
-    `tryCatch` = try_catch_type(expr),
+    `tryCatch` = ,
+    `withCallingHandlers` = with_handlers_type(expr, head),
     default
   )
 }
 
-# `tryCatch()` is treated as a simple expression unless the argument
-# is a potentially yielding control flow expression
-try_catch_type <- function(expr) {
-  call <- match.call(tryCatch, expr)
+# `tryCatch()` and `withCallingHandlers()` are treated as a simple
+# expressions unless the argument is a potentially yielding control
+# flow expression
+with_handlers_type <- function(expr, fn_name) {
+  fn <- switch(fn_name,
+    tryCatch = tryCatch,
+    withCallingHandlers = withCallingHandlers,
+    stop_internal("Unexpected state in `handler_type()`.")
+  )
+  call <- match.call(fn, expr)
 
   if (is_string(expr_type(call$expr), "expr")) {
     "expr"
   } else {
-    "tryCatch"
+    fn_name
   }
 }
 
@@ -530,7 +538,8 @@ block_states <- function(block, counter, continue, last, return, info) {
           info = info
         ))
         next
-      }
+      },
+      `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`")
     )
 
     stop_internal("block_states", sprintf("Unexpected operation `%s`", type))

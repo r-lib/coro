@@ -1865,3 +1865,21 @@
           invisible(NULL)
       }
 
+# withCallingHandlers() expressions are parsed
+
+    Code
+      generator_body(function() withCallingHandlers(expr))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user(withCallingHandlers(expr))
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
+
