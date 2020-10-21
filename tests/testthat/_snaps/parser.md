@@ -1776,6 +1776,7 @@
               })
               handlers[[2L]] <- user(base::list(error = function(...) "handled"))
               state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               .last_value <- with_try_catch(handlers[[2L]], {
                   repeat switch(state[[2L]], `1` = {
@@ -1827,6 +1828,7 @@
               })
               handlers[[2L]] <- user(base::list(error = function(...) "handled"))
               state[[1L]] <- 2L
+              state[[2L]] <- 1L
           }, `2` = {
               with_try_catch(handlers[[2L]], {
                   repeat switch(state[[2L]], `1` = {

@@ -138,4 +138,17 @@ test_that("can use tryCatch()", {
     "value"
   })()
   expect_equal(out, "value")
+
+  expect_error(
+    gen({
+      tryCatch(
+        foo = function(...) "handled", {
+          stop("error")
+          yield("yield")
+        }
+      )
+      "value"
+    })(),
+    regexp = "error"
+  )
 })

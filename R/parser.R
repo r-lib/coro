@@ -971,6 +971,7 @@ try_catch_states <- function(preamble,
     !!!preamble %&&% list(user_call(preamble))
     handlers[[!!try_catch_depth]] <- user(base::list(!!!handlers_exprs))
     state[[!!depth]] <- !!(state_i + 1L)
+    state[[!!(depth + 1L)]] <- 1L
   })
   states <- new_state(handler_body, NULL, counter())
   state_i <- counter(inc = 1L)
