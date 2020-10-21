@@ -283,3 +283,24 @@ test_that("tryCatch() expressions are treated as normal expressions if possible"
 
   expect_snapshot0(generator_body(function() tryCatch(foo())))
 })
+
+test_that("tryCatch() expressions are parsed", {
+  expect_snapshot0(generator_body(function() {
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+    "value"
+  }))
+})

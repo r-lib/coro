@@ -116,3 +116,16 @@ test_that("unexpected exits disable generators", {
   )
   expect_error(g(), "disabled because of an unexpected exit")
 })
+
+test_that("can use tryCatch()", {
+  out <- gen({
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+    "value"
+  })()
+  expect_equal(out, "value")
+})

@@ -43,7 +43,14 @@ walk_loop_states <- function(body, states, counter, info) {
 
   expr(repeat switch(state[[!!loop_depth]], !!!states))
 }
-walk_branch_states <- function(body, offset, counter, continue, last, return, info) {
+walk_branch_states <- function(body,
+                               offset,
+                               counter,
+                               continue,
+                               last,
+                               return,
+                               info,
+                               new_machine = machine_call) {
   nested_continue <- function(counter, last) {
     counter() + 1L
   }
@@ -72,8 +79,11 @@ walk_branch_states <- function(body, offset, counter, continue, last, return, in
     next_i <- next_i + offset
   }
 
+  new_machine(states, machine_depth, prev_depth, next_i)
+}
+machine_call <- function(states, depth, prev_depth, next_i) {
   expr({
-    repeat switch(state[[!!machine_depth]], !!!states)
+    repeat switch(state[[!!depth]], !!!states)
     n <- length(state)
     if (n < !!prev_depth) {
       !!break_call()
@@ -496,6 +506,19 @@ block_states <- function(block, counter, continue, last, return, info) {
         push_states(next_state(
           preamble = collect(),
           counter = counter,
+          info = info
+        ))
+        next
+      },
+      `tryCatch` = {
+        node_poke_car(node, "tryCatch")
+        push_states(try_catch_states(
+          preamble = collect(),
+          expr = expr,
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
           info = info
         ))
         next
@@ -922,6 +945,59 @@ next_state <- function(preamble, counter, info) {
   counter(inc = 1L)
 
   state
+}
+
+try_catch_states <- function(preamble,
+                             expr,
+                             counter,
+                             continue,
+                             last,
+                             return,
+                             info) {
+  # Can't use `match.call()` because we don't have any environment to
+  # expand dots in, and because expanding dots without keeping track
+  # of environments is problematic.
+  i <- try_catch_arg(expr)
+  body <- expr[[i]]
+  handlers_exprs <- as.list(expr[-c(1, i)])
+
+  state_i <- counter()
+  depth <- machine_depth(counter)
+  try_catch_depth <- depth + 1L
+
+  # Handlers can't be evaluated until runtime. We store them in a list
+  # dynamically.
+  handler_body <- expr({
+    !!!preamble %&&% list(user_call(preamble))
+    handlers[[!!try_catch_depth]] <- user(base::list(!!!handlers_exprs))
+    state[[!!depth]] <- !!(state_i + 1L)
+  })
+  states <- new_state(handler_body, NULL, counter())
+  state_i <- counter(inc = 1L)
+
+  try_catch_machine_call <- function(states, depth, prev_depth, next_i) {
+    machine <- machine_call(states, depth, prev_depth, next_i)
+    expr(with_try_catch(handlers[[!!depth]], !!machine))
+  }
+
+  machine <- walk_branch_states(
+    body,
+    offset = 0L,
+    counter = counter,
+    continue = continue,
+    last = last,
+    return = return,
+    info = info,
+    new_machine = try_catch_machine_call
+  )
+  machine_block <- block(
+    machine,
+    continue_call(continue(counter, last), depth)
+  )
+  node_list_poke_cdr(states, new_state(machine_block, NULL, state_i))
+  counter(inc = 1L)
+
+  states
 }
 
 # Must be trailing or before a `next` statement
