@@ -125,6 +125,16 @@ test_that("can use tryCatch()", {
         yield("yield")
       }
     )
+  })()
+  expect_equal(out, "handled")
+
+  out <- gen({
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
     "value"
   })()
   expect_equal(out, "value")

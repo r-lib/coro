@@ -1777,7 +1777,7 @@
               handlers[[2L]] <- user(base::list(error = function(...) "handled"))
               state[[1L]] <- 2L
           }, `2` = {
-              with_try_catch(handlers[[2L]], {
+              .last_value <- with_try_catch(handlers[[2L]], {
                   repeat switch(state[[2L]], `1` = {
                       validate_yield(user({
                         stop("error")
@@ -1799,7 +1799,8 @@
                   length(state) <- 1L
                   break
               })
-              break
+              exhausted <- TRUE
+              return(last_value())
           })
           exhausted <- TRUE
           invisible(NULL)

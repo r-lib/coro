@@ -990,12 +990,19 @@ try_catch_states <- function(preamble,
     info = info,
     new_machine = try_catch_machine_call
   )
-  machine_block <- block(
-    machine,
-    continue_call(continue(counter, last), depth)
-  )
-  node_list_poke_cdr(states, new_state(machine_block, NULL, state_i))
-  counter(inc = 1L)
+
+  if (last && return) {
+    machine <- expr(.last_value <- !!machine)
+    machine_state <- return_state(machine, counter, info)
+  } else {
+    machine_block <- block(
+      machine,
+      continue_call(continue(counter, last), depth)
+    )
+    machine_state <- new_state(machine_block, NULL, state_i)
+    counter(inc = 1L)
+  }
+  node_list_poke_cdr(states, machine_state)
 
   states
 }
