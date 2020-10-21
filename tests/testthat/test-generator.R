@@ -139,6 +139,19 @@ test_that("can use tryCatch()", {
   })()
   expect_equal(out, "value")
 
+  out <- gen({
+    if (TRUE) {
+      tryCatch(
+        error = function(...) "handled", {
+          repeat if (TRUE) stop("error")
+          yield("yield")
+        }
+      )
+    }
+    "value"
+  })()
+  expect_equal(out, "value")
+
   expect_error(
     gen({
       tryCatch(
@@ -167,4 +180,15 @@ test_that("tryCatch(finally = ) is handled", {
     })(),
     regexp = "not implemented"
   )
+})
+
+test_that("can yield within tryCatch()", {
+  g <- gen({
+    tryCatch(error = function(...) "handled", {
+      yield("value")
+      stop("error")
+    })
+  })
+  expect_equal(g(), "value")
+  expect_equal(g(), "handled")
 })
