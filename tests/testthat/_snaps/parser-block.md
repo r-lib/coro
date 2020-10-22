@@ -45,6 +45,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "after1"
                   "after2"
@@ -76,6 +79,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "after"
               })
@@ -110,14 +116,20 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               validate_yield(user({
                   "during"
                   2L
               }))
-              state[[1L]] <- 3L
+              state[[1L]] <- 4L
               suspend()
               return(last_value())
-          }, `3` = {
+          }, `4` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 5L
+          }, `5` = {
               user({
                   "after"
               })
@@ -151,13 +163,19 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               validate_yield(user({
                   2L
               }))
-              state[[1L]] <- 3L
+              state[[1L]] <- 4L
               suspend()
               return(last_value())
-          }, `3` = {
+          }, `4` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 5L
+          }, `5` = {
               user({
                   "after"
               })
@@ -245,6 +263,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               validate_yield(user({
                   2L
               }))
@@ -285,6 +306,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "after-inner"
                   "after1"
@@ -323,6 +347,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "after-inner"
                   "after1"
@@ -360,6 +387,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "after1"
                   "after2"
@@ -402,20 +432,29 @@
               suspend()
               return(last_value())
           }, `2` = {
-              validate_yield(user({
-                  2L
-              }))
+              without_call_errors(force(arg))
               state[[1L]] <- 3L
-              suspend()
-              return(last_value())
           }, `3` = {
               validate_yield(user({
-                  3L
+                  2L
               }))
               state[[1L]] <- 4L
               suspend()
               return(last_value())
           }, `4` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 5L
+          }, `5` = {
+              validate_yield(user({
+                  3L
+              }))
+              state[[1L]] <- 6L
+              suspend()
+              return(last_value())
+          }, `6` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 7L
+          }, `7` = {
               user({
                   "after-inner"
                   "after"
@@ -452,6 +491,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "after-inner-inner"
                   "after"
@@ -488,6 +530,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "after-inner"
                   "after"

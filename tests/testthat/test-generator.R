@@ -223,3 +223,21 @@ test_that("can't await() within a generator", {
   expect_error(generator(function() await(foo))(), "non-async")
   expect_error(generator(function() for (x in await_each(foo)) NULL)(), "non-async")
 })
+
+test_that("reentering the generator forces argument in proper context", {
+  g <- generator(function() {
+    yield("value")
+    "wrong"
+  })()
+  g()
+  expect_error(g(stop("error")), "error")
+
+  g <- generator(function() {
+    tryCatch(error = function(...) "handled", {
+      yield("value")
+      return("wrong")
+    })
+  })()
+  g()
+  expect_equal(g(stop("error")), "handled")
+})

@@ -214,6 +214,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   if ({
                       if (is_null(arg)) {
                         FALSE
@@ -222,18 +225,18 @@
                         TRUE
                       }
                   }) {
-                      state[[2L]] <- 3L
+                      state[[2L]] <- 4L
                   } else {
                       break
                   }
-              }, `3` = {
+              }, `4` = {
                   user({
                       values <<- c(values, x)
                   })
                   iterators[[3L]] <- as_iterator(user(s2))
-                  state[[2L]] <- 4L
+                  state[[2L]] <- 5L
                   state[[3L]] <- 1L
-              }, `4` = {
+              }, `5` = {
                   repeat switch(state[[3L]], `1` = {
                       .last_value <- then(as_promise({
                         iterator <- iterators[[3L]]
@@ -243,6 +246,9 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
+                      without_call_errors(force(arg))
+                      state[[3L]] <- 3L
+                  }, `3` = {
                       if ({
                         if (is_null(arg)) {
                           FALSE
@@ -251,11 +257,11 @@
                           TRUE
                         }
                       }) {
-                        state[[3L]] <- 3L
+                        state[[3L]] <- 4L
                       } else {
                         break
                       }
-                  }, `3` = {
+                  }, `4` = {
                       user({
                         values <<- c(values, y)
                       })

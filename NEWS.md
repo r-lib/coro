@@ -1,6 +1,12 @@
 
 # flowery 0.0.1.9000
 
+* Generator arguments are forced on reentry in the approriate context
+  (e.g. in the `tryCatch()` context if generator was yielded from a
+  `tryCatch()`). This makes it possible to clean up cancelled
+  generators (by jumping from the generator with a restart) or
+  propagate errors in async functions.
+
 * Generators and async functions now support yielding within
   `tryCatch()` expressions.
 

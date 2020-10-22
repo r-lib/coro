@@ -59,6 +59,9 @@
                         suspend()
                         return(last_value())
                       }, `2` = {
+                        without_call_errors(force(arg))
+                        state[[3L]] <- 3L
+                      }, `3` = {
                         break
                       })
                       n <- length(state)

@@ -66,3 +66,10 @@ try_catch_arg <- function(call) {
 
   abort("Can't supply empty `tryCatch()`.")
 }
+
+without_call_errors <- function(expr, env = caller_env()) {
+  withCallingHandlers(expr, simpleError = function(cnd) {
+    cnd$call <- NULL
+    stop(cnd)
+  })
+}
