@@ -173,3 +173,27 @@ test_that("yield() inside `async_generator()` returns a promise", {
   new_g <- async_generator(function() yield(1))
   expect_true(inherits(new_g()(), "promise"))
 })
+
+test_that("async functions handle errors", {
+  async_fail <- async(function() {
+    await(async_sleep(0))
+    stop("some error")
+  })
+  g <- async(function() {
+    await(async_fail())
+    "value"
+  })
+  expect_error(
+    wait_for(g()),
+    "some error"
+  )
+
+  g <- async(function() {
+    tryCatch(await(async_fail()), error = function(...) "handled")
+    "value"
+  })
+  expect_equal(
+    wait_for(g()),
+    "value"
+  )
+})

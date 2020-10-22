@@ -23,11 +23,19 @@ prom_status <- function(prom) {
   impl <- prom_impl(prom)
   impl$status()
 }
+
+# FIXME: Is there a better way to dereference resolved promises?
 prom_value <- function(prom) {
-  # FIXME: Is there a better way to dereference resolved promises?
   impl <- prom_impl(prom)
-  .subset2(impl, ".__enclos_env__")$private$value
+  out <- .subset2(impl, ".__enclos_env__")$private$value
+
+  if (is_string(prom_status(prom), "rejected")) {
+    stop(out)
+  } else {
+    out
+  }
 }
+
 prom_impl <- function(prom) {
   stopifnot(promises::is.promise(prom))
   attr(prom, "promise_impl", exact = TRUE)
