@@ -120,48 +120,24 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       return = return,
       info = info
     ),
-    `yield` =
-      if (assign) {
-        yield_assign_states(
-          expr = user_call(node_get(node_get(expr, 3), 2)),
-          var = as_string(node_get(expr, 2)),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        )
-      } else {
-        yield_state(
-          expr = user_call(node_get(expr, 2)),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        )
-      },
-    `await` =
-      if (assign) {
-        await_assign_states(
-          expr = user_call(node_get(node_get(expr, 3), 2)),
-          var = as_string(node_get(expr, 2)),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        )
-      } else {
-        await_state(
-          expr = user_call(node_get(expr, 2)),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        )
-      },
+    `yield` = yield_state(
+      expr = user_call(yield_expr(expr, assign)),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return,
+      info = info,
+      assign_var = yield_lhs(expr, assign)
+    ),
+    `await` = await_state(
+      expr = user_call(yield_expr(expr, assign)),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return,
+      info = info,
+      assign_var = yield_lhs(expr, assign)
+    ),
     `return` = return_state(
       expr = user_call(strip_explicit_return(expr)),
       counter = counter,
@@ -422,53 +398,29 @@ block_states <- function(block, counter, continue, last, return, info) {
         next
       },
       `yield` = {
-        if (assign) {
-          node_poke_car(node, node_get(node_get(expr, 3), 2))
-          push_states(yield_assign_states(
-            expr = collect(),
-            var = as_string(node_get(expr, 2)),
-            counter = counter,
-            continue = continue,
-            last = last,
-            return = return,
-            info = info
-          ))
-        } else {
-          node_poke_car(node, node_get(expr, 2))
-          push_states(yield_state(
-            expr = collect(),
-            counter = counter,
-            continue = continue,
-            last = last,
-            return = return,
-            info = info
-          ))
-        }
+        node_poke_car(node, yield_expr(expr, assign))
+        push_states(yield_state(
+          expr = collect(),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info,
+          assign_var = yield_lhs(expr, assign)
+        ))
         next
       },
       `await` = {
-        if (assign) {
-          node_poke_car(node, node_get(node_get(expr, 3), 2))
-          push_states(await_assign_states(
-            expr = collect(),
-            var = as_string(node_get(expr, 2)),
-            counter = counter,
-            continue = continue,
-            last = last,
-            return = return,
-            info = info
-          ))
-        } else {
-          node_poke_car(node, node_get(expr, 2))
-          push_states(await_state(
-            expr = collect(),
-            counter = counter,
-            continue = continue,
-            last = last,
-            return = return,
-            info = info
-          ))
-        }
+        node_poke_car(node, yield_expr(expr, assign))
+        push_states(await_state(
+          expr = collect(),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info,
+          assign_var = yield_lhs(expr, assign)
+        ))
         next
       },
       `return` = {
@@ -643,25 +595,63 @@ continue_state <- function(expr, counter, continue, last, return, info) {
   state
 }
 
-yield_state <- function(expr, counter, continue, last, return, info) {
-  assert_can_yield(info)
+yield_state <- function(expr,
+                        counter,
+                        continue,
+                        last,
+                        return,
+                        info,
+                        assign_var = NULL) {
+  if (is_string(info$type, "async")) {
+    abort("Can't yield within an `async()` function.")
+  }
+
   expr <- expr(validate_yield(!!expr))
 
   if (is_string(info$type, "async_generator")) {
     expr <- expr(.last_value <- as_promise(!!expr))
   }
 
-  suspend_state(expr, counter, continue, last, return, info)
-}
-assert_can_yield <- function(info) {
-  if (is_string(info$type, "async")) {
-    abort("Can't yield within an `async()` function.")
-  }
+  suspend_state(expr, counter, continue, last, return, info, assign_var = assign_var)
 }
 
-suspend_state <- function(expr, counter, continue, last, return, info) {
-  if (last && return) {
+await_state <- function(expr,
+                        counter,
+                        continue,
+                        last,
+                        return,
+                        info,
+                        assign_var = NULL) {
+  expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
+  suspend_state(
+    expr = expr,
+    counter = counter,
+    continue = continue,
+    last = last,
+    return = return,
+    info = info,
+    assign_var = assign_var
+  )
+}
+
+suspend_state <- function(expr,
+                          counter,
+                          continue,
+                          last,
+                          return,
+                          info,
+                          assign_var) {
+  assign <- !is_null(assign_var)
+
+  if (!assign && last && return) {
     return(return_state(expr, counter, info))
+  }
+
+  # Hard-code `last` to `FALSE` because we are inserting an assignment
+  # state after the yielding state
+  if (assign) {
+    saved_last <- last
+    last <- FALSE
   }
 
   i <- counter()
@@ -674,67 +664,20 @@ suspend_state <- function(expr, counter, continue, last, return, info) {
     suspend()
     return(last_value())
   })
-  state <- new_state(block, NULL, tag = i)
+  states <- new_state(block, NULL, tag = i)
   counter(inc = 1L)
 
-  state
-}
-
-yield_assign_states <- function(expr,
-                                var,
-                                counter,
-                                continue,
-                                last,
-                                return,
-                                info) {
-  assert_can_yield(info)
-  expr <- expr(validate_yield(!!expr))
-  suspend_assign_states(expr, var, counter, continue, last, return, info)
-}
-
-suspend_assign_states <- function(expr,
-                                  var,
-                                  counter,
-                                  continue,
-                                  last,
-                                  return,
-                                  info) {
-  # Hard-code `last` to `FALSE` because we are inserting an assignment
-  # state after the yielding state
-  states <- suspend_state(expr, counter, continue, last = FALSE, return = return)
-
-  assign_block <- expr({
-    user_env[[!!var]] <- arg
-    !!continue_call(continue(counter, last), machine_depth(counter))
-  })
-  assign_state <- new_state(assign_block, NULL, counter())
-  node_list_poke_cdr(states, assign_state)
-  counter(inc = 1L)
+  if (assign) {
+    assign_block <- expr({
+      user_env[[!!assign_var]] <- arg
+      !!continue_call(continue(counter, saved_last), machine_depth(counter))
+    })
+    assign_state <- new_state(assign_block, NULL, counter())
+    node_list_poke_cdr(states, assign_state)
+    counter(inc = 1L)
+  }
 
   states
-}
-
-await_state <- function(expr, counter, continue, last, return, info) {
-  expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
-  suspend_state(
-    expr = expr,
-    counter = counter,
-    continue = continue,
-    last = last,
-    return = return,
-    info = info
-  )
-}
-
-await_assign_states <- function(expr,
-                                var,
-                                counter,
-                                continue,
-                                last,
-                                return,
-                                info) {
-  expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
-  suspend_assign_states(expr, var, counter, continue, last, return, info)
 }
 
 if_states <- function(preamble,

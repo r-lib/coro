@@ -51,3 +51,18 @@ call_lhs <- function(call) {
 call_rhs <- function(call) {
   node_cadr(node_cdr(call))
 }
+
+yield_expr <- function(call, assign) {
+  if (assign) {
+    node_get(node_get(call, 3), 2)
+  } else {
+    node_get(call, 2)
+  }
+}
+yield_lhs <- function(call, assign) {
+  if (assign) {
+    as_string(node_get(call, 2))
+  } else {
+    NULL
+  }
+}
