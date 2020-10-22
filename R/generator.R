@@ -207,6 +207,7 @@ new_generator_env <- function(parent, info) {
   env$exhausted <- FALSE
   env$state <- 1L
   env$iterators <- list()
+  env$handlers <- list()
 
   with(env, {
     .last_value <- NULL
@@ -292,6 +293,10 @@ is_generator_factory <- function(x) {
 
 # Currently a no-op but will disable exit expressions in the future
 suspend <- function() NULL
+
+with_try_catch <- function(handlers, expr) {
+  blast(tryCatch(expr, !!!handlers))
+}
 
 validate_yield <- function(x) {
   if (is_null(x)) {

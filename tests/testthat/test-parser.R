@@ -275,3 +275,44 @@ test_that("can parse generators without source references", {
     eval(parse(text = src, keep.source = FALSE))
   )
 })
+
+test_that("tryCatch() expressions are treated as normal expressions if possible", {
+  expect_equal(with_handlers_type(quote(tryCatch(error = hnd, foo())), "tryCatch"), "expr")
+  expect_equal(with_handlers_type(quote(tryCatch(error = hnd, yield())), "tryCatch"), "tryCatch")
+  expect_equal(with_handlers_type(quote(tryCatch(error = hnd, { foo() })), "tryCatch"), "tryCatch")
+
+  expect_snapshot0(generator_body(function() tryCatch(foo())))
+})
+
+test_that("tryCatch() expressions are parsed", {
+  expect_snapshot0(generator_body(function() {
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+  }))
+
+  expect_snapshot0(generator_body(function() {
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+    "value"
+  }))
+})
+
+test_that("withCallingHandlers() expressions are parsed", {
+  expect_snapshot0(generator_body(function() withCallingHandlers(expr)))
+  expect_error(
+    generator_body(function() withCallingHandlers(yield("value"))),
+    "not implemented yet"
+  )
+  expect_error(
+    generator_body(function() { withCallingHandlers(yield("value")) }),
+    "not implemented yet"
+  )
+})

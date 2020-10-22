@@ -43,7 +43,14 @@ walk_loop_states <- function(body, states, counter, info) {
 
   expr(repeat switch(state[[!!loop_depth]], !!!states))
 }
-walk_branch_states <- function(body, offset, counter, continue, last, return, info) {
+walk_branch_states <- function(body,
+                               offset,
+                               counter,
+                               continue,
+                               last,
+                               return,
+                               info,
+                               new_machine = machine_call) {
   nested_continue <- function(counter, last) {
     counter() + 1L
   }
@@ -72,8 +79,11 @@ walk_branch_states <- function(body, offset, counter, continue, last, return, in
     next_i <- next_i + offset
   }
 
+  new_machine(states, machine_depth, prev_depth, next_i)
+}
+machine_call <- function(states, depth, prev_depth, next_i) {
   expr({
-    repeat switch(state[[!!machine_depth]], !!!states)
+    repeat switch(state[[!!depth]], !!!states)
     n <- length(state)
     if (n < !!prev_depth) {
       !!break_call()
@@ -197,7 +207,16 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       last = last,
       info = info
     ),
-    `tryCatch` = ,
+    `tryCatch` = try_catch_states(
+      preamble = NULL,
+      expr = expr,
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return,
+      info = info
+    ),
+    `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`"),
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
     stop_internal("expr_states", sprintf("Unexpected operation `%s`", expr_type(expr)))
   )
@@ -244,10 +263,29 @@ expr_type <- function(expr) {
     `for` = ,
     `break` = ,
     `next` = ,
-    `tryCatch` = ,
     `on.exit` = head,
+    `tryCatch` = ,
+    `withCallingHandlers` = with_handlers_type(expr, head),
     default
   )
+}
+
+# `tryCatch()` and `withCallingHandlers()` are treated as a simple
+# expressions unless the argument is a potentially yielding control
+# flow expression
+with_handlers_type <- function(expr, fn_name) {
+  fn <- switch(fn_name,
+    tryCatch = tryCatch,
+    withCallingHandlers = withCallingHandlers,
+    stop_internal("Unexpected state in `handler_type()`.")
+  )
+  call <- match.call(fn, expr)
+
+  if (is_string(expr_type(call$expr), "expr")) {
+    "expr"
+  } else {
+    fn_name
+  }
 }
 
 block_states <- function(block, counter, continue, last, return, info) {
@@ -487,7 +525,21 @@ block_states <- function(block, counter, continue, last, return, info) {
           info = info
         ))
         next
-      }
+      },
+      `tryCatch` = {
+        node_poke_car(node, "tryCatch")
+        push_states(try_catch_states(
+          preamble = collect(),
+          expr = expr,
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        ))
+        next
+      },
+      `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`")
     )
 
     stop_internal("block_states", sprintf("Unexpected operation `%s`", type))
@@ -910,6 +962,72 @@ next_state <- function(preamble, counter, info) {
   counter(inc = 1L)
 
   state
+}
+
+try_catch_states <- function(preamble,
+                             expr,
+                             counter,
+                             continue,
+                             last,
+                             return,
+                             info) {
+  # Can't use `match.call()` because we don't have any environment to
+  # expand dots in, and because expanding dots without keeping track
+  # of environments is problematic.
+  i <- try_catch_arg(expr)
+  body <- expr[[i]]
+  handlers_exprs <- as.list(expr[-c(1, i)])
+
+  finally <- handlers_exprs$finally
+  if (!is_null(finally)) {
+    stop_unimplemented("`tryCatch(finally = )`")
+  }
+
+  state_i <- counter()
+  depth <- machine_depth(counter)
+  try_catch_depth <- depth + 1L
+
+  # Handlers can't be evaluated until runtime. We store them in a list
+  # dynamically.
+  handler_body <- expr({
+    !!!preamble %&&% list(user_call(preamble))
+    handlers[[!!try_catch_depth]] <- user(base::list(!!!handlers_exprs))
+    state[[!!depth]] <- !!(state_i + 1L)
+    state[[!!(depth + 1L)]] <- 1L
+  })
+  states <- new_state(handler_body, NULL, counter())
+  state_i <- counter(inc = 1L)
+
+  try_catch_machine_call <- function(states, depth, prev_depth, next_i) {
+    machine <- machine_call(states, depth, prev_depth, next_i)
+    expr(with_try_catch(handlers[[!!depth]], !!machine))
+  }
+
+  machine <- walk_branch_states(
+    body,
+    offset = 0L,
+    counter = counter,
+    continue = continue,
+    last = last,
+    return = return,
+    info = info,
+    new_machine = try_catch_machine_call
+  )
+
+  if (last && return) {
+    machine <- expr(.last_value <- !!machine)
+    machine_state <- return_state(machine, counter, info)
+  } else {
+    machine_block <- block(
+      machine,
+      continue_call(continue(counter, last), depth)
+    )
+    machine_state <- new_state(machine_block, NULL, state_i)
+    counter(inc = 1L)
+  }
+  node_list_poke_cdr(states, machine_state)
+
+  states
 }
 
 # Must be trailing or before a `next` statement

@@ -116,3 +116,82 @@ test_that("unexpected exits disable generators", {
   )
   expect_error(g(), "disabled because of an unexpected exit")
 })
+
+test_that("can use tryCatch()", {
+  out <- gen({
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+  })()
+  expect_equal(out, "handled")
+
+  out <- gen({
+    tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+    "value"
+  })()
+  expect_equal(out, "value")
+
+  out <- gen({
+    if (TRUE) {
+      tryCatch(
+        error = function(...) "handled", {
+          repeat if (TRUE) stop("error")
+          yield("yield")
+        }
+      )
+    }
+    "value"
+  })()
+  expect_equal(out, "value")
+
+  out <- gen(tryCatch({ stop("foo"); yield("value") }, error = function(...) "handled"))()
+  expect_equal(out, "handled")
+
+  expect_error(
+    gen({
+      tryCatch(
+        foo = function(...) "handled", {
+          stop("error")
+          yield("yield")
+        }
+      )
+      "value"
+    })(),
+    regexp = "error"
+  )
+})
+
+test_that("tryCatch(finally = ) is handled", {
+  expect_error(
+    gen({
+      tryCatch(
+        error = function(...) "handled", {
+          stop("error")
+          yield("yield")
+        },
+        finally = return("finally")
+      )
+      "value"
+    })(),
+    regexp = "not implemented"
+  )
+})
+
+test_that("can yield within tryCatch()", {
+  g <- gen({
+    tryCatch(error = function(...) "handled", {
+      yield("value")
+      stop("error")
+    })
+  })
+  expect_equal(g(), "value")
+  expect_equal(g(), "handled")
+})

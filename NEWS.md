@@ -1,6 +1,9 @@
 
 # flowery 0.0.1.9000
 
+* Generators and async functions now support yielding within
+  `tryCatch()` expressions.
+
 * Generators and async functions are now disabled when an unexpected
   exit occurs (error, interrupt, restart invokation, debugger exit,
   etc.). Reentering the generator is an error.

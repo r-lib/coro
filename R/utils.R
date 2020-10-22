@@ -45,3 +45,24 @@ assert_lambda <- function(call) {
 stop_internal <- function(fn, msg) {
   abort(sprintf("Internal error in `%s()`: %s.", fn, msg))
 }
+
+stop_unimplemented <- function(what) {
+  abort(c(
+    sprintf("%s is not implemented yet.", what),
+    i = "Please send a feature request if you are interested."
+  ))
+}
+
+try_catch_arg <- function(call) {
+  i <- match("expr", names(call))
+  if (!is_na(i)) {
+    return(i)
+  }
+
+  i <- which(!have_name(call[-1]))
+  if (length(i)) {
+    return(i[[1]] + 1)
+  }
+
+  abort("Can't supply empty `tryCatch()`.")
+}
