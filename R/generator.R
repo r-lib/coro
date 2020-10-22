@@ -312,5 +312,6 @@ utils::globalVariables(c(
   "arg",
   ".self",
   "then",
-  "as_promise"
+  "as_promise",
+  "user"
 ))
