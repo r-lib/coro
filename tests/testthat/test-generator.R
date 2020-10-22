@@ -218,3 +218,8 @@ test_that("can assign tryCatch()", {
   expect_equal(collect(g), list("value", "handled"))
   expect_equal(fn(), "handled")
 })
+
+test_that("can't await() within a generator", {
+  expect_error(generator(function() await(foo))(), "non-async")
+  expect_error(generator(function() for (x in await_each(foo)) NULL)(), "non-async")
+})

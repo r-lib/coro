@@ -603,7 +603,7 @@ yield_state <- function(expr,
                         info,
                         assign_var = NULL) {
   if (is_string(info$type, "async")) {
-    abort("Can't yield within an `async()` function.")
+    abort("Can't use `yield()` within an async function.")
   }
 
   expr <- expr(validate_yield(!!expr))
@@ -622,7 +622,12 @@ await_state <- function(expr,
                         return,
                         info,
                         assign_var = NULL) {
+  if (is_string(info$type, "generator")) {
+    stop_non_async_generator("await")
+  }
+
   expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
+
   suspend_state(
     expr = expr,
     counter = counter,
@@ -810,10 +815,7 @@ for_states <- function(preamble,
   async <- is_call(iterator, "await_each", ns = c("", "flowery"))
   if (async) {
     if (is_string(info$type, "generator")) {
-      abort(c(
-        "Can't use `await_each()` in a non-async generator.",
-        i = "Do you need `async_generator()`?"
-      ))
+      stop_non_async_generator("await_each")
     }
     iterator <- iterator[[2]]
   }

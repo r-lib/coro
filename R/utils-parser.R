@@ -66,3 +66,10 @@ yield_lhs <- function(call, assign) {
     NULL
   }
 }
+
+stop_non_async_generator <- function(keyword) {
+  abort(c(
+    sprintf("Can't use `%s()` in a non-async generator.", keyword),
+    i = "Do you need `async_generator()`?"
+  ))
+}
