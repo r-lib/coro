@@ -99,7 +99,11 @@ machine_call <- function(states, depth, prev_depth, next_i) {
 }
 
 expr_states <- function(expr, counter, continue, last, return, info) {
-  switch(expr_type(expr),
+  expr_info <- expr_info(expr)
+  type <- expr_info$type
+  assign <- expr_info$assign
+
+  switch(type,
     `{` = block_states(
       block = expr,
       counter = counter,
@@ -116,40 +120,48 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       return = return,
       info = info
     ),
-    `yield` = yield_state(
-      expr = user_call(node_get(expr, 2)),
-      counter = counter,
-      continue = continue,
-      last = last,
-      return = return,
-      info = info
-    ),
-    `await` = await_state(
-      expr = user_call(node_get(expr, 2)),
-      counter = counter,
-      continue = continue,
-      last = last,
-      return = return,
-      info = info
-    ),
-    `yield_assign` = yield_assign_states(
-      expr = user_call(node_get(node_get(expr, 3), 2)),
-      var = as_string(node_get(expr, 2)),
-      counter = counter,
-      continue = continue,
-      last = last,
-      return = return,
-      info = info
-    ),
-    `await_assign` = await_assign_states(
-      expr = user_call(node_get(node_get(expr, 3), 2)),
-      var = as_string(node_get(expr, 2)),
-      counter = counter,
-      continue = continue,
-      last = last,
-      return = return,
-      info = info
-    ),
+    `yield` =
+      if (assign) {
+        yield_assign_states(
+          expr = user_call(node_get(node_get(expr, 3), 2)),
+          var = as_string(node_get(expr, 2)),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        )
+      } else {
+        yield_state(
+          expr = user_call(node_get(expr, 2)),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        )
+      },
+    `await` =
+      if (assign) {
+        await_assign_states(
+          expr = user_call(node_get(node_get(expr, 3), 2)),
+          var = as_string(node_get(expr, 2)),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        )
+      } else {
+        await_state(
+          expr = user_call(node_get(expr, 2)),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        )
+      },
     `return` = return_state(
       expr = user_call(strip_explicit_return(expr)),
       counter = counter,
@@ -217,12 +229,36 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info
     ),
     `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`"),
-    `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", expr_type(expr))),
-    stop_internal("expr_states", sprintf("Unexpected operation `%s`", expr_type(expr)))
+    `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", type)),
+    stop_internal("expr_states", sprintf("Unexpected operation `%s`", type))
   )
 }
 
+expr_info <- function(expr) {
+  if (is_call(expr, "<-")) {
+    assign <- TRUE
+    expr <- node_cadr(node_cdr(expr))
+  } else {
+    assign <- FALSE
+  }
+
+  type <- expr_type_impl(expr)
+
+  if (is_string(type, "expr")) {
+    assign <- FALSE
+  }
+  if (assign && !type %in% c("yield", "await", "await_each")) {
+    abort(sprintf("Can't assign the result of a `%s` expression.", type))
+  }
+
+  list(type = type, assign = assign)
+}
+
 expr_type <- function(expr) {
+  expr_info(expr)$type
+}
+
+expr_type_impl <- function(expr) {
   default <- "expr"
 
   if (!is_call(expr)) {
@@ -241,16 +277,6 @@ expr_type <- function(expr) {
     return(default)
   }
   head <- as_string(head)
-
-  if (is_string(head, "<-")) {
-    rhs <- node_cadr(node_cdr(expr))
-    if (is_yield_call(rhs)) {
-      return("yield_assign")
-    } else if (is_await_call(rhs)) {
-      return("await_assign")
-      return(default)
-    }
-  }
 
   switch(head,
     `{` = ,
@@ -377,7 +403,10 @@ block_states <- function(block, counter, continue, last, return, info) {
 
     expr <- node_car(node)
     ref <- node_car(refs)
-    type <- expr_type(expr)
+
+    expr_info <- expr_info(expr)
+    type <- expr_info$type
+    assign <- expr_info$assign
 
     switch(type,
       # Collect as many user expressions as possible
@@ -392,53 +421,53 @@ block_states <- function(block, counter, continue, last, return, info) {
         next
       },
       `yield` = {
-        node_poke_car(node, node_get(expr, 2))
-        push_states(yield_state(
-          expr = collect(),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        ))
-        next
-      },
-      `yield_assign` = {
-        node_poke_car(node, node_get(node_get(expr, 3), 2))
-        push_states(yield_assign_states(
-          expr = collect(),
-          var = as_string(node_get(expr, 2)),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        ))
+        if (assign) {
+          node_poke_car(node, node_get(node_get(expr, 3), 2))
+          push_states(yield_assign_states(
+            expr = collect(),
+            var = as_string(node_get(expr, 2)),
+            counter = counter,
+            continue = continue,
+            last = last,
+            return = return,
+            info = info
+          ))
+        } else {
+          node_poke_car(node, node_get(expr, 2))
+          push_states(yield_state(
+            expr = collect(),
+            counter = counter,
+            continue = continue,
+            last = last,
+            return = return,
+            info = info
+          ))
+        }
         next
       },
       `await` = {
-        node_poke_car(node, node_get(expr, 2))
-        push_states(await_state(
-          expr = collect(),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        ))
-        next
-      },
-      `await_assign` = {
-        node_poke_car(node, node_get(node_get(expr, 3), 2))
-        push_states(await_assign_states(
-          expr = collect(),
-          var = as_string(node_get(expr, 2)),
-          counter = counter,
-          continue = continue,
-          last = last,
-          return = return,
-          info = info
-        ))
+        if (assign) {
+          node_poke_car(node, node_get(node_get(expr, 3), 2))
+          push_states(await_assign_states(
+            expr = collect(),
+            var = as_string(node_get(expr, 2)),
+            counter = counter,
+            continue = continue,
+            last = last,
+            return = return,
+            info = info
+          ))
+        } else {
+          node_poke_car(node, node_get(expr, 2))
+          push_states(await_state(
+            expr = collect(),
+            counter = counter,
+            continue = continue,
+            last = last,
+            return = return,
+            info = info
+          ))
+        }
         next
       },
       `return` = {
