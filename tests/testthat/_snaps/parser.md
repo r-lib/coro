@@ -1883,3 +1883,55 @@
           invisible(NULL)
       }
 
+# tryCatch() can be assigned
+
+    Code
+      generator_body(function() {
+        value <- tryCatch(error = function(...) "handled", {
+          stop("error")
+          yield("yield")
+        })
+      })
+    Output
+      {
+          if (exhausted) {
+              return(invisible(NULL))
+          }
+          repeat switch(state[[1L]], `1` = {
+              user({
+                  "tryCatch"
+              })
+              handlers[[2L]] <- user(base::list(error = function(...) "handled"))
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
+          }, `2` = {
+              .last_value <- user_env[["value"]] <- with_try_catch(handlers[[2L]], 
+                  {
+                      repeat switch(state[[2L]], `1` = {
+                        validate_yield(user({
+                          stop("error")
+                          "yield"
+                        }))
+                        exhausted <- TRUE
+                        return(last_value())
+                      }, `2` = {
+                        break
+                      })
+                      n <- length(state)
+                      if (n < 1L) {
+                        break
+                      }
+                      if (n == 1L) {
+                        state[[1L]] <- 1L
+                        next
+                      }
+                      length(state) <- 1L
+                      break
+                  })
+              exhausted <- TRUE
+              return(last_value())
+          })
+          exhausted <- TRUE
+          invisible(NULL)
+      }
+

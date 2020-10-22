@@ -316,3 +316,14 @@ test_that("withCallingHandlers() expressions are parsed", {
     "not implemented yet"
   )
 })
+
+test_that("tryCatch() can be assigned", {
+  expect_snapshot0(generator_body(function() {
+    value <- tryCatch(
+      error = function(...) "handled", {
+        stop("error")
+        yield("yield")
+      }
+    )
+  }))
+})
