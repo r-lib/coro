@@ -226,7 +226,8 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       continue = continue,
       last = last,
       return = return,
-      info = info
+      info = info,
+      assign = assign
     ),
     `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`"),
     `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", type)),
@@ -247,7 +248,7 @@ expr_info <- function(expr) {
   if (is_string(type, "expr")) {
     assign <- FALSE
   }
-  if (assign && !type %in% c("yield", "await", "await_each")) {
+  if (assign && !type %in% c("yield", "await", "await_each", "tryCatch")) {
     abort(sprintf("Can't assign the result of a `%s` expression.", type))
   }
 
@@ -564,7 +565,8 @@ block_states <- function(block, counter, continue, last, return, info) {
           continue = continue,
           last = last,
           return = return,
-          info = info
+          info = info,
+          assign = assign
         ))
         next
       },
@@ -999,7 +1001,13 @@ try_catch_states <- function(preamble,
                              continue,
                              last,
                              return,
-                             info) {
+                             info,
+                             assign = FALSE) {
+  if (assign) {
+    var <- call_lhs(expr)
+    expr <- call_rhs(expr)
+  }
+
   # Can't use `match.call()` because we don't have any environment to
   # expand dots in, and because expanding dots without keeping track
   # of environments is problematic.
@@ -1042,6 +1050,10 @@ try_catch_states <- function(preamble,
     info = info,
     new_machine = try_catch_machine_call
   )
+
+  if (assign) {
+    machine <- expr(user_env[[!!as_string(var)]] <- !!machine)
+  }
 
   if (last && return) {
     machine <- expr(.last_value <- !!machine)

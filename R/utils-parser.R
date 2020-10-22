@@ -44,3 +44,10 @@ is_await_call <- function(x) {
 # Useful to circumvent notes emitted by the bytecode compiler
 next_call <- function() call("next")
 break_call <- function() call("break")
+
+call_lhs <- function(call) {
+  node_cadr(call)
+}
+call_rhs <- function(call) {
+  node_cadr(node_cdr(call))
+}

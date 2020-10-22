@@ -195,3 +195,26 @@ test_that("can yield within tryCatch()", {
   expect_equal(g(), "value")
   expect_equal(g(), "handled")
 })
+
+test_that("can assign tryCatch()", {
+  g <- gen({
+    value <- tryCatch(error = function(...) "handled", {
+      yield("value")
+      stop("error")
+    })
+    value
+  })
+  expect_equal(collect(g), list("value", "handled"))
+
+  # Last expression
+  fn <- NULL
+  g <- gen({
+    fn <<- function() value
+    value <- tryCatch(error = function(...) "handled", {
+      yield("value")
+      stop("error")
+    })
+  })
+  expect_equal(collect(g), list("value", "handled"))
+  expect_equal(fn(), "handled")
+})
