@@ -32,6 +32,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   user({
                       "loop-after"
                   })
@@ -180,6 +183,9 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
+                      without_call_errors(force(arg))
+                      state[[3L]] <- 3L
+                  }, `3` = {
                       break
                   })
                   n <- length(state)
@@ -307,6 +313,9 @@
               suspend()
               return(last_value())
           }, `4` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 5L
+          }, `5` = {
               user({
                   "after"
               })
@@ -393,6 +402,9 @@
               suspend()
               return(last_value())
           }, `4` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 5L
+          }, `5` = {
               user({
                   "after"
               })
@@ -479,20 +491,26 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   user({
                       "loop-after"
                       "next"
                   })
                   state[[2L]] <- 1L
-              }, `3` = {
+              }, `4` = {
                   validate_yield(user({
                       "next-after"
                       2L
                   }))
-                  state[[2L]] <- 4L
+                  state[[2L]] <- 5L
                   suspend()
                   return(last_value())
-              }, `4` = {
+              }, `5` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 6L
+              }, `6` = {
                   user({
                       "loop-final"
                   })
@@ -664,26 +682,32 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   user({
                       "loop-after"
                       "break"
                   })
                   break
-              }, `3` = {
+              }, `4` = {
                   user({
                       "break-after"
                       "next"
                   })
                   state[[2L]] <- 1L
-              }, `4` = {
+              }, `5` = {
                   validate_yield(user({
                       "next-after"
                       2L
                   }))
-                  state[[2L]] <- 5L
+                  state[[2L]] <- 6L
                   suspend()
                   return(last_value())
-              }, `5` = {
+              }, `6` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 7L
+              }, `7` = {
                   user({
                       "loop-final"
                   })
@@ -966,11 +990,14 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
+                      without_call_errors(force(arg))
+                      state[[3L]] <- 3L
+                  }, `3` = {
                       user({
                         "after-pause"
                       })
-                      state[[3L]] <- 3L
-                  }, `3` = {
+                      state[[3L]] <- 4L
+                  }, `4` = {
                       break
                   })
                   n <- length(state)
@@ -1033,6 +1060,9 @@
                   suspend()
                   return(last_value())
               }, `3` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 4L
+              }, `4` = {
                   user({
                       "loop-after"
                   })
@@ -1080,6 +1110,9 @@
                   suspend()
                   return(last_value())
               }, `3` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 4L
+              }, `4` = {
                   user({
                       "loop-after"
                   })
@@ -1169,18 +1202,21 @@
                   suspend()
                   return(last_value())
               }, `3` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 4L
+              }, `4` = {
                   user({
                       "loop-after"
                   })
                   if (user({
                       TRUE
                   })) {
-                      state[[2L]] <- 4L
-                  } else {
                       state[[2L]] <- 5L
+                  } else {
+                      state[[2L]] <- 6L
                   }
                   state[[3L]] <- 1L
-              }, `4` = {
+              }, `5` = {
                   repeat switch(state[[3L]], `1` = {
                       user({
                         "break-before"
@@ -1205,8 +1241,8 @@
                       next
                   }
                   length(state) <- 2L
-                  state[[2L]] <- 6L
-              }, `5` = {
+                  state[[2L]] <- 7L
+              }, `6` = {
                   repeat switch(state[[3L]], `1` = {
                       validate_yield(user({
                         "yield-2-before"
@@ -1216,11 +1252,14 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
+                      without_call_errors(force(arg))
+                      state[[3L]] <- 3L
+                  }, `3` = {
                       user({
                         "yield-2-after"
                       })
-                      state[[3L]] <- 3L
-                  }, `3` = {
+                      state[[3L]] <- 4L
+                  }, `4` = {
                       break
                   })
                   n <- length(state)
@@ -1232,14 +1271,14 @@
                       next
                   }
                   length(state) <- 2L
-                  state[[2L]] <- 6L
-              }, `6` = {
+                  state[[2L]] <- 7L
+              }, `7` = {
                   user({
                       "next-before"
                       "next"
                   })
                   state[[2L]] <- 1L
-              }, `7` = {
+              }, `8` = {
                   user({
                       "loop-end"
                   })
@@ -1431,6 +1470,9 @@
                   suspend()
                   return(last_value())
               }, `3` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 4L
+              }, `4` = {
                   user({
                       "for-after"
                   })
@@ -1505,6 +1547,9 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
+                      without_call_errors(force(arg))
+                      state[[3L]] <- 3L
+                  }, `3` = {
                       break
                   })
                   n <- length(state)
@@ -1977,6 +2022,9 @@
                       suspend()
                       return(last_value())
                   }, `3` = {
+                      without_call_errors(force(arg))
+                      state[[3L]] <- 4L
+                  }, `4` = {
                       user({
                         "break"
                       })

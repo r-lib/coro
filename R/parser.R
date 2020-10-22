@@ -680,6 +680,16 @@ suspend_state <- function(expr,
     assign_state <- new_state(assign_block, NULL, counter())
     node_list_poke_cdr(states, assign_state)
     counter(inc = 1L)
+  } else if (!last) {
+    # Insert state to force the reentering generator argument in the
+    # proper context. This is how generators can be cancelled and cleaned up.
+    force_block <- expr({
+      without_call_errors(force(arg))
+      !!continue_call(continue(counter, last), machine_depth(counter))
+    })
+    force_state <- new_state(force_block, NULL, counter())
+    node_list_poke_cdr(states, force_state)
+    counter(inc = 1L)
   }
 
   states

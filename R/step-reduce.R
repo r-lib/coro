@@ -474,6 +474,8 @@ on_load(async_reduce_steps %<~% async(function(x, steps, builder, init) {
 }))
 
 on_load(async_reduce %<~% async(function(.x, .f, ...) {
+  out <- NULL
+
   while (TRUE) {
     new <- await(.x())
 

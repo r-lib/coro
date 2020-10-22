@@ -144,9 +144,23 @@ get_async_ops <- function(env) {
 
   async_ops(
     package = "promises",
-    then = function(x, callback) promises::then(x, onFulfilled = callback),
-    as_promise = function(x) if (promises::is.promise(x)) x else promises::promise_resolve(x)
+    then = op_then,
+    as_promise = op_as_promise
   )
+}
+op_then <- function(x, callback) {
+  promises::then(
+    x,
+    onFulfilled = callback,
+    onRejected = function(cnd) callback(stop(cnd))
+  )
+}
+op_as_promise <- function(x) {
+  if (promises::is.promise(x)) {
+    x
+  } else {
+    promises::promise_resolve(x)
+  }
 }
 
 #' Sleep asynchronously

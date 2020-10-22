@@ -164,6 +164,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "bar"
               })
@@ -196,6 +199,9 @@
               suspend()
               return(last_value())
           }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
               user({
                   "bar"
               })
@@ -269,6 +275,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   user({
                       "break"
                   })
@@ -321,6 +330,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   user({
                       body3()
                   })
@@ -453,6 +465,9 @@
                   suspend()
                   return(last_value())
               }, `3` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 4L
+              }, `4` = {
                   user({
                       body3()
                   })
@@ -770,6 +785,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   break
               })
               n <- length(state)
@@ -831,6 +849,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   break
               })
               n <- length(state)
@@ -852,6 +873,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   break
               })
               n <- length(state)
@@ -918,11 +942,14 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   user({
                       then2()
                   })
-                  state[[2L]] <- 3L
-              }, `3` = {
+                  state[[2L]] <- 4L
+              }, `4` = {
                   break
               })
               n <- length(state)
@@ -945,11 +972,14 @@
                   suspend()
                   return(last_value())
               }, `2` = {
+                  without_call_errors(force(arg))
+                  state[[2L]] <- 3L
+              }, `3` = {
                   user({
                       else2()
                   })
-                  state[[2L]] <- 3L
-              }, `3` = {
+                  state[[2L]] <- 4L
+              }, `4` = {
                   break
               })
               n <- length(state)
@@ -1214,6 +1244,9 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
+                      without_call_errors(force(arg))
+                      state[[3L]] <- 3L
+                  }, `3` = {
                       break
                   })
                   n <- length(state)
@@ -1840,6 +1873,9 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
+                      without_call_errors(force(arg))
+                      state[[2L]] <- 3L
+                  }, `3` = {
                       break
                   })
                   n <- length(state)
