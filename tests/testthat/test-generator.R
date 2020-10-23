@@ -256,4 +256,8 @@ test_that("exit expressions are suspended and resumed", {
 
   expect_equal(g(), 2)
   expect_true(unwound)
+
+  unwound <- FALSE
+  expect_null(g())
+  expect_false(unwound)
 })

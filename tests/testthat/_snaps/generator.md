@@ -24,6 +24,9 @@
           if (is_true(env$jumped)) {
               abort("This function has been disabled because of an unexpected exit.")
           }
+          if (is_true(env$exhausted)) {
+              return(NULL)
+          }
           env$jumped <- TRUE
           out <- evalq(envir = user_env, base::evalq(envir = <environment>, 
               {

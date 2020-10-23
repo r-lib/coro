@@ -157,6 +157,10 @@ generator0 <- function(fn, type = "generator") {
         abort("This function has been disabled because of an unexpected exit.")
       }
 
+      if (is_true(env$exhausted)) {
+        return(NULL)
+      }
+
       # Resume state machine. Set up an execution env in the user
       # environment first to serve as a target for on.exit()
       # expressions. Then evaluate state machine in its private
