@@ -7,7 +7,7 @@ Authors@R: c(
     )
 Description: Make R a more flowery language with generators and transducers.
 Depends:
-    R (>= 3.1.0)
+    R (>= 3.5.0)
 Imports:
     glue,
     rlang (>= 0.4.8.9000)

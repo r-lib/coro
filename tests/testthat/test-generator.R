@@ -241,3 +241,19 @@ test_that("reentering the generator forces argument in proper context", {
   g()
   expect_equal(g(stop("error")), "handled")
 })
+
+test_that("exit expressions are suspended and resumed", {
+  unwound <- FALSE
+
+  g <- generator(function() {
+    on.exit(unwound <<- TRUE)
+    yield(1)
+    2
+  })()
+
+  expect_equal(g(), 1)
+  expect_false(unwound)
+
+  expect_equal(g(), 2)
+  expect_true(unwound)
+})
