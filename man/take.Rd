@@ -71,6 +71,3 @@ take_chr(1:10, 5)
 iter <- as_iterator(1:10)
 drain(iter)
 }
-\seealso{
-\code{\link[=iter_take]{iter_take()}}
-}

@@ -16,7 +16,7 @@
 #'   `return()`, the generator keeps returning `NULL`.
 #'
 #' Generators are compatible with all iterator features such as
-#' [iterate()], [iter_adapt()], or [drain()].
+#' [iterate()], or [drain()].
 #'
 #' @param fn A function of zero or one argument to be transformed into
 #'   a generator function that can [yield()] and `return()` values.

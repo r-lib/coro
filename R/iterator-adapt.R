@@ -1,6 +1,11 @@
 #' Adapt an iterator with transformation steps
 #'
+#' @noRd
 #' @description
+#'
+#' _Currently unexported because it is not clear whether we want to
+#' commit to the transducer approach. Feedback welcome._
+#'
 #' `iter_adapt()` takes an iterator `iter` and a list of
 #' [Transformation steps][steps]. It returns an iterator that returns
 #' transformed values.
@@ -14,7 +19,6 @@
 #'
 #' @seealso [iterate()] for looping over iterator values with `for`
 #'   loops.
-#' @export
 #' @examples
 #' # Let's create a simple iterator:
 #' iter <- as_iterator(1:50)
@@ -71,8 +75,8 @@ iter_builder <- function(result, input) {
   }
 }
 
+#' @noRd
 #' @rdname iter_adapt
-#' @export
 #' @name async_adapt
 #' @usage async_adapt(iter, steps)
 on_load(async_adapt %<~% async_generator(function(iter, steps) {

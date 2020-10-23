@@ -31,7 +31,7 @@ point. All local variables are preserved.
 }
 
 Generators are compatible with all iterator features such as
-\code{\link[=iterate]{iterate()}}, \code{\link[=iter_adapt]{iter_adapt()}}, or \code{\link[=drain]{drain()}}.
+\code{\link[=iterate]{iterate()}}, or \code{\link[=drain]{drain()}}.
 }
 \section{Passing arguments to a generator}{
 

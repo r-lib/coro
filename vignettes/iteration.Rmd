@@ -284,27 +284,9 @@ drain_dbl(final_iter)
 ```
 
 
-### Transformation step
-
-Transformation steps bring the familiar `map`, `keep` or `discard` idioms that you know from purrr to iterators. You can map a function over iterated chunks with `iter_map()` and discard or keep unwanted elements with `iter_discard()` and `iter_keep()`. You apply these steps to iterators with `iter_adapt()`, which takes an iterator and steps as inputs and returns another iterator.
-
-Let's apply steps so that odd numbers are discarded and all values that pass through the filter are squared by mapping the `^` operator. Note that transformation steps support purrr's `~` notation for lambda functions:
-
-```{r}
-iter <- gen(for (x in 1:10) yield(x))
-
-iter <- iter_adapt(iter,
-  iter_discard(~ . %% 2 != 0),
-  iter_map(`^`, 2)
-)
-
-drain_dbl(iter)
-```
-
-
 ### Iteration with for loops
 
-Finally, flowery provides `iterate()`. It takes a `for` loop expression and instruments it so it understands flowery iterators.
+The `iterate()` helper takes a `for` loop expression and instruments it so it understands the iterator protocol.
 
 ```{r}
 iter <- gen(for (x in 1:10) yield(x^2))

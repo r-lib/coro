@@ -269,7 +269,6 @@ into <- function(to, from, steps = NULL) {
 #' @param x A reducible object.
 #' @param n The number of elements to take from `x`.
 #'
-#' @seealso [iter_take()]
 #' @export
 #' @examples
 #' take(letters, 5)

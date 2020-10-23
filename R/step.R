@@ -1,5 +1,6 @@
 #' Transformation steps
 #'
+#' @noRd
 #' @description
 #'
 #' Transformation steps can be chained together to modify the
@@ -26,9 +27,9 @@
 #' steps <- purrr::compose(iter_map(`+`, 10), iter_discard(`>`, 15))
 NULL
 
+#' @noRd
 #' @rdname steps
 #' @param n The number of inputs to take.
-#' @export
 iter_take <- function(n) {
   force(n)
 
@@ -69,12 +70,12 @@ iter_take <- function(n) {
   }
 }
 
+#' @noRd
 #' @rdname steps
 #' @param .f A function to map over inputs. If needed this argument is
 #'   transformed to a function with [rlang::as_closure()] and thus
 #'   supports the lambda-formula notation.
 #' @param ... Further arguments passed over to `.f` or `.p`.
-#' @export
 iter_map <- function(.f, ...) {
   .f <- as_closure(.f)
 
@@ -94,17 +95,17 @@ iter_map <- function(.f, ...) {
   }
 }
 
+#' @noRd
 #' @rdname steps
 #' @param .p A predicate function applied to inputs. If needed this
 #'   argument is transformed to a function with [rlang::as_closure()]
 #'   and thus supports the lambda-formula notation.
-#' @export
 iter_keep <- function(.p, ...) {
   .p <- as_closure(.p)
   iter_discard(negate(.p), ...)
 }
+#' @noRd
 #' @rdname steps
-#' @export
 iter_discard <- function(.p, ...) {
   .p <- as_closure(.p)
 
