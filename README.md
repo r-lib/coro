@@ -7,10 +7,7 @@
 ## Overview
 
 Flowery is an experimental package implementing generators and
-async-functions in R. It also provides transducers for transforming
-iterators in a pipeline.  See the [iteration
-vignette](http://rpubs.com/lionel-/iteration-draft) for more
-information.
+async-functions in R.
 
 
 ## Installation
