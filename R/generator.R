@@ -325,5 +325,7 @@ utils::globalVariables(c(
   ".self",
   "then",
   "as_promise",
-  "user"
+  "user",
+  "exits",
+  "suspend"
 ))
