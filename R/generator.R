@@ -142,12 +142,12 @@ generator0 <- function(fn, type = "generator") {
       if (!undebugged && (debugged || is_true(peek_option("flowery_debug")))) {
         env_browse(user_env)
 
-        on.exit(add = TRUE, {
+        on.exit({
           # `f` was pressed, disable debugging for this generator
           if (!env_is_browsed(user_env)) {
             undebugged <<- TRUE
           }
-        })
+        }, add = TRUE)
       }
 
       # Disable generator on error, interrupt, debugger quit, etc.
