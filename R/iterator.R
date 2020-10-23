@@ -1,3 +1,17 @@
+#' Iterator protocol
+#'
+#' @description
+#' ```{r, child = "man/md/iterator.Rmd"}
+#' ```
+#' @export
+exhausted <- function() {
+  NULL
+}
+#' @export
+is_exhausted <- function(x) {
+  is_null(x)
+}
+
 #' Iterate over an iterator
 #'
 #' `iterate()` instruments `for` loops to support iteration with
@@ -29,7 +43,7 @@ iterate <- function(loop) {
   loop_env <- current_env()
 
   elt <- NULL
-  advance <- function() !is_null(elt <<- iterator())
+  advance <- function() !is_exhausted(elt <<- iterator())
   update <- function() env[[var]] <- elt
 
   loop <- expr(
@@ -38,8 +52,9 @@ iterate <- function(loop) {
       !!body
     }
   )
+  eval_bare(loop, env)
 
-  invisible(eval_bare(loop, env))
+  invisible(exhausted())
 }
 
 #' Iterable functions
@@ -75,7 +90,7 @@ as_iterator <- function(x) {
 
   function() {
     if (i == n) {
-      return(NULL)
+      return(exhausted())
     }
 
     i <<- i + 1L

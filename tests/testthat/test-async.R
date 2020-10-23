@@ -73,11 +73,12 @@ test_that("async_generator() creates streams", {
   async_obs <- async(function(i) {
     while (TRUE) {
       x <- await(i())
-      consumed <<- c(consumed, x)
 
-      if (is_null(x)) {
+      if (is_exhausted(x)) {
         return("done")
       }
+
+      consumed <<- c(consumed, x)
     }
   })
 
@@ -95,11 +96,12 @@ test_that("can adapt async streams", {
   async_obs <- async(function(i) {
     while (TRUE) {
       x <- await(i())
-      consumed <<- c(consumed, x)
 
-      if (is_null(x)) {
+      if (is_exhausted(x)) {
         return("done")
       }
+
+      consumed <<- c(consumed, x)
     }
   })
 

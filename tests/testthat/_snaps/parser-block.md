@@ -7,7 +7,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -17,7 +17,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - one pause
@@ -33,7 +33,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -56,7 +56,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - no preamble
@@ -69,7 +69,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -89,7 +89,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - multiple pauses
@@ -105,7 +105,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -137,7 +137,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - consecutive pauses
@@ -152,7 +152,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -183,7 +183,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - return value from pause
@@ -197,7 +197,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -218,7 +218,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - no return value
@@ -230,7 +230,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -240,7 +240,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -253,7 +253,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -273,7 +273,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - nested
@@ -293,7 +293,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -318,7 +318,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - nested and no past before pause
@@ -336,7 +336,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -359,7 +359,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - nested and goto after pause
@@ -376,7 +376,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -398,7 +398,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - complex nesting
@@ -420,7 +420,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -463,7 +463,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `{` blocks - simple nesting with various continuation states
@@ -481,7 +481,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -502,7 +502,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -520,7 +520,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               validate_yield(user({
@@ -541,7 +541,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # yield assignment in a loop
@@ -551,7 +551,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -576,6 +576,6 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 

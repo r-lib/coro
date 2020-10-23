@@ -13,7 +13,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -50,7 +50,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `repeat` - no continuation
@@ -64,7 +64,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -90,7 +90,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -108,7 +108,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -136,7 +136,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `repeat` - pause within `if`
@@ -154,7 +154,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -214,7 +214,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `repeat` - nested loop
@@ -232,7 +232,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -274,7 +274,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `repeat` - non-yielding
@@ -289,7 +289,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -323,7 +323,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `repeat` - non-yielding but other control flow constructs
@@ -338,7 +338,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -412,7 +412,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # loops - single `next`
@@ -427,7 +427,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -453,7 +453,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # loops - single `next` with past and future
@@ -473,7 +473,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -520,7 +520,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # loops - single `break`
@@ -535,7 +535,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -561,7 +561,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # loops - `next` and `break` within `if`-`else`
@@ -577,7 +577,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -642,7 +642,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # loops - `break` and `next` with past and future
@@ -664,7 +664,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -717,7 +717,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # loops - goto loop start after `if` or `else`
@@ -729,7 +729,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -771,7 +771,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -783,7 +783,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -842,7 +842,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `while` - single pause no past or future
@@ -854,7 +854,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -878,7 +878,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `while` - pause within `if`
@@ -892,7 +892,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -941,7 +941,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `while` - pause within `if` with future
@@ -958,7 +958,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -1017,7 +1017,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `while` - past before loop
@@ -1034,7 +1034,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1072,7 +1072,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `while` - pause after loop
@@ -1088,7 +1088,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -1128,7 +1128,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `while` - complex control flow
@@ -1159,7 +1159,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1294,7 +1294,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `while` - top level break
@@ -1309,7 +1309,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -1334,7 +1334,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `for` - top level break (#7)
@@ -1346,7 +1346,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               iterators[[2L]] <- as_iterator(user(x))
@@ -1356,7 +1356,7 @@
               repeat switch(state[[2L]], `1` = {
                   if ({
                       iterator <- iterators[[2L]]
-                      if (is_null(elt <- iterator())) {
+                      if (is_exhausted(elt <- iterator())) {
                         FALSE
                       } else {
                         user_env[["i"]] <- elt
@@ -1375,7 +1375,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `for` - one pause with no past or future
@@ -1387,7 +1387,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               iterators[[2L]] <- as_iterator(user(x))
@@ -1397,7 +1397,7 @@
               repeat switch(state[[2L]], `1` = {
                   if ({
                       iterator <- iterators[[2L]]
-                      if (is_null(elt <- iterator())) {
+                      if (is_exhausted(elt <- iterator())) {
                         FALSE
                       } else {
                         user_env[["i"]] <- elt
@@ -1419,7 +1419,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `for` - one pause with past and future
@@ -1437,7 +1437,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1450,7 +1450,7 @@
               repeat switch(state[[2L]], `1` = {
                   if ({
                       iterator <- iterators[[2L]]
-                      if (is_null(elt <- iterator())) {
+                      if (is_exhausted(elt <- iterator())) {
                         FALSE
                       } else {
                         user_env[["i"]] <- elt
@@ -1489,7 +1489,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `for` - one pause within `if` and one `break` within `else`
@@ -1507,7 +1507,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               iterators[[2L]] <- as_iterator(user(x))
@@ -1517,7 +1517,7 @@
               repeat switch(state[[2L]], `1` = {
                   if ({
                       iterator <- iterators[[2L]]
-                      if (is_null(elt <- iterator())) {
+                      if (is_exhausted(elt <- iterator())) {
                         FALSE
                       } else {
                         user_env[["i"]] <- elt
@@ -1596,7 +1596,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `return()` deep in control flow
@@ -1608,7 +1608,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -1673,7 +1673,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # nested loops break to outer loops
@@ -1703,7 +1703,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1825,7 +1825,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -1854,7 +1854,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1971,7 +1971,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -1988,7 +1988,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -2037,6 +2037,6 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 

@@ -15,7 +15,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -86,7 +86,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `else` blocks - one pause
@@ -106,7 +106,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -177,7 +177,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - inner block
@@ -201,7 +201,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -274,7 +274,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - nested
@@ -293,7 +293,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -385,7 +385,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - nested and trailing pause
@@ -403,7 +403,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -487,7 +487,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - multiply nested and all trailing
@@ -511,7 +511,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -635,7 +635,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - trailing
@@ -656,7 +656,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -736,7 +736,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - non trailing
@@ -758,7 +758,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -840,7 +840,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - same continuation
@@ -858,7 +858,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -928,7 +928,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - continuation in `if`
@@ -947,7 +947,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1022,7 +1022,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - continuation in `else`
@@ -1041,7 +1041,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1116,7 +1116,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - doubly nested with continuation
@@ -1134,7 +1134,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               if (user({
@@ -1205,7 +1205,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - multiply nested and not trailing
@@ -1236,7 +1236,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1426,6 +1426,6 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 

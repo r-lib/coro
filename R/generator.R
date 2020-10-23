@@ -158,7 +158,7 @@ generator0 <- function(fn, type = "generator") {
       }
 
       if (is_true(env$exhausted)) {
-        return(NULL)
+        return(exhausted())
       }
 
       # Resume state machine. Set up an execution env in the user
@@ -310,6 +310,7 @@ with_try_catch <- function(handlers, expr) {
   blast(tryCatch(expr, !!!handlers))
 }
 
+# FIXME: can validate yield
 validate_yield <- function(x) {
   if (is_null(x)) {
     abort("Can't yield `NULL`.")
