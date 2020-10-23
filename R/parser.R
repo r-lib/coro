@@ -15,12 +15,12 @@ walk_states <- function(expr, info) {
 
   expr({
     if (exhausted) {
-      return(invisible(NULL))
+      return(invisible(exhausted()))
     }
     repeat switch(state[[1L]], !!!states)
 
     exhausted <- TRUE
-    invisible(NULL)
+    invisible(exhausted())
   })
 }
 walk_loop_states <- function(body, states, counter, info) {
@@ -604,8 +604,6 @@ yield_state <- function(expr,
     abort("Can't use `yield()` within an async function.")
   }
 
-  expr <- expr(validate_yield(!!expr))
-
   if (is_string(info$type, "async_generator")) {
     expr <- expr(.last_value <- as_promise(!!expr))
   }
@@ -842,7 +840,7 @@ for_states <- function(preamble,
     nested_states <- await_state(await_block, nested_counter, continue, FALSE, FALSE, info)
 
     condition <- expr({
-      if (is_null(arg)) {
+      if (is_exhausted(arg)) {
         FALSE
       } else {
         user_env[[!!as.character(var)]] <- arg
@@ -854,7 +852,7 @@ for_states <- function(preamble,
   } else {
     condition <- expr({
       iterator <- iterators[[!!loop_depth]]
-      if (is_null(elt <- iterator())) {
+      if (is_exhausted(elt <- iterator())) {
         FALSE
       } else {
         user_env[[!!as.character(var)]] <- elt

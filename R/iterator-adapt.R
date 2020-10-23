@@ -56,10 +56,10 @@ iter_adapt <- function(iter, ...) {
     # If we get `flag` back, it means a transducer has skipped this
     # input. Continue until we get an actual result.
     while (identical(last, flag)) {
-      if (is_null(out <- iter())) {
+      if (is_exhausted(out <- iter())) {
         # Complete and terminate
         reducer(NULL)
-        return(NULL)
+        return(exhausted())
       }
       last <- reducer(flag, out)
     }
@@ -92,10 +92,10 @@ on_load(async_adapt %<~% async_generator(function(iter, steps) {
   while (TRUE) {
     out <- await(iter())
 
-    if (is_null(out)) {
+    if (is_exhausted(out)) {
       # Finalise adaptors and signal exhaustion
       reducer(NULL)
-      return(NULL)
+      return(exhausted())
     }
 
     last <- reducer(flag, out)

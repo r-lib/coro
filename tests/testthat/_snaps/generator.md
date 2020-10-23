@@ -25,7 +25,7 @@
               abort("This function has been disabled because of an unexpected exit.")
           }
           if (is_true(env$exhausted)) {
-              return(NULL)
+              return(exhausted())
           }
           env$jumped <- TRUE
           out <- evalq(envir = user_env, base::evalq(envir = <environment>, 
@@ -33,7 +33,7 @@
                   env_poke_exits(user_env, exits)
                   {
                       if (exhausted) {
-                        return(invisible(NULL))
+                        return(invisible(exhausted()))
                       }
                       repeat switch(state[[1L]], `1` = {
                         state[[1L]] <- 2L
@@ -58,9 +58,9 @@
                           state[[3L]] <- 1L
                         }, `3` = {
                           repeat switch(state[[3L]], `1` = {
-                            validate_yield(user({
+                            user({
                               1
-                            }))
+                            })
                             state[[3L]] <- 2L
                             suspend()
                             return(last_value())
@@ -91,7 +91,7 @@
                         break
                       })
                       exhausted <- TRUE
-                      invisible(NULL)
+                      invisible(exhausted())
                   }
               }))
           env$jumped <- FALSE

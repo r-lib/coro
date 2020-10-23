@@ -82,7 +82,7 @@ test_that("can reduce iterators", {
 
 test_that("reducing exhausted iterators produces empty output", {
   expect_identical(
-    drain(function() NULL),
+    drain(function() exhausted()),
     list()
   )
 })

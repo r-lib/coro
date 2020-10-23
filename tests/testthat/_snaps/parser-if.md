@@ -15,7 +15,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -31,10 +31,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "if-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -86,7 +86,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `else` blocks - one pause
@@ -106,7 +106,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -141,10 +141,10 @@
               state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "else-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -177,7 +177,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - inner block
@@ -201,7 +201,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -217,11 +217,11 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "if-before"
                       "inner-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -274,7 +274,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - nested
@@ -293,7 +293,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -322,7 +322,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(1L))
+                      user(1L)
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -385,7 +385,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - nested and trailing pause
@@ -403,7 +403,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -432,7 +432,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(1L))
+                      user(1L)
                       exhausted <- TRUE
                       return(last_value())
                   }, `2` = {
@@ -487,7 +487,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - multiply nested and all trailing
@@ -511,7 +511,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -550,9 +550,9 @@
                       state[[4L]] <- 1L
                   }, `2` = {
                       repeat switch(state[[4L]], `1` = {
-                        validate_yield(user({
+                        user({
                           1L
-                        }))
+                        })
                         state[[4L]] <- 2L
                         suspend()
                         return(last_value())
@@ -635,7 +635,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - trailing
@@ -656,7 +656,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -672,10 +672,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "if-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -703,10 +703,10 @@
               break
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "else-before"
                       2L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -736,7 +736,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - non trailing
@@ -758,7 +758,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -774,10 +774,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "if-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -804,10 +804,10 @@
               state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "else-before"
                       2L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -840,7 +840,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - same continuation
@@ -858,7 +858,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -874,9 +874,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -898,9 +898,9 @@
               state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       2L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -928,7 +928,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - continuation in `if`
@@ -947,7 +947,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -963,9 +963,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -992,9 +992,9 @@
               state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       2L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -1022,7 +1022,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - continuation in `else`
@@ -1041,7 +1041,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1057,9 +1057,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -1081,9 +1081,9 @@
               state[[1L]] <- 4L
           }, `3` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       2L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -1116,7 +1116,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if` blocks - doubly nested with continuation
@@ -1134,7 +1134,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               if (user({
@@ -1157,9 +1157,9 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user({
+                      user({
                         1L
-                      }))
+                      })
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -1205,7 +1205,7 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # `if`-`else` blocks - multiply nested and not trailing
@@ -1236,7 +1236,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user({
@@ -1275,9 +1275,9 @@
                       state[[4L]] <- 1L
                   }, `2` = {
                       repeat switch(state[[4L]], `1` = {
-                        validate_yield(user({
+                        user({
                           1L
-                        }))
+                        })
                         state[[4L]] <- 2L
                         suspend()
                         return(last_value())
@@ -1351,9 +1351,9 @@
                       state[[3L]] <- 4L
                   }, `3` = {
                       repeat switch(state[[4L]], `1` = {
-                        validate_yield(user({
+                        user({
                           2L
-                        }))
+                        })
                         state[[4L]] <- 2L
                         suspend()
                         return(last_value())
@@ -1426,6 +1426,6 @@
               return(last_value())
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 

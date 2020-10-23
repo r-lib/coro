@@ -27,7 +27,8 @@ iterators. The following rules apply:
 generator again, the execution resumes right after the yielding
 point. All local variables are preserved.
 \item Returned values terminate the generator. If called again after a
-\code{return()}, the generator keeps returning \code{NULL}.
+\code{return()}, the generator keeps returning the \code{\link[=exhausted]{exhausted()}}
+sentinel.
 }
 
 Generators are compatible with all iterator features such as
@@ -56,8 +57,8 @@ iter <- new_gen()
 iter()
 iter()
 
-# Once a generator has returned it keeps returning `NULL`. This
-# signals to its caller that new values can no longer be
+# Once a generator has returned it keeps returning `exhausted()`.
+# This signals to its caller that new values can no longer be
 # produced. The generator is exhausted:
 iter()
 iter()

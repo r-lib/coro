@@ -421,7 +421,7 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
 
   out <- NULL
 
-  while (!is_null(new <- .x())) {
+  while (!is_exhausted(new <- .x())) {
     out <- .f(out, new, ...)
 
     # Return early if we get a reduced result
@@ -478,7 +478,7 @@ on_load(async_reduce %<~% async(function(.x, .f, ...) {
   while (TRUE) {
     new <- await(.x())
 
-    if (is_null(new)) {
+    if (is_exhausted(new)) {
       break
     }
 

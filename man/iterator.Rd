@@ -2,25 +2,22 @@
 % Please edit documentation in R/iterator.R
 \name{iterator}
 \alias{iterator}
-\alias{as_iterator}
-\title{Iterable functions}
+\alias{exhausted}
+\alias{is_exhausted}
+\title{Iterator protocol}
 \usage{
-as_iterator(x)
+exhausted()
+
+is_exhausted(x)
 }
 \arguments{
-\item{x}{A vector to be transformed to an iterable function.
-Functions are returned as is.}
+\item{x}{An object.}
 }
 \description{
-A flowery iterator is a function that implements the iteration
-protocol:
+An r-lib iterator is a function that implements the following protocol:
 \itemize{
-\item The iterator is advanced by invoking it without argument. This
-returns the next value.
-\item An iterator signals exhaustion by returning \code{NULL}.
+\item Calling the function advances the iterator. The new value is returned.
+\item When the iterator is exhausted and there are no more elements to return, the symbol \code{quote(exhausted)} is returned. This signals exhaustion to the caller.
+\item Once an iterator has signalled exhaustion, all subsequent invokations must consistently return \code{quote(exhausted)}.
 }
-
-The \code{NULL} sentinel synergises well with the R control flow
-constructs like \verb{while ()} as they return \code{NULL} when they are
-done.
 }

@@ -5,7 +5,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               user("value")
@@ -13,7 +13,7 @@
               return(as_promise(last_value()))
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -23,7 +23,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               .last_value <- then(as_promise(user("value")), callback = .self)
@@ -31,7 +31,7 @@
               return(as_promise(last_value()))
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -41,7 +41,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               if (user(1)) {
@@ -90,7 +90,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -100,7 +100,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -146,7 +146,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 ---
@@ -156,7 +156,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               state[[1L]] <- 2L
@@ -181,7 +181,7 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 
 # for loops support await_each()
@@ -198,7 +198,7 @@
     Output
       {
           if (exhausted) {
-              return(invisible(NULL))
+              return(invisible(exhausted()))
           }
           repeat switch(state[[1L]], `1` = {
               iterators[[2L]] <- as_iterator(user(s1))
@@ -218,7 +218,7 @@
                   state[[2L]] <- 3L
               }, `3` = {
                   if ({
-                      if (is_null(arg)) {
+                      if (is_exhausted(arg)) {
                         FALSE
                       } else {
                         user_env[["x"]] <- arg
@@ -250,7 +250,7 @@
                       state[[3L]] <- 3L
                   }, `3` = {
                       if ({
-                        if (is_null(arg)) {
+                        if (is_exhausted(arg)) {
                           FALSE
                         } else {
                           user_env[["y"]] <- arg
@@ -276,6 +276,6 @@
               break
           })
           exhausted <- TRUE
-          invisible(NULL)
+          invisible(exhausted())
       }
 

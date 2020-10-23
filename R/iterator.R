@@ -1,3 +1,23 @@
+#' Iterator protocol
+#'
+#' @description
+#' ```{r, child = "man/md/iterator.Rmd"}
+#' ```
+#' @name iterator
+NULL
+
+#' @rdname iterator
+#' @export
+exhausted <- function() {
+  quote(exhausted)
+}
+#' @rdname iterator
+#' @param x An object.
+#' @export
+is_exhausted <- function(x) {
+  identical(x, quote(exhausted))
+}
+
 #' Iterate over an iterator
 #'
 #' `iterate()` instruments `for` loops to support iteration with
@@ -29,7 +49,7 @@ iterate <- function(loop) {
   loop_env <- current_env()
 
   elt <- NULL
-  advance <- function() !is_null(elt <<- iterator())
+  advance <- function() !is_exhausted(elt <<- iterator())
   update <- function() env[[var]] <- elt
 
   loop <- expr(
@@ -38,30 +58,12 @@ iterate <- function(loop) {
       !!body
     }
   )
+  eval_bare(loop, env)
 
-  invisible(eval_bare(loop, env))
+  invisible(exhausted())
 }
 
-#' Iterable functions
-#'
-#' @description
-#'
-#' A flowery iterator is a function that implements the iteration
-#' protocol:
-#'
-#' - The iterator is advanced by invoking it without argument. This
-#'   returns the next value.
-#'
-#' - An iterator signals exhaustion by returning `NULL`.
-#'
-#'  The `NULL` sentinel synergises well with the R control flow
-#' constructs like `while ()` as they return `NULL` when they are
-#' done.
-#'
-#' @name iterator
-NULL
-
-#' @rdname iterator
+#' Transform a vector or list to an iterator
 #' @param x A vector to be transformed to an iterable function.
 #'   Functions are returned as is.
 #' @export
@@ -75,7 +77,7 @@ as_iterator <- function(x) {
 
   function() {
     if (i == n) {
-      return(NULL)
+      return(exhausted())
     }
 
     i <<- i + 1L
