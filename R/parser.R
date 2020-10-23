@@ -206,7 +206,6 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       assign = assign
     ),
     `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`"),
-    `on.exit` = stop_internal("expr_states", sprintf("Unimplemented operation `%s`", type)),
     stop_internal("expr_states", sprintf("Unexpected operation `%s`", type))
   )
 }
@@ -265,8 +264,7 @@ expr_type_impl <- function(expr) {
     `while` = ,
     `for` = ,
     `break` = ,
-    `next` = ,
-    `on.exit` = head,
+    `next` = head,
     `tryCatch` = ,
     `withCallingHandlers` = with_handlers_type(expr, head),
     default
