@@ -44,15 +44,11 @@
 
   - An iterator is a function. You advance it and get a new value by
     calling it.
-  - An iterator signals exhaustion by returning `NULL`.
-  - Yielding `NULL` is an error.
-
-  The `NULL` sentinel synergises well with the R control flow
-  constructs like `while` which return `NULL` when they are done.
-  This design is experimental and may be reviewed later on.
+  - An iterator signals exhaustion by returning `exhausted()` (or
+    equivalently, the `quote(exhausted)` symbol).
 
 * Exhausted generators no longer throw when called again. Instead,
-  they return `NULL` (#6).
+  they return the `exhausted()` sentinel (#6).
 
 * Fixed top-level `break` statements in loops (#7).
 
