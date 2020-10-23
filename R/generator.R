@@ -13,7 +13,8 @@
 #'   point. All local variables are preserved.
 #'
 #' * Returned values terminate the generator. If called again after a
-#'   `return()`, the generator keeps returning `NULL`.
+#'   `return()`, the generator keeps returning the [exhausted()]
+#'   sentinel.
 #'
 #' Generators are compatible with all iterator features such as
 #' [iterate()], or [drain()].
@@ -45,8 +46,8 @@
 #' iter()
 #' iter()
 #'
-#' # Once a generator has returned it keeps returning `NULL`. This
-#' # signals to its caller that new values can no longer be
+#' # Once a generator has returned it keeps returning `exhausted()`.
+#' # This signals to its caller that new values can no longer be
 #' # produced. The generator is exhausted:
 #' iter()
 #' iter()
@@ -308,15 +309,6 @@ is_generator_factory <- function(x) {
 
 with_try_catch <- function(handlers, expr) {
   blast(tryCatch(expr, !!!handlers))
-}
-
-# FIXME: can validate yield
-validate_yield <- function(x) {
-  if (is_null(x)) {
-    abort("Can't yield `NULL`.")
-  }
-
-  x
 }
 
 utils::globalVariables(c(

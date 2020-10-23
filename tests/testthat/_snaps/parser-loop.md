@@ -24,10 +24,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "loop-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -75,7 +75,7 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user(1L))
+                  user(1L)
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -119,9 +119,9 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       1L
-                  }))
+                  })
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -178,7 +178,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(1L))
+                      user(1L)
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -251,7 +251,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(1L))
+                      user(1L)
                       state[[3L]] <- 1L
                       suspend()
                       return(last_value())
@@ -306,9 +306,9 @@
               length(state) <- 1L
               state[[1L]] <- 3L
           }, `3` = {
-              validate_yield(user({
+              user({
                   1L
-              }))
+              })
               state[[1L]] <- 4L
               suspend()
               return(last_value())
@@ -395,9 +395,9 @@
               length(state) <- 1L
               state[[1L]] <- 3L
           }, `3` = {
-              validate_yield(user({
+              user({
                   1L
-              }))
+              })
               state[[1L]] <- 4L
               suspend()
               return(last_value())
@@ -442,9 +442,9 @@
                   })
                   state[[2L]] <- 1L
               }, `2` = {
-                  validate_yield(user({
+                  user({
                       1L
-                  }))
+                  })
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -483,10 +483,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "loop-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -500,10 +500,10 @@
                   })
                   state[[2L]] <- 1L
               }, `4` = {
-                  validate_yield(user({
+                  user({
                       "next-after"
                       2L
-                  }))
+                  })
                   state[[2L]] <- 5L
                   suspend()
                   return(last_value())
@@ -550,9 +550,9 @@
                   })
                   break
               }, `2` = {
-                  validate_yield(user({
+                  user({
                       1L
-                  }))
+                  })
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -674,10 +674,10 @@
               state[[2L]] <- 1L
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
-                  validate_yield(user({
+                  user({
                       "loop-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 2L
                   suspend()
                   return(last_value())
@@ -697,10 +697,10 @@
                   })
                   state[[2L]] <- 1L
               }, `5` = {
-                  validate_yield(user({
+                  user({
                       "next-after"
                       2L
-                  }))
+                  })
                   state[[2L]] <- 6L
                   suspend()
                   return(last_value())
@@ -747,7 +747,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(NULL))
+                      user(NULL)
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -801,7 +801,7 @@
                   state[[3L]] <- 1L
               }, `2` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(1L))
+                      user(1L)
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -869,7 +869,7 @@
                       break
                   }
               }, `2` = {
-                  validate_yield(user(1L))
+                  user(1L)
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -917,7 +917,7 @@
                   state[[3L]] <- 1L
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(1L))
+                      user(1L)
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -983,9 +983,9 @@
                   state[[3L]] <- 1L
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user({
+                      user({
                         1L
-                      }))
+                      })
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -1052,10 +1052,10 @@
                       break
                   }
               }, `2` = {
-                  validate_yield(user({
+                  user({
                       "loop-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 3L
                   suspend()
                   return(last_value())
@@ -1103,9 +1103,9 @@
                       break
                   }
               }, `2` = {
-                  validate_yield(user({
+                  user({
                       1L
-                  }))
+                  })
                   state[[2L]] <- 3L
                   suspend()
                   return(last_value())
@@ -1121,9 +1121,9 @@
               length(state) <- 1L
               state[[1L]] <- 3L
           }, `3` = {
-              validate_yield(user({
+              user({
                   2L
-              }))
+              })
               exhausted <- TRUE
               return(last_value())
           })
@@ -1194,10 +1194,10 @@
                       break
                   }
               }, `2` = {
-                  validate_yield(user({
+                  user({
                       "loop-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 3L
                   suspend()
                   return(last_value())
@@ -1244,10 +1244,10 @@
                   state[[2L]] <- 7L
               }, `6` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user({
+                      user({
                         "yield-2-before"
                         2L
-                      }))
+                      })
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -1409,7 +1409,7 @@
                       break
                   }
               }, `2` = {
-                  validate_yield(user(1L))
+                  user(1L)
                   state[[2L]] <- 1L
                   suspend()
                   return(last_value())
@@ -1462,10 +1462,10 @@
                       break
                   }
               }, `2` = {
-                  validate_yield(user({
+                  user({
                       "for-before"
                       1L
-                  }))
+                  })
                   state[[2L]] <- 3L
                   suspend()
                   return(last_value())
@@ -1542,7 +1542,7 @@
                   state[[3L]] <- 1L
               }, `3` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(1L))
+                      user(1L)
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -1649,7 +1649,7 @@
                   state[[2L]] <- 1L
               }, `4` = {
                   repeat switch(state[[3L]], `1` = {
-                      validate_yield(user(2L))
+                      user(2L)
                       state[[3L]] <- 2L
                       suspend()
                       return(last_value())
@@ -2015,9 +2015,9 @@
                         break
                       }
                   }, `2` = {
-                      validate_yield(user({
+                      user({
                         1
-                      }))
+                      })
                       state[[3L]] <- 3L
                       suspend()
                       return(last_value())

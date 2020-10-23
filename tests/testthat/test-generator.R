@@ -5,9 +5,9 @@ test_that("can create non-yielding generator functions", {
 })
 
 test_that("can yield `NULL` without terminating iteration", {
-  gen <- gen(NULL)
+  gen <- gen(yield(NULL))
   expect_null(gen())
-  expect_null(gen())
+  expect_exhausted(gen())
 })
 
 test_that("short syntax and for loop support", {
@@ -60,14 +60,6 @@ test_that("state is refreshed", {
 test_that("generator() takes anonymous functions", {
   fn <- function() NULL
   expect_error(generator(fn), "anonymous")
-})
-
-test_that("generators can't yield `NULL`", {
-  g <- generator(function() yield())
-  expect_error(g()(), "Can't yield `NULL`")
-
-  g <- generator(function() yield(NULL))
-  expect_error(g()(), "Can't yield `NULL`")
 })
 
 test_that("generator functions inherit from `flowery_generator`", {
@@ -258,6 +250,6 @@ test_that("exit expressions are suspended and resumed", {
   expect_true(unwound)
 
   unwound <- FALSE
-  expect_null(g())
+  expect_exhausted(g())
   expect_false(unwound)
 })

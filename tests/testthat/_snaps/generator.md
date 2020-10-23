@@ -58,9 +58,9 @@
                           state[[3L]] <- 1L
                         }, `3` = {
                           repeat switch(state[[3L]], `1` = {
-                            validate_yield(user({
+                            user({
                               1
-                            }))
+                            })
                             state[[3L]] <- 2L
                             suspend()
                             return(last_value())

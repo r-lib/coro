@@ -604,8 +604,6 @@ yield_state <- function(expr,
     abort("Can't use `yield()` within an async function.")
   }
 
-  expr <- expr(validate_yield(!!expr))
-
   if (is_string(info$type, "async_generator")) {
     expr <- expr(.last_value <- as_promise(!!expr))
   }

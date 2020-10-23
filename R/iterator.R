@@ -5,11 +5,11 @@
 #' ```
 #' @export
 exhausted <- function() {
-  NULL
+  quote(exhausted)
 }
 #' @export
 is_exhausted <- function(x) {
-  is_null(x)
+  identical(x, quote(exhausted))
 }
 
 #' Iterate over an iterator

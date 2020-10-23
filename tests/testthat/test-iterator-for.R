@@ -51,7 +51,7 @@ test_that("can iterate with a non-block expression", {
 test_that("iterating with a done iterator cause an error", {
   iter <- gen("foo")
   iterate(for (x in iter) x)
-  expect_null(iterate(for (x in iter) x))
+  expect_exhausted(iterate(for (x in iter) x))
 })
 
 test_that("iterating works when flowery is not loaded", {
