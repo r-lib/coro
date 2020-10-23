@@ -73,3 +73,27 @@ without_call_errors <- function(expr, env = caller_env()) {
     stop(cnd)
   })
 }
+
+env_exits <- function(env) {
+  exit <- eval_bare(call2(sys.on.exit), env)
+
+  if (is_null(exit)) {
+    return(NULL)
+  }
+  if (is_call(exit, "{")) {
+    return(node_cdr(exit))
+  }
+  new_node(exit)
+}
+env_poke_exits <- function(env, exprs) {
+  old <- env_exits(env)
+
+  if (length(exprs)) {
+    arg <- block(!!!exprs)
+  } else {
+    arg <- NULL
+  }
+  eval_bare(call2(on.exit, arg), env)
+
+  invisible(old)
+}

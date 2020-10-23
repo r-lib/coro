@@ -1,6 +1,10 @@
 
 # flowery 0.0.1.9000
 
+* Generators and async functions now support `on.exit()`
+  expressions. They also support exit expressions installed with
+  functions like `withr::local_options()`. This requires R >= 3.5.
+
 * Generator arguments are forced on reentry in the approriate context
   (e.g. in the `tryCatch()` context if generator was yielded from a
   `tryCatch()`). This makes it possible to clean up cancelled

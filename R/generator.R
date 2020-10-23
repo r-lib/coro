@@ -157,9 +157,17 @@ generator0 <- function(fn, type = "generator") {
         abort("This function has been disabled because of an unexpected exit.")
       }
 
-      # Resume state machine
+      # Resume state machine. Set up an execution env in the user
+      # environment first to serve as a target for on.exit()
+      # expressions. Then evaluate state machine in its private
+      # environment.
       env$jumped <- TRUE
-      out <- evalq(envir = env, !!state_machine)
+      out <- evalq(envir = user_env,
+        base::evalq(envir = !!env, {
+          env_poke_exits(user_env, exits)
+          !!state_machine
+        })
+      )
       env$jumped <- FALSE
 
       out
@@ -208,15 +216,19 @@ new_generator_env <- function(parent, info) {
   env$state <- 1L
   env$iterators <- list()
   env$handlers <- list()
+  env$exits <- NULL
+  env$.last_value <- NULL
 
   with(env, {
-    .last_value <- NULL
-
     user <- function(expr) {
       .last_value <<- eval_bare(substitute(expr), user_env)
     }
     last_value <- function() {
       .last_value
+    }
+
+    suspend <- function() {
+      exits <<- env_poke_exits(user_env, NULL)
     }
   })
 
@@ -289,10 +301,6 @@ is_generator_factory <- function(x) {
     "flowery_async_generator"
   ))
 }
-
-
-# Currently a no-op but will disable exit expressions in the future
-suspend <- function() NULL
 
 with_try_catch <- function(handlers, expr) {
   blast(tryCatch(expr, !!!handlers))
