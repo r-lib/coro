@@ -20,6 +20,6 @@ iterate(for (x in iter) {
 })
 }
 \seealso{
-\code{\link[=iter_adapt]{iter_adapt()}} for a more functional way of dealing with
-iterated valued.
+\code{\link[=collect]{collect()}} is a functional that iterates over an
+iterator and returns the values.
 }

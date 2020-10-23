@@ -5,8 +5,8 @@
 #'
 #' @param loop A `for` loop expression.
 #'
-#' @seealso [iter_adapt()] for a more functional way of dealing with
-#'   iterated valued.
+#' @seealso [collect()] is a functional that iterates over an
+#'   iterator and returns the values.
 #' @export
 #' @examples
 #' iter <- gen(for (x in 1:10) yield(x^2))
