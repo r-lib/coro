@@ -97,3 +97,8 @@ env_poke_exits <- function(env, exprs) {
 
   invisible(old)
 }
+
+zap_env <- function(x) {
+  environment(x) <- global_env()
+  x
+}

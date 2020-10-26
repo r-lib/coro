@@ -199,3 +199,13 @@ test_that("async functions handle errors", {
     "value"
   )
 })
+
+test_that("async functions and async generator factories print nicely", {
+  fn <- async(function() await(NULL))
+  expect_snapshot(print(fn, reproducible = TRUE))
+  expect_snapshot(print(fn, internals = TRUE, reproducible = TRUE))
+
+  factory <- async_generator(function() { await(NULL); yield(NULL) })
+  expect_snapshot(print(factory, reproducible = TRUE))
+  expect_snapshot(print(factory, internals = TRUE, reproducible = TRUE))
+})

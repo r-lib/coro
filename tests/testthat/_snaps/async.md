@@ -279,3 +279,73 @@
           invisible(exhausted())
       }
 
+# async functions and async generator factories print nicely
+
+    Code
+      print(fn, reproducible = TRUE)
+    Output
+      <async>
+      function() await(NULL)
+
+---
+
+    Code
+      print(fn, internals = TRUE, reproducible = TRUE)
+    Output
+      <async>
+      function() await(NULL)
+      State machine:
+      {
+          if (exhausted) {
+              return(invisible(exhausted()))
+          }
+          repeat switch(state[[1L]], `1` = {
+              .last_value <- then(as_promise(user(NULL)), callback = .self)
+              exhausted <- TRUE
+              return(as_promise(last_value()))
+          })
+          exhausted <- TRUE
+          invisible(exhausted())
+      }
+
+---
+
+    Code
+      print(factory, reproducible = TRUE)
+    Output
+      <async/generator>
+      function() { await(NULL); yield(NULL) }
+
+---
+
+    Code
+      print(factory, internals = TRUE, reproducible = TRUE)
+    Output
+      <async/generator>
+      function() { await(NULL); yield(NULL) }
+      State machine:
+      {
+          if (exhausted) {
+              return(invisible(exhausted()))
+          }
+          repeat switch(state[[1L]], `1` = {
+              .last_value <- then(as_promise(user({
+                  NULL
+              })), callback = .self)
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              without_call_errors(force(arg))
+              state[[1L]] <- 3L
+          }, `3` = {
+              .last_value <- as_promise(user({
+                  NULL
+              }))
+              exhausted <- TRUE
+              return(as_promise(last_value()))
+          })
+          exhausted <- TRUE
+          invisible(exhausted())
+      }
+

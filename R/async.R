@@ -113,25 +113,14 @@ await_each <- function(x) {
 }
 
 #' @export
-print.flowery_async <- function(x, ...) {
-  # TODO: Print user-friendly async function by default. Make it
-  # configurable for easier development.
-
+print.flowery_async <- function(x, ..., internals = FALSE) {
   writeLines("<async>")
-  print(unclass(x), ...)
-
-  print_state_machine(x, ...)
-
-  invisible(x)
+  print_generator(x, ..., internals = internals)
 }
 #' @export
-print.flowery_async_generator <- function(x, ...) {
+print.flowery_async_generator <- function(x, ..., internals = FALSE) {
   writeLines("<async/generator>")
-  print(unclass(x), ...)
-
-  print_state_machine(x, ...)
-
-  invisible(x)
+  print_generator(x, ..., internals = internals)
 }
 
 

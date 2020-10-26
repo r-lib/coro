@@ -197,15 +197,26 @@ generator0 <- function(fn, type = "generator") {
 }
 
 #' @export
-print.flowery_generator <- function(x, ...) {
+print.flowery_generator <- function(x, ..., internals = FALSE) {
   writeLines("<generator>")
-  print(unstructure(x), ...)
+  print_generator(x, ..., internals = internals)
+}
 
-  print_state_machine(x, ...)
+print_generator <- function(x, ..., internals = FALSE, reproducible = FALSE) {
+  fn <- env_get(fn_env(x), "fn")
+
+  if (reproducible) {
+    fn <- zap_env(fn)
+  }
+
+  print(fn, ...)
+
+  if (internals) {
+    print_state_machine(x, ...)
+  }
 
   invisible(x)
 }
-
 print_state_machine <- function(x, ...) {
   machine <- with(env(fn_env(x)), {
     info <- machine_info(type, env = global_env())

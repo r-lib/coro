@@ -23,12 +23,13 @@ test_that("short syntax and for loop support", {
   expect_identical(out, dbl(1, 9, 25))
 })
 
-test_that("generator prints nicely", {
-  zap_env <- function(x) {
-    environment(x) <- global_env()
-    x
-  }
+test_that("generator factories print nicely", {
+  factory <- generator(function() yield(NULL))
+  expect_snapshot(print(factory, reproducible = TRUE))
+  expect_snapshot(print(factory, reproducible = TRUE, internals = TRUE))
+})
 
+test_that("generator prints nicely", {
   expect_snapshot({
     print(zap_env(gen({
       while (TRUE) {
