@@ -208,4 +208,8 @@ test_that("async functions and async generator factories print nicely", {
   factory <- async_generator(function() { await(NULL); yield(NULL) })
   expect_snapshot(print(factory, reproducible = TRUE))
   expect_snapshot(print(factory, internals = TRUE, reproducible = TRUE))
+
+  instance <- factory()
+  expect_snapshot(print(instance, reproducible = TRUE))
+  expect_snapshot(print(instance, internals = TRUE, reproducible = TRUE))
 })

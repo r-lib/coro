@@ -188,43 +188,11 @@ generator0 <- function(fn, type = "generator") {
       # Step into the generator right away
       gen(NULL)
     } else {
-      # Zap source references so we can see the state machine
-      unstructure(gen)
+      structure(gen, class = "flowery_generator_instance")
     }
   }))
 
   structure(out, class = c(paste0("flowery_", type), "function"))
-}
-
-#' @export
-print.flowery_generator <- function(x, ..., internals = FALSE) {
-  writeLines("<generator>")
-  print_generator(x, ..., internals = internals)
-}
-
-print_generator <- function(x, ..., internals = FALSE, reproducible = FALSE) {
-  fn <- env_get(fn_env(x), "fn")
-
-  if (reproducible) {
-    fn <- zap_env(fn)
-  }
-
-  print(fn, ...)
-
-  if (internals) {
-    print_state_machine(x, ...)
-  }
-
-  invisible(x)
-}
-print_state_machine <- function(x, ...) {
-  machine <- with(env(fn_env(x)), {
-    info <- machine_info(type, env = global_env())
-    state_machine %||% walk_states(body(fn), info = info)
-  })
-
-  writeLines("State machine:")
-  print(machine, ...)
 }
 
 new_generator_env <- function(parent, info) {
@@ -267,6 +235,50 @@ env_bind_arg <- function(env, arg, frame = caller_env()) {
     env_bind_lazy(env, !!arg := !!sym(arg), .eval_env = frame)
   }
 }
+
+#' @export
+print.flowery_generator <- function(x, ..., internals = FALSE) {
+  writeLines("<generator>")
+  print_generator(x, ..., internals = internals)
+}
+#' @export
+print.flowery_generator_instance <- function(x, ..., internals = FALSE) {
+  type <- env_get(fn_env(x), "type", inherit = TRUE)
+
+  if (is_string(type, "async_generator")) {
+    writeLines("<async/generator/instance>")
+  } else {
+    writeLines("<generator/instance>")
+  }
+
+  print_generator(x, ..., internals = internals)
+}
+
+print_generator <- function(x, ..., internals = FALSE, reproducible = FALSE) {
+  fn <- env_get(fn_env(x), "fn", inherit = TRUE)
+
+  if (reproducible) {
+    fn <- zap_env(fn)
+  }
+
+  print(fn, ...)
+
+  if (internals) {
+    print_state_machine(x, ...)
+  }
+
+  invisible(x)
+}
+print_state_machine <- function(x, ...) {
+  machine <- with(env(fn_env(x)), {
+    info <- machine_info(type, env = global_env())
+    state_machine %||% walk_states(body(fn), info = info)
+  })
+
+  writeLines("State machine:")
+  print(machine, ...)
+}
+
 
 #' Yield a value from a generator
 #'

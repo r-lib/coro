@@ -29,17 +29,11 @@ test_that("generator factories print nicely", {
   expect_snapshot(print(factory, reproducible = TRUE, internals = TRUE))
 })
 
-test_that("generator prints nicely", {
-  expect_snapshot({
-    print(zap_env(gen({
-      while (TRUE) {
-        if (TRUE) {
-          yield(1)
-        }
-        return(2)
-      }
-    })))
-  })
+test_that("generator instances prints nicely", {
+  factory <- generator(function() yield(NULL))
+  instance <- factory()
+  expect_snapshot(print(instance, reproducible = TRUE))
+  expect_snapshot(print(instance, reproducible = TRUE, internals = TRUE))
 })
 
 test_that("can send values to generators", {
