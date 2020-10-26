@@ -28,7 +28,7 @@
 #' @seealso [yield()], [flowery_debug()] for step-debugging.
 #' @export
 #' @examples
-#' # A generator statement creates a generator constructor. The
+#' # A generator statement creates a generator factory. The
 #' # following generator yields two times and then returns `"c"`:
 #' generate_abc <- generator(function() {
 #'   yield("a")
@@ -43,7 +43,7 @@
 #'   }
 #' })
 #'
-#' # The constructor creates generator functions. They are iterators
+#' # The factory creates generator instances. They are iterators
 #' # that you can call successively to new values:
 #' abc <- generate_abc()
 #' abc()
