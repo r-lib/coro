@@ -25,7 +25,7 @@
 #'   [yield()] values. Within a generator, `for` loops have
 #'   [iterator] support.
 #'
-#' @seealso [yield()], [flowery_debug()] for step-debugging.
+#' @seealso [yield()], [coro_debug()] for step-debugging.
 #' @export
 #' @examples
 #' # A generator statement creates a generator factory. The
@@ -67,7 +67,7 @@
 #' iterate(for (x in abc) print(x))
 #'
 #'
-#' # flowery provides a short syntax `gen()` for creating one-off
+#' # coro provides a short syntax `gen()` for creating one-off
 #' # generator functions. It is handy to chain iterators:
 #' numbers <- 1:10
 #' odds <- gen(for (x in numbers) if (x %% 2 != 0) yield(x))
@@ -111,7 +111,7 @@ generator0 <- function(fn, type = "generator") {
   fmls <- formals(fn)
   env <- environment(fn)
 
-  # Flipped when `flowery_debug()` is applied on a generator factory
+  # Flipped when `coro_debug()` is applied on a generator factory
   debugged <- FALSE
 
   # Create the generator factory (returned by `generator()` and
@@ -144,7 +144,7 @@ generator0 <- function(fn, type = "generator") {
       # Forward generator argument inside the state machine environment
       delayedAssign("arg", arg, assign.env = env)
 
-      if (!undebugged && (debugged || is_true(peek_option("flowery_debug")))) {
+      if (!undebugged && (debugged || is_true(peek_option("coro_debug")))) {
         env_browse(user_env)
 
         on.exit({
@@ -188,15 +188,15 @@ generator0 <- function(fn, type = "generator") {
       # Step into the generator right away
       gen(NULL)
     } else {
-      structure(gen, class = "flowery_generator_instance")
+      structure(gen, class = "coro_generator_instance")
     }
   }))
 
-  structure(out, class = c(paste0("flowery_", type), "function"))
+  structure(out, class = c(paste0("coro_", type), "function"))
 }
 
 new_generator_env <- function(parent, info) {
-  env <- env(ns_env("flowery"))
+  env <- env(ns_env("coro"))
   user_env <- env(parent)
 
   env$user_env <- user_env
@@ -237,12 +237,12 @@ env_bind_arg <- function(env, arg, frame = caller_env()) {
 }
 
 #' @export
-print.flowery_generator <- function(x, ..., internals = FALSE) {
+print.coro_generator <- function(x, ..., internals = FALSE) {
   writeLines("<generator>")
   print_generator(x, ..., internals = internals)
 }
 #' @export
-print.flowery_generator_instance <- function(x, ..., internals = FALSE) {
+print.coro_generator_instance <- function(x, ..., internals = FALSE) {
   type <- env_get(fn_env(x), "type", inherit = TRUE)
 
   if (is_string(type, "async_generator")) {
@@ -309,18 +309,17 @@ yield <- function(x) {
 #'
 #' @description
 #'
-#' * Call `flowery_debug()` on a [generator()], [async()], or
+#' * Call `coro_debug()` on a [generator()], [async()], or
 #'   [async_generator()] function to enable step-debugging.
 #'
-#' * Alternatively, set `options(flowery_debug = TRUE)` for
-#' step-debugging through all functions created with flowery.
+#' * Alternatively, set `options(coro_debug = TRUE)` for
+#' step-debugging through all functions created with coro.
 #'
-#' @param fn A generator factory or an async function created by
-#'   flowery.
+#' @param fn A generator factory or an async function.
 #' @param value Whether to debug the function.
 #'
 #' @export
-flowery_debug <- function(fn, value = TRUE) {
+coro_debug <- function(fn, value = TRUE) {
   if (!is_generator_factory(fn)) {
     abort("`fn` must be a `generator()`, `async()`, or `async_generator()` function.")
   }
@@ -330,9 +329,9 @@ flowery_debug <- function(fn, value = TRUE) {
 
 is_generator_factory <- function(x) {
   inherits_any(x, c(
-    "flowery_generator",
-    "flowery_async",
-    "flowery_async_generator"
+    "coro_generator",
+    "coro_async",
+    "coro_async_generator"
   ))
 }
 

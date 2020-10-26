@@ -55,7 +55,7 @@
 ---
 
     Code
-      generator_body(function() flowery::yield("foo"))
+      generator_body(function() coro::yield("foo"))
     Output
       {
           if (exhausted) {

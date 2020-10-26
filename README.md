@@ -1,5 +1,5 @@
 
-# flowery
+# coro
 
 ![](https://img.shields.io/badge/lifecycle-experimental-red.svg)
 
@@ -16,5 +16,5 @@ Install the development version from github with:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("lionel-/flowery", build_vignettes = TRUE)
+devtools::install_github("lionel-/coro", build_vignettes = TRUE)
 ```

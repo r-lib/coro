@@ -35,10 +35,10 @@ refd_block <- function(expr, ref = NULL) {
 }
 
 is_yield_call <- function(x) {
-  is_call(x, "yield", ns = c("", "flowery"))
+  is_call(x, "yield", ns = c("", "coro"))
 }
 is_await_call <- function(x) {
-  is_call(x, "await", ns = c("", "flowery"))
+  is_call(x, "await", ns = c("", "coro"))
 }
 
 # Useful to circumvent notes emitted by the bytecode compiler

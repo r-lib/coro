@@ -54,11 +54,11 @@ test_that("iterating with a done iterator cause an error", {
   expect_exhausted(iterate(for (x in iter) x))
 })
 
-test_that("iterating works when flowery is not loaded", {
+test_that("iterating works when coro is not loaded", {
   new_env <- new.env(parent = baseenv())
 
   evalq(
-    flowery::iterate(for (x in flowery::as_iterator(1:3)) x),
+    coro::iterate(for (x in coro::as_iterator(1:3)) x),
     new_env
   )
 

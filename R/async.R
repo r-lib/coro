@@ -22,7 +22,7 @@
 #' package.
 #'
 #' @seealso [async_generator()] and [await_each()];
-#'   [flowery_debug()] for step-debugging.
+#'   [coro_debug()] for step-debugging.
 #'
 #' @examples
 #' # This async function counts down from `n`, sleeping for 2 seconds
@@ -83,7 +83,7 @@ await <- function(x) {
 #'
 #' @seealso [async()] for creating awaitable functions;
 #'   [async_collect()] for collecting the values of an async iterator;
-#'   [flowery_debug()] for step-debugging.
+#'   [coro_debug()] for step-debugging.
 #' @examples
 #' # Creates awaitable functions that transform their inputs into a stream
 #' generate_stream <- async_generator(function(x) for (elt in x) yield(elt))
@@ -113,12 +113,12 @@ await_each <- function(x) {
 }
 
 #' @export
-print.flowery_async <- function(x, ..., internals = FALSE) {
+print.coro_async <- function(x, ..., internals = FALSE) {
   writeLines("<async>")
   print_generator(x, ..., internals = internals)
 }
 #' @export
-print.flowery_async_generator <- function(x, ..., internals = FALSE) {
+print.coro_async_generator <- function(x, ..., internals = FALSE) {
   writeLines("<async/generator>")
   print_generator(x, ..., internals = internals)
 }
@@ -130,7 +130,7 @@ print.flowery_async_generator <- function(x, ..., internals = FALSE) {
 #'
 #' Customisation point for the _async_ package or any concurrency
 #' framework that defines a "then" operation. Assign the result of
-#' `async_ops()` to the `.__flowery_async_ops__.` symbol in your
+#' `async_ops()` to the `.__coro_async_ops__.` symbol in your
 #' namespace.
 #'
 #' @param package The package name of the framework as a
@@ -158,12 +158,12 @@ async_ops <- function(package, then, as_promise) {
       then = then,
       as_promise = as_promise
     ),
-    class = "flowery_async_ops"
+    class = "coro_async_ops"
   )
 }
 
 get_async_ops <- function(env) {
-  ops <- env_get(env, ".__flowery_async_ops__.", inherit = TRUE, default = NULL)
+  ops <- env_get(env, ".__coro_async_ops__.", inherit = TRUE, default = NULL)
 
   if (!is_null(ops)) {
     return(ops)

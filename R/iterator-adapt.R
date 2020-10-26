@@ -50,7 +50,7 @@ iter_adapt <- function(iter, ...) {
   reducer()
 
   function() {
-    flag <- "_flowery_iter_adapt_result"
+    flag <- "_coro_iter_adapt_result"
     last <- flag
 
     # If we get `flag` back, it means a transducer has skipped this
@@ -87,7 +87,7 @@ on_load(async_adapt %<~% async_generator(function(iter, steps) {
   # Initialise the adaptors
   reducer()
 
-  flag <- "_flowery_iter_adapt_result"
+  flag <- "_coro_iter_adapt_result"
 
   while (TRUE) {
     out <- await(iter())

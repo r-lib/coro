@@ -242,7 +242,7 @@ expr_type_impl <- function(expr) {
   }
 
   head <- node_car(expr)
-  if (is_call(head, "::") && identical(head[[2]], quote(flowery))) {
+  if (is_call(head, "::") && identical(head[[2]], quote(coro))) {
     head <- head[[3]]
     if (!as_string(head) %in% c("yield", "await", "await_each")) {
       return(default)
@@ -818,7 +818,7 @@ for_states <- function(preamble,
                        info) {
   loop_depth <- machine_depth(counter) + 1L
 
-  async <- is_call(iterator, "await_each", ns = c("", "flowery"))
+  async <- is_call(iterator, "await_each", ns = c("", "coro"))
   if (async) {
     if (is_string(info$type, "generator")) {
       stop_non_async_generator("await_each")

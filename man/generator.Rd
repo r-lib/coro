@@ -76,7 +76,7 @@ abc()
 iterate(for (x in abc) print(x))
 
 
-# flowery provides a short syntax `gen()` for creating one-off
+# coro provides a short syntax `gen()` for creating one-off
 # generator functions. It is handy to chain iterators:
 numbers <- 1:10
 odds <- gen(for (x in numbers) if (x \%\% 2 != 0) yield(x))
@@ -106,5 +106,5 @@ tally(2)
 tally(10)
 }
 \seealso{
-\code{\link[=yield]{yield()}}, \code{\link[=flowery_debug]{flowery_debug()}} for step-debugging.
+\code{\link[=yield]{yield()}}, \code{\link[=coro_debug]{coro_debug()}} for step-debugging.
 }

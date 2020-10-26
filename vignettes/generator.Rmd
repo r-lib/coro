@@ -24,7 +24,7 @@ options(cli.unicode = FALSE)
 Generators are a simple way of creating __iterator functions__, i.e. functions that you can call to return a new value. The iteration protocol is described in `?iterator`. Here is a simple iterator that iterates over the elements of `1:3`:
 
 ```{r}
-library(flowery)
+library(coro)
 
 iterator <- as_iterator(1:3)
 

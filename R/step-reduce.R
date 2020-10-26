@@ -16,11 +16,11 @@
 #' abstract and it takes some time understand how they work and how to
 #' write one. However most of the time you shouldn't have to use
 #' `reduce_steps()` or write your own transformation step. You will
-#' typically use existing steps provided in flowery (like [iter_map()]
+#' typically use existing steps provided in coro (like [iter_map()]
 #' and [iter_discard()]) with user-friendly wrappers such as
 #' `iter_adapt()`.
 #'
-#' `reduce_steps()` and thus all functions based on it support flowery
+#' `reduce_steps()` and thus all functions based on it support coro
 #' [iterators][iterator] and [generators][generator].
 #'
 #' `reduce_steps()` is equivalent to `transduce` in Clojure. See their
@@ -103,7 +103,7 @@
 #'
 #' @section Early termination:
 #'
-#' The `reduce()` function used internally in flowery has support for
+#' The `reduce()` function used internally in coro has support for
 #' early termination. If the reducer returns a `reduced` box
 #' (constructed with [done()]), remaining inputs in `x` are
 #' ignored and `reduce_steps()` finishes the reduction right away.

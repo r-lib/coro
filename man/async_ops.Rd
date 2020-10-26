@@ -23,7 +23,7 @@ resolved promise.}
 \description{
 Customisation point for the \emph{async} package or any concurrency
 framework that defines a "then" operation. Assign the result of
-\code{async_ops()} to the \code{.__flowery_async_ops__.} symbol in your
+\code{async_ops()} to the \code{.__coro_async_ops__.} symbol in your
 namespace.
 }
 \keyword{internal}

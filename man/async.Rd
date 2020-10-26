@@ -67,5 +67,5 @@ if (FALSE) {
 }
 \seealso{
 \code{\link[=async_generator]{async_generator()}} and \code{\link[=await_each]{await_each()}};
-\code{\link[=flowery_debug]{flowery_debug()}} for step-debugging.
+\code{\link[=coro_debug]{coro_debug()}} for step-debugging.
 }

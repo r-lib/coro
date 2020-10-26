@@ -1,3 +1,5 @@
+#' @import rlang
+"_PACKAGE"
 
 `%<~%` <- function(lhs, rhs, env = caller_env()) {
   env_bind_lazy(env, !!substitute(lhs) := !!substitute(rhs), .eval_env = env)

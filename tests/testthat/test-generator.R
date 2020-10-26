@@ -57,10 +57,10 @@ test_that("generator() takes anonymous functions", {
   expect_error(generator(fn), "anonymous")
 })
 
-test_that("generator functions inherit from `flowery_generator`", {
+test_that("generator functions inherit from `coro_generator`", {
   g <- generator(function() NULL)
-  expect_true(inherits(g, "flowery_generator"))
-  expect_false(inherits(g(), "flowery_generator"))
+  expect_true(inherits(g, "coro_generator"))
+  expect_false(inherits(g(), "coro_generator"))
 })
 
 test_that("generator factories can take dots", {

@@ -6,7 +6,7 @@ test_that("generators have return states", {
 
 test_that("generators have yield states", {
   expect_snapshot0(generator_body(function() yield("foo")))
-  expect_snapshot0(generator_body(function() flowery::yield("foo")))
+  expect_snapshot0(generator_body(function() coro::yield("foo")))
 })
 
 test_that("generators support blocks", {

@@ -1,4 +1,4 @@
 library(testthat)
-library(flowery)
+library(coro)
 
-test_check("flowery")
+test_check("coro")

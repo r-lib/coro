@@ -1,5 +1,5 @@
 
-# flowery 0.0.1.9000
+# coro 0.0.1.9000
 
 * Generators and async functions now support `on.exit()`
   expressions. They also support exit expressions installed with
@@ -19,8 +19,8 @@
   etc.). Reentering the generator is an error.
 
 * Generators and async functions now support stepping with
-  `browser()`. Set `options(flowery_debug = TRUE)` for browsing all
-  functions created with flowery. Use `flowery_debug()` for browsing
+  `browser()`. Set `options(coro_debug = TRUE)` for browsing all
+  functions created with coro. Use `coro_debug()` for browsing
   specific functions.
 
 * `generator()` now accepts functions of one argument. The first time
@@ -39,7 +39,7 @@
   `async_generator()` creates iterable functions that are also
   awaitable.
 
-* The iterator abstraction has been removed from flowery. It is
+* The iterator abstraction has been removed from coro. It is
   replaced with the following protocol:
 
   - An iterator is a function. You advance it and get a new value by
@@ -53,6 +53,6 @@
 * Fixed top-level `break` statements in loops (#7).
 
 
-# flowery 0.0.1
+# coro 0.0.1
 
 Initial release

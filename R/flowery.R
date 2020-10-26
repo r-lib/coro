@@ -1,2 +1,0 @@
-#' @import rlang
-"_PACKAGE"
