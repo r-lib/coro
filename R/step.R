@@ -49,9 +49,11 @@ iter_take <- function(n) {
         # results
         out <- continue(out)
         if (length(out) < orig_n) {
-          abort(glue(
+          abort(sprintf(
             "Not enough elements for `take()` \\
-             ({ length(out) } / { orig_n } elements)"
+             (%s / %s elements)",
+            length(out),
+            orig_n
           ))
         }
 
