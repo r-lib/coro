@@ -10,10 +10,12 @@ yield(x)
 \item{x}{A value to yield.}
 }
 \description{
-\code{yield()} is like \code{return()} except that the function continues
-execution at the yielding point when it is called again. \code{yield()}
-can be called within loops and if-else branches but for technical
-reasons it has a few limitations:
+The \code{yield()} statement suspends \code{\link[=generator]{generator()}} functions. It works
+like \code{return()} except that the function continues execution at the
+yielding point when it is called again.
+
+\code{yield()} can be called within loops and if-else branches but for
+technical reasons it can't be used anywhere in R code:
 \itemize{
 \item \code{yield()} cannot be called as part of a function argument. Code
 such as \code{list(yield())} is illegal.

@@ -1,0 +1,203 @@
+---
+title: "Generators"
+author: "Lionel Henry"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Generators}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+options(cli.unicode = FALSE)
+```
+
+
+## Iterators
+
+Generators are a simple way of creating __iterator functions__, i.e. functions that you can call to return a new value. The iteration protocol is described in `?iterator`. Here is a simple iterator that iterates over the elements of `1:3`:
+
+```{r}
+library(flowery)
+
+iterator <- as_iterator(1:3)
+
+# Call the iterator to retrieve new values
+iterator()
+
+iterator()
+```
+
+Once the iterator is exhausted, it returns a sentinel value that signals to its caller that there are no more values available:
+
+```{r}
+# This is the last value
+iterator()
+
+# This is the exhaustion sentinel
+iterator()
+```
+
+In R we normally don't use this sort of iteration to work with vectors. Instead, we use the idiomatic techniques of vectorised programming. Iterator functions are useful for very specific tasks:
+
+- Iterating over __chunks__ of data when the whole data doesn't fit in memory.
+
+- Generating __sequences__ when you don't know in advance how many elements you will need. These sequences may be complex and even infinite.
+
+The iterator protocol is designed to be free of dependency. However, the easiest way to create an iterator is by using the generator factories provided in this package.
+
+
+## Generators
+
+Generators create functions that can __yield__, i.e. suspend themselves. When a generator reaches a `yield(value)` statement it returns the value as if you called `return(value)`. However, calling the generator again resumes the function right where it left off. Because they preserve their state between invokations, generators are ideal for creating iterator functions.
+
+
+```{r}
+generate_abc <- generator(function() {
+  for (x in letters[1:3]) {
+    yield(x)
+  }
+})
+```
+
+`generator()` creates an __iterator factory__. This is a function that returns fresh iterator functions:
+
+```{r}
+# Create the iterator
+abc <- generate_abc()
+
+# Use the iterator by invoking it
+abc()
+
+abc()
+```
+
+Once the last loop in a generator has finished iterating (here there is only one), it returns the exhaustion sentinel:
+
+```{r}
+# Last value
+abc()
+
+# Exhaustion sentinel
+abc()
+
+abc()
+```
+
+You can also create infinite iterators that can't be exhausted:
+
+```{r}
+generate_natural_numbers <- generator(function(from = 1L) {
+  x <- from
+  repeat {
+    yield(x)
+    x <- x + 1L
+  }
+})
+
+natural_numbers <- generate_natural_numbers(from = 10L)
+
+# The iterator generates new numbers forever
+natural_numbers()
+
+natural_numbers()
+```
+
+
+## Iterating
+
+Iterating manually over an iterator function is a bit tricky because you have to watch out for the exhaustion sentinel:
+
+```{r}
+abc <- generate_abc()
+
+while (!is_exhausted(x <- abc())) {
+  print(x)
+}
+```
+
+A simpler way is to iterate with a `for` loop using the `iterate()` helper. Within `iterate()`, `for` understands the iterator protocol:
+
+```{r}
+abc <- generate_abc()
+
+iterate(for (x in abc) {
+  print(x)
+})
+```
+
+You can also collect all remaning values of an iterator in a list with `collect()`:
+
+```{r}
+abc <- generate_abc()
+
+collect(abc)
+```
+
+Beware that trying to exhaust an infinite iterator is a programming error. This causes an infinite loop that never returns, forcing the user to interrupt R with `ctrl-c`. Make sure that you iterate over an infinite iterator only a finite amount of time:
+
+```{r}
+for (x in 1:3) {
+  print(natural_numbers())
+}
+
+collect(natural_numbers, n = 3)
+```
+
+
+## Adapting generators
+
+A generator factory can take another iterator as argument to modify its values. This pattern is called __adapting__:
+
+```{r}
+library(magrittr)
+
+adapt_toupper <- generator(function(i) {
+  for (x in i) {
+    yield(toupper(x))
+  }
+})
+
+ABC <- generate_abc() %>% adapt_toupper()
+
+ABC()
+
+ABC()
+```
+
+Once the modified iterator is exhausted, the adaptor automatically closes as well:
+
+```{r}
+ABC()
+
+ABC()
+```
+
+As a user, you might not want to create an iterator factory for a one-off adaptor. In this case you can use `gen()` instead of `generator()`. This enables a more pythonic style of working with iterators:
+
+```{r}
+abc <- generate_abc()
+ABC <- gen(for (x in abc) yield(toupper(x)))
+
+collect(ABC)
+```
+
+Or you can use the general purpose adaptor `adapt_map()`. It maps a function over each value of an iterator:
+
+```{r}
+adapt_map <- generator(function(.i, .fn, ...) {
+  for (x in .i) {
+    yield(.fn(x, ...))
+  }
+})
+
+ABC <- generate_abc() %>% adapt_map(toupper)
+
+ABC()
+```

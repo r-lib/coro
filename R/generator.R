@@ -2,11 +2,13 @@
 #'
 #' @description
 #'
-#' `generator()` creates a factory function for generators. A
-#' generator is an [iterator function][iterator] that can pause its
-#' execution with [yield()] and resume from where it left off. Because
-#' they manage state for you, generators are the easiest way to create
-#' iterators. The following rules apply:
+#' `generator()` creates an generator factory. A generator is an
+#' [iterator function][iterator] that can pause its execution with
+#' [yield()] and resume from where it left off. Because they manage
+#' state for you, generators are the easiest way to create
+#' iterators. See `vignette("generator")`.
+#'
+#' The following rules apply:
 #'
 #' * Yielded values do not terminate the generator. If you call the
 #'   generator again, the execution resumes right after the yielding
@@ -16,52 +18,53 @@
 #'   `return()`, the generator keeps returning the [exhausted()]
 #'   sentinel.
 #'
-#' Generators are compatible with all iterator features such as
-#' [iterate()], or [drain()].
+#' Generators are compatible with all features based on the iterator
+#' protocol such as [iterate()] and [collect()].
 #'
-#' @param fn A function of zero or one argument to be transformed into
-#'   a generator function that can [yield()] and `return()` values.
-#'   Within a generator, `for` loops have [iterator] support.
+#' @param fn A function template for generators. The function can
+#'   [yield()] values. Within a generator, `for` loops have
+#'   [iterator] support.
 #'
-#' @section Passing arguments to a generator:
-#'
-#' You can create generator functions that take one argument. The
-#' first time the generator is called, the argument is defined in the
-#' suspendable function. On subsequent invokations, the argument is
-#' returned from `yield()`.
-#'
-#' @seealso [flowery_debug()] for step-debugging.
+#' @seealso [yield()], [flowery_debug()] for step-debugging.
 #' @export
 #' @examples
-#' # A generator statement creates a generator constructor:
-#' new_gen <- generator(function() {
-#'   yield("foo")
-#'   yield("bar")
-#'   "baz"
+#' # A generator statement creates a generator constructor. The
+#' # following generator yields two times and then returns `"c"`:
+#' generate_abc <- generator(function() {
+#'   yield("a")
+#'   yield("b")
+#'   "c"
 #' })
 #'
-#' # The constructor creates generator functions. They are essentially
-#' # iterators that you can call successively to obtain values from:
-#' iter <- new_gen()
-#' iter()
-#' iter()
+#' # Or equivalently:
+#' generate_abc <- generator(function() {
+#'   for (x in letters[1:3]) {
+#'     yield(x)
+#'   }
+#' })
+#'
+#' # The constructor creates generator functions. They are iterators
+#' # that you can call successively to new values:
+#' abc <- generate_abc()
+#' abc()
+#' abc()
 #'
 #' # Once a generator has returned it keeps returning `exhausted()`.
 #' # This signals to its caller that new values can no longer be
 #' # produced. The generator is exhausted:
-#' iter()
-#' iter()
-#'
+#' abc()
+#' abc()
 #'
 #' # You can only exhaust a generator once but you can always create
 #' # new ones from a factory:
-#' iter <- new_gen()
-#' iter()
+#' abc <- generate_abc()
+#' abc()
+#'
 #'
 #' # As generators are regular iterators, you can use all iterator
 #' # tools such as iterate() which allows you to loop over all values
 #' # with a `for` loop:
-#' iterate(for (x in iter) cat(x, "\n"))
+#' iterate(for (x in abc) print(x))
 #'
 #'
 #' # flowery provides a short syntax `gen()` for creating one-off
@@ -71,15 +74,16 @@
 #' squares <- gen(for (x in odds) yield(x^2))
 #' greetings <- gen(for (x in squares) yield(paste("Hey", x)))
 #'
-#' # As with all iterators, you can take() elements from a generator:
-#' take(greetings, 2)
+#' # Use collect() with the `n` argument to take a given number of
+#' # elements from a generator:
+#' collect(greetings, 2)
 #'
-#' # Or drain the remaining elements:
-#' drain(greetings)
+#' # Or drain all remaining elements:
+#' collect(greetings)
 #'
 #'
-#' # You can supply arguments to generator functions. They are
-#' # returned from `yield()`.
+#' # If you generator functions with an argument, it is returned from
+#' # the `yield()` statement on reentry:
 #' new_tally <- generator(function() {
 #'   count <- 0
 #'   while (TRUE) {
@@ -257,10 +261,12 @@ env_bind_arg <- function(env, arg, frame = caller_env()) {
 #'
 #' @description
 #'
-#' `yield()` is like `return()` except that the function continues
-#' execution at the yielding point when it is called again. `yield()`
-#' can be called within loops and if-else branches but for technical
-#' reasons it has a few limitations:
+#' The `yield()` statement suspends [generator()] functions. It works
+#' like `return()` except that the function continues execution at the
+#' yielding point when it is called again.
+#'
+#' `yield()` can be called within loops and if-else branches but for
+#' technical reasons it can't be used anywhere in R code:
 #'
 #' * `yield()` cannot be called as part of a function argument. Code
 #'   such as `list(yield())` is illegal.

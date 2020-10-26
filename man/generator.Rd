@@ -10,18 +10,20 @@ generator(fn)
 gen(expr)
 }
 \arguments{
-\item{fn}{A function of zero or one argument to be transformed into
-a generator function that can \code{\link[=yield]{yield()}} and \code{return()} values.
-Within a generator, \code{for} loops have \link{iterator} support.}
+\item{fn}{A function template for generators. The function can
+\code{\link[=yield]{yield()}} values. Within a generator, \code{for} loops have
+\link{iterator} support.}
 
 \item{expr}{A yielding expression.}
 }
 \description{
-\code{generator()} creates a factory function for generators. A
-generator is an \link[=iterator]{iterator function} that can pause its
-execution with \code{\link[=yield]{yield()}} and resume from where it left off. Because
-they manage state for you, generators are the easiest way to create
-iterators. The following rules apply:
+\code{generator()} creates an generator factory. A generator is an
+\link[=iterator]{iterator function} that can pause its execution with
+\code{\link[=yield]{yield()}} and resume from where it left off. Because they manage
+state for you, generators are the easiest way to create
+iterators. See \code{vignette("generator")}.
+
+The following rules apply:
 \itemize{
 \item Yielded values do not terminate the generator. If you call the
 generator again, the execution resumes right after the yielding
@@ -31,48 +33,47 @@ point. All local variables are preserved.
 sentinel.
 }
 
-Generators are compatible with all iterator features such as
-\code{\link[=iterate]{iterate()}}, or \code{\link[=drain]{drain()}}.
+Generators are compatible with all features based on the iterator
+protocol such as \code{\link[=iterate]{iterate()}} and \code{\link[=collect]{collect()}}.
 }
-\section{Passing arguments to a generator}{
-
-
-You can create generator functions that take one argument. The
-first time the generator is called, the argument is defined in the
-suspendable function. On subsequent invokations, the argument is
-returned from \code{yield()}.
-}
-
 \examples{
-# A generator statement creates a generator constructor:
-new_gen <- generator(function() {
-  yield("foo")
-  yield("bar")
-  "baz"
+# A generator statement creates a generator constructor. The
+# following generator yields two times and then returns `"c"`:
+generate_abc <- generator(function() {
+  yield("a")
+  yield("b")
+  "c"
 })
 
-# The constructor creates generator functions. They are essentially
-# iterators that you can call successively to obtain values from:
-iter <- new_gen()
-iter()
-iter()
+# Or equivalently:
+generate_abc <- generator(function() {
+  for (x in letters[1:3]) {
+    yield(x)
+  }
+})
+
+# The constructor creates generator functions. They are iterators
+# that you can call successively to new values:
+abc <- generate_abc()
+abc()
+abc()
 
 # Once a generator has returned it keeps returning `exhausted()`.
 # This signals to its caller that new values can no longer be
 # produced. The generator is exhausted:
-iter()
-iter()
-
+abc()
+abc()
 
 # You can only exhaust a generator once but you can always create
 # new ones from a factory:
-iter <- new_gen()
-iter()
+abc <- generate_abc()
+abc()
+
 
 # As generators are regular iterators, you can use all iterator
 # tools such as iterate() which allows you to loop over all values
 # with a `for` loop:
-iterate(for (x in iter) cat(x, "\n"))
+iterate(for (x in abc) print(x))
 
 
 # flowery provides a short syntax `gen()` for creating one-off
@@ -82,15 +83,16 @@ odds <- gen(for (x in numbers) if (x \%\% 2 != 0) yield(x))
 squares <- gen(for (x in odds) yield(x^2))
 greetings <- gen(for (x in squares) yield(paste("Hey", x)))
 
-# As with all iterators, you can take() elements from a generator:
-take(greetings, 2)
+# Use collect() with the `n` argument to take a given number of
+# elements from a generator:
+collect(greetings, 2)
 
-# Or drain the remaining elements:
-drain(greetings)
+# Or drain all remaining elements:
+collect(greetings)
 
 
-# You can supply arguments to generator functions. They are
-# returned from `yield()`.
+# If you generator functions with an argument, it is returned from
+# the `yield()` statement on reentry:
 new_tally <- generator(function() {
   count <- 0
   while (TRUE) {
@@ -104,5 +106,5 @@ tally(2)
 tally(10)
 }
 \seealso{
-\code{\link[=flowery_debug]{flowery_debug()}} for step-debugging.
+\code{\link[=yield]{yield()}}, \code{\link[=flowery_debug]{flowery_debug()}} for step-debugging.
 }

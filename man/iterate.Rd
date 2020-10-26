@@ -11,7 +11,8 @@ iterate(loop)
 }
 \description{
 \code{iterate()} instruments \code{for} loops to support iteration with
-flowery iterators and generators.
+flowery iterators and generators. See \code{vignette("generators")} for
+more examples.
 }
 \examples{
 iter <- gen(for (x in 1:10) yield(x^2))

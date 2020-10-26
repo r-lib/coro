@@ -24,10 +24,15 @@ An async generator constructs iterable functions that are also
 awaitables. They support both the \code{yield()} and \code{await()} syntax.
 An async iterator can be looped within async functions and
 iterators using \code{await_each()} on the input of a \code{for} loop.
+
+The iteration protocol is derived from the one described in
+\code{\link{iterator}}. An async iterator always returns a
+promise. When the iterator is exhausted, it returns a resolved
+promise to the exhaustion sentinel.
 }
 \examples{
 # Creates awaitable functions that transform their inputs into a stream
-new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+generate_stream <- async_generator(function(x) for (elt in x) yield(elt))
 
 # Maps a function to a stream
 async_map <- async_generator(function(.i, .fn, ...) {
@@ -36,7 +41,11 @@ async_map <- async_generator(function(.i, .fn, ...) {
   }
 })
 
-# new_stream(1:3) \%>\% async_map(`*`, 2) \%>\% async_collect()
+# Example usage:
+if (FALSE) {
+  library(magrittr)
+  generate_stream(1:3) \%>\% async_map(`*`, 2) \%>\% async_collect()
+}
 }
 \seealso{
 \code{\link[=async]{async()}} for creating awaitable functions;

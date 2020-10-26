@@ -14,10 +14,48 @@ is_exhausted(x)
 \item{x}{An object.}
 }
 \description{
-An r-lib iterator is a function that implements the following protocol:
+An \strong{iterator} is a function that implements the following
+protocol:
 \itemize{
-\item Calling the function advances the iterator. The new value is returned.
-\item When the iterator is exhausted and there are no more elements to return, the symbol \code{quote(exhausted)} is returned. This signals exhaustion to the caller.
-\item Once an iterator has signalled exhaustion, all subsequent invokations must consistently return \code{quote(exhausted)}.
+\item Calling the function advances the iterator. The new value is
+returned.
+\item When the iterator is exhausted and there are no more elements to
+return, the symbol \code{quote(exhausted)} is returned. This signals
+exhaustion to the caller.
+\item Once an iterator has signalled exhaustion, all subsequent
+invokations must consistently return \code{quote(exhausted)}.
+}\if{html}{\out{<div class="r">}}\preformatted{iterator <- as_iterator(1:3)
+
+# Calling the iterator advances it
+iterator()
+}\if{html}{\out{</div>}}\preformatted{## [1] 1
+}\if{html}{\out{<div class="r">}}\preformatted{iterator()
+}\if{html}{\out{</div>}}\preformatted{## [1] 2
+}\if{html}{\out{<div class="r">}}\preformatted{# This is the last value
+iterator()
+}\if{html}{\out{</div>}}\preformatted{## [1] 3
+}\if{html}{\out{<div class="r">}}\preformatted{# Subsequent invokations return the exhaustion sentinel
+iterator()
+}\if{html}{\out{</div>}}\preformatted{## exhausted
 }
+
+Because iteration is defined by a protocol, creating iterators is
+free of dependency. However, it is often simpler to create
+iterators with \link[=generator]{generators}, see
+\code{vignette("generator")}. To iterate over an iterator, it is simpler
+to use the \code{\link[=iterate]{iterate()}} and \code{\link[=collect]{collect()}} helpers provided in this
+package.
 }
+\section{Properties}{
+
+
+Iterators are \strong{stateful}. Advancing the iterator creates a
+persistent effect in the R session. Also iterators are
+\strong{one-way}. Once you have advanced an iterator, there is no going
+back and once it is exhausted, it stays exhausted.
+
+Iterators are not necessarily finite. They can also represent
+infinite sequences, in which case trying to exhaust them is a
+programming error that causes an infinite loop.
+}
+

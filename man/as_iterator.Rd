@@ -7,9 +7,16 @@
 as_iterator(x)
 }
 \arguments{
-\item{x}{A vector to be transformed to an iterable function.
-Functions are returned as is.}
+\item{x}{A vector or a function. Functions are returned as is.}
+}
+\value{
+An iterable function.
 }
 \description{
-Transform a vector or list to an iterator
+\code{as_iterator()} takes a vector and transforms it to an \link[=iterator]{iterator function}.
+
+This is mostly useful for creating examples or to provide a bridge
+between vectors and iterators. It is generally not efficient to use
+the iteration protocol with vectors. Vectorised idioms are
+generally preferred in R programming.
 }
