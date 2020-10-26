@@ -4,3 +4,4 @@
 ^codecov\.yml$
 ^\.github$
 ^LICENSE\.md$
+^README\.Rmd$

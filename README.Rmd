@@ -1,0 +1,175 @@
+---
+output: github_document
+always_allow_html: yes
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README",
+  out.width = "100%"
+)
+```
+
+
+# coro
+
+<!-- badges: start -->
+![](https://img.shields.io/badge/lifecycle-maturing-blue.svg)
+<!-- badges: end -->
+
+
+## Overview
+
+coro implements __coroutines__ for R, i.e. functions that can be suspended and resumed later on. There are two kinds:
+
+- Async/await functions, which make it straightforward to program concurrently
+
+- Generators for iterating over complex sequences
+
+```{r}
+library(coro)
+```
+
+
+### Async/await functions
+
+Concurrent programming is made straightforward by async-await functions. Whenever you are waiting for a result that may take a while (downloading a file, computing a value in an external process), use `await()`. The argument to `await()` must return a promise from the [promises](https://github.com/rstudio/promises/) package.
+
+Concurrent code based on promises can quickly become hard to write and follow. In the following artificial example, we wait for a download to complete, then decide to launch a computation in an external process depending on a property of the downloaded data. We also handle some errors specifically.
+
+```{r}
+my_async <- function() {
+  async_download() %>%
+    then(function(data) {
+      if (ncol(data) > 10) {
+        then(future::future(fib(30)), function(fib) {
+          data / fib
+        })
+      } else {
+        data
+      }
+    }, onRejected = function(err) {
+      if (inherits(err, "download_error")) {
+        NULL
+      } else {
+        stop(err)
+      }
+    })
+}
+```
+
+Rewriting this function with async/await greatly simplifies the code:
+
+```{r}
+my_async <- async(function() {
+  data <- tryCatch(
+    await(async_download()),
+    download_error = function(err) NULL
+  )
+
+  if (is.null(data)) {
+    return(NULL)
+  }
+
+  if (ncol(data) > 10) {
+    fib <- await(future::future(fib(30)))
+    data <- data /fib
+  }
+
+  data
+})
+```
+
+
+### Generators
+
+Generators are based on a simple iteration protocol:
+
+- Iterators are functions.
+- They can be advanced by calling the function. The new value is returned.
+- An exhausted iterator returns the sentinel symbol `exhausted`.
+
+The `generator()` function creates a generator factory which returns generator instances:
+
+```{r}
+# Create a generator factory
+generate_abc <- generator(function() {
+  for (x in letters[1:3]) {
+    yield(x)
+  }
+})
+
+# Create a generator instance
+abc <- generate_abc()
+```
+
+A generator instance is an iterator function which yields values:
+
+```{r}
+abc
+
+abc()
+```
+
+Collect all remaining values from an iterator with `collect()`:
+
+```{r}
+collect(abc)
+```
+
+See `vignette("generator")` for more information.
+
+
+
+## Limitations
+
+`yield()` and `await()` can be used in loops, if/else branches, `tryCatch()` expressions, or any combinations of these. However they can't be used as function arguments. These will cause errors:
+
+```{r, eval = FALSE}
+generator(function() {
+  list(yield("foo"))
+})
+
+async(function() {
+  list(await(foo()))
+})
+```
+
+Fortunately it is easy to rewrite the code to work around this limitation:
+
+```{r, eval = FALSE}
+generator(function() {
+  x <- yield("foo")
+  list(x)
+})
+
+async(function() {
+  x <- await(foo())
+  list(x)
+})
+```
+
+
+## How does it work
+
+Coroutines are an [abstraction for state machines](https://eli.thegreenplace.net/2009/08/29/co-routines-as-an-alternative-to-state-machines) in languages that support them. Conversely, you can implement coroutines by rewriting the code source provided by the user as a state machine. Pass `internals = TRUE` to the print methods of coroutines to reveal the state machine that is running under the hood:
+
+```{r}
+print(generate_abc, internals = TRUE)
+```
+
+Despite this transformation of source code, `browser()` and step-debugging still work as you would expect. This is because coro keeps track of the source references from the original code.
+
+
+## Installation
+
+Install the development version from github with:
+
+```r
+# install.packages("devtools")
+devtools::install_github("lionel-/coro", build_vignettes = TRUE)
+```
