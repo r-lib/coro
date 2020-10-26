@@ -23,6 +23,33 @@
 #'
 #' @seealso [async_generator()] and [await_each()];
 #'   [flowery_debug()] for step-debugging.
+#'
+#' @examples
+#' # This async function counts down from `n`, sleeping for 2 seconds
+#' # at each iteration:
+#' async_count_down <- async(function(n) {
+#'   while (n > 0) {
+#'     cat("Down", n, "\n")
+#'     await(async_sleep(2))
+#'     n <- n - 1
+#'   }
+#' })
+#'
+#' # This async function counts up until `stop`, sleeping for 0.5
+#' # seconds at each iteration:
+#' async_count_up <- async(function(stop) {
+#'   n <- 1
+#'   while (n <= stop) {
+#'     cat("Up", n, "\n")
+#'     await(async_sleep(0.5))
+#'     n <- n + 1
+#'   }
+#' })
+#'
+#' # You can run these functions concurrently using `promise_all()`
+#' if (FALSE) {
+#'   promises::promise_all(async_count_down(5), async_count_up(5))
+#' }
 #' @export
 async <- function(fn) {
   assert_lambda(substitute(fn))
