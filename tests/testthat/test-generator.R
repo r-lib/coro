@@ -1,7 +1,7 @@
 
 test_that("can create non-yielding generator functions", {
   gen <- generator(function() "foo")
-  expect_identical(drain(gen()), list("foo"))
+  expect_identical(collect(gen()), list("foo"))
 })
 
 test_that("can yield `NULL` without terminating iteration", {
@@ -88,7 +88,7 @@ test_that("yield within if within for loops properly", {
       }
     }
   })
-  expect_identical(drain_int(new_gen()), c(1:4, 100L))
+  expect_identical(collect(new_gen()), list(1L, 2L, 3L, 4L, 100L))
 })
 
 test_that("unexpected exits disable generators", {

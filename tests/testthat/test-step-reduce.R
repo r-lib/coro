@@ -50,28 +50,8 @@ test_that("into() grows vector if needed", {
   expect_identical(into(integer(1), 1:3), 1:3)
 })
 
-test_that("take variants return correct output type", {
-  expect_identical(take(1:10, 2), list(1L, 2L))
-  expect_identical(take_lgl(1:10, 2), lgl(1, 2))
-  expect_identical(take_int(1:10, 2), int(1, 2))
-  expect_identical(take_dbl(1:10, 2), dbl(1, 2))
-  expect_identical(take_cpl(1:10, 2), cpl(1, 2))
-  expect_identical(take_chr(1:10, 2), chr("1", "2"))
-  expect_identical(take_raw(1:10, 2), as.raw(c(1, 2)))
-})
-
-test_that("take() fails if not enough elements", {
-  expect_error(take(1:10, 15), "10 / 15 elements")
-})
-
-test_that("drain variants return correct output type", {
-  expect_identical(drain(1:2), list(1L, 2L))
-  expect_identical(drain_lgl(1:2), lgl(1, 2))
-  expect_identical(drain_int(1:2), int(1, 2))
-  expect_identical(drain_dbl(1:2), dbl(1, 2))
-  expect_identical(drain_cpl(1:2), cpl(1, 2))
-  expect_identical(drain_chr(1:2), chr("1", "2"))
-  expect_identical(drain_raw(1:2), as.raw(c(1, 2)))
+test_that("collect(n = ) fails if not enough elements", {
+  expect_error(collect(1:10, n = 15), "10 / 15 elements")
 })
 
 test_that("can reduce iterators", {
@@ -82,7 +62,7 @@ test_that("can reduce iterators", {
 
 test_that("reducing exhausted iterators produces empty output", {
   expect_identical(
-    drain(function() exhausted()),
+    collect(function() exhausted()),
     list()
   )
 })
