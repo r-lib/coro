@@ -247,7 +247,7 @@ new_generator_env <- function(parent, info) {
 
 env_bind_arg <- function(env, arg, frame = caller_env()) {
   if (identical(arg, "...")) {
-    env$... <- env_get(frame, "...", inherit = TRUE, default = missing_arg())
+    env[["..."]] <- env_get(frame, "...", inherit = TRUE, default = missing_arg())
   } else {
     env_bind_lazy(env, !!arg := !!sym(arg), .eval_env = frame)
   }
