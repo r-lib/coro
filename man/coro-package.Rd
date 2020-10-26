@@ -4,9 +4,14 @@
 \name{coro-package}
 \alias{coro}
 \alias{coro-package}
-\title{coro: Generators and transducers for R}
+\title{coro: Generators and async/await functions}
 \description{
-Make R a more coro language with generators and transducers.
+Provides 'coroutines' for R, a family of functions that
+    can be suspended and resumed later on. This includes generators
+    (which yield) and 'async' functions (which await). The 'coro'
+    package defines an iteration protocol for generator functions and
+    provides a set of tools for iteration. The 'async/await' functions
+    are based on the concurrency framework of the 'promises' package.
 }
 \author{
 \strong{Maintainer}: Lionel Henry \email{lionel@rstudio.com}

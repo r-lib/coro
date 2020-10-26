@@ -1,11 +1,16 @@
 Package: coro
-Title: Generators and transducers for R
+Title: Generators and async/await functions
 Version: 0.0.1.9000
 Authors@R: c(
     person("Lionel", "Henry", ,"lionel@rstudio.com", c("aut", "cre")),
     person("RStudio", role = "cph")
     )
-Description: Make R a more coro language with generators and transducers.
+Description: Provides 'coroutines' for R, a family of functions that
+    can be suspended and resumed later on. This includes generators
+    (which yield) and 'async' functions (which await). The 'coro'
+    package defines an iteration protocol for generator functions and
+    provides a set of tools for iteration. The 'async/await' functions
+    are based on the concurrency framework of the 'promises' package.
 Depends:
     R (>= 3.5.0)
 Imports:
