@@ -346,15 +346,6 @@ drain_raw <- function(x, n) {
   reduce_steps(x, NULL, along_builder(raw(0)))
 }
 
-# TODO: replace all of the above by `collect()`
-
-#' @rdname take
-#' @export
-collect <- function(x, n = NULL) {
-  steps <- n %&&% iter_take(n)
-  reduce_steps(x, steps, along_builder(list()))
-}
-
 # From purrr. The only change is that this reduce() function supports
 # reduced objects for early termination of reducing.
 reduce <- function(.x, .f, ..., .init) {
@@ -431,24 +422,6 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   }
 
   out
-}
-
-
-#' Collect output of an asynchronous iterator
-#'
-#' `async_collect()` takes an asynchronous iterator, i.e. an iterable
-#' function that is also awaitable. `async_collect()` returns an
-#' awaitable that eventually resolves to a list containing the values
-#' returned by the iterator. The values are collected until exhaustion
-#' unless `n` is supplied. The collection is grown geometrically for
-#' performance.
-#'
-#' @inheritParams take
-#'
-#' @export
-async_collect <- function(x, n = NULL) {
-  steps <- n %&&% iter_take(n)
-  async_reduce_steps(x, steps, along_builder(list()))
 }
 
 on_load(async_reduce_steps %<~% async(function(x, steps, builder, init) {
