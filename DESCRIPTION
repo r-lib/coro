@@ -14,7 +14,7 @@ Imports:
 Suggests:
     knitr,
     later (>= 1.1.0),
-    magrittr,
+    magrittr (>= 1.5.0.9000),
     promises,
     purrr,
     rmarkdown,
@@ -23,7 +23,8 @@ VignetteBuilder:
     knitr
 Remotes:
     r-lib/rlang,
-    r-lib/testthat
+    r-lib/testthat,
+    tidyverse/magrittr
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
