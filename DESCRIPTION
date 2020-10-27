@@ -1,16 +1,16 @@
 Package: coro
-Title: Generators and async/await functions
+Title: 'Coroutines' for R
 Version: 0.0.1.9000
 Authors@R: c(
     person("Lionel", "Henry", ,"lionel@rstudio.com", c("aut", "cre")),
     person("RStudio", role = "cph")
     )
 Description: Provides 'coroutines' for R, a family of functions that
-    can be suspended and resumed later on. This includes generators
-    (which yield) and 'async' functions (which await). The 'coro'
-    package defines an iteration protocol for generator functions and
-    provides a set of tools for iteration. The 'async/await' functions
-    are based on the concurrency framework of the 'promises' package.
+    can be suspended and resumed later on. This includes 'async'
+    functions (which await) and generators (which yield). 'Async'
+    functions are based on the concurrency framework of the 'promises'
+    package. Generators are based on a dependency free iteration
+    protocol defined in 'coro'.
 Depends:
     R (>= 3.5.0)
 Imports:
