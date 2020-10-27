@@ -165,6 +165,13 @@ print(generate_abc, internals = TRUE)
 Despite this transformation of source code, `browser()` and step-debugging still work as you would expect. This is because coro keeps track of the source references from the original code.
 
 
+## Acknowledgements
+
+- The [regenerator](https://facebook.github.io/regenerator/) Javascript package which uses a similar transformation to implement generators and async functions in older versions of Javascript.
+
+- Gabor Csardi for many interesting discussions about concurrency and the design of coro.
+
+
 ## Installation
 
 Install the development version from github with:
