@@ -13,12 +13,20 @@
 coro implements **coroutines** for R, i.e. functions that can be
 suspended and resumed later on. There are two kinds:
 
-  - Async/await functions, which make it straightforward to program
+  - **Async** functions, which make it straightforward to program
     concurrently
+  - **Generators** for iterating over complex sequences
 
-  - Generators for iterating over complex sequences
+Supported features:
 
-<!-- end list -->
+  - Suspending within loops and if/else branches
+  - Suspending within `tryCatch()`
+  - `on.exit()` expressions and stack-based cleanup such as provided by
+    `local_` functions in the [withr](https://github.com/r-lib/withr/)
+    package
+  - Step-debugging and `browser()` within coroutines
+
+Attach the package to follow the examples:
 
 ``` r
 library(coro)
