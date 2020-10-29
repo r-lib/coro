@@ -1760,8 +1760,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              user_env[["x"]] <- arg
-              break
+              .last_value <- user_env[["x"]] <- arg
+              exhausted <- TRUE
+              return(last_value())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1786,8 +1787,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              user_env[["x"]] <- arg
-              break
+              .last_value <- user_env[["x"]] <- arg
+              exhausted <- TRUE
+              return(last_value())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -2141,6 +2143,29 @@
               iterators[[2L]] <- NULL
               length(state) <- 1L
               break
+          })
+          exhausted <- TRUE
+          invisible(exhausted())
+      }
+
+---
+
+    Code
+      async_body(function() x <- await(async_foo()))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(exhausted()))
+          }
+          repeat switch(state[[1L]], `1` = {
+              .last_value <- then(as_promise(user(async_foo())), callback = .self)
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              .last_value <- user_env[["x"]] <- arg
+              exhausted <- TRUE
+              return(as_promise(last_value()))
           })
           exhausted <- TRUE
           invisible(exhausted())

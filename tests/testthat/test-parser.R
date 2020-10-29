@@ -335,4 +335,7 @@ test_that("trailing `await()` returns the awaited value wrapped in a promise", {
   expect_snapshot0(async_body(function() repeat await(x)))
   expect_snapshot0(async_body(function() while (x) if (y) await(z)))
   expect_snapshot0(async_body(function() for (x in y) await(z)))
+
+  # Assignment case
+  expect_snapshot0(async_body(function() x <- await(async_foo())))
 })

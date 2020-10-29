@@ -678,13 +678,19 @@ suspend_state <- function(expr,
   counter(inc = 1L)
 
   if (assign) {
-    assign_block <- expr({
-      user_env[[!!assign_var]] <- arg
-      !!continue_call(continue(counter, saved_last), machine_depth(counter))
-    })
-    assign_state <- new_state(assign_block, NULL, counter())
-    node_list_poke_cdr(states, assign_state)
-    counter(inc = 1L)
+    if (saved_last && return) {
+      assign_expr <- expr(.last_value <- user_env[[!!assign_var]] <- arg)
+      assign_state <- return_state(assign_expr, counter, info)
+      node_list_poke_cdr(states, assign_state)
+    } else {
+      assign_block <- expr({
+        user_env[[!!assign_var]] <- arg
+        !!continue_call(continue(counter, saved_last), machine_depth(counter))
+      })
+      assign_state <- new_state(assign_block, NULL, counter())
+      counter(inc = 1L)
+      node_list_poke_cdr(states, assign_state)
+    }
   } else if (!last) {
     # Insert state to force the reentering generator argument in the
     # proper context. This is how generators can be cancelled and cleaned up.

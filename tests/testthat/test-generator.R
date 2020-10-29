@@ -262,3 +262,10 @@ test_that("yield-assign is an error in case of missing argument", {
   g()
   expect_error(g(), "missing")
 })
+
+test_that("trailing yield-assign returns argument", {
+  generate <- generator(function() x <- yield("foo"))
+  g <- generate()
+  g()
+  expect_equal(g("bar"), "bar")
+})

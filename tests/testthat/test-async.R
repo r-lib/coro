@@ -215,8 +215,9 @@ test_that("async functions and async generator factories print nicely", {
 })
 
 test_that("trailing await() returns awaited value", {
-  fn <- async(function() {
-    await("value")
-  })
+  fn <- async(function() await("value"))
+  expect_equal(wait_for(fn()), "value")
+
+  fn <- async(function() x <- await("value"))
   expect_equal(wait_for(fn()), "value")
 })
