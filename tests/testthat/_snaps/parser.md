@@ -1995,3 +1995,154 @@
           invisible(exhausted())
       }
 
+# trailing `await()` returns the awaited value wrapped in a promise
+
+    Code
+      async_body(function() await(x))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(exhausted()))
+          }
+          repeat switch(state[[1L]], `1` = {
+              .last_value <- then(as_promise(user(x)), callback = .self)
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
+              state[[1L]] <- 3L
+          }, `3` = {
+              .last_value <- arg
+              exhausted <- TRUE
+              return(as_promise(last_value()))
+          })
+          exhausted <- TRUE
+          invisible(exhausted())
+      }
+
+---
+
+    Code
+      async_body(function() repeat await(x))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(exhausted()))
+          }
+          repeat switch(state[[1L]], `1` = {
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  .last_value <- then(as_promise(user(x)), callback = .self)
+                  state[[2L]] <- 1L
+                  suspend()
+                  return(last_value())
+              })
+              length(state) <- 1L
+              break
+          })
+          exhausted <- TRUE
+          invisible(exhausted())
+      }
+
+---
+
+    Code
+      async_body(function() while (x) if (y) await(z))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(exhausted()))
+          }
+          repeat switch(state[[1L]], `1` = {
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  if (user(x)) {
+                      state[[2L]] <- 2L
+                  } else {
+                      break
+                  }
+              }, `2` = {
+                  if (user(y)) {
+                      state[[2L]] <- 3L
+                  } else {
+                      state[[2L]] <- 4L
+                  }
+                  state[[3L]] <- 1L
+              }, `3` = {
+                  repeat switch(state[[3L]], `1` = {
+                      .last_value <- then(as_promise(user(z)), callback = .self)
+                      state[[3L]] <- 2L
+                      suspend()
+                      return(last_value())
+                  }, `2` = {
+                      break
+                  })
+                  n <- length(state)
+                  if (n < 2L) {
+                      break
+                  }
+                  if (n == 2L) {
+                      state[[2L]] <- 1L
+                      next
+                  }
+                  length(state) <- 2L
+                  state[[2L]] <- 1L
+              }, `4` = {
+                  state[[2L]] <- 1L
+              })
+              length(state) <- 1L
+              break
+          })
+          exhausted <- TRUE
+          invisible(exhausted())
+      }
+
+---
+
+    Code
+      async_body(function() for (x in y) await(z))
+    Output
+      {
+          if (exhausted) {
+              return(invisible(exhausted()))
+          }
+          repeat switch(state[[1L]], `1` = {
+              iterators[[2L]] <- as_iterator(user(y))
+              state[[1L]] <- 2L
+              state[[2L]] <- 1L
+          }, `2` = {
+              repeat switch(state[[2L]], `1` = {
+                  if ({
+                      iterator <- iterators[[2L]]
+                      if (is_exhausted(elt <- iterator())) {
+                        FALSE
+                      } else {
+                        user_env[["x"]] <- elt
+                        TRUE
+                      }
+                  }) {
+                      state[[2L]] <- 2L
+                  } else {
+                      break
+                  }
+              }, `2` = {
+                  .last_value <- then(as_promise(user(z)), callback = .self)
+                  state[[2L]] <- 1L
+                  suspend()
+                  return(last_value())
+              })
+              iterators[[2L]] <- NULL
+              length(state) <- 1L
+              break
+          })
+          exhausted <- TRUE
+          invisible(exhausted())
+      }
+

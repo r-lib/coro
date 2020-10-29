@@ -327,3 +327,12 @@ test_that("tryCatch() can be assigned", {
     )
   }))
 })
+
+test_that("trailing `await()` returns the awaited value wrapped in a promise", {
+  expect_snapshot0(async_body(function() await(x)))
+
+  # Non-returning cases
+  expect_snapshot0(async_body(function() repeat await(x)))
+  expect_snapshot0(async_body(function() while (x) if (y) await(z)))
+  expect_snapshot0(async_body(function() for (x in y) await(z)))
+})

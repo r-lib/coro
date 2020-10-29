@@ -27,6 +27,16 @@
           }
           repeat switch(state[[1L]], `1` = {
               .last_value <- then(as_promise(user("value")), callback = .self)
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
+              state[[1L]] <- 3L
+          }, `3` = {
+              .last_value <- arg
               exhausted <- TRUE
               return(as_promise(last_value()))
           })
@@ -53,9 +63,19 @@
           }, `2` = {
               repeat switch(state[[2L]], `1` = {
                   .last_value <- then(as_promise(user("value")), callback = .self)
+                  state[[2L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  if (!missing(arg)) {
+                      without_call_errors(force(arg))
+                  }
+                  state[[2L]] <- 3L
+              }, `3` = {
+                  .last_value <- arg
                   exhausted <- TRUE
                   return(as_promise(last_value()))
-              }, `2` = {
+              }, `4` = {
                   break
               })
               n <- length(state)
@@ -305,6 +325,16 @@
           }
           repeat switch(state[[1L]], `1` = {
               .last_value <- then(as_promise(user(NULL)), callback = .self)
+              state[[1L]] <- 2L
+              suspend()
+              return(last_value())
+          }, `2` = {
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
+              state[[1L]] <- 3L
+          }, `3` = {
+              .last_value <- arg
               exhausted <- TRUE
               return(as_promise(last_value()))
           })

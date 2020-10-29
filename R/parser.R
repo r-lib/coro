@@ -624,15 +624,24 @@ await_state <- function(expr,
 
   expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
 
-  suspend_state(
+  return_last <- last && return && is_null(assign_var)
+
+  states <- suspend_state(
     expr = expr,
     counter = counter,
     continue = continue,
-    last = last,
+    last = if (return_last) FALSE else last,
     return = return,
     info = info,
     assign_var = assign_var
   )
+
+  if (return_last) {
+    last_state <- return_state(quote(.last_value <- arg), counter, info)
+    node_list_poke_cdr(states, last_state)
+  }
+
+  states
 }
 
 suspend_state <- function(expr,

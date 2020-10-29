@@ -213,3 +213,10 @@ test_that("async functions and async generator factories print nicely", {
   expect_snapshot(print(instance, reproducible = TRUE))
   expect_snapshot(print(instance, internals = TRUE, reproducible = TRUE))
 })
+
+test_that("trailing await() returns awaited value", {
+  fn <- async(function() {
+    await("value")
+  })
+  expect_equal(wait_for(fn()), "value")
+})
