@@ -363,5 +363,6 @@ utils::globalVariables(c(
   "as_promise",
   "user",
   "exits",
-  "suspend"
+  "suspend",
+  "generator_env"
 ))
