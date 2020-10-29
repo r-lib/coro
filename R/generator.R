@@ -168,6 +168,11 @@ generator0 <- function(fn, type = "generator") {
         # There is no safe way of resuming a generator that didn't
         # suspend normally.
         if (is_true(env$jumped)) {
+          # In case a scheduler calls back the generator for error
+          # handling or cleanup
+          if (!missing(arg)) {
+            force(arg)
+          }
           abort("This function has been disabled because of an unexpected exit.")
         }
 
