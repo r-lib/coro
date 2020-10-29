@@ -248,3 +248,11 @@ test_that("exit expressions are suspended and resumed", {
   expect_exhausted(g())
   expect_false(unwound)
 })
+
+test_that("formals of generator factory do not mask private variables", {
+  generate <- generator(function(fn = "arg", env = "arg") c(fn, env))
+  expect_equal(
+    generate()(),
+    c("arg", "arg")
+  )
+})

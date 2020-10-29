@@ -114,82 +114,92 @@ generator0 <- function(fn, type = "generator") {
   # Flipped when `coro_debug()` is applied on a generator factory
   debugged <- FALSE
 
+  `_parent` <- environment()
+
   # Create the generator factory (returned by `generator()` and
   # entered by `async()`)
   out <- new_function(fmls, quote({
-    info <- machine_info(type, env = caller_env())
+    # Evaluate here so the formals of the generator factory do not
+    # mask our variables
+    `_private` <- rlang::env(`_parent`)
+    `_private`$generator_env <- base::environment()
+    `_private`$caller_env <- base::environment()
 
-    # Generate the state machine lazily at runtime
-    if (is_null(state_machine)) {
-      state_machine <<- walk_states(body(fn), info = info)
-    }
+    base::local(envir = `_private`, {
+      info <- machine_info(type, env = caller_env)
 
-    ops <- info$async_ops
-    if (!is_null(ops) && !is_installed(ops$package)) {
-      abort(sprintf("The %s package must be installed.", ops$package))
-    }
-
-    env <- new_generator_env(env, info)
-    user_env <- env$user_env
-
-    # Forward arguments inside the user space of the state machine
-    frame <- environment()
-    lapply(names(fmls), function(arg) env_bind_arg(user_env, arg, frame = frame))
-
-    # Flipped when `f` is pressed in the browser
-    undebugged <- FALSE
-
-    # Create the generator. This is a function that resumes a state machine.
-    gen <- blast(function(arg = NULL) {
-      # Forward generator argument inside the state machine environment
-      delayedAssign("arg", arg, assign.env = env)
-
-      if (!undebugged && (debugged || is_true(peek_option("coro_debug")))) {
-        env_browse(user_env)
-
-        on.exit({
-          # `f` was pressed, disable debugging for this generator
-          if (!env_is_browsed(user_env)) {
-            undebugged <<- TRUE
-          }
-        }, add = TRUE)
+      # Generate the state machine lazily at runtime
+      if (is_null(state_machine)) {
+        state_machine <<- walk_states(body(fn), info = info)
       }
 
-      # Disable generator on error, interrupt, debugger quit, etc.
-      # There is no safe way of resuming a generator that didn't
-      # suspend normally.
-      if (is_true(env$jumped)) {
-        abort("This function has been disabled because of an unexpected exit.")
+      ops <- info$async_ops
+      if (!is_null(ops) && !is_installed(ops$package)) {
+        abort(sprintf("The %s package must be installed.", ops$package))
       }
 
-      if (is_true(env$exhausted)) {
-        return(exhausted())
+      env <- new_generator_env(env, info)
+      user_env <- env$user_env
+
+      # Forward arguments inside the user space of the state machine
+      lapply(names(fmls), function(arg) env_bind_arg(user_env, arg, frame = generator_env))
+
+      # Flipped when `f` is pressed in the browser
+      undebugged <- FALSE
+
+      # Create the generator instance. This is a function that resumes
+      # a state machine.
+      gen <- blast(function(arg = NULL) {
+        # Forward generator argument inside the state machine environment
+        delayedAssign("arg", arg, assign.env = env)
+
+        if (!undebugged && (debugged || is_true(peek_option("coro_debug")))) {
+          env_browse(user_env)
+
+          on.exit({
+            # `f` was pressed, disable debugging for this generator
+            if (!env_is_browsed(user_env)) {
+              undebugged <<- TRUE
+            }
+          }, add = TRUE)
+        }
+
+        # Disable generator on error, interrupt, debugger quit, etc.
+        # There is no safe way of resuming a generator that didn't
+        # suspend normally.
+        if (is_true(env$jumped)) {
+          abort("This function has been disabled because of an unexpected exit.")
+        }
+
+        if (is_true(env$exhausted)) {
+          return(exhausted())
+        }
+
+        # Resume state machine. Set up an execution env in the user
+        # environment first to serve as a target for on.exit()
+        # expressions. Then evaluate state machine in its private
+        # environment.
+        env$jumped <- TRUE
+        out <- evalq(envir = user_env,
+          base::evalq(envir = !!env, {
+            env_poke_exits(user_env, exits)
+            !!state_machine
+          })
+        )
+        env$jumped <- FALSE
+
+        out
+      })
+
+      env$.self <- gen
+
+      if (is_string(type, "async")) {
+        # Step into the generator right away
+        gen(NULL)
+      } else {
+        structure(gen, class = "coro_generator_instance")
       }
-
-      # Resume state machine. Set up an execution env in the user
-      # environment first to serve as a target for on.exit()
-      # expressions. Then evaluate state machine in its private
-      # environment.
-      env$jumped <- TRUE
-      out <- evalq(envir = user_env,
-        base::evalq(envir = !!env, {
-          env_poke_exits(user_env, exits)
-          !!state_machine
-        })
-      )
-      env$jumped <- FALSE
-
-      out
     })
-
-    env$.self <- gen
-
-    if (is_string(type, "async")) {
-      # Step into the generator right away
-      gen(NULL)
-    } else {
-      structure(gen, class = "coro_generator_instance")
-    }
   }))
 
   structure(out, class = c(paste0("coro_", type), "function"))
