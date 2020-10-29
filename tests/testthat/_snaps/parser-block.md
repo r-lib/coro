@@ -45,7 +45,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -79,7 +81,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -116,7 +120,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -127,7 +133,9 @@
               suspend()
               return(last_value())
           }, `4` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 5L
           }, `5` = {
               user({
@@ -163,7 +171,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -173,7 +183,9 @@
               suspend()
               return(last_value())
           }, `4` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 5L
           }, `5` = {
               user({
@@ -263,7 +275,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -306,7 +320,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -347,7 +363,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -387,7 +405,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -432,7 +452,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -442,7 +464,9 @@
               suspend()
               return(last_value())
           }, `4` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 5L
           }, `5` = {
               user({
@@ -452,7 +476,9 @@
               suspend()
               return(last_value())
           }, `6` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 7L
           }, `7` = {
               user({
@@ -491,7 +517,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -530,7 +558,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               user({

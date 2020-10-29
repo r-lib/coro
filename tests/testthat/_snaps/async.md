@@ -214,7 +214,9 @@
                   suspend()
                   return(last_value())
               }, `2` = {
-                  without_call_errors(force(arg))
+                  if (!missing(arg)) {
+                      without_call_errors(force(arg))
+                  }
                   state[[2L]] <- 3L
               }, `3` = {
                   if ({
@@ -246,7 +248,9 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
-                      without_call_errors(force(arg))
+                      if (!missing(arg)) {
+                        without_call_errors(force(arg))
+                      }
                       state[[3L]] <- 3L
                   }, `3` = {
                       if ({
@@ -336,7 +340,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               .last_value <- as_promise(user({
@@ -377,7 +383,9 @@
               suspend()
               return(last_value())
           }, `2` = {
-              without_call_errors(force(arg))
+              if (!missing(arg)) {
+                  without_call_errors(force(arg))
+              }
               state[[1L]] <- 3L
           }, `3` = {
               .last_value <- as_promise(user({

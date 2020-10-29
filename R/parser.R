@@ -680,7 +680,9 @@ suspend_state <- function(expr,
     # Insert state to force the reentering generator argument in the
     # proper context. This is how generators can be cancelled and cleaned up.
     force_block <- expr({
-      without_call_errors(force(arg))
+      if (!missing(arg)) {
+        without_call_errors(force(arg))
+      }
       !!continue_call(continue(counter, last), machine_depth(counter))
     })
     force_state <- new_state(force_block, NULL, counter())

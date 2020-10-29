@@ -149,7 +149,7 @@ generator0 <- function(fn, type = "generator") {
 
       # Create the generator instance. This is a function that resumes
       # a state machine.
-      gen <- blast(function(arg = NULL) {
+      gen <- blast(function(arg) {
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
 

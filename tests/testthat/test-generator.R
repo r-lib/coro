@@ -256,3 +256,9 @@ test_that("formals of generator factory do not mask private variables", {
     c("arg", "arg")
   )
 })
+
+test_that("yield-assign is an error in case of missing argument", {
+  g <- generator(function() x <- yield("yield"))()
+  g()
+  expect_error(g(), "missing")
+})
