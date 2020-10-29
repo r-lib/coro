@@ -4,14 +4,22 @@
 \name{coro-package}
 \alias{coro}
 \alias{coro-package}
-\title{coro: Generators and async/await functions}
+\title{coro: 'Coroutines' for R}
 \description{
 Provides 'coroutines' for R, a family of functions that
-    can be suspended and resumed later on. This includes generators
-    (which yield) and 'async' functions (which await). The 'coro'
-    package defines an iteration protocol for generator functions and
-    provides a set of tools for iteration. The 'async/await' functions
-    are based on the concurrency framework of the 'promises' package.
+    can be suspended and resumed later on. This includes 'async'
+    functions (which await) and generators (which yield). 'Async'
+    functions are based on the concurrency framework of the 'promises'
+    package. Generators are based on a dependency free iteration
+    protocol defined in 'coro'.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/r-lib/coro}
+  \item Report bugs at \url{https://github.com/r-lib/coro/issues}
+}
+
 }
 \author{
 \strong{Maintainer}: Lionel Henry \email{lionel@rstudio.com}
