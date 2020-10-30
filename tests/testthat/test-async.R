@@ -221,3 +221,19 @@ test_that("trailing await() returns awaited value", {
   fn <- async(function() x <- await("value"))
   expect_equal(wait_for(fn()), "value")
 })
+
+test_that("can tryCatch() r-promises to async-promises", {
+  async_fail <- async(function() {
+    async_sleep(0)
+    abort("foo")
+  })
+  async_catch <- async(function(expr) {
+    tryCatch(await(expr), error = identity)
+  })
+
+  out <- wait_for(
+    async_catch(async_fail())
+  )
+  expect_true(inherits(out, "error"))
+  expect_equal(out$message, "foo")
+})
