@@ -1,6 +1,8 @@
 
 # coro 0.0.1.9000
 
+* `as_iterator()` is now a generic function (#28).
+
 * Generators and async functions now support `on.exit()`
   expressions. They also support exit expressions installed with
   functions like `withr::local_options()`. This requires R >= 3.5.

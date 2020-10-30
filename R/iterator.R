@@ -63,22 +63,41 @@ is_exhausted <- function(x) {
   identical(x, quote(exhausted))
 }
 
-#' Transform a vector or list to an iterator
+#' Transform an object to an iterator
 #'
 #' @description
 #'
-#' `as_iterator()` takes a vector and transforms it to an [iterator
-#' function][iterator].
+#' `as_iterator()` is a generic function that transforms its input to
+#' an [iterator function][iterator]. The default implementation
+#' is as follows:
 #'
-#' This is mostly useful for creating examples or to provide a bridge
-#' between vectors and iterators. It is generally not efficient to use
-#' the iteration protocol with vectors. Vectorised idioms are
-#' generally preferred in R programming.
+#' - Functions are returned as is.
 #'
-#' @param x A vector or a function. Functions are returned as is.
+#' - Other objects are assumed to be vectors with `length()` and `[[`
+#'   methods.
+#'
+#' Methods must return functions that implement coro's [iterator
+#' protocol][iterator].
+#'
+#' `as_iterator()` is called by coro on the RHS of `in` in `for`
+#' loops. This applies within [generators][generator], [async
+#' functions][async], and [iterate()].
+#'
+#' @param x An object.
 #' @return An iterable function.
+#'
 #' @export
+#' @examples
+#' as_iterator(1:3)
+#'
+#' i <- as_iterator(1:3)
+#' iterate(for (x in i) print(x))
 as_iterator <- function(x) {
+  UseMethod("as_iterator")
+}
+#' @rdname as_iterator
+#' @export
+as_iterator.default <- function(x) {
   if (is_closure(x)) {
     return(x)
   }

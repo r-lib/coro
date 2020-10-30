@@ -2,21 +2,37 @@
 % Please edit documentation in R/iterator.R
 \name{as_iterator}
 \alias{as_iterator}
-\title{Transform a vector or list to an iterator}
+\alias{as_iterator.default}
+\title{Transform an object to an iterator}
 \usage{
 as_iterator(x)
+
+\method{as_iterator}{default}(x)
 }
 \arguments{
-\item{x}{A vector or a function. Functions are returned as is.}
+\item{x}{An object.}
 }
 \value{
 An iterable function.
 }
 \description{
-\code{as_iterator()} takes a vector and transforms it to an \link[=iterator]{iterator function}.
+\code{as_iterator()} is a generic function that transforms its input to
+an \link[=iterator]{iterator function}. The default implementation
+is as follows:
+\itemize{
+\item Functions are returned as is.
+\item Other objects are assumed to be vectors with \code{length()} and \code{[[}
+methods.
+}
 
-This is mostly useful for creating examples or to provide a bridge
-between vectors and iterators. It is generally not efficient to use
-the iteration protocol with vectors. Vectorised idioms are
-generally preferred in R programming.
+Methods must return functions that implement coro's \link[=iterator]{iterator protocol}.
+
+\code{as_iterator()} is called by coro on the RHS of \verb{in} in \code{for}
+loops. This applies within \link[=generator]{generators}, \link[=async]{async functions}, and \code{\link[=iterate]{iterate()}}.
+}
+\examples{
+as_iterator(1:3)
+
+i <- as_iterator(1:3)
+iterate(for (x in i) print(x))
 }

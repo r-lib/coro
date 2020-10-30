@@ -8,3 +8,7 @@ expect_snapshot0 <- function(expr, cran = TRUE) {
 expect_exhausted <- function(x) {
   expect_true(is_exhausted(x))
 }
+
+local_methods <- function(..., .frame = caller_env()) {
+  local_bindings(..., .env = global_env(), .frame = .frame)
+}

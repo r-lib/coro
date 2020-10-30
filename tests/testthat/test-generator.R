@@ -269,3 +269,26 @@ test_that("trailing yield-assign returns argument", {
   g()
   expect_equal(g("bar"), "bar")
 })
+
+test_that("generators call as_iterator() method", {
+  local_methods(
+    `as_iterator.coro_iterator` = function(x) {
+      x <- 0L
+      function() {
+        if (x < 3L) {
+          x <<- x + 1L
+          x
+        } else {
+          quote(exhausted)
+        }
+      }
+    }
+  )
+
+  i <- structure(list(), class = "coro_iterator")
+
+  out <- NULL
+  iterate(for (x in i) out <- c(out, x))
+
+  expect_equal(out, 1:3)
+})
