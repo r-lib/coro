@@ -123,7 +123,7 @@ generator0 <- function(fn, type = "generator") {
     # mask our variables
     `_private` <- rlang::env(`_parent`)
     `_private`$generator_env <- base::environment()
-    `_private`$caller_env <- base::environment()
+    `_private`$caller_env <- base::parent.frame()
 
     base::local(envir = `_private`, {
       info <- machine_info(type, env = caller_env)

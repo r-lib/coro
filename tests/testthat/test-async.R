@@ -237,3 +237,21 @@ test_that("can tryCatch() r-promises to async-promises", {
   expect_true(inherits(out, "error"))
   expect_equal(out$message, "foo")
 })
+
+test_that("async ops are picked up from caller env", {
+  fn <- async(function() await(TRUE))
+
+  local({
+    .__coro_async_ops__. <- coro::async_ops(
+      package = "coro",
+      then = function(...) signal("then", "found"),
+      as_promise = function(...) signal("as_promise", "found")
+    )
+
+    expect_condition(
+      fn(),
+      "then",
+      class = "found"
+    )
+  })
+})
