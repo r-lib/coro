@@ -165,7 +165,7 @@
               return(last_value())
           }, `2` = {
               if (!missing(arg)) {
-                  without_call_errors(force(arg))
+                  .last_value <- without_call_errors(force(arg))
               }
               state[[1L]] <- 3L
           }, `3` = {
@@ -202,7 +202,7 @@
               return(last_value())
           }, `2` = {
               if (!missing(arg)) {
-                  without_call_errors(force(arg))
+                  .last_value <- without_call_errors(force(arg))
               }
               state[[1L]] <- 3L
           }, `3` = {
@@ -280,7 +280,7 @@
                   return(last_value())
               }, `2` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 3L
               }, `3` = {
@@ -337,7 +337,7 @@
                   return(last_value())
               }, `2` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 3L
               }, `3` = {
@@ -474,7 +474,7 @@
                   return(last_value())
               }, `3` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 4L
               }, `4` = {
@@ -796,7 +796,7 @@
                   return(last_value())
               }, `2` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 3L
               }, `3` = {
@@ -862,7 +862,7 @@
                   return(last_value())
               }, `2` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 3L
               }, `3` = {
@@ -888,7 +888,7 @@
                   return(last_value())
               }, `2` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 3L
               }, `3` = {
@@ -959,7 +959,7 @@
                   return(last_value())
               }, `2` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 3L
               }, `3` = {
@@ -991,7 +991,7 @@
                   return(last_value())
               }, `2` = {
                   if (!missing(arg)) {
-                      without_call_errors(force(arg))
+                      .last_value <- without_call_errors(force(arg))
                   }
                   state[[2L]] <- 3L
               }, `3` = {
@@ -1265,7 +1265,7 @@
                       return(last_value())
                   }, `2` = {
                       if (!missing(arg)) {
-                        without_call_errors(force(arg))
+                        .last_value <- without_call_errors(force(arg))
                       }
                       state[[3L]] <- 3L
                   }, `3` = {
@@ -1898,7 +1898,7 @@
                       return(last_value())
                   }, `2` = {
                       if (!missing(arg)) {
-                        without_call_errors(force(arg))
+                        .last_value <- without_call_errors(force(arg))
                       }
                       state[[2L]] <- 3L
                   }, `3` = {
@@ -2013,11 +2013,10 @@
               return(last_value())
           }, `2` = {
               if (!missing(arg)) {
-                  without_call_errors(force(arg))
+                  .last_value <- without_call_errors(force(arg))
               }
               state[[1L]] <- 3L
           }, `3` = {
-              .last_value <- arg
               exhausted <- TRUE
               return(as_promise(last_value()))
           })

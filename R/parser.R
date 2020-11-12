@@ -545,7 +545,7 @@ block_states <- function(block, counter, continue, last, return, info) {
 
 return_state <- function(expr, counter, info) {
   block <- expr({
-    !!expr
+    !!!expr %&&% list(expr)
     exhausted <- TRUE
     !!return_call(info)
   })
@@ -637,7 +637,7 @@ await_state <- function(expr,
   )
 
   if (return_last) {
-    last_state <- return_state(quote(.last_value <- arg), counter, info)
+    last_state <- return_state(NULL, counter, info)
     node_list_poke_cdr(states, last_state)
   }
 
@@ -696,7 +696,7 @@ suspend_state <- function(expr,
     # proper context. This is how generators can be cancelled and cleaned up.
     force_block <- expr({
       if (!missing(arg)) {
-        without_call_errors(force(arg))
+        .last_value <- without_call_errors(force(arg))
       }
       !!continue_call(continue(counter, last), machine_depth(counter))
     })
