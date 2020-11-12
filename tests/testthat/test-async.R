@@ -220,6 +220,15 @@ test_that("trailing await() returns awaited value", {
 
   fn <- async(function() x <- await("value"))
   expect_equal(wait_for(fn()), "value")
+
+  fn <- async(function() x <- tryCatch(await("value")))
+  expect_equal(wait_for(fn()), "value")
+
+  fn <- async(function() {
+    x <- tryCatch(await("value"))
+    x
+  })
+  expect_equal(wait_for(fn()), "value")
 })
 
 test_that("can tryCatch() r-promises to async-promises", {

@@ -1004,7 +1004,10 @@ try_catch_states <- function(preamble,
   state_i <- counter(inc = 1L)
 
   try_catch_machine_call <- function(states, depth, prev_depth, next_i) {
-    machine <- machine_call(states, depth, prev_depth, next_i)
+    machine <- expr({
+      !!machine_call(states, depth, prev_depth, next_i)
+      last_value()
+    })
     expr(with_try_catch(handlers[[!!depth]], !!machine))
   }
 

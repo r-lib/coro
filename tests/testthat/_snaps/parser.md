@@ -1836,26 +1836,29 @@
               state[[2L]] <- 1L
           }, `2` = {
               .last_value <- with_try_catch(handlers[[2L]], {
-                  repeat switch(state[[2L]], `1` = {
-                      user({
-                        stop("error")
-                        "yield"
+                  {
+                      repeat switch(state[[2L]], `1` = {
+                        user({
+                          stop("error")
+                          "yield"
+                        })
+                        exhausted <- TRUE
+                        return(last_value())
+                      }, `2` = {
+                        break
                       })
-                      exhausted <- TRUE
-                      return(last_value())
-                  }, `2` = {
-                      break
-                  })
-                  n <- length(state)
-                  if (n < 1L) {
+                      n <- length(state)
+                      if (n < 1L) {
+                        break
+                      }
+                      if (n == 1L) {
+                        state[[1L]] <- 1L
+                        next
+                      }
+                      length(state) <- 1L
                       break
                   }
-                  if (n == 1L) {
-                      state[[1L]] <- 1L
-                      next
-                  }
-                  length(state) <- 1L
-                  break
+                  last_value()
               })
               exhausted <- TRUE
               return(last_value())
@@ -1888,32 +1891,35 @@
               state[[2L]] <- 1L
           }, `2` = {
               with_try_catch(handlers[[2L]], {
-                  repeat switch(state[[2L]], `1` = {
-                      user({
-                        stop("error")
-                        "yield"
+                  {
+                      repeat switch(state[[2L]], `1` = {
+                        user({
+                          stop("error")
+                          "yield"
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        if (!missing(arg)) {
+                          .last_value <- without_call_errors(force(arg))
+                        }
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        break
                       })
-                      state[[2L]] <- 2L
-                      suspend()
-                      return(last_value())
-                  }, `2` = {
-                      if (!missing(arg)) {
-                        .last_value <- without_call_errors(force(arg))
+                      n <- length(state)
+                      if (n < 1L) {
+                        break
                       }
-                      state[[2L]] <- 3L
-                  }, `3` = {
-                      break
-                  })
-                  n <- length(state)
-                  if (n < 1L) {
-                      break
+                      if (n == 1L) {
+                        state[[1L]] <- 1L
+                        next
+                      }
+                      length(state) <- 1L
+                      state[[1L]] <- 3L
                   }
-                  if (n == 1L) {
-                      state[[1L]] <- 1L
-                      next
-                  }
-                  length(state) <- 1L
-                  state[[1L]] <- 3L
+                  last_value()
               })
               state[[1L]] <- 3L
           }, `3` = {
@@ -1969,26 +1975,29 @@
           }, `2` = {
               .last_value <- user_env[["value"]] <- with_try_catch(handlers[[2L]], 
                   {
-                      repeat switch(state[[2L]], `1` = {
-                        user({
-                          stop("error")
-                          "yield"
+                      {
+                        repeat switch(state[[2L]], `1` = {
+                          user({
+                            stop("error")
+                            "yield"
+                          })
+                          exhausted <- TRUE
+                          return(last_value())
+                        }, `2` = {
+                          break
                         })
-                        exhausted <- TRUE
-                        return(last_value())
-                      }, `2` = {
-                        break
-                      })
-                      n <- length(state)
-                      if (n < 1L) {
+                        n <- length(state)
+                        if (n < 1L) {
+                          break
+                        }
+                        if (n == 1L) {
+                          state[[1L]] <- 1L
+                          next
+                        }
+                        length(state) <- 1L
                         break
                       }
-                      if (n == 1L) {
-                        state[[1L]] <- 1L
-                        next
-                      }
-                      length(state) <- 1L
-                      break
+                      last_value()
                   })
               exhausted <- TRUE
               return(last_value())
