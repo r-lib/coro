@@ -211,7 +211,7 @@ expr_states <- function(expr, counter, continue, last, return, info) {
 }
 
 expr_info <- function(expr) {
-  if (is_call(expr, "<-")) {
+  if (is_call(expr, c("<-", "="))) {
     assign <- TRUE
     expr <- node_cadr(node_cdr(expr))
   } else {

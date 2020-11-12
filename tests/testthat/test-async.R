@@ -269,3 +269,11 @@ test_that("async ops are picked up from caller env", {
     )
   })
 })
+
+test_that("can await-assign with `=` (#29)", {
+  fn <- async(function() {
+    x = tryCatch(await(1))
+    x + 1
+  })
+  expect_equal(wait_for(fn()), 2)
+})

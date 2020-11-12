@@ -311,3 +311,14 @@ test_that("generators call as_iterator() method", {
 
   expect_equal(out, 1:3)
 })
+
+test_that("can yield-assign with `=` (#29)", {
+  new_g <- generator(function() x = yield("foo"))
+  g <- new_g()
+  expect_equal(g(), "foo")
+  expect_error(g(), "missing")
+
+  g <- new_g()
+  g()
+  expect_equal(g("bar"), "bar")
+})
