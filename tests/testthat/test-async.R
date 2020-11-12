@@ -215,20 +215,25 @@ test_that("async functions and async generator factories print nicely", {
 })
 
 test_that("trailing await() returns awaited value", {
-  fn <- async(function() await("value"))
-  expect_equal(wait_for(fn()), "value")
+  input <- function() async_sleep(0)$then(function(...) "output")
 
-  fn <- async(function() x <- await("value"))
-  expect_equal(wait_for(fn()), "value")
+  fn <- async(function() await(input()))
+  expect_equal(wait_for(fn()), "output")
 
-  fn <- async(function() x <- tryCatch(await("value")))
-  expect_equal(wait_for(fn()), "value")
+  fn <- async(function() x <- await(input()))
+  expect_equal(wait_for(fn()), "output")
+
+  fn <- async(function() x <- tryCatch(await(input())))
+  expect_equal(wait_for(fn()), "output")
+
+  fn <- async(function() x <- tryCatch(if (TRUE) await(input())))
+  expect_equal(wait_for(fn()), "output")
 
   fn <- async(function() {
-    x <- tryCatch(await("value"))
+    x <- tryCatch(await(input()))
     x
   })
-  expect_equal(wait_for(fn()), "value")
+  expect_equal(wait_for(fn()), "output")
 })
 
 test_that("can tryCatch() r-promises to async-promises", {

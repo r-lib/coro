@@ -261,11 +261,30 @@ test_that("yield-assign is an error in case of missing argument", {
   g <- generator(function() x <- yield("yield"))()
   g()
   expect_error(g(), "missing")
+
+  skip("FIXME")
+  g <- generator(function() x <- tryCatch(yield("foo")))()
+  g()
+  expect_error(g(), "missing")
 })
 
 test_that("trailing yield-assign returns argument", {
-  generate <- generator(function() x <- yield("foo"))
-  g <- generate()
+  g <- generator(function() x <- yield("foo"))()
+  g()
+  expect_equal(g("bar"), "bar")
+
+  g <- generator(function() x <- tryCatch(yield("foo")))()
+  g()
+  expect_equal(g("bar"), "bar")
+
+  g <- generator(function() x <- tryCatch(if (TRUE) yield("foo")))()
+  g()
+  expect_equal(g("bar"), "bar")
+
+  g <- generator(function() {
+    x <- tryCatch(if (TRUE) yield("foo"))
+    x
+  })()
   g()
   expect_equal(g("bar"), "bar")
 })

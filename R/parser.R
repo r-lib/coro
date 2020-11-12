@@ -608,7 +608,15 @@ yield_state <- function(expr,
     expr <- expr(.last_value <- as_promise(!!expr))
   }
 
-  suspend_state(expr, counter, continue, last, return, info, assign_var = assign_var)
+  suspend_state(
+    expr,
+    counter = counter,
+    continue = continue,
+    last = last,
+    return = return,
+    info = info,
+    assign_var = assign_var
+  )
 }
 
 await_state <- function(expr,
@@ -624,24 +632,15 @@ await_state <- function(expr,
 
   expr <- expr(.last_value <- then(as_promise(!!expr), callback = .self))
 
-  return_last <- last && return && is_null(assign_var)
-
-  states <- suspend_state(
+  suspend_state(
     expr = expr,
     counter = counter,
     continue = continue,
-    last = if (return_last) FALSE else last,
+    last = last,
     return = return,
     info = info,
     assign_var = assign_var
   )
-
-  if (return_last) {
-    last_state <- return_state(NULL, counter, info)
-    node_list_poke_cdr(states, last_state)
-  }
-
-  states
 }
 
 suspend_state <- function(expr,
@@ -653,16 +652,11 @@ suspend_state <- function(expr,
                           assign_var) {
   assign <- !is_null(assign_var)
 
-  if (!assign && last && return) {
-    return(return_state(expr, counter, info))
-  }
+  return_last <- last && return && !assign
 
-  # Hard-code `last` to `FALSE` because we are inserting an assignment
-  # state after the yielding state
-  if (assign) {
-    saved_last <- last
-    last <- FALSE
-  }
+  # Hard-code `last` to `FALSE` because we add assign states
+  saved_last <- last
+  last <- FALSE
 
   i <- counter()
   next_i <- continue(counter, last)
@@ -695,14 +689,21 @@ suspend_state <- function(expr,
     # Insert state to force the reentering generator argument in the
     # proper context. This is how generators can be cancelled and cleaned up.
     force_block <- expr({
-      if (!missing(arg)) {
+      if (missing(arg)) {
+        .last_value <- exhausted()
+      } else {
         .last_value <- without_call_errors(force(arg))
       }
-      !!continue_call(continue(counter, last), machine_depth(counter))
+      !!continue_call(continue(counter, saved_last && !return_last), machine_depth(counter))
     })
     force_state <- new_state(force_block, NULL, counter())
     node_list_poke_cdr(states, force_state)
     counter(inc = 1L)
+  }
+
+  if (return_last) {
+    last_state <- return_state(NULL, counter, info)
+    node_list_poke_cdr(states, last_state)
   }
 
   states
