@@ -14,21 +14,17 @@ Description: Provides 'coroutines' for R, a family of functions that
 Depends:
     R (>= 3.5.0)
 Imports:
-    rlang (>= 0.4.8.9000)
+    rlang (>= 0.4.9)
 Suggests:
     knitr,
     later (>= 1.1.0),
-    magrittr (>= 1.5.0.9000),
+    magrittr (>= 2.0.0),
     promises,
     purrr,
     rmarkdown,
-    testthat (>= 2.99.0.9000)
+    testthat (>= 3.0.0)
 VignetteBuilder:
     knitr
-Remotes:
-    r-lib/rlang,
-    r-lib/testthat,
-    tidyverse/magrittr
 License: MIT + file LICENSE
 URL: https://github.com/r-lib/coro
 BugReports: https://github.com/r-lib/coro/issues
