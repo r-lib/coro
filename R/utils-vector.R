@@ -20,7 +20,7 @@ as_vector_fn <- function(type) {
     # FIXME: explicit rlang::as_character() should serialise input
     character = as.character,
     raw = as.raw,
-    list = function(x) list2(!!!x),
+    list = function(x) if (is_null(x)) list(NULL) else list2(!!!x),
     abort("Internal error in `as_vector()`: unexpected type")
   )
 }

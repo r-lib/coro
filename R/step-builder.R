@@ -79,6 +79,7 @@ poke_into_builder <- function(to) {
       return(to)
     }
 
+    new <- coercer(new)
     next_i <- i + length(new)
 
     # Grow vector geometrically. Note that this incurs several copies,
@@ -89,7 +90,7 @@ poke_into_builder <- function(to) {
       to <<- new_to
     }
 
-    vec_poke_range(to, i + 1, coercer(new))
+    vec_poke_range(to, i + 1, new)
     i <<- next_i
 
     to

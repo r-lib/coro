@@ -66,3 +66,23 @@ test_that("reducing exhausted iterators produces empty output", {
     list()
   )
 })
+
+test_that("collect() retains `NULL` values", {
+  g <- function() {
+    i <- 0
+    function() {
+      i <<- i + 1
+      if (i > 3) {
+        exhausted()
+      } else {
+        out[[i]]
+      }
+    }
+  }
+
+  out <- list(1, 2, NULL)
+  expect_equal(collect(g()), out)
+
+  out <- list(1, NULL, 2)
+  expect_equal(collect(g()), out)
+})
