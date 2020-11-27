@@ -31,11 +31,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
@@ -68,11 +64,7 @@
                   suspend()
                   return(last_value())
               }, `2` = {
-                  if (missing(arg)) {
-                      .last_value <- exhausted()
-                  } else {
-                      .last_value <- without_call_errors(force(arg))
-                  }
+                  .last_value <- if (missing(arg)) exhausted() else arg
                   state[[2L]] <- 3L
               }, `3` = {
                   exhausted <- TRUE
@@ -149,11 +141,7 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
-                      if (missing(arg)) {
-                        .last_value <- exhausted()
-                      } else {
-                        .last_value <- without_call_errors(force(arg))
-                      }
+                      .last_value <- if (missing(arg)) NULL else arg
                       state[[3L]] <- 3L
                   }, `3` = {
                       break
@@ -203,7 +191,7 @@
                   suspend()
                   return(last_value())
               }, `3` = {
-                  user_env[["foo"]] <- arg
+                  user_env[["foo"]] <- if (missing(arg)) NULL else arg
                   state[[2L]] <- 1L
               })
               length(state) <- 1L
@@ -243,11 +231,7 @@
                   suspend()
                   return(last_value())
               }, `2` = {
-                  if (missing(arg)) {
-                      .last_value <- exhausted()
-                  } else {
-                      .last_value <- without_call_errors(force(arg))
-                  }
+                  .last_value <- if (missing(arg)) NULL else arg
                   state[[2L]] <- 3L
               }, `3` = {
                   if ({
@@ -279,11 +263,7 @@
                       suspend()
                       return(last_value())
                   }, `2` = {
-                      if (missing(arg)) {
-                        .last_value <- exhausted()
-                      } else {
-                        .last_value <- without_call_errors(force(arg))
-                      }
+                      .last_value <- if (missing(arg)) NULL else arg
                       state[[3L]] <- 3L
                   }, `3` = {
                       if ({
@@ -342,11 +322,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
@@ -384,11 +360,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               .last_value <- as_promise(user({
@@ -398,11 +370,7 @@
               suspend()
               return(last_value())
           }, `4` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 5L
           }, `5` = {
               exhausted <- TRUE
@@ -440,11 +408,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               .last_value <- as_promise(user({
@@ -454,11 +418,7 @@
               suspend()
               return(last_value())
           }, `4` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 5L
           }, `5` = {
               exhausted <- TRUE

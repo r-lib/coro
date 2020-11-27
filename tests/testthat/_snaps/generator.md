@@ -24,11 +24,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
@@ -64,11 +60,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE

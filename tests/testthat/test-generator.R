@@ -257,15 +257,12 @@ test_that("formals of generator factory do not mask private variables", {
   )
 })
 
-test_that("yield-assign is an error in case of missing argument", {
-  g <- generator(function() x <- yield("yield"))()
-  g()
-  expect_error(g(), "missing")
+test_that("yield-assign returns default `NULL`", {
+  g <- generator(function() x <- yield("foo"))()
+  expect_equal(collect(g), list("foo", NULL))
 
-  skip("FIXME")
   g <- generator(function() x <- tryCatch(yield("foo")))()
-  g()
-  expect_error(g(), "missing")
+  expect_equal(collect(g), list("foo", NULL))
 })
 
 test_that("trailing yield-assign returns argument", {
@@ -313,12 +310,10 @@ test_that("generators call as_iterator() method", {
 })
 
 test_that("can yield-assign with `=` (#29)", {
-  new_g <- generator(function() x = yield("foo"))
-  g <- new_g()
-  expect_equal(g(), "foo")
-  expect_error(g(), "missing")
+  g <- generator(function() x = yield("foo"))
+  expect_equal(collect(g()), list("foo", NULL))
 
-  g <- new_g()
-  g()
-  expect_equal(g("bar"), "bar")
+  i <- g()
+  i()
+  expect_equal(i("bar"), "bar")
 })

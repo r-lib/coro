@@ -17,11 +17,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
@@ -56,11 +52,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -94,11 +86,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -135,11 +123,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -150,11 +134,7 @@
               suspend()
               return(last_value())
           }, `4` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 5L
           }, `5` = {
               user({
@@ -190,11 +170,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -204,11 +180,7 @@
               suspend()
               return(last_value())
           }, `4` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 5L
           }, `5` = {
               user({
@@ -243,7 +215,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              user_env[["value"]] <- arg
+              user_env[["value"]] <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -275,11 +247,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
@@ -309,11 +277,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -323,11 +287,7 @@
               suspend()
               return(last_value())
           }, `4` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) exhausted() else arg
               state[[1L]] <- 5L
           }, `5` = {
               exhausted <- TRUE
@@ -367,11 +327,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -412,11 +368,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -456,11 +408,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -505,11 +453,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -519,11 +463,7 @@
               suspend()
               return(last_value())
           }, `4` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 5L
           }, `5` = {
               user({
@@ -533,11 +473,7 @@
               suspend()
               return(last_value())
           }, `6` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 7L
           }, `7` = {
               user({
@@ -576,11 +512,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -619,11 +551,7 @@
               suspend()
               return(last_value())
           }, `2` = {
-              if (missing(arg)) {
-                  .last_value <- exhausted()
-              } else {
-                  .last_value <- without_call_errors(force(arg))
-              }
+              .last_value <- if (missing(arg)) NULL else arg
               state[[1L]] <- 3L
           }, `3` = {
               user({
@@ -662,7 +590,7 @@
                   suspend()
                   return(last_value())
               }, `3` = {
-                  user_env[["var"]] <- arg
+                  user_env[["var"]] <- if (missing(arg)) NULL else arg
                   state[[2L]] <- 1L
               })
               length(state) <- 1L
