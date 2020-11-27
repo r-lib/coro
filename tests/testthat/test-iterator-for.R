@@ -80,3 +80,10 @@ test_that("can return from `iterate()`", {
   }
   expect_identical(fn(), "foo")
 })
+
+test_that("iterate() fails informatively inside generators (#31)", {
+  expect_snapshot_error(
+    gen(iterate(for (x in 1:10) yield(x)))(),
+    cran = TRUE
+  )
+})

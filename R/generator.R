@@ -212,7 +212,7 @@ generator0 <- function(fn, type = "generator") {
 
 new_generator_env <- function(parent, info) {
   env <- env(ns_env("coro"))
-  user_env <- env(parent)
+  user_env <- env(parent, .__generator_instance__. = TRUE)
 
   env$user_env <- user_env
   env$exhausted <- FALSE

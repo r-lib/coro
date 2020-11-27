@@ -52,6 +52,13 @@ iterate <- function(loop) {
 
   env <- caller_env()
 
+  if (is_true(env$.__generator_instance__.)) {
+    abort(c(
+      "Can't use `iterate()` within a generator.",
+      i = "`for` loops already support iterators in generator functions."
+    ))
+  }
+
   args <- node_cdr(loop)
   var <- as_string(node_car(args))
   iterator <- as_iterator(eval_bare(node_cadr(args), env))
