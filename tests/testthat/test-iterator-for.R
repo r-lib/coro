@@ -87,3 +87,13 @@ test_that("iterate() fails informatively inside generators (#31)", {
     cran = TRUE
   )
 })
+
+test_that("can use iterate() in lambdas inside generators", {
+  out <- NULL
+  g <- gen(for (i in 1:3) yield(i))
+  gen({
+    f <- function() iterate(for (x in g) out <<- c(out, x))
+    f()
+  })()
+  expect_equal(out, 1:3)
+})
