@@ -86,3 +86,21 @@ test_that("collect() retains `NULL` values", {
   out <- list(1, NULL, 2)
   expect_equal(collect(g()), out)
 })
+
+test_that("collect() calls `as_iterator()`", {
+  local_methods(
+    as_iterator.coro_foobar = function(x) {
+      called <- FALSE
+      function() {
+        out <- if (called) exhausted() else "foo"
+        called <<- TRUE
+        out
+      }
+    }
+  )
+  foobar <- structure(list(), class = "coro_foobar")
+  expect_equal(
+    collect(foobar),
+    list("foo")
+  )
+})

@@ -259,6 +259,9 @@ reduce <- function(.x, .f, ..., .init) {
 }
 
 reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
+  if (is.object(.x)) {
+    .x <- as_iterator(.x)
+  }
   if (is_closure(.x)) {
     return(iter_reduce_impl(.x, .f, ..., .left = .left))
   }

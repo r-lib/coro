@@ -1,6 +1,8 @@
 
 # coro 0.0.1.9000
 
+* `collect()` calls `as_iterator()` on its input.
+
 * `as_iterator()` is now a generic function (#28).
 
 * Generators and async functions now support `on.exit()`
