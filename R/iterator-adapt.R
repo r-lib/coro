@@ -17,8 +17,8 @@
 #' @param steps,... [Transformation steps][steps]. These dots are taken with
 #'   implicit splicing of lists and passed to `compose()`.
 #'
-#' @seealso [iterate()] for looping over iterator values with `for`
-#'   loops.
+#' @seealso [loop()] for looping over iterator values with a `for`
+#'   expression.
 #' @examples
 #' # Let's create a simple iterator:
 #' iter <- as_iterator(1:50)

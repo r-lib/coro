@@ -42,8 +42,8 @@ iterator()
 Because iteration is defined by a protocol, creating iterators is
 free of dependency. However, it is often simpler to create
 iterators with \link[=generator]{generators}, see
-\code{vignette("generator")}. To iterate over an iterator, it is simpler
-to use the \code{\link[=iterate]{iterate()}} and \code{\link[=collect]{collect()}} helpers provided in this
+\code{vignette("generator")}. To loop over an iterator, it is simpler
+to use the \code{\link[=loop]{loop()}} and \code{\link[=collect]{collect()}} helpers provided in this
 package.
 }
 \section{Properties}{

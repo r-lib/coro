@@ -19,7 +19,7 @@
 #'   sentinel.
 #'
 #' Generators are compatible with all features based on the iterator
-#' protocol such as [iterate()] and [collect()].
+#' protocol such as [loop()] and [collect()].
 #'
 #' @param fn A function template for generators. The function can
 #'   [yield()] values. Within a generator, `for` loops have
@@ -61,10 +61,10 @@
 #' abc()
 #'
 #'
-#' # As generators are regular iterators, you can use all iterator
-#' # tools such as iterate() which allows you to loop over all values
-#' # with a `for` loop:
-#' iterate(for (x in abc) print(x))
+#' # As generators are regular iterators, you can use the coro
+#' # iteration tools such as loop() which makes it possible to loop
+#' # over iterators with `for` expressions:
+#' loop(for (x in abc) print(x))
 #'
 #'
 #' # coro provides a short syntax `gen()` for creating one-off

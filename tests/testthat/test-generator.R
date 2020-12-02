@@ -16,7 +16,7 @@ test_that("short syntax and for loop support", {
   squares <- gen(for (x in odds) yield(x^2))
 
   out <- dbl()
-  iterate(for (x in squares) {
+  loop(for (x in squares) {
     out <- c(out, x)
   })
 
@@ -304,7 +304,7 @@ test_that("generators call as_iterator() method", {
   i <- structure(list(), class = "coro_iterator")
 
   out <- NULL
-  iterate(for (x in i) out <- c(out, x))
+  loop(for (x in i) out <- c(out, x))
 
   expect_equal(out, 1:3)
 })

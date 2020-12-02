@@ -127,7 +127,7 @@ A simpler way is to iterate with a `for` loop using the `iterate()` helper. With
 ```{r}
 abc <- generate_abc()
 
-iterate(for (x in abc) {
+loop(for (x in abc) {
   print(x)
 })
 ```

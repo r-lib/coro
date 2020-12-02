@@ -32,8 +32,8 @@
 #' Because iteration is defined by a protocol, creating iterators is
 #' free of dependency. However, it is often simpler to create
 #' iterators with [generators][generator], see
-#' `vignette("generator")`. To iterate over an iterator, it is simpler
-#' to use the [iterate()] and [collect()] helpers provided in this
+#' `vignette("generator")`. To loop over an iterator, it is simpler
+#' to use the [loop()] and [collect()] helpers provided in this
 #' package.
 #'
 #'
@@ -81,7 +81,7 @@ is_exhausted <- function(x) {
 #'
 #' `as_iterator()` is called by coro on the RHS of `in` in `for`
 #' loops. This applies within [generators][generator], [async
-#' functions][async], and [iterate()].
+#' functions][async], and [loop()].
 #'
 #' @param x An object.
 #' @return An iterable function.
@@ -91,7 +91,7 @@ is_exhausted <- function(x) {
 #' as_iterator(1:3)
 #'
 #' i <- as_iterator(1:3)
-#' iterate(for (x in i) print(x))
+#' loop(for (x in i) print(x))
 as_iterator <- function(x) {
   UseMethod("as_iterator")
 }

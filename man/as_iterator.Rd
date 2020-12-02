@@ -28,11 +28,11 @@ methods.
 Methods must return functions that implement coro's \link[=iterator]{iterator protocol}.
 
 \code{as_iterator()} is called by coro on the RHS of \verb{in} in \code{for}
-loops. This applies within \link[=generator]{generators}, \link[=async]{async functions}, and \code{\link[=iterate]{iterate()}}.
+loops. This applies within \link[=generator]{generators}, \link[=async]{async functions}, and \code{\link[=loop]{loop()}}.
 }
 \examples{
 as_iterator(1:3)
 
 i <- as_iterator(1:3)
-iterate(for (x in i) print(x))
+loop(for (x in i) print(x))
 }

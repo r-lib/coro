@@ -2,12 +2,12 @@
 % Please edit documentation in R/iterator-collect.R
 \name{collect}
 \alias{collect}
-\alias{iterate}
+\alias{loop}
 \title{Iterate over iterator functions}
 \usage{
 collect(x, n = NULL)
 
-iterate(loop)
+loop(loop)
 }
 \arguments{
 \item{x}{An iterator function.}
@@ -18,14 +18,14 @@ sequence, \code{n} must be supplied to prevent an infinite loop.}
 \item{loop}{A \code{for} loop expression.}
 }
 \value{
-\code{collect()} returns a list of values; \code{iterate()} returns
+\code{collect()} returns a list of values; \code{loop()} returns
 the \code{\link[=exhausted]{exhausted()}} sentinel, invisibly.
 }
 \description{
-\code{iterate()} and \code{collect()} are helpers for iterating over
+\code{loop()} and \code{collect()} are helpers for iterating over
 \link[=iterator]{iterator functions} such as \link[=generator]{generators}.
 \itemize{
-\item \code{iterate()} takes a \code{for} loop expression in which the collection
+\item \code{loop()} takes a \code{for} loop expression in which the collection
 can be an iterator function.
 \item \code{collect()} loops over the iterator and collects the values in a
 list.
@@ -45,9 +45,9 @@ collect(abc)
 collect(abc)
 
 
-# With iterate() you can use `for` loops with iterators:
+# With loop() you can use `for` loops with iterators:
 abc <- generate_abc()
-iterate(for (x in abc) print(x))
+loop(for (x in abc) print(x))
 }
 \seealso{
 \code{\link[=async_collect]{async_collect()}} for async generators.

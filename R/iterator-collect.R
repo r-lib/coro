@@ -2,10 +2,10 @@
 #'
 #' @description
 #'
-#' `iterate()` and `collect()` are helpers for iterating over
+#' `loop()` and `collect()` are helpers for iterating over
 #' [iterator functions][iterator] such as [generators][generator].
 #'
-#' - `iterate()` takes a `for` loop expression in which the collection
+#' - `loop()` takes a `for` loop expression in which the collection
 #'   can be an iterator function.
 #'
 #' - `collect()` loops over the iterator and collects the values in a
@@ -14,7 +14,7 @@
 #' @param x An iterator function.
 #' @param n The number of elements to collect. If `x` is an infinite
 #'   sequence, `n` must be supplied to prevent an infinite loop.
-#' @return `collect()` returns a list of values; `iterate()` returns
+#' @return `collect()` returns a list of values; `loop()` returns
 #'   the [exhausted()] sentinel, invisibly.
 #'
 #' @seealso [async_collect()] for async generators.
@@ -33,9 +33,9 @@
 #' collect(abc)
 #'
 #'
-#' # With iterate() you can use `for` loops with iterators:
+#' # With loop() you can use `for` loops with iterators:
 #' abc <- generate_abc()
-#' iterate(for (x in abc) print(x))
+#' loop(for (x in abc) print(x))
 #' @export
 collect <- function(x, n = NULL) {
   steps <- n %&&% iter_take(n)
@@ -44,7 +44,7 @@ collect <- function(x, n = NULL) {
 #' @rdname collect
 #' @param loop A `for` loop expression.
 #' @export
-iterate <- function(loop) {
+loop <- function(loop) {
   loop <- substitute(loop)
   if (!is_call(loop, "for")) {
     abort("`loop` must be a `for` loop")
@@ -54,7 +54,7 @@ iterate <- function(loop) {
 
   if (is_true(env$.__generator_instance__.)) {
     abort(c(
-      "Can't use `iterate()` within a generator.",
+      "Can't use `loop()` within a generator.",
       i = "`for` loops already support iterators in generator functions."
     ))
   }

@@ -1,5 +1,7 @@
-
 # coro 0.0.1.9000
+
+* `iterate()` has been renamed to `loop()` to avoid name clash and
+  semantic conflict with `reticulate::iterate()`.
 
 * `collect()` calls `as_iterator()` on its input.
 

@@ -34,7 +34,7 @@ sentinel.
 }
 
 Generators are compatible with all features based on the iterator
-protocol such as \code{\link[=iterate]{iterate()}} and \code{\link[=collect]{collect()}}.
+protocol such as \code{\link[=loop]{loop()}} and \code{\link[=collect]{collect()}}.
 }
 \examples{
 # A generator statement creates a generator factory. The
@@ -70,10 +70,10 @@ abc <- generate_abc()
 abc()
 
 
-# As generators are regular iterators, you can use all iterator
-# tools such as iterate() which allows you to loop over all values
-# with a `for` loop:
-iterate(for (x in abc) print(x))
+# As generators are regular iterators, you can use the coro
+# iteration tools such as loop() which makes it possible to loop
+# over iterators with `for` expressions:
+loop(for (x in abc) print(x))
 
 
 # coro provides a short syntax `gen()` for creating one-off
