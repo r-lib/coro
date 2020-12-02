@@ -122,7 +122,7 @@ on_load(on_package_load("reticulate", {
   if (!s3_has_method("coro::as_iterator", "python.builtin.iterator")) {
     s3_register("coro::as_iterator", "python.builtin.iterator", function(x) {
       function() {
-        reticulate::iter_next(x) %||% coro::exhausted()
+        reticulate::iter_next(x, completed = exhausted())
       }
     })
   }
