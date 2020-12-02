@@ -1,5 +1,9 @@
 # coro 0.0.1.9000
 
+* Python iterators created with the reticulate package can now be
+  composed with coro generators. They can also be used with `loop()`
+  and `collect()`.
+
 * `iterate()` has been renamed to `loop()` to avoid name clash and
   semantic conflict with `reticulate::iterate()`.
 

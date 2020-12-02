@@ -21,6 +21,7 @@ Suggests:
     magrittr (>= 2.0.0),
     promises,
     purrr,
+    reticulate,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder:
