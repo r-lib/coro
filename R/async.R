@@ -1,25 +1,33 @@
 #' Make an async function
 #'
-#' `async()` functions are the building blocks of cooperative
-#' concurrency. They suspend themselves with `await()` when they
-#' expect an operation to take a long time to complete. While they
-#' wait for the result, other async functions can be resumed once they
-#' are ready to make progress.
+#' @description
+#'
+#' `async()` functions are building blocks for cooperative
+#' concurrency.
+#'
+#' - They are _concurrent_ because they are jointly managed by a
+#'   scheduler in charge of running them.
+#'
+#' - They are _cooperative_ because they decide on their own when they
+#'   can no longer make quick progress and need to __await__ some
+#'   result. This is done with the `await()` keyword which suspends
+#'   the async function and gives control back to the scheduler. The
+#'   scheduler waits until the next async operation is ready to make
+#'   progress.
+#'
+#' The async framework used by `async()` functions is implemented in
+#' the [later](https://github.com/r-lib/later/) and
+#' [promises](https://rstudio.github.io/promises/) packages:
+#'
+#' - You can chain async functions created with coro to promises.
+
+#' - You can await promises. You can also await futures created with
+#'   the [future](https://github.com/HenrikBengtsson/future) package
+#'   because they are coercible to promises.
 #'
 #' @param fn An anonymous function within which `await()` calls are
 #'   allowed.
 #' @return A function that returns a [promises::promise()].
-#'
-#' @section Concurrency framework:
-#'
-#' The default scheduler used by `async()` functions is provided by
-#' the _later_ package. It currently only supports timers but these
-#' are sufficient to implement basic cooperative concurrency. Since
-#' this scheduler normally runs at top level, the async functions are
-#' called back once all current computations have finished running.
-#'
-#' `async()` functions can be chained to promises from the _promises_
-#' package.
 #'
 #' @seealso [async_generator()] and [await_each()];
 #'   [coro_debug()] for step-debugging.
@@ -60,6 +68,16 @@ async <- function(fn) {
 #' @export
 await <- function(x) {
   abort("`await()` can't be called directly or within function arguments.")
+}
+
+#' Sleep asynchronously
+#' @param seconds The number of second to sleep.
+#' @return A chainable promise.
+#' @export
+async_sleep <- function(seconds) {
+  promises::promise(function(resolve, reject) {
+    later::later(~ resolve(NULL) , delay = seconds)
+  })
 }
 
 #' Construct an async generator
@@ -190,14 +208,4 @@ op_as_promise <- function(x) {
   } else {
     promises::promise_resolve(x)
   }
-}
-
-#' Sleep asynchronously
-#' @param seconds The number of second to sleep.
-#' @return A chainable promise.
-#' @export
-async_sleep <- function(seconds) {
-  promises::promise(function(resolve, reject) {
-    later::later(~ resolve(NULL) , delay = seconds)
-  })
 }

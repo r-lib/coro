@@ -19,25 +19,29 @@ allowed.}
 A function that returns a \code{\link[promises:promise]{promises::promise()}}.
 }
 \description{
-\code{async()} functions are the building blocks of cooperative
-concurrency. They suspend themselves with \code{await()} when they
-expect an operation to take a long time to complete. While they
-wait for the result, other async functions can be resumed once they
-are ready to make progress.
-}
-\section{Concurrency framework}{
-
-
-The default scheduler used by \code{async()} functions is provided by
-the \emph{later} package. It currently only supports timers but these
-are sufficient to implement basic cooperative concurrency. Since
-this scheduler normally runs at top level, the async functions are
-called back once all current computations have finished running.
-
-\code{async()} functions can be chained to promises from the \emph{promises}
-package.
+\code{async()} functions are building blocks for cooperative
+concurrency.
+\itemize{
+\item They are \emph{concurrent} because they are jointly managed by a
+scheduler in charge of running them.
+\item They are \emph{cooperative} because they decide on their own when they
+can no longer make quick progress and need to \strong{await} some
+result. This is done with the \code{await()} keyword which suspends
+the async function and gives control back to the scheduler. The
+scheduler waits until the next async operation is ready to make
+progress.
 }
 
+The async framework used by \code{async()} functions is implemented in
+the \href{https://github.com/r-lib/later/}{later} and
+\href{https://rstudio.github.io/promises/}{promises} packages:
+\itemize{
+\item You can chain async functions created with coro to promises.
+\item You can await promises. You can also await futures created with
+the \href{https://github.com/HenrikBengtsson/future}{future} package
+because they are coercible to promises.
+}
+}
 \examples{
 # This async function counts down from `n`, sleeping for 2 seconds
 # at each iteration:
