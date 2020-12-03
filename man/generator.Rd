@@ -53,7 +53,7 @@ generate_abc <- generator(function() {
 })
 
 # The factory creates generator instances. They are iterators
-# that you can call successively to new values:
+# that you can call successively to obtain new values:
 abc <- generate_abc()
 abc()
 abc()
@@ -70,29 +70,33 @@ abc <- generate_abc()
 abc()
 
 
-# As generators are regular iterators, you can use the coro
-# iteration tools such as loop() which makes it possible to loop
-# over iterators with `for` expressions:
+# As generators implement the coro iteration protocol, you can use
+# coro tools like `loop()`. It makes it possible to loop over
+# iterators with `for` expressions:
 loop(for (x in abc) print(x))
+
+# To gather values of an iterator in a list, use `collect()`. Pass
+# the `n` argument to collect that number of elements from a
+# generator:
+abc <- generate_abc()
+collect(abc, 1)
+
+# Or drain all remaining elements:
+collect(abc)
 
 
 # coro provides a short syntax `gen()` for creating one-off
-# generator functions. It is handy to chain iterators:
+# generator _instances_. It is handy to adapt existing iterators:
 numbers <- 1:10
 odds <- gen(for (x in numbers) if (x \%\% 2 != 0) yield(x))
 squares <- gen(for (x in odds) yield(x^2))
 greetings <- gen(for (x in squares) yield(paste("Hey", x)))
 
-# Use collect() with the `n` argument to take a given number of
-# elements from a generator:
-collect(greetings, 2)
-
-# Or drain all remaining elements:
 collect(greetings)
 
 
-# If you generator functions with an argument, it is returned from
-# the `yield()` statement on reentry:
+# Arguments passed to generator instances are returned from the
+# `yield()` statement on reentry:
 new_tally <- generator(function() {
   count <- 0
   while (TRUE) {
