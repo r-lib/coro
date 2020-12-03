@@ -47,7 +47,7 @@ collect <- function(x, n = NULL) {
 loop <- function(loop) {
   loop <- substitute(loop)
   if (!is_call(loop, "for")) {
-    abort("`loop` must be a `for` loop")
+    abort("`loop` must be a `for` expression.")
   }
 
   env <- caller_env()
