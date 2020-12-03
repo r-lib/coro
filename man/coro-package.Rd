@@ -11,7 +11,8 @@ Provides 'coroutines' for R, a family of functions that
     functions (which await) and generators (which yield). 'Async'
     functions are based on the concurrency framework of the 'promises'
     package. Generators are based on a dependency free iteration
-    protocol defined in 'coro'.
+    protocol defined in 'coro' and are compatible with iterators from
+    the 'reticulate' package.
 }
 \seealso{
 Useful links:

@@ -29,6 +29,15 @@ Supported features:
     package
   - Step-debugging and `browser()` within coroutines
 
+Compatibility with:
+
+  - Python iterators from the
+    [reticulate](https://rstudio.github.io/reticulate/) package
+  - Async operations from the
+    [promises](https://github.com/rstudio/promises/) package
+  - Parallel computations from the
+    [future](https://github.com/HenrikBengtsson/future) package
+
 Attach the package to follow the examples:
 
 ``` r
@@ -142,7 +151,61 @@ collect(abc)
 #> [1] "c"
 ```
 
+Iterate over an iterator with `loop()`:
+
+``` r
+loop(for (x in generate_abc()) {
+  print(toupper(x))
+})
+#> [1] "A"
+#> [1] "B"
+#> [1] "C"
+```
+
 See `vignette("generator")` for more information.
+
+### Compatibility with the reticulate package
+
+Python iterators imported with the
+[reticulate](https://rstudio.github.io/reticulate/) package are
+compatible with `loop()` and `collect()`:
+
+``` r
+suppressMessages(library(reticulate))
+
+py_run_string("
+def first_n(n):
+    num = 1
+    while num <= n:
+        yield num
+        num += 1
+")
+
+loop(for (x in py$first_n(3)) {
+  print(x * 2)
+})
+#> [1] 2
+#> [1] 4
+#> [1] 6
+```
+
+They can also be composed with coro generators:
+
+``` r
+times <- generator(function(it, n) for (x in it) yield(x * n))
+
+composed <- times(py$first_n(3), 10)
+
+collect(composed)
+#> [[1]]
+#> [1] 10
+#> 
+#> [[2]]
+#> [1] 20
+#> 
+#> [[3]]
+#> [1] 30
+```
 
 ## Limitations
 
