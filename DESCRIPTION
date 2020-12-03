@@ -21,7 +21,6 @@ Suggests:
     later (>= 1.1.0),
     magrittr (>= 2.0.0),
     promises,
-    purrr,
     reticulate,
     rmarkdown,
     testthat (>= 3.0.0)
