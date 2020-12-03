@@ -1,4 +1,6 @@
-# coro 0.0.1.9000
+# coro 1.0.0
+
+This is the first public version of coro.
 
 * Python iterators created with the reticulate package can now be
   composed with coro generators. They can also be used with `loop()`
