@@ -128,6 +128,8 @@ print.coro_async_generator <- function(x, ..., internals = FALSE) {
 #'
 #' @description
 #'
+#' `r lifecycle::badge("experimental")`
+#'
 #' Customisation point for the _async_ package or any concurrency
 #' framework that defines a "then" operation. Assign the result of
 #' `async_ops()` to the `.__coro_async_ops__.` symbol in your

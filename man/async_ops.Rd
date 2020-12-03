@@ -21,6 +21,8 @@ when passed a promise object, and otherwise wrap the value in a
 resolved promise.}
 }
 \description{
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
+
 Customisation point for the \emph{async} package or any concurrency
 framework that defines a "then" operation. Assign the result of
 \code{async_ops()} to the \code{.__coro_async_ops__.} symbol in your
