@@ -220,9 +220,12 @@ print(generate_abc, internals = TRUE)
 #>             user({
 #>                 x
 #>             })
-#>             state[[2L]] <- 1L
+#>             state[[2L]] <- 3L
 #>             suspend()
 #>             return(last_value())
+#>         }, `3` = {
+#>             .last_value <- if (missing(arg)) NULL else arg
+#>             state[[2L]] <- 1L
 #>         })
 #>         iterators[[2L]] <- NULL
 #>         length(state) <- 1L
