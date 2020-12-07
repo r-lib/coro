@@ -65,7 +65,7 @@ async_count_up <- async(function(stop) {
 })
 
 # You can run these functions concurrently using `promise_all()`
-if (FALSE) {
+if (interactive()) {
   promises::promise_all(async_count_down(5), async_count_up(5))
 }
 }

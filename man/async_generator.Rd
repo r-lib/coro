@@ -42,7 +42,7 @@ async_map <- async_generator(function(.i, .fn, ...) {
 })
 
 # Example usage:
-if (FALSE) {
+if (interactive()) {
   library(magrittr)
   generate_stream(1:3) \%>\% async_map(`*`, 2) \%>\% async_collect()
 }

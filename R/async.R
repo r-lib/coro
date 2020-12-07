@@ -55,7 +55,7 @@
 #' })
 #'
 #' # You can run these functions concurrently using `promise_all()`
-#' if (FALSE) {
+#' if (interactive()) {
 #'   promises::promise_all(async_count_down(5), async_count_up(5))
 #' }
 #' @export
@@ -114,7 +114,7 @@ async_sleep <- function(seconds) {
 #' })
 #'
 #' # Example usage:
-#' if (FALSE) {
+#' if (interactive()) {
 #'   library(magrittr)
 #'   generate_stream(1:3) %>% async_map(`*`, 2) %>% async_collect()
 #' }
