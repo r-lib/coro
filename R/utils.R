@@ -102,3 +102,12 @@ zap_env <- function(x) {
   environment(x) <- global_env()
   x
 }
+
+# Safe version of `<<-` that never assigns in the global
+# environment. It fails with an error if `lhs` does not exist.
+`<<-` <- function(lhs, value) {
+  env <- caller_env()
+  lhs <- as_string(substitute(lhs))
+  env_poke(env, lhs, value, inherit = TRUE, create = FALSE)
+  invisible(value)
+}
