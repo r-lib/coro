@@ -3,5 +3,8 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   generator: generator.html
-last_built: 2020-12-10T14:30Z
+last_built: 2020-12-10T14:43Z
+urls:
+  reference: https://coro.r-lib.org//reference
+  article: https://coro.r-lib.org//articles
 
