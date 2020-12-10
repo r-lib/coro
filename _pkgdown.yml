@@ -1,1 +1,26 @@
 url: https://coro.r-lib.org/
+
+reference:
+- title: Generators
+  contents:
+  - generator
+  - gen
+  - yield
+  - loop
+  - collect
+
+- title: Async functions
+  contents:
+  - async
+  - await
+  - async_generator
+  - await_each
+  - async_collect
+  - async_sleep
+
+- title: Developer tools
+  contents:
+  - as_iterator
+  - exhausted
+  - is_exhausted
+  - coro_debug
