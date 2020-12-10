@@ -2,6 +2,6 @@ pandoc: 2.7.3
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
-  iteration: iteration.html
-last_built: 2020-09-30T15:37Z
+  generator: generator.html
+last_built: 2020-12-10T14:30Z
 

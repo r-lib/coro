@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Yield a value from a generator — yield • coro</title>
+<title>Collect elements of an asynchronous iterator — async_collect • coro</title>
 
 
 <!-- jquery -->
@@ -39,18 +39,13 @@
 
 
 
-<meta property="og:title" content="Yield a value from a generator — yield" />
-<meta property="og:description" content="The yield() statement suspends generator() functions. It works
-like return() except that the function continues execution at the
-yielding point when it is called again.
-yield() can be called within loops and if-else branches but for
-technical reasons it can't be used anywhere in R code:
-yield() cannot be called as part of a function argument. Code
-such as list(yield()) is illegal.
-yield() does not cross function boundaries. You can't use it a
-lambda function passed to lapply() for instance.
-
-" />
+<meta property="og:title" content="Collect elements of an asynchronous iterator — async_collect" />
+<meta property="og:description" content="async_collect() takes an asynchronous iterator, i.e. an iterable
+function that is also awaitable. async_collect() returns an
+awaitable that eventually resolves to a list containing the values
+returned by the iterator. The values are collected until exhaustion
+unless n is supplied. The collection is grown geometrically for
+performance." />
 
 
 
@@ -133,40 +128,57 @@ lambda function passed to lapply() for instance.
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Yield a value from a generator</h1>
-    <small class="dont-index">Source: <a href='https://github.com/r-lib/coro/blob/master/R/generator.R'><code>R/generator.R</code></a></small>
-    <div class="hidden name"><code>yield.Rd</code></div>
+    <h1>Collect elements of an asynchronous iterator</h1>
+    <small class="dont-index">Source: <a href='https://github.com/r-lib/coro/blob/master/R/iterator-collect.R'><code>R/iterator-collect.R</code></a></small>
+    <div class="hidden name"><code>async_collect.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>The <code>yield()</code> statement suspends <code><a href='generator.html'>generator()</a></code> functions. It works
-like <code><a href='https://rdrr.io/r/base/function.html'>return()</a></code> except that the function continues execution at the
-yielding point when it is called again.</p>
-<p><code>yield()</code> can be called within loops and if-else branches but for
-technical reasons it can't be used anywhere in R code:</p><ul>
-<li><p><code>yield()</code> cannot be called as part of a function argument. Code
-such as <code><a href='https://rdrr.io/r/base/list.html'>list(yield())</a></code> is illegal.</p></li>
-<li><p><code>yield()</code> does not cross function boundaries. You can't use it a
-lambda function passed to <code><a href='https://rdrr.io/r/base/lapply.html'>lapply()</a></code> for instance.</p></li>
-</ul>
-
+    <p><code>async_collect()</code> takes an asynchronous iterator, i.e. an iterable
+function that is also awaitable. <code>async_collect()</code> returns an
+awaitable that eventually resolves to a list containing the values
+returned by the iterator. The values are collected until exhaustion
+unless <code>n</code> is supplied. The collection is grown geometrically for
+performance.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>yield</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>async_collect</span><span class='op'>(</span><span class='va'>x</span>, n <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x</th>
-      <td><p>A value to yield.</p></td>
+      <td><p>An iterator function.</p></td>
+    </tr>
+    <tr>
+      <th>n</th>
+      <td><p>The number of elements to collect. If <code>x</code> is an infinite
+sequence, <code>n</code> must be supplied to prevent an infinite loop.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='generator.html'>generator()</a></code> for examples.</p></div>
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'>
+<span class='co'># Emulate an async stream by yielding promises that resolve to the</span>
+<span class='co'># elements of the input vector</span>
+<span class='va'>generate_stream</span> <span class='op'>&lt;-</span> <span class='fu'><a href='async_generator.html'>async_generator</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='kw'>for</span> <span class='op'>(</span><span class='va'>elt</span> <span class='kw'>in</span> <span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>elt</span><span class='op'>)</span><span class='op'>)</span>
 
+<span class='co'># You can await `async_collect()` in an async function. Once the</span>
+<span class='co'># list of values is resolved, the async function resumes.</span>
+<span class='fu'><a href='async.html'>async</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='va'>stream</span> <span class='op'>&lt;-</span> <span class='fu'>generate_stream</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>
+  <span class='va'>values</span> <span class='op'>&lt;-</span> <span class='fu'><a href='async.html'>await</a></span><span class='op'>(</span><span class='fu'>async_collect</span><span class='op'>(</span><span class='va'>stream</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='va'>values</span>
+<span class='op'>}</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; &lt;async&gt;
+#&gt; function() {
+#&gt;   stream &lt;- generate_stream(1:3)
+#&gt;   values &lt;- await(async_collect(stream))
+#&gt;   values
+#&gt; }
+#&gt; &lt;environment: 0x7f82dae7c048&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

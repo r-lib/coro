@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Make an async function — async • coro</title>
+<title>Construct an async generator — async_generator • coro</title>
 
 
 <!-- jquery -->
@@ -39,28 +39,15 @@
 
 
 
-<meta property="og:title" content="Make an async function — async" />
-<meta property="og:description" content="async() functions are building blocks for cooperative
-concurrency.
-They are concurrent because they are jointly managed by a
-scheduler in charge of running them.
-They are cooperative because they decide on their own when they
-can no longer make quick progress and need to await some
-result. This is done with the await() keyword which suspends
-the async function and gives control back to the scheduler. The
-scheduler waits until the next async operation is ready to make
-progress.
-
-
-The async framework used by async() functions is implemented in
-the later and
-promises packages:
-You can chain async functions created with coro to promises.
-You can await promises. You can also await futures created with
-the future package
-because they are coercible to promises.
-
-" />
+<meta property="og:title" content="Construct an async generator — async_generator" />
+<meta property="og:description" content="An async generator constructs iterable functions that are also
+awaitables. They support both the yield() and await() syntax.
+An async iterator can be looped within async functions and
+iterators using await_each() on the input of a for loop.
+The iteration protocol is derived from the one described in
+iterator. An async iterator always returns a
+promise. When the iterator is exhausted, it returns a resolved
+promise to the exhaustion sentinel." />
 
 
 
@@ -143,46 +130,33 @@ because they are coercible to promises.
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Make an async function</h1>
+    <h1>Construct an async generator</h1>
     <small class="dont-index">Source: <a href='https://github.com/r-lib/coro/blob/master/R/async.R'><code>R/async.R</code></a></small>
-    <div class="hidden name"><code>async.Rd</code></div>
+    <div class="hidden name"><code>async_generator.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>async()</code> functions are building blocks for cooperative
-concurrency.</p><ul>
-<li><p>They are <em>concurrent</em> because they are jointly managed by a
-scheduler in charge of running them.</p></li>
-<li><p>They are <em>cooperative</em> because they decide on their own when they
-can no longer make quick progress and need to <strong>await</strong> some
-result. This is done with the <code>await()</code> keyword which suspends
-the async function and gives control back to the scheduler. The
-scheduler waits until the next async operation is ready to make
-progress.</p></li>
-</ul>
-
-<p>The async framework used by <code>async()</code> functions is implemented in
-the <a href='https://github.com/r-lib/later/'>later</a> and
-<a href='https://rstudio.github.io/promises/'>promises</a> packages:</p><ul>
-<li><p>You can chain async functions created with coro to promises.</p></li>
-<li><p>You can await promises. You can also await futures created with
-the <a href='https://github.com/HenrikBengtsson/future'>future</a> package
-because they are coercible to promises.</p></li>
-</ul>
-
+    <p>An async generator constructs iterable functions that are also
+awaitables. They support both the <code><a href='yield.html'>yield()</a></code> and <code><a href='async.html'>await()</a></code> syntax.
+An async iterator can be looped within async functions and
+iterators using <code>await_each()</code> on the input of a <code>for</code> loop.</p>
+<p>The iteration protocol is derived from the one described in
+<code><a href='iterator.html'>iterator</a></code>. An async iterator always returns a
+promise. When the iterator is exhausted, it returns a resolved
+promise to the exhaustion sentinel.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>async</span><span class='op'>(</span><span class='va'>fn</span><span class='op'>)</span>
+    <pre class="usage"><span class='fu'>async_generator</span><span class='op'>(</span><span class='va'>fn</span><span class='op'>)</span>
 
-<span class='fu'>await</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
+<span class='fu'>await_each</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>fn</th>
-      <td><p>An anonymous function within which <code>await()</code> calls are
-allowed.</p></td>
+      <td><p>An anonymous function describing an async generator
+within which <code><a href='async.html'>await()</a></code> calls are allowed.</p></td>
     </tr>
     <tr>
       <th>x</th>
@@ -192,37 +166,29 @@ allowed.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A function that returns a <code><a href='https://rstudio.github.io/promises/reference/promise.html'>promises::promise()</a></code>.</p>
+    <p>A generator factory. Generators constructed with this
+factory always return <code><a href='https://rstudio.github.io/promises/reference/promise.html'>promises::promise()</a></code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='async_generator.html'>async_generator()</a></code> and <code><a href='async_generator.html'>await_each()</a></code>;
+    <div class='dont-index'><p><code><a href='async.html'>async()</a></code> for creating awaitable functions;
+<code><a href='async_collect.html'>async_collect()</a></code> for collecting the values of an async iterator;
 <code><a href='coro_debug.html'>coro_debug()</a></code> for step-debugging.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># This async function counts down from `n`, sleeping for 2 seconds</span>
-<span class='co'># at each iteration:</span>
-<span class='va'>async_count_down</span> <span class='op'>&lt;-</span> <span class='fu'>async</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='kw'>while</span> <span class='op'>(</span><span class='va'>n</span> <span class='op'>&gt;</span> <span class='fl'>0</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"Down"</span>, <span class='va'>n</span>, <span class='st'>"\n"</span><span class='op'>)</span>
-    <span class='fu'>await</span><span class='op'>(</span><span class='fu'><a href='async_sleep.html'>async_sleep</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-    <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='va'>n</span> <span class='op'>-</span> <span class='fl'>1</span>
+    <pre class="examples"><div class='input'><span class='co'># Creates awaitable functions that transform their inputs into a stream</span>
+<span class='va'>generate_stream</span> <span class='op'>&lt;-</span> <span class='fu'>async_generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='kw'>for</span> <span class='op'>(</span><span class='va'>elt</span> <span class='kw'>in</span> <span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>elt</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='co'># Maps a function to a stream</span>
+<span class='va'>async_map</span> <span class='op'>&lt;-</span> <span class='fu'>async_generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>.i</span>, <span class='va'>.fn</span>, <span class='va'>...</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='kw'>for</span> <span class='op'>(</span><span class='va'>elt</span> <span class='kw'>in</span> <span class='fu'>await_each</span><span class='op'>(</span><span class='va'>.i</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
+    <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='fu'>.fn</span><span class='op'>(</span><span class='va'>elt</span>, <span class='va'>...</span><span class='op'>)</span><span class='op'>)</span>
   <span class='op'>}</span>
 <span class='op'>}</span><span class='op'>)</span>
 
-<span class='co'># This async function counts up until `stop`, sleeping for 0.5</span>
-<span class='co'># seconds at each iteration:</span>
-<span class='va'>async_count_up</span> <span class='op'>&lt;-</span> <span class='fu'>async</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>stop</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
-  <span class='kw'>while</span> <span class='op'>(</span><span class='va'>n</span> <span class='op'>&lt;=</span> <span class='va'>stop</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"Up"</span>, <span class='va'>n</span>, <span class='st'>"\n"</span><span class='op'>)</span>
-    <span class='fu'>await</span><span class='op'>(</span><span class='fu'><a href='async_sleep.html'>async_sleep</a></span><span class='op'>(</span><span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span>
-    <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='va'>n</span> <span class='op'>+</span> <span class='fl'>1</span>
-  <span class='op'>}</span>
-<span class='op'>}</span><span class='op'>)</span>
-
-<span class='co'># You can run these functions concurrently using `promise_all()`</span>
+<span class='co'># Example usage:</span>
 <span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='fu'>promises</span><span class='fu'>::</span><span class='fu'><a href='https://rstudio.github.io/promises/reference/promise_all.html'>promise_all</a></span><span class='op'>(</span><span class='fu'>async_count_down</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span>, <span class='fu'>async_count_up</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://magrittr.tidyverse.org'>magrittr</a></span><span class='op'>)</span>
+  <span class='fu'>generate_stream</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'>async_map</span><span class='op'>(</span><span class='va'>`*`</span>, <span class='fl'>2</span><span class='op'>)</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='async_collect.html'>async_collect</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>}</span>
 </div></pre>
   </div>

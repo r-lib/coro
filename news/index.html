@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • flowery</title>
+<title>Changelog • coro</title>
 
 
 <!-- jquery -->
@@ -70,8 +70,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">flowery</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
+        <a class="navbar-link" href="../index.html">coro</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9000</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/iteration.html">Iteration in R</a>
+      <a href="../articles/generator.html">Generators</a>
     </li>
   </ul>
 </li>
@@ -103,7 +103,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/r-lib/coro/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -118,32 +123,50 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      
+      <small>Source: <a href='https://github.com/r-lib/coro/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="flowery-0019000" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.1.9000">
-<a href="#flowery-0019000" class="anchor"></a>flowery 0.0.1.9000</h1>
+    <div id="coro-development-version" class="section level1">
+<h1 class="page-header" data-toc-text="development version">
+<a href="#coro-development-version" class="anchor"></a>coro (development version)<small> Unreleased </small>
+</h1>
+</div>
+    <div id="coro-100" class="section level1">
+<h1 class="page-header" data-toc-text="1.0.0">
+<a href="#coro-100" class="anchor"></a>coro 1.0.0<small> 2020-12-09 </small>
+</h1>
+<p>This is the first public version of coro.</p>
 <ul>
+<li><p>Python iterators created with the reticulate package can now be composed with coro generators. They can also be used with <code><a href="../reference/collect.html">loop()</a></code> and <code><a href="../reference/collect.html">collect()</a></code>.</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/reticulate/man/iterate.html">iterate()</a></code> has been renamed to <code><a href="../reference/collect.html">loop()</a></code> to avoid name clash and semantic conflict with <code><a href="https://rdrr.io/pkg/reticulate/man/iterate.html">reticulate::iterate()</a></code>.</p></li>
+<li><p><code><a href="../reference/collect.html">collect()</a></code> calls <code><a href="../reference/as_iterator.html">as_iterator()</a></code> on its input.</p></li>
+<li><p><code><a href="../reference/as_iterator.html">as_iterator()</a></code> is now a generic function (<a href='https://github.com/r-lib/coro/issues/28'>#28</a>).</p></li>
+<li><p>Generators and async functions now support <code><a href="https://rdrr.io/r/base/on.exit.html">on.exit()</a></code> expressions. They also support exit expressions installed with functions like <code><a href="https://withr.r-lib.org/reference/with_options.html">withr::local_options()</a></code>. This requires R &gt;= 3.5.</p></li>
+<li><p>Generator arguments are forced on reentry in the approriate context (e.g. in the <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code> context if generator was yielded from a <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code>). This makes it possible to clean up cancelled generators (by jumping from the generator with a restart) or propagate errors in async functions.</p></li>
+<li><p>Generators and async functions now support yielding within <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code> expressions.</p></li>
+<li><p>Generators and async functions are now disabled when an unexpected exit occurs (error, interrupt, restart invokation, debugger exit, etc.). Reentering the generator is an error.</p></li>
+<li><p>Generators and async functions now support stepping with <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>. Set <code><a href="https://rdrr.io/r/base/options.html">options(coro_debug = TRUE)</a></code> for browsing all functions created with coro. Use <code><a href="../reference/coro_debug.html">coro_debug()</a></code> for browsing specific functions.</p></li>
 <li><p><code><a href="../reference/generator.html">generator()</a></code> now accepts functions of one argument. The first time a generator is called the argument is defined in the suspendable function. On subsequent invokations, the argument is returned from <code><a href="../reference/yield.html">yield()</a></code>.</p></li>
 <li><p><code><a href="../reference/generator.html">generator()</a></code> now creates generator factories. It takes a function template and returns a function that creates generator functions from this template. This is consistent with languages like Javascript and Python.</p></li>
-<li><p>The <code><a href="../reference/async.html">async()</a></code> function operator creates functions for cooperative concurrency using the <em>later</em> and <em>promises</em> framework.</p></li>
 <li>
-<p>The iterator abstraction has been removed from flowery. It is replaced with the following protocol:</p>
+<p>The <code><a href="../reference/async.html">async()</a></code> function operator creates functions for cooperative concurrency using the <em>later</em> and <em>promises</em> framework.</p>
+<p><code><a href="../reference/async_generator.html">async_generator()</a></code> creates iterable functions that are also awaitable.</p>
+</li>
+<li>
+<p>The iterator abstraction has been removed from coro. It is replaced with the following protocol:</p>
 <ul>
 <li>An iterator is a function. You advance it and get a new value by calling it.</li>
-<li>An iterator signals exhaustion by returning <code>NULL</code>.</li>
-<li>Yielding <code>NULL</code> is an error.</li>
+<li>An iterator signals exhaustion by returning <code><a href="../reference/iterator.html">exhausted()</a></code> (or equivalently, the <code><a href="https://rdrr.io/r/base/substitute.html">quote(exhausted)</a></code> symbol).</li>
 </ul>
-<p>The <code>NULL</code> sentinel synergises well with the R control flow constructs like <code>while</code> which return <code>NULL</code> when they are done. This design is experimental and may be reviewed later on.</p>
 </li>
-<li><p>Exhausted generators no longer throw when called again. Instead, they return <code>NULL</code> (#6).</p></li>
-<li><p>Fixed top-level <code>break</code> statements in loops (#7).</p></li>
+<li><p>Exhausted generators no longer throw when called again. Instead, they return the <code><a href="../reference/iterator.html">exhausted()</a></code> sentinel (<a href='https://github.com/r-lib/coro/issues/6'>#6</a>).</p></li>
+<li><p>Fixed top-level <code>break</code> statements in loops (<a href='https://github.com/r-lib/coro/issues/7'>#7</a>).</p></li>
 </ul>
 </div>
-    <div id="flowery-001" class="section level1">
+    <div id="coro-001" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.1">
-<a href="#flowery-001" class="anchor"></a>flowery 0.0.1</h1>
+<a href="#coro-001" class="anchor"></a>coro 0.0.1<small> Unreleased </small>
+</h1>
 <p>Initial release</p>
 </div>
   </div>

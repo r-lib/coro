@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • flowery</title>
+<title>Function reference • coro</title>
 
 
 <!-- jquery -->
@@ -70,8 +70,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">flowery</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1.9000</span>
+        <a class="navbar-link" href="../index.html">coro</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9000</span>
       </span>
     </div>
 
@@ -94,7 +94,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/iteration.html">Iteration in R</a>
+      <a href="../articles/generator.html">Generators</a>
     </li>
   </ul>
 </li>
@@ -103,7 +103,12 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/r-lib/coro/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -143,15 +148,51 @@
       <tr>
         
         <td>
+          <p><code><a href="as_iterator.html">as_iterator()</a></code> </p>
+        </td>
+        <td><p>Transform an object to an iterator</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="async.html">async()</a></code> <code><a href="async.html">await()</a></code> </p>
         </td>
         <td><p>Make an async function</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="flowery-package.html">flowery-package</a></code> </p>
+          <p><code><a href="async_collect.html">async_collect()</a></code> </p>
         </td>
-        <td><p>flowery: Generators and transducers for R</p></td>
+        <td><p>Collect elements of an asynchronous iterator</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="async_generator.html">async_generator()</a></code> <code><a href="async_generator.html">await_each()</a></code> </p>
+        </td>
+        <td><p>Construct an async generator</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="async_sleep.html">async_sleep()</a></code> </p>
+        </td>
+        <td><p>Sleep asynchronously</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="collect.html">collect()</a></code> <code><a href="collect.html">loop()</a></code> </p>
+        </td>
+        <td><p>Iterate over iterator functions</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="coro-package.html">coro-package</a></code> </p>
+        </td>
+        <td><p>coro: 'Coroutines' for R</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="coro_debug.html">coro_debug()</a></code> </p>
+        </td>
+        <td><p>Debug a generator or async function</p></td>
       </tr><tr>
         
         <td>
@@ -161,33 +202,9 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="iter_adapt.html">iter_adapt()</a></code> </p>
+          <p><code><a href="iterator.html">exhausted()</a></code> <code><a href="iterator.html">is_exhausted()</a></code> </p>
         </td>
-        <td><p>Adapt an iterator with transformation steps</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="iterate.html">iterate()</a></code> </p>
-        </td>
-        <td><p>Iterate over an iterator</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="iterator.html">as_iterator()</a></code> </p>
-        </td>
-        <td><p>Iterable functions</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="steps.html">iter_take()</a></code> <code><a href="steps.html">iter_map()</a></code> <code><a href="steps.html">iter_keep()</a></code> <code><a href="steps.html">iter_discard()</a></code> </p>
-        </td>
-        <td><p>Transformation steps</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="take.html">take()</a></code> <code><a href="take.html">take_lgl()</a></code> <code><a href="take.html">take_int()</a></code> <code><a href="take.html">take_dbl()</a></code> <code><a href="take.html">take_cpl()</a></code> <code><a href="take.html">take_chr()</a></code> <code><a href="take.html">take_raw()</a></code> <code><a href="take.html">drain()</a></code> <code><a href="take.html">drain_lgl()</a></code> <code><a href="take.html">drain_int()</a></code> <code><a href="take.html">drain_dbl()</a></code> <code><a href="take.html">drain_cpl()</a></code> <code><a href="take.html">drain_chr()</a></code> <code><a href="take.html">drain_raw()</a></code> </p>
-        </td>
-        <td><p>Take n or all elements from a vector or iterator</p></td>
+        <td><p>Iterator protocol</p></td>
       </tr><tr>
         
         <td>
