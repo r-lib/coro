@@ -1,6 +1,6 @@
 Package: coro
 Title: 'Coroutines' for R
-Version: 1.0.0
+Version: 1.0.0.9000
 Authors@R: c(
     person("Lionel", "Henry", ,"lionel@rstudio.com", c("aut", "cre")),
     person("RStudio", role = "cph")

@@ -1,3 +1,5 @@
+# coro (development version)
+
 # coro 1.0.0
 
 This is the first public version of coro.
