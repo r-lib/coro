@@ -5,10 +5,10 @@
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/coro)](https://cran.r-project.org/package=coro)
 [![R build
 status](https://github.com/r-lib/coro/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/coro/actions)
-[![Lifecycle
-Status](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/)
 <!-- badges: end -->
 
 ## Overview
