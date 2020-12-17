@@ -1,6 +1,6 @@
 # coro (development version)
 
-* `collect()` now preserves lists and data frames.
+* `collect()` now preserves lists and data frames (#32).
 
 # coro 1.0.0
 
