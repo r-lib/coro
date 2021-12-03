@@ -1,3 +1,5 @@
+# coro (development version)
+
 # coro 1.0.2
 
 * The exhaustion sentinel is now `as.symbol(".__exhausted__.")`
