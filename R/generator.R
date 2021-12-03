@@ -214,6 +214,8 @@ generator0 <- function(fn, type = "generator") {
   structure(out, class = c(paste0("coro_", type), "function"))
 }
 
+# Creates a child of the coro namespace that holds all the variables
+# used by the generator runtime
 new_generator_env <- function(parent, info) {
   env <- env(ns_env("coro"))
   user_env <- env(parent, .__generator_instance__. = TRUE)
