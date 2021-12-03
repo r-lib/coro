@@ -10,3 +10,4 @@
 ^docs$
 ^pkgdown$
 ^revdep$
+^cran-comments\.md$
