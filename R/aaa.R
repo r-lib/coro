@@ -1,4 +1,5 @@
 #' @import rlang
+#' @keywords internal
 "_PACKAGE"
 
 .onLoad <- function(...) {
