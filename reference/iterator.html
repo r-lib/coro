@@ -48,7 +48,8 @@ When the iterator is exhausted and there are no more elements to
 return, the symbol quote(exhausted) is returned. This signals
 exhaustion to the caller.
 Once an iterator has signalled exhaustion, all subsequent
-invokations must consistently return quote(exhausted).
+invokations must consistently return coro::exhausted() or
+as.symbol(&quot;.__exhausted__.&quot;).
 iterator &amp;lt;- as_iterator(1:3)
 
 # Calling the iterator advances it
@@ -61,7 +62,7 @@ iterator()
 ## [1] 3
 # Subsequent invokations return the exhaustion sentinel
 iterator()
-## exhausted
+## .__exhausted__.
 
 
 Because iteration is defined by a protocol, creating iterators is
@@ -166,20 +167,21 @@ returned.</p></li>
 return, the symbol <code>quote(exhausted)</code> is returned. This signals
 exhaustion to the caller.</p></li>
 <li><p>Once an iterator has signalled exhaustion, all subsequent
-invokations must consistently return <code>quote(exhausted)</code>.</p></li>
-</ul><p><div class="r"></p><pre><span class='va'>iterator</span> <span class='op'>&lt;-</span> <span class='fu'><a href='as_iterator.html'>as_iterator</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>
+invokations must consistently return <code>coro::exhausted()</code> or
+<code>as.symbol(".__exhausted__.")</code>.</p></li>
+</ul><p><div class="sourceCode r"></p><pre><span class='va'>iterator</span> <span class='op'>&lt;-</span> <span class='fu'><a href='as_iterator.html'>as_iterator</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>
 
 <span class='co'># Calling the iterator advances it</span>
 <span class='fu'>iterator</span><span class='op'>(</span><span class='op'>)</span>
 </pre><p></div></p><pre><span class='co'>## [1] 1</span>
-</pre><p><div class="r"></p><pre><span class='fu'>iterator</span><span class='op'>(</span><span class='op'>)</span>
+</pre><p><div class="sourceCode r"></p><pre><span class='fu'>iterator</span><span class='op'>(</span><span class='op'>)</span>
 </pre><p></div></p><pre><span class='co'>## [1] 2</span>
-</pre><p><div class="r"></p><pre><span class='co'># This is the last value</span>
+</pre><p><div class="sourceCode r"></p><pre><span class='co'># This is the last value</span>
 <span class='fu'>iterator</span><span class='op'>(</span><span class='op'>)</span>
 </pre><p></div></p><pre><span class='co'>## [1] 3</span>
-</pre><p><div class="r"></p><pre><span class='co'># Subsequent invokations return the exhaustion sentinel</span>
+</pre><p><div class="sourceCode r"></p><pre><span class='co'># Subsequent invokations return the exhaustion sentinel</span>
 <span class='fu'>iterator</span><span class='op'>(</span><span class='op'>)</span>
-</pre><p></div></p><pre><span class='co'>## exhausted</span>
+</pre><p></div></p><pre><span class='co'>## .__exhausted__.</span>
 </pre>
 
 <p>Because iteration is defined by a protocol, creating iterators is
@@ -215,6 +217,24 @@ back and once it is exhausted, it stays exhausted.</p>
 <p>Iterators are not necessarily finite. They can also represent
 infinite sequences, in which case trying to exhaust them is a
 programming error that causes an infinite loop.</p>
+    <h2 class="hasAnchor" id="the-exhausted-sentinel"><a class="anchor" href="#the-exhausted-sentinel"></a>The exhausted sentinel</h2>
+
+    
+
+
+<p>Termination of iteration is signalled via a sentinel value,
+<code>as.symbol(".__exhausted__.")</code>. Alternative designs include:</p><ul>
+<li><p>A condition as in python.</p></li>
+<li><p>A rich value containing a termination flag as in Javascript.</p></li>
+</ul>
+
+<p>The sentinel design is a simple and efficient solution but it has a
+downside. If you are iterating over a collection of elements that
+inadvertently contains the sentinel value, the iteration will be
+terminated early. To avoid such mix-ups, the sentinel should only
+be used as a temporary value. It should be created from scratch by
+a function like <code>coro::exhausted()</code> and never stored in a container
+or namespace.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

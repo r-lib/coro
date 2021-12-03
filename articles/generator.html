@@ -117,7 +117,7 @@
 
 <span class="co"># This is the exhaustion sentinel</span>
 <span class="fu"><a href="../reference/iterator.html">iterator</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; exhausted</span></code></pre></div>
+<span class="co">#&gt; .__exhausted__.</span></code></pre></div>
 <p>In R we normally don’t use this sort of iteration to work with vectors. Instead, we use the idiomatic techniques of vectorised programming. Iterator functions are useful for very specific tasks:</p>
 <ul>
 <li><p>Iterating over <strong>chunks</strong> of data when the whole data doesn’t fit in memory.</p></li>
@@ -154,10 +154,10 @@
 
 <span class="co"># Exhaustion sentinel</span>
 <span class="fu">abc</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; exhausted</span>
+<span class="co">#&gt; .__exhausted__.</span>
 
 <span class="fu">abc</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; exhausted</span></code></pre></div>
+<span class="co">#&gt; .__exhausted__.</span></code></pre></div>
 <p>You can also create infinite iterators that can’t be exhausted:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">generate_natural_numbers</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">from</span> <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span> <span class="op">{</span>
@@ -258,7 +258,7 @@
 <span class="co">#&gt; [1] "C"</span>
 
 <span class="fu">ABC</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; exhausted</span></code></pre></div>
+<span class="co">#&gt; .__exhausted__.</span></code></pre></div>
 <p>As a user, you might not want to create an iterator factory for a one-off adaptor. In this case you can use <code><a href="../reference/generator.html">gen()</a></code> instead of <code><a href="../reference/generator.html">generator()</a></code>. This enables a more pythonic style of working with iterators:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span>
