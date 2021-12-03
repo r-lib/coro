@@ -64,8 +64,6 @@ loop <- function(loop) {
   iterator <- as_iterator(eval_bare(node_cadr(args), env))
   body <- node_cadr(node_cdr(args))
 
-  loop_env <- current_env()
-
   elt <- NULL
   advance <- function() !is_exhausted(elt <<- iterator())
   update <- function() env[[var]] <- elt
