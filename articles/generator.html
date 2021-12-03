@@ -85,7 +85,7 @@
       <h1 data-toc-skip>Generators</h1>
                         <h4 class="author">Lionel Henry</h4>
             
-            <h4 class="date">2020-12-17</h4>
+            <h4 class="date">2021-12-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/r-lib/coro/blob/master/vignettes/generator.Rmd"><code>vignettes/generator.Rmd</code></a></small>
       <div class="hidden name"><code>generator.Rmd</code></div>
@@ -128,7 +128,7 @@
 <div id="generators" class="section level2">
 <h2 class="hasAnchor">
 <a href="#generators" class="anchor"></a>Generators</h2>
-<p>Generators create functions that can <strong>yield</strong>, i.e. suspend themselves. When a generator reaches a <code><a href="../reference/yield.html">yield(value)</a></code> statement it returns the value as if you called <code><a href="https://rdrr.io/r/base/function.html">return(value)</a></code>. However, calling the generator again resumes the function right where it left off. Because they preserve their state between invokations, generators are ideal for creating iterator functions.</p>
+<p>Generators create functions that can <strong>yield</strong>, i.e. suspend themselves. When a generator reaches a <code>yield(value)</code> statement it returns the value as if you called <code>return(value)</code>. However, calling the generator again resumes the function right where it left off. Because they preserve their state between invokations, generators are ideal for creating iterator functions.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">generate_abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span>
@@ -245,7 +245,7 @@
   <span class="op">}</span>
 <span class="op">}</span><span class="op">)</span>
 
-<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">adapt_toupper</span><span class="op">(</span><span class="op">)</span>
+<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">adapt_toupper</span><span class="op">(</span><span class="op">)</span>
 
 <span class="fu">ABC</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "A"</span>
@@ -281,7 +281,7 @@
   <span class="op">}</span>
 <span class="op">}</span><span class="op">)</span>
 
-<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">adapt_map</span><span class="op">(</span><span class="va">toupper</span><span class="op">)</span>
+<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">adapt_map</span><span class="op">(</span><span class="va">toupper</span><span class="op">)</span>
 
 <span class="fu">ABC</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "A"</span></code></pre></div>

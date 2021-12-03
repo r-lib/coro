@@ -130,10 +130,13 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#coro-development-version" class="anchor"></a>coro (development version)<small> Unreleased </small>
 </h1>
+<ul>
+<li>Fixed a leak that occurred via JIT caching (<a href='https://github.com/r-lib/coro/issues/36'>#36</a>).</li>
+</ul>
 </div>
     <div id="coro-101" class="section level1">
 <h1 class="page-header" data-toc-text="1.0.1">
-<a href="#coro-101" class="anchor"></a>coro 1.0.1<small> Unreleased </small>
+<a href="#coro-101" class="anchor"></a>coro 1.0.1<small> 2020-12-17 </small>
 </h1>
 <ul>
 <li>
@@ -154,7 +157,7 @@
 <li><p>Generator arguments are forced on reentry in the approriate context (e.g. in the <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code> context if generator was yielded from a <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code>). This makes it possible to clean up cancelled generators (by jumping from the generator with a restart) or propagate errors in async functions.</p></li>
 <li><p>Generators and async functions now support yielding within <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code> expressions.</p></li>
 <li><p>Generators and async functions are now disabled when an unexpected exit occurs (error, interrupt, restart invokation, debugger exit, etc.). Reentering the generator is an error.</p></li>
-<li><p>Generators and async functions now support stepping with <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>. Set <code><a href="https://rdrr.io/r/base/options.html">options(coro_debug = TRUE)</a></code> for browsing all functions created with coro. Use <code><a href="../reference/coro_debug.html">coro_debug()</a></code> for browsing specific functions.</p></li>
+<li><p>Generators and async functions now support stepping with <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>. Set <code>options(coro_debug = TRUE)</code> for browsing all functions created with coro. Use <code><a href="../reference/coro_debug.html">coro_debug()</a></code> for browsing specific functions.</p></li>
 <li><p><code><a href="../reference/generator.html">generator()</a></code> now accepts functions of one argument. The first time a generator is called the argument is defined in the suspendable function. On subsequent invokations, the argument is returned from <code><a href="../reference/yield.html">yield()</a></code>.</p></li>
 <li><p><code><a href="../reference/generator.html">generator()</a></code> now creates generator factories. It takes a function template and returns a function that creates generator functions from this template. This is consistent with languages like Javascript and Python.</p></li>
 <li>
@@ -165,11 +168,11 @@
 <p>The iterator abstraction has been removed from coro. It is replaced with the following protocol:</p>
 <ul>
 <li>An iterator is a function. You advance it and get a new value by calling it.</li>
-<li>An iterator signals exhaustion by returning <code><a href="../reference/iterator.html">exhausted()</a></code> (or equivalently, the <code><a href="https://rdrr.io/r/base/substitute.html">quote(exhausted)</a></code> symbol).</li>
+<li>An iterator signals exhaustion by returning <code><a href="../reference/iterator.html">exhausted()</a></code> (or equivalently, the <code>quote(exhausted)</code> symbol).</li>
 </ul>
 </li>
 <li><p>Exhausted generators no longer throw when called again. Instead, they return the <code><a href="../reference/iterator.html">exhausted()</a></code> sentinel (<a href='https://github.com/r-lib/coro/issues/6'>#6</a>).</p></li>
-<li><p>Fixed top-level <code>break</code> statements in loops (<a href='https://github.com/r-lib/coro/issues/7'>#7</a>).</p></li>
+<li><p>Fixed top-level <code><a href="https://rdrr.io/r/base/Control.html">break</a></code> statements in loops (<a href='https://github.com/r-lib/coro/issues/7'>#7</a>).</p></li>
 </ul>
 </div>
     <div id="coro-001" class="section level1">

@@ -186,45 +186,45 @@ allowed.</p></td>
     </tr>
     <tr>
       <th>x</th>
-      <td><p>An awaitable value, i.e. a <a href='https://rstudio.github.io/promises/reference/promise.html'>promise</a>.</p></td>
+      <td><p>An awaitable value, i.e. a <a href='https://rstudio.github.io/promises//reference/promise.html'>promise</a>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A function that returns a <code><a href='https://rstudio.github.io/promises/reference/promise.html'>promises::promise()</a></code>.</p>
+    <p>A function that returns a <code><a href='https://rstudio.github.io/promises//reference/promise.html'>promises::promise()</a></code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='async_generator.html'>async_generator()</a></code> and <code><a href='async_generator.html'>await_each()</a></code>;
 <code><a href='coro_debug.html'>coro_debug()</a></code> for step-debugging.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># This async function counts down from `n`, sleeping for 2 seconds</span>
-<span class='co'># at each iteration:</span>
-<span class='va'>async_count_down</span> <span class='op'>&lt;-</span> <span class='fu'>async</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='kw'>while</span> <span class='op'>(</span><span class='va'>n</span> <span class='op'>&gt;</span> <span class='fl'>0</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"Down"</span>, <span class='va'>n</span>, <span class='st'>"\n"</span><span class='op'>)</span>
-    <span class='fu'>await</span><span class='op'>(</span><span class='fu'><a href='async_sleep.html'>async_sleep</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-    <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='va'>n</span> <span class='op'>-</span> <span class='fl'>1</span>
-  <span class='op'>}</span>
-<span class='op'>}</span><span class='op'>)</span>
-
-<span class='co'># This async function counts up until `stop`, sleeping for 0.5</span>
-<span class='co'># seconds at each iteration:</span>
-<span class='va'>async_count_up</span> <span class='op'>&lt;-</span> <span class='fu'>async</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>stop</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1</span>
-  <span class='kw'>while</span> <span class='op'>(</span><span class='va'>n</span> <span class='op'>&lt;=</span> <span class='va'>stop</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"Up"</span>, <span class='va'>n</span>, <span class='st'>"\n"</span><span class='op'>)</span>
-    <span class='fu'>await</span><span class='op'>(</span><span class='fu'><a href='async_sleep.html'>async_sleep</a></span><span class='op'>(</span><span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span>
-    <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='va'>n</span> <span class='op'>+</span> <span class='fl'>1</span>
-  <span class='op'>}</span>
-<span class='op'>}</span><span class='op'>)</span>
-
-<span class='co'># You can run these functions concurrently using `promise_all()`</span>
-<span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='fu'>promises</span><span class='fu'>::</span><span class='fu'><a href='https://rstudio.github.io/promises/reference/promise_all.html'>promise_all</a></span><span class='op'>(</span><span class='fu'>async_count_down</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span>, <span class='fu'>async_count_up</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
-<span class='op'>}</span>
-</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># This async function counts down from `n`, sleeping for 2 seconds</span></span>
+<span class='r-in'><span class='co'># at each iteration:</span></span>
+<span class='r-in'><span class='va'>async_count_down</span> <span class='op'>&lt;-</span> <span class='fu'>async</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='kw'>while</span> <span class='op'>(</span><span class='va'>n</span> <span class='op'>&gt;</span> <span class='fl'>0</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"Down"</span>, <span class='va'>n</span>, <span class='st'>"\n"</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='fu'>await</span><span class='op'>(</span><span class='fu'><a href='async_sleep.html'>async_sleep</a></span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='va'>n</span> <span class='op'>-</span> <span class='fl'>1</span></span>
+<span class='r-in'>  <span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># This async function counts up until `stop`, sleeping for 0.5</span></span>
+<span class='r-in'><span class='co'># seconds at each iteration:</span></span>
+<span class='r-in'><span class='va'>async_count_up</span> <span class='op'>&lt;-</span> <span class='fu'>async</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>stop</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1</span></span>
+<span class='r-in'>  <span class='kw'>while</span> <span class='op'>(</span><span class='va'>n</span> <span class='op'>&lt;=</span> <span class='va'>stop</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='fu'><a href='https://rdrr.io/r/base/cat.html'>cat</a></span><span class='op'>(</span><span class='st'>"Up"</span>, <span class='va'>n</span>, <span class='st'>"\n"</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='fu'>await</span><span class='op'>(</span><span class='fu'><a href='async_sleep.html'>async_sleep</a></span><span class='op'>(</span><span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='va'>n</span> <span class='op'>+</span> <span class='fl'>1</span></span>
+<span class='r-in'>  <span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># You can run these functions concurrently using `promise_all()`</span></span>
+<span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='fu'>promises</span><span class='fu'>::</span><span class='fu'><a href='https://rstudio.github.io/promises//reference/promise_all.html'>promise_all</a></span><span class='op'>(</span><span class='fu'>async_count_down</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span>, <span class='fu'>async_count_up</span><span class='op'>(</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

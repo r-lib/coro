@@ -145,7 +145,7 @@ yielding point when it is called again.</p>
 <p><code>yield()</code> can be called within loops and if-else branches but for
 technical reasons it can't be used anywhere in R code:</p><ul>
 <li><p><code>yield()</code> cannot be called as part of a function argument. Code
-such as <code><a href='https://rdrr.io/r/base/list.html'>list(yield())</a></code> is illegal.</p></li>
+such as <code>list(yield())</code> is illegal.</p></li>
 <li><p><code>yield()</code> does not cross function boundaries. You can't use it a
 lambda function passed to <code><a href='https://rdrr.io/r/base/lapply.html'>lapply()</a></code> for instance.</p></li>
 </ul>

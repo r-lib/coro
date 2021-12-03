@@ -160,25 +160,26 @@ sequence, <code>n</code> must be supplied to prevent an infinite loop.</p></td>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='co'># Emulate an async stream by yielding promises that resolve to the</span>
-<span class='co'># elements of the input vector</span>
-<span class='va'>generate_stream</span> <span class='op'>&lt;-</span> <span class='fu'><a href='async_generator.html'>async_generator</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='kw'>for</span> <span class='op'>(</span><span class='va'>elt</span> <span class='kw'>in</span> <span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>elt</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='co'># You can await `async_collect()` in an async function. Once the</span>
-<span class='co'># list of values is resolved, the async function resumes.</span>
-<span class='fu'><a href='async.html'>async</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>stream</span> <span class='op'>&lt;-</span> <span class='fu'>generate_stream</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>
-  <span class='va'>values</span> <span class='op'>&lt;-</span> <span class='fu'><a href='async.html'>await</a></span><span class='op'>(</span><span class='fu'>async_collect</span><span class='op'>(</span><span class='va'>stream</span><span class='op'>)</span><span class='op'>)</span>
-  <span class='va'>values</span>
-<span class='op'>}</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; &lt;async&gt;
-#&gt; function() {
-#&gt;   stream &lt;- generate_stream(1:3)
-#&gt;   values &lt;- await(async_collect(stream))
-#&gt;   values
-#&gt; }
-#&gt; &lt;environment: 0x7fb0e2fbb3c8&gt;</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='co'># Emulate an async stream by yielding promises that resolve to the</span></span>
+<span class='r-in'><span class='co'># elements of the input vector</span></span>
+<span class='r-in'><span class='va'>generate_stream</span> <span class='op'>&lt;-</span> <span class='fu'><a href='async_generator.html'>async_generator</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='kw'>for</span> <span class='op'>(</span><span class='va'>elt</span> <span class='kw'>in</span> <span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>elt</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># You can await `async_collect()` in an async function. Once the</span></span>
+<span class='r-in'><span class='co'># list of values is resolved, the async function resumes.</span></span>
+<span class='r-in'><span class='fu'><a href='async.html'>async</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>stream</span> <span class='op'>&lt;-</span> <span class='fu'>generate_stream</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>values</span> <span class='op'>&lt;-</span> <span class='fu'><a href='async.html'>await</a></span><span class='op'>(</span><span class='fu'>async_collect</span><span class='op'>(</span><span class='va'>stream</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='va'>values</span></span>
+<span class='r-in'><span class='op'>}</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;async&gt;</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> function() {</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   stream &lt;- generate_stream(1:3)</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   values &lt;- await(async_collect(stream))</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>   values</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> }</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> &lt;environment: 0x7f97ebb036d0&gt;</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

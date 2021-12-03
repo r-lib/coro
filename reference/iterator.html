@@ -163,10 +163,10 @@ protocol:</p><ul>
 <li><p>Calling the function advances the iterator. The new value is
 returned.</p></li>
 <li><p>When the iterator is exhausted and there are no more elements to
-return, the symbol <code><a href='https://rdrr.io/r/base/substitute.html'>quote(exhausted)</a></code> is returned. This signals
+return, the symbol <code>quote(exhausted)</code> is returned. This signals
 exhaustion to the caller.</p></li>
 <li><p>Once an iterator has signalled exhaustion, all subsequent
-invokations must consistently return <code><a href='https://rdrr.io/r/base/substitute.html'>quote(exhausted)</a></code>.</p></li>
+invokations must consistently return <code>quote(exhausted)</code>.</p></li>
 </ul><p><div class="r"></p><pre><span class='va'>iterator</span> <span class='op'>&lt;-</span> <span class='fu'><a href='as_iterator.html'>as_iterator</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>)</span>
 
 <span class='co'># Calling the iterator advances it</span>

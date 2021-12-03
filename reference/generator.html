@@ -186,100 +186,112 @@ protocol such as <code><a href='collect.html'>loop()</a></code> and <code><a hre
     <div class='dont-index'><p><code><a href='yield.html'>yield()</a></code>, <code><a href='coro_debug.html'>coro_debug()</a></code> for step-debugging.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># A generator statement creates a generator factory. The</span>
-<span class='co'># following generator yields two times and then returns `"c"`:</span>
-<span class='va'>generate_abc</span> <span class='op'>&lt;-</span> <span class='fu'>generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='st'>"a"</span><span class='op'>)</span>
-  <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='st'>"b"</span><span class='op'>)</span>
-  <span class='st'>"c"</span>
-<span class='op'>}</span><span class='op'>)</span>
-
-<span class='co'># Or equivalently:</span>
-<span class='va'>generate_abc</span> <span class='op'>&lt;-</span> <span class='fu'>generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span>
-  <span class='op'>}</span>
-<span class='op'>}</span><span class='op'>)</span>
-
-<span class='co'># The factory creates generator instances. They are iterators</span>
-<span class='co'># that you can call successively to obtain new values:</span>
-<span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "a"</div><div class='input'><span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "b"</div><div class='input'>
-<span class='co'># Once a generator has returned it keeps returning `exhausted()`.</span>
-<span class='co'># This signals to its caller that new values can no longer be</span>
-<span class='co'># produced. The generator is exhausted:</span>
-<span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "c"</div><div class='input'><span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; exhausted</div><div class='input'>
-<span class='co'># You can only exhaust a generator once but you can always create</span>
-<span class='co'># new ones from a factory:</span>
-<span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "a"</div><div class='input'>
-
-<span class='co'># As generators implement the coro iteration protocol, you can use</span>
-<span class='co'># coro tools like `loop()`. It makes it possible to loop over</span>
-<span class='co'># iterators with `for` expressions:</span>
-<span class='fu'><a href='collect.html'>loop</a></span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>abc</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "b"
-#&gt; [1] "c"</div><div class='input'>
-<span class='co'># To gather values of an iterator in a list, use `collect()`. Pass</span>
-<span class='co'># the `n` argument to collect that number of elements from a</span>
-<span class='co'># generator:</span>
-<span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'><a href='collect.html'>collect</a></span><span class='op'>(</span><span class='va'>abc</span>, <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt; [1] "a"
-#&gt; </div><div class='input'>
-<span class='co'># Or drain all remaining elements:</span>
-<span class='fu'><a href='collect.html'>collect</a></span><span class='op'>(</span><span class='va'>abc</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt; [1] "b"
-#&gt; 
-#&gt; [[2]]
-#&gt; [1] "c"
-#&gt; </div><div class='input'>
-
-<span class='co'># coro provides a short syntax `gen()` for creating one-off</span>
-<span class='co'># generator _instances_. It is handy to adapt existing iterators:</span>
-<span class='va'>numbers</span> <span class='op'>&lt;-</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span>
-<span class='va'>odds</span> <span class='op'>&lt;-</span> <span class='fu'>gen</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>numbers</span><span class='op'>)</span> <span class='kw'>if</span> <span class='op'>(</span><span class='va'>x</span> <span class='op'>%%</span> <span class='fl'>2</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>squares</span> <span class='op'>&lt;-</span> <span class='fu'>gen</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>odds</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>greetings</span> <span class='op'>&lt;-</span> <span class='fu'>gen</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>squares</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Hey"</span>, <span class='va'>x</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
-
-<span class='fu'><a href='collect.html'>collect</a></span><span class='op'>(</span><span class='va'>greetings</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt; [1] "Hey 1"
-#&gt; 
-#&gt; [[2]]
-#&gt; [1] "Hey 9"
-#&gt; 
-#&gt; [[3]]
-#&gt; [1] "Hey 25"
-#&gt; 
-#&gt; [[4]]
-#&gt; [1] "Hey 49"
-#&gt; 
-#&gt; [[5]]
-#&gt; [1] "Hey 81"
-#&gt; </div><div class='input'>
-
-<span class='co'># Arguments passed to generator instances are returned from the</span>
-<span class='co'># `yield()` statement on reentry:</span>
-<span class='va'>new_tally</span> <span class='op'>&lt;-</span> <span class='fu'>generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>count</span> <span class='op'>&lt;-</span> <span class='fl'>0</span>
-  <span class='kw'>while</span> <span class='op'>(</span><span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>{</span>
-    <span class='va'>i</span> <span class='op'>&lt;-</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>count</span><span class='op'>)</span>
-    <span class='va'>count</span> <span class='op'>&lt;-</span> <span class='va'>count</span> <span class='op'>+</span> <span class='va'>i</span>
-  <span class='op'>}</span>
-<span class='op'>}</span><span class='op'>)</span>
-<span class='va'>tally</span> <span class='op'>&lt;-</span> <span class='fu'>new_tally</span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>tally</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 0</div><div class='input'><span class='fu'>tally</span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 2</div><div class='input'><span class='fu'>tally</span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] 12</div></pre>
+    <pre class="examples"><span class='r-in'><span class='co'># A generator statement creates a generator factory. The</span></span>
+<span class='r-in'><span class='co'># following generator yields two times and then returns `"c"`:</span></span>
+<span class='r-in'><span class='va'>generate_abc</span> <span class='op'>&lt;-</span> <span class='fu'>generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='st'>"a"</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='st'>"b"</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='st'>"c"</span></span>
+<span class='r-in'><span class='op'>}</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Or equivalently:</span></span>
+<span class='r-in'><span class='va'>generate_abc</span> <span class='op'>&lt;-</span> <span class='fu'>generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></span>
+<span class='r-in'>  <span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># The factory creates generator instances. They are iterators</span></span>
+<span class='r-in'><span class='co'># that you can call successively to obtain new values:</span></span>
+<span class='r-in'><span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "a"</span>
+<span class='r-in'><span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "b"</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Once a generator has returned it keeps returning `exhausted()`.</span></span>
+<span class='r-in'><span class='co'># This signals to its caller that new values can no longer be</span></span>
+<span class='r-in'><span class='co'># produced. The generator is exhausted:</span></span>
+<span class='r-in'><span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "c"</span>
+<span class='r-in'><span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> exhausted</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># You can only exhaust a generator once but you can always create</span></span>
+<span class='r-in'><span class='co'># new ones from a factory:</span></span>
+<span class='r-in'><span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "a"</span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># As generators implement the coro iteration protocol, you can use</span></span>
+<span class='r-in'><span class='co'># coro tools like `loop()`. It makes it possible to loop over</span></span>
+<span class='r-in'><span class='co'># iterators with `for` expressions:</span></span>
+<span class='r-in'><span class='fu'><a href='collect.html'>loop</a></span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>abc</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "b"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "c"</span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># To gather values of an iterator in a list, use `collect()`. Pass</span></span>
+<span class='r-in'><span class='co'># the `n` argument to collect that number of elements from a</span></span>
+<span class='r-in'><span class='co'># generator:</span></span>
+<span class='r-in'><span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'><a href='collect.html'>collect</a></span><span class='op'>(</span><span class='va'>abc</span>, <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "a"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Or drain all remaining elements:</span></span>
+<span class='r-in'><span class='fu'><a href='collect.html'>collect</a></span><span class='op'>(</span><span class='va'>abc</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "b"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[2]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "c"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># coro provides a short syntax `gen()` for creating one-off</span></span>
+<span class='r-in'><span class='co'># generator _instances_. It is handy to adapt existing iterators:</span></span>
+<span class='r-in'><span class='va'>numbers</span> <span class='op'>&lt;-</span> <span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span></span>
+<span class='r-in'><span class='va'>odds</span> <span class='op'>&lt;-</span> <span class='fu'>gen</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>numbers</span><span class='op'>)</span> <span class='kw'>if</span> <span class='op'>(</span><span class='va'>x</span> <span class='op'><a href='https://rdrr.io/r/base/Arithmetic.html'>%%</a></span> <span class='fl'>2</span> <span class='op'>!=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>squares</span> <span class='op'>&lt;-</span> <span class='fu'>gen</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>odds</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>greetings</span> <span class='op'>&lt;-</span> <span class='fu'>gen</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>squares</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Hey"</span>, <span class='va'>x</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='fu'><a href='collect.html'>collect</a></span><span class='op'>(</span><span class='va'>greetings</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "Hey 1"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[2]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "Hey 9"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[3]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "Hey 25"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[4]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "Hey 49"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[5]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "Hey 81"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Arguments passed to generator instances are returned from the</span></span>
+<span class='r-in'><span class='co'># `yield()` statement on reentry:</span></span>
+<span class='r-in'><span class='va'>new_tally</span> <span class='op'>&lt;-</span> <span class='fu'>generator</span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>  <span class='va'>count</span> <span class='op'>&lt;-</span> <span class='fl'>0</span></span>
+<span class='r-in'>  <span class='kw'>while</span> <span class='op'>(</span><span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'>    <span class='va'>i</span> <span class='op'>&lt;-</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>count</span><span class='op'>)</span></span>
+<span class='r-in'>    <span class='va'>count</span> <span class='op'>&lt;-</span> <span class='va'>count</span> <span class='op'>+</span> <span class='va'>i</span></span>
+<span class='r-in'>  <span class='op'>}</span></span>
+<span class='r-in'><span class='op'>}</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>tally</span> <span class='op'>&lt;-</span> <span class='fu'>new_tally</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>tally</span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 0</span>
+<span class='r-in'><span class='fu'>tally</span><span class='op'>(</span><span class='fl'>2</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 2</span>
+<span class='r-in'><span class='fu'>tally</span><span class='op'>(</span><span class='fl'>10</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] 12</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -177,32 +177,36 @@ the <code><a href='iterator.html'>exhausted()</a></code> sentinel, invisibly.</p
     <div class='dont-index'><p><code><a href='async_collect.html'>async_collect()</a></code> for async generators.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='va'>generate_abc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='generator.html'>generator</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span>
-
-<span class='co'># Collect 1 element:</span>
-<span class='fu'>collect</span><span class='op'>(</span><span class='va'>abc</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt; [1] "a"
-#&gt; </div><div class='input'>
-<span class='co'># Collect all remaining elements:</span>
-<span class='fu'>collect</span><span class='op'>(</span><span class='va'>abc</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [[1]]
-#&gt; [1] "b"
-#&gt; 
-#&gt; [[2]]
-#&gt; [1] "c"
-#&gt; </div><div class='input'>
-<span class='co'># With exhausted iterators collect() returns an empty list:</span>
-<span class='fu'>collect</span><span class='op'>(</span><span class='va'>abc</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; list()</div><div class='input'>
-
-<span class='co'># With loop() you can use `for` loops with iterators:</span>
-<span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span>
-<span class='fu'>loop</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>abc</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; [1] "a"
-#&gt; [1] "b"
-#&gt; [1] "c"</div></pre>
+    <pre class="examples"><span class='r-in'><span class='va'>generate_abc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='generator.html'>generator</a></span><span class='op'>(</span><span class='kw'>function</span><span class='op'>(</span><span class='op'>)</span> <span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>letters</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>3</span><span class='op'>]</span><span class='op'>)</span> <span class='fu'><a href='yield.html'>yield</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-in'><span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Collect 1 element:</span></span>
+<span class='r-in'><span class='fu'>collect</span><span class='op'>(</span><span class='va'>abc</span>, n <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "a"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Collect all remaining elements:</span></span>
+<span class='r-in'><span class='fu'>collect</span><span class='op'>(</span><span class='va'>abc</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[1]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "b"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [[2]]</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "c"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> </span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># With exhausted iterators collect() returns an empty list:</span></span>
+<span class='r-in'><span class='fu'>collect</span><span class='op'>(</span><span class='va'>abc</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> list()</span>
+<span class='r-in'></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># With loop() you can use `for` loops with iterators:</span></span>
+<span class='r-in'><span class='va'>abc</span> <span class='op'>&lt;-</span> <span class='fu'>generate_abc</span><span class='op'>(</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>loop</span><span class='op'>(</span><span class='kw'>for</span> <span class='op'>(</span><span class='va'>x</span> <span class='kw'>in</span> <span class='va'>abc</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "a"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "b"</span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> [1] "c"</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
