@@ -1,4 +1,3 @@
-
 test_that("`if` blocks - one pause", {
   expect_snapshot0(generator_body(function() {
     "before"

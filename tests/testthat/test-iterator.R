@@ -1,4 +1,3 @@
-
 test_that("can use reticulate iterators", {
   skip_if_not_installed("reticulate")
   skip_on_cran()

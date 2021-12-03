@@ -1,4 +1,3 @@
-
 test_that("`{` blocks - one pause with no past or future", {
   expect_snapshot0(generator_body(function() {
     yield(1L)

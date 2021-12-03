@@ -1,4 +1,3 @@
-
 test_that("reduce() stops early on reduced input", {
   reducer <- function(result, input) {
     if (input %% 2 == 0) {

@@ -1,4 +1,3 @@
-
 test_that("async functions construct a generator", {
   expect_snapshot0(async_body(function() "value"))
   expect_snapshot0(async_body(function() await("value")))

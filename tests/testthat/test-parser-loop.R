@@ -1,4 +1,3 @@
-
 test_that("`repeat` - one pause", {
   expect_snapshot0(generator_body(function() {
     "before"

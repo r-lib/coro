@@ -1,4 +1,3 @@
-
 test_that("can loop() with iterators", {
   iter <- as_iterator(1:3)
   out <- int()

@@ -1,4 +1,3 @@
-
 walk_states <- function(expr, info) {
   continue <- function(counter, last) {
     # Break if last

@@ -1,4 +1,3 @@
-
 vec_types <- c(
   "logical",
   "integer",

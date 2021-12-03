@@ -1,4 +1,3 @@
-
 test_that("can create non-yielding generator functions", {
   gen <- generator(function() "foo")
   expect_identical(collect(gen()), list("foo"))

@@ -1,4 +1,3 @@
-
 node_list_tail <- function(node) {
   while (!is_null(node_cdr(node))) {
     node <- node_cdr(node)

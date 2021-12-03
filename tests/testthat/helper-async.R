@@ -1,4 +1,3 @@
-
 expect_promise <- function(x, value, status = NULL) {
   expect_true(inherits(x, "promise"))
 

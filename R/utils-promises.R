@@ -1,4 +1,3 @@
-
 wait_for <- function(expr) {
   loop <- later::create_loop(parent = NULL)
 

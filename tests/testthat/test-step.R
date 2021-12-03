@@ -1,4 +1,3 @@
-
 test_that("iter_map() applies function", {
   expect_identical(into(int(), 1:3, iter_map(`+`, 10L)), 11:13)
 })
