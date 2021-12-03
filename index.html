@@ -25,6 +25,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -37,18 +39,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">coro</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/r-lib/coro/">
+  <a href="https://github.com/r-lib/coro/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -87,14 +83,14 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="coro" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#coro" class="anchor"></a>coro</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="coro">coro<a class="anchor" aria-label="anchor" href="#coro"></a>
+</h1></div>
 <!-- badges: start -->
 
-<div id="overview" class="section level2">
-<h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
 <p>coro implements <strong>coroutines</strong> for R, i.e. functions that can be suspended and resumed later on. There are two kinds:</p>
 <ul>
 <li>
@@ -105,31 +101,31 @@
 <p>Supported features:</p>
 <ul>
 <li>Suspending within loops and if/else branches</li>
-<li>Suspending within <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code>
+<li>Suspending within <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code>
 </li>
 <li>
-<code><a href="https://rdrr.io/r/base/on.exit.html">on.exit()</a></code> expressions and stack-based cleanup such as provided by <code>local_</code> functions in the <a href="https://github.com/r-lib/withr/">withr</a> package</li>
-<li>Step-debugging and <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code> within coroutines</li>
+<code><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit()</a></code> expressions and stack-based cleanup such as provided by <code>local_</code> functions in the <a href="https://github.com/r-lib/withr/" class="external-link">withr</a> package</li>
+<li>Step-debugging and <code><a href="https://rdrr.io/r/base/browser.html" class="external-link">browser()</a></code> within coroutines</li>
 </ul>
 <p>Compatibility with:</p>
 <ul>
-<li>Python iterators from the <a href="https://rstudio.github.io/reticulate/">reticulate</a> package</li>
-<li>Async operations from the <a href="https://github.com/rstudio/promises/">promises</a> package</li>
-<li>Parallel computations from the <a href="https://github.com/HenrikBengtsson/future">future</a> package</li>
+<li>Python iterators from the <a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a> package</li>
+<li>Async operations from the <a href="https://github.com/rstudio/promises/" class="external-link">promises</a> package</li>
+<li>Parallel computations from the <a href="https://github.com/HenrikBengtsson/future" class="external-link">future</a> package</li>
 </ul>
 <p>Attach the package to follow the examples:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/coro">coro</a></span><span class="op">)</span></code></pre></div>
-<div id="asyncawait-functions" class="section level3">
-<h3 class="hasAnchor">
-<a href="#asyncawait-functions" class="anchor"></a>Async/await functions</h3>
-<p>Concurrent programming is made straightforward by async-await functions. Whenever you are waiting for a result that may take a while (downloading a file, computing a value in an external process), use <code><a href="reference/async.html">await()</a></code>. The argument to <code><a href="reference/async.html">await()</a></code> must return a promise from the <a href="https://github.com/rstudio/promises/">promises</a> package.</p>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/coro" class="external-link">coro</a></span><span class="op">)</span></code></pre></div>
+<div class="section level3">
+<h3 id="asyncawait-functions">Async/await functions<a class="anchor" aria-label="anchor" href="#asyncawait-functions"></a>
+</h3>
+<p>Concurrent programming is made straightforward by async-await functions. Whenever you are waiting for a result that may take a while (downloading a file, computing a value in an external process), use <code><a href="reference/async.html">await()</a></code>. The argument to <code><a href="reference/async.html">await()</a></code> must return a promise from the <a href="https://github.com/rstudio/promises/" class="external-link">promises</a> package.</p>
 <p>Concurrent code based on promises can quickly become hard to write and follow. In the following artificial example, we wait for a download to complete, then decide to launch a computation in an external process depending on a property of the downloaded data. We also handle some errors specifically.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_async</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="fu">async_download</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
     <span class="fu">then</span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span>
+      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span>
         <span class="fu">then</span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu">future</span><span class="op">(</span><span class="fu">fib</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">fib</span><span class="op">)</span> <span class="op">{</span>
           <span class="va">data</span> <span class="op">/</span> <span class="va">fib</span>
         <span class="op">}</span><span class="op">)</span>
@@ -137,26 +133,26 @@
         <span class="va">data</span>
       <span class="op">}</span>
     <span class="op">}</span>, onRejected <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">err</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html">inherits</a></span><span class="op">(</span><span class="va">err</span>, <span class="st">"download_error"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">err</span>, <span class="st">"download_error"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
         <span class="cn">NULL</span>
       <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-        <span class="kw"><a href="https://rdrr.io/r/base/stop.html">stop</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span>
+        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span>
       <span class="op">}</span>
     <span class="op">}</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
 <p>Rewriting this function with async/await greatly simplifies the code:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">my_async</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">data</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html">tryCatch</a></span><span class="op">(</span>
+  <span class="va">data</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span>
     <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">async_download</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,
     download_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">err</span><span class="op">)</span> <span class="cn">NULL</span>
   <span class="op">)</span>
 
-  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>
+  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>
   <span class="op">}</span>
 
-  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span>
     <span class="va">fib</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu">future</span><span class="op">(</span><span class="fu">fib</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
     <span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">/</span><span class="va">fib</span>
   <span class="op">}</span>
@@ -164,9 +160,9 @@
   <span class="va">data</span>
 <span class="op">}</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="generators" class="section level3">
-<h3 class="hasAnchor">
-<a href="#generators" class="anchor"></a>Generators</h3>
+<div class="section level3">
+<h3 id="generators">Generators<a class="anchor" aria-label="anchor" href="#generators"></a>
+</h3>
 <p>Generators are based on a simple iteration protocol:</p>
 <ul>
 <li>Iterators are functions.</li>
@@ -207,21 +203,21 @@
 <p>Iterate over an iterator with <code><a href="reference/collect.html">loop()</a></code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/collect.html">loop</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span>
 <span class="co">#&gt; [1] "A"</span>
 <span class="co">#&gt; [1] "B"</span>
 <span class="co">#&gt; [1] "C"</span></code></pre></div>
 <p>See <code><a href="articles/generator.html">vignette("generator")</a></code> for more information.</p>
 </div>
-<div id="compatibility-with-the-reticulate-package" class="section level3">
-<h3 class="hasAnchor">
-<a href="#compatibility-with-the-reticulate-package" class="anchor"></a>Compatibility with the reticulate package</h3>
-<p>Python iterators imported with the <a href="https://rstudio.github.io/reticulate/">reticulate</a> package are compatible with <code><a href="reference/collect.html">loop()</a></code> and <code><a href="reference/collect.html">collect()</a></code>:</p>
+<div class="section level3">
+<h3 id="compatibility-with-the-reticulate-package">Compatibility with the reticulate package<a class="anchor" aria-label="anchor" href="#compatibility-with-the-reticulate-package"></a>
+</h3>
+<p>Python iterators imported with the <a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a> package are compatible with <code><a href="reference/collect.html">loop()</a></code> and <code><a href="reference/collect.html">collect()</a></code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/reticulate">reticulate</a></span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/reticulate" class="external-link">reticulate</a></span><span class="op">)</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/py_run.html">py_run_string</a></span><span class="op">(</span><span class="st">"
+<span class="fu"><a href="https://rdrr.io/pkg/reticulate/man/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">"
 def first_n(n):
     num = 1
     while num &lt;= n:
@@ -230,7 +226,7 @@ def first_n(n):
 "</span><span class="op">)</span>
 
 <span class="fu"><a href="reference/collect.html">loop</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">py</span><span class="op">$</span><span class="fu">first_n</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span>
 <span class="co">#&gt; [1] 2</span>
 <span class="co">#&gt; [1] 4</span>
@@ -252,36 +248,36 @@ def first_n(n):
 <span class="co">#&gt; [1] 30</span></code></pre></div>
 </div>
 </div>
-<div id="limitations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#limitations" class="anchor"></a>Limitations</h2>
-<p><code><a href="reference/yield.html">yield()</a></code> and <code><a href="reference/async.html">await()</a></code> can be used in loops, if/else branches, <code><a href="https://rdrr.io/r/base/conditions.html">tryCatch()</a></code> expressions, or any combinations of these. However they can’t be used as function arguments. These will cause errors:</p>
+<div class="section level2">
+<h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
+</h2>
+<p><code><a href="reference/yield.html">yield()</a></code> and <code><a href="reference/async.html">await()</a></code> can be used in loops, if/else branches, <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code> expressions, or any combinations of these. However they can’t be used as function arguments. These will cause errors:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="st">"foo"</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="st">"foo"</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span>
 
 <span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span></code></pre></div>
 <p>Fortunately it is easy to rewrite the code to work around this limitation:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="st">"foo"</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span>
 
 <span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
   <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="how-does-it-work" class="section level2">
-<h2 class="hasAnchor">
-<a href="#how-does-it-work" class="anchor"></a>How does it work</h2>
-<p>Coroutines are an <a href="https://eli.thegreenplace.net/2009/08/29/co-routines-as-an-alternative-to-state-machines">abstraction for state machines</a> in languages that support them. Conversely, you can implement coroutines by rewriting the code source provided by the user as a state machine. Pass <code>internals = TRUE</code> to the print methods of coroutines to reveal the state machine that is running under the hood:</p>
+<div class="section level2">
+<h2 id="how-does-it-work">How does it work<a class="anchor" aria-label="anchor" href="#how-does-it-work"></a>
+</h2>
+<p>Coroutines are an <a href="https://eli.thegreenplace.net/2009/08/29/co-routines-as-an-alternative-to-state-machines" class="external-link">abstraction for state machines</a> in languages that support them. Conversely, you can implement coroutines by rewriting the code source provided by the user as a state machine. Pass <code>internals = TRUE</code> to the print methods of coroutines to reveal the state machine that is running under the hood:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">generate_abc</span>, internals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">generate_abc</span>, internals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; &lt;generator&gt;</span>
 <span class="co">#&gt; function() {</span>
 <span class="co">#&gt;   for (x in letters[1:3]) {</span>
@@ -330,19 +326,19 @@ def first_n(n):
 <span class="co">#&gt;     exhausted &lt;- TRUE</span>
 <span class="co">#&gt;     invisible(exhausted())</span>
 <span class="co">#&gt; }</span></code></pre></div>
-<p>Despite this transformation of source code, <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code> and step-debugging still work as you would expect. This is because coro keeps track of the source references from the original code.</p>
+<p>Despite this transformation of source code, <code><a href="https://rdrr.io/r/base/browser.html" class="external-link">browser()</a></code> and step-debugging still work as you would expect. This is because coro keeps track of the source references from the original code.</p>
 </div>
-<div id="acknowledgements" class="section level2">
-<h2 class="hasAnchor">
-<a href="#acknowledgements" class="anchor"></a>Acknowledgements</h2>
+<div class="section level2">
+<h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
+</h2>
 <ul>
-<li><p>The <a href="https://facebook.github.io/regenerator/">regenerator</a> Javascript package which uses a similar transformation to implement generators and async functions in older versions of Javascript.</p></li>
+<li><p>The <a href="https://facebook.github.io/regenerator/" class="external-link">regenerator</a> Javascript package which uses a similar transformation to implement generators and async functions in older versions of Javascript.</p></li>
 <li><p>Gabor Csardi for many interesting discussions about concurrency and the design of coro.</p></li>
 </ul>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>Install the development version from github with:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
@@ -353,48 +349,58 @@ def first_n(n):
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=coro">https://​cloud.r-project.org/​package=coro</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/r-lib/coro/">https://​github.com/​r-lib/​coro/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/r-lib/coro/issues">https://​github.com/​r-lib/​coro/​issues</a>
-</li>
-</ul>
-</div>
-<div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>Lionel Henry <br><small class="roles"> Author, maintainer </small>  </li>
-<li><a href="authors.html">All authors...</a></li>
+<li><a href="https://cloud.r-project.org/package=coro" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/r-lib/coro/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/r-lib/coro/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="license">
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://cran.r-project.org/package=coro"><img src="https://www.r-pkg.org/badges/version/coro" alt="CRAN status"></a></li>
-<li><a href="https://github.com/r-lib/coro/actions"><img src="https://github.com/r-lib/coro/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="LICENSE.html">Full license</a></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing coro</a></li>
+</ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>Lionel Henry <br><small class="roles"> Author, maintainer </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://cran.r-project.org/package=coro" class="external-link"><img src="https://www.r-pkg.org/badges/version/coro" alt="CRAN status"></a></li>
+<li><a href="https://github.com/r-lib/coro/actions" class="external-link"><img src="https://github.com/r-lib/coro/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+</ul>
+</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Lionel Henry.</p>
+  <p></p>
+<p>Developed by Lionel Henry.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -402,6 +408,8 @@ def first_n(n):
 
   
 
+
+  
 
   </body>
 </html>

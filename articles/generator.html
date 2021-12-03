@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">coro</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -64,7 +60,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/r-lib/coro/">
+  <a href="https://github.com/r-lib/coro/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -83,23 +79,23 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Generators</h1>
-                        <h4 class="author">Lionel Henry</h4>
+                        <h4 data-toc-skip class="author">Lionel Henry</h4>
             
-            <h4 class="date">2021-12-03</h4>
+            <h4 data-toc-skip class="date">2021-12-03</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/r-lib/coro/blob/master/vignettes/generator.Rmd"><code>vignettes/generator.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/r-lib/coro/blob/HEAD/vignettes/generator.Rmd" class="external-link"><code>vignettes/generator.Rmd</code></a></small>
       <div class="hidden name"><code>generator.Rmd</code></div>
 
     </div>
 
     
     
-<div id="iterators" class="section level2">
-<h2 class="hasAnchor">
-<a href="#iterators" class="anchor"></a>Iterators</h2>
+<div class="section level2">
+<h2 id="iterators">Iterators<a class="anchor" aria-label="anchor" href="#iterators"></a>
+</h2>
 <p>Generators are a simple way of creating <strong>iterator functions</strong>, i.e. functions that you can call to return a new value. The iteration protocol is described in <code><a href="../reference/iterator.html">?iterator</a></code>. Here is a simple iterator that iterates over the elements of <code>1:3</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/coro">coro</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/coro" class="external-link">coro</a></span><span class="op">)</span>
 
 <span class="va">iterator</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_iterator.html">as_iterator</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span>
 
@@ -125,9 +121,9 @@
 </ul>
 <p>The iterator protocol is designed to be free of dependency. However, the easiest way to create an iterator is by using the generator factories provided in this package.</p>
 </div>
-<div id="generators" class="section level2">
-<h2 class="hasAnchor">
-<a href="#generators" class="anchor"></a>Generators</h2>
+<div class="section level2">
+<h2 id="generators">Generators<a class="anchor" aria-label="anchor" href="#generators"></a>
+</h2>
 <p>Generators create functions that can <strong>yield</strong>, i.e. suspend themselves. When a generator reaches a <code>yield(value)</code> statement it returns the value as if you called <code>return(value)</code>. However, calling the generator again resumes the function right where it left off. Because they preserve their state between invokations, generators are ideal for creating iterator functions.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">generate_abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
@@ -177,25 +173,25 @@
 <span class="fu">natural_numbers</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] 11</span></code></pre></div>
 </div>
-<div id="iterating" class="section level2">
-<h2 class="hasAnchor">
-<a href="#iterating" class="anchor"></a>Iterating</h2>
+<div class="section level2">
+<h2 id="iterating">Iterating<a class="anchor" aria-label="anchor" href="#iterating"></a>
+</h2>
 <p>Iterating manually over an iterator function is a bit tricky because you have to watch out for the exhaustion sentinel:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span>
 
 <span class="kw">while</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="../reference/iterator.html">is_exhausted</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu">abc</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="co">#&gt; [1] "a"</span>
 <span class="co">#&gt; [1] "b"</span>
 <span class="co">#&gt; [1] "c"</span></code></pre></div>
-<p>A simpler way is to iterate with a <code>for</code> loop using the <code><a href="https://rdrr.io/pkg/reticulate/man/iterate.html">iterate()</a></code> helper. Within <code><a href="https://rdrr.io/pkg/reticulate/man/iterate.html">iterate()</a></code>, <code>for</code> understands the iterator protocol:</p>
+<p>A simpler way is to iterate with a <code>for</code> loop using the <code><a href="https://rdrr.io/pkg/reticulate/man/iterate.html" class="external-link">iterate()</a></code> helper. Within <code><a href="https://rdrr.io/pkg/reticulate/man/iterate.html" class="external-link">iterate()</a></code>, <code>for</code> understands the iterator protocol:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/collect.html">loop</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">abc</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
 <span class="op">}</span><span class="op">)</span>
 <span class="co">#&gt; [1] "a"</span>
 <span class="co">#&gt; [1] "b"</span>
@@ -216,7 +212,7 @@
 <p>Beware that trying to exhaust an infinite iterator is a programming error. This causes an infinite loop that never returns, forcing the user to interrupt R with <code>ctrl-c</code>. Make sure that you iterate over an infinite iterator only a finite amount of time:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu">natural_numbers</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">natural_numbers</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="op">}</span>
 <span class="co">#&gt; [1] 12</span>
 <span class="co">#&gt; [1] 13</span>
@@ -232,20 +228,20 @@
 <span class="co">#&gt; [[3]]</span>
 <span class="co">#&gt; [1] 17</span></code></pre></div>
 </div>
-<div id="adapting-generators" class="section level2">
-<h2 class="hasAnchor">
-<a href="#adapting-generators" class="anchor"></a>Adapting generators</h2>
+<div class="section level2">
+<h2 id="adapting-generators">Adapting generators<a class="anchor" aria-label="anchor" href="#adapting-generators"></a>
+</h2>
 <p>A generator factory can take another iterator as argument to modify its values. This pattern is called <strong>adapting</strong>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org">magrittr</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span>
 
 <span class="va">adapt_toupper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span>
   <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">i</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="../reference/yield.html">yield</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="../reference/yield.html">yield</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
   <span class="op">}</span>
 <span class="op">}</span><span class="op">)</span>
 
-<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">adapt_toupper</span><span class="op">(</span><span class="op">)</span>
+<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">adapt_toupper</span><span class="op">(</span><span class="op">)</span>
 
 <span class="fu">ABC</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "A"</span>
@@ -262,7 +258,7 @@
 <p>As a user, you might not want to create an iterator factory for a one-off adaptor. In this case you can use <code><a href="../reference/generator.html">gen()</a></code> instead of <code><a href="../reference/generator.html">generator()</a></code>. This enables a more pythonic style of working with iterators:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span>
-<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">gen</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">abc</span><span class="op">)</span> <span class="fu"><a href="../reference/yield.html">yield</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
+<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">gen</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">abc</span><span class="op">)</span> <span class="fu"><a href="../reference/yield.html">yield</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/collect.html">collect</a></span><span class="op">(</span><span class="va">ABC</span><span class="op">)</span>
 <span class="co">#&gt; [[1]]</span>
@@ -281,7 +277,7 @@
   <span class="op">}</span>
 <span class="op">}</span><span class="op">)</span>
 
-<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">adapt_map</span><span class="op">(</span><span class="va">toupper</span><span class="op">)</span>
+<span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">adapt_map</span><span class="op">(</span><span class="va">toupper</span><span class="op">)</span>
 
 <span class="fu">ABC</span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; [1] "A"</span></code></pre></div>
@@ -299,11 +295,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Lionel Henry.</p>
+  <p></p>
+<p>Developed by Lionel Henry.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -311,6 +309,8 @@
 
   
 
+
+  
 
   </body>
 </html>
