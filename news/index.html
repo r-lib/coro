@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">coro</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.1.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.2</span>
       </span>
     </div>
 
@@ -58,7 +58,7 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="development version" id="coro-development-version">coro (development version)<a class="anchor" aria-label="anchor" href="#coro-development-version"></a></h2>
+<h2 class="page-header" data-toc-text="1.0.2" id="coro-102">coro 1.0.2<a class="anchor" aria-label="anchor" href="#coro-102"></a></h2>
 <ul><li><p>The exhaustion sentinel is now <code>as.symbol(".__exhausted__.")</code> instead of <code>as.symbol("exhausted")</code> to reduce the risk of collisions. It is also recommended to never store the exhaustion sentinel in an environment or list, and instead use it as a temporary value to further reduce the risk of collisions (<a href="https://github.com/r-lib/coro/issues/35" class="external-link">#35</a>).</p></li>
 <li><p>Fixed a leak that occurred via JIT caching (<a href="https://github.com/r-lib/coro/issues/36" class="external-link">#36</a>).</p></li>
 </ul></div>
