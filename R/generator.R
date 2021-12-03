@@ -153,7 +153,7 @@ generator0 <- function(fn, type = "generator") {
 
       # Create the generator instance. This is a function that resumes
       # a state machine.
-      gen <- blast(function(arg) {
+      gen <- inject(function(arg) {
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
 
@@ -355,7 +355,7 @@ is_generator_factory <- function(x) {
 }
 
 with_try_catch <- function(handlers, expr) {
-  blast(tryCatch(expr, !!!handlers))
+  inject(tryCatch(expr, !!!handlers))
 }
 
 utils::globalVariables(c(

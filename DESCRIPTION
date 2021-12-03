@@ -15,7 +15,7 @@ Description: Provides 'coroutines' for R, a family of functions that
 Depends:
     R (>= 3.5.0)
 Imports:
-    rlang (>= 0.4.9)
+    rlang (>= 0.4.12)
 Suggests:
     knitr,
     later (>= 1.1.0),

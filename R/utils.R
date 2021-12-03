@@ -1,11 +1,6 @@
-
 unstructure <- function(x) {
   attributes(x) <- NULL
   x
-}
-
-blast <- function(expr, env = caller_env()) {
-  eval_bare(enexpr(expr), env)
 }
 
 `%&&%` <- function(x, y) {
