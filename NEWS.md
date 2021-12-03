@@ -1,8 +1,12 @@
 # coro (development version)
 
+* Fixed a leak that occurred via JIT caching (#36).
+
+
 # coro 1.0.1
 
 * `collect()` now preserves lists and data frames (#32).
+
 
 # coro 1.0.0
 

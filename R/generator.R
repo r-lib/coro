@@ -145,6 +145,10 @@ generator0 <- function(fn, type = "generator") {
       env <- new_generator_env(env, info)
       user_env <- env$user_env
 
+      # The compiler caches function bodies, so inline a weak
+      # reference to avoid leaks (#36)
+      weak_env <- new_weakref(env)
+
       # Forward arguments inside the user space of the state machine
       lapply(names(fmls), function(arg) env_bind_arg(user_env, arg, frame = generator_env))
 
@@ -190,7 +194,7 @@ generator0 <- function(fn, type = "generator") {
         # environment.
         env$jumped <- TRUE
         out <- evalq(envir = user_env,
-          base::evalq(envir = !!env, {
+          base::evalq(envir = rlang::wref_key(!!weak_env), {
             env_poke_exits(user_env, exits)
             !!state_machine
           })
