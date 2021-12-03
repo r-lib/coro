@@ -3,7 +3,7 @@ pkgdown: 2.0.1
 pkgdown_sha: ~
 articles:
   generator: generator.html
-last_built: 2021-12-03T15:15Z
+last_built: 2021-12-03T15:36Z
 urls:
   reference: https://coro.r-lib.org/reference
   article: https://coro.r-lib.org/articles
