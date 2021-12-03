@@ -23,20 +23,21 @@ returned.
 return, the symbol \code{quote(exhausted)} is returned. This signals
 exhaustion to the caller.
 \item Once an iterator has signalled exhaustion, all subsequent
-invokations must consistently return \code{quote(exhausted)}.
-}\if{html}{\out{<div class="r">}}\preformatted{iterator <- as_iterator(1:3)
+invokations must consistently return \code{coro::exhausted()} or
+\code{as.symbol(".__exhausted__.")}.
+}\if{html}{\out{<div class="sourceCode r">}}\preformatted{iterator <- as_iterator(1:3)
 
 # Calling the iterator advances it
 iterator()
 }\if{html}{\out{</div>}}\preformatted{## [1] 1
-}\if{html}{\out{<div class="r">}}\preformatted{iterator()
+}\if{html}{\out{<div class="sourceCode r">}}\preformatted{iterator()
 }\if{html}{\out{</div>}}\preformatted{## [1] 2
-}\if{html}{\out{<div class="r">}}\preformatted{# This is the last value
+}\if{html}{\out{<div class="sourceCode r">}}\preformatted{# This is the last value
 iterator()
 }\if{html}{\out{</div>}}\preformatted{## [1] 3
-}\if{html}{\out{<div class="r">}}\preformatted{# Subsequent invokations return the exhaustion sentinel
+}\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Subsequent invokations return the exhaustion sentinel
 iterator()
-}\if{html}{\out{</div>}}\preformatted{## exhausted
+}\if{html}{\out{</div>}}\preformatted{## .__exhausted__.
 }
 
 Because iteration is defined by a protocol, creating iterators is
@@ -57,5 +58,24 @@ back and once it is exhausted, it stays exhausted.
 Iterators are not necessarily finite. They can also represent
 infinite sequences, in which case trying to exhaust them is a
 programming error that causes an infinite loop.
+}
+
+\section{The exhausted sentinel}{
+
+
+Termination of iteration is signalled via a sentinel value,
+\code{as.symbol(".__exhausted__.")}. Alternative designs include:
+\itemize{
+\item A condition as in python.
+\item A rich value containing a termination flag as in Javascript.
+}
+
+The sentinel design is a simple and efficient solution but it has a
+downside. If you are iterating over a collection of elements that
+inadvertently contains the sentinel value, the iteration will be
+terminated early. To avoid such mix-ups, the sentinel should only
+be used as a temporary value. It should be created from scratch by
+a function like \code{coro::exhausted()} and never stored in a container
+or namespace.
 }
 

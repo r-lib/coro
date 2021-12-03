@@ -6,13 +6,7 @@
 \alias{coro-package}
 \title{coro: 'Coroutines' for R}
 \description{
-Provides 'coroutines' for R, a family of functions that
-    can be suspended and resumed later on. This includes 'async'
-    functions (which await) and generators (which yield). 'Async'
-    functions are based on the concurrency framework of the 'promises'
-    package. Generators are based on a dependency free iteration
-    protocol defined in 'coro' and are compatible with iterators from
-    the 'reticulate' package.
+Provides 'coroutines' for R, a family of functions that can be suspended and resumed later on. This includes 'async' functions (which await) and generators (which yield). 'Async' functions are based on the concurrency framework of the 'promises' package. Generators are based on a dependency free iteration protocol defined in 'coro' and are compatible with iterators from the 'reticulate' package.
 }
 \seealso{
 Useful links:

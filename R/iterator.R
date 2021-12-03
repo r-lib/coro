@@ -13,7 +13,8 @@
 #'   exhaustion to the caller.
 #'
 #' - Once an iterator has signalled exhaustion, all subsequent
-#'   invokations must consistently return `quote(exhausted)`.
+#'   invokations must consistently return `coro::exhausted()` or
+#'   `as.symbol(".__exhausted__.")`.
 #'
 #' ```{r}
 #' iterator <- as_iterator(1:3)
@@ -48,19 +49,36 @@
 #' infinite sequences, in which case trying to exhaust them is a
 #' programming error that causes an infinite loop.
 #'
+#'
+#' @section The exhausted sentinel:
+#'
+#' Termination of iteration is signalled via a sentinel value,
+#' `as.symbol(".__exhausted__.")`. Alternative designs include:
+#'
+#' - A condition as in python.
+#' - A rich value containing a termination flag as in Javascript.
+#'
+#' The sentinel design is a simple and efficient solution but it has a
+#' downside. If you are iterating over a collection of elements that
+#' inadvertently contains the sentinel value, the iteration will be
+#' terminated early. To avoid such mix-ups, the sentinel should only
+#' be used as a temporary value. It should be created from scratch by
+#' a function like `coro::exhausted()` and never stored in a container
+#' or namespace.
+#'
 #' @name iterator
 NULL
 
 #' @rdname iterator
 #' @export
 exhausted <- function() {
-  quote(exhausted)
+  as.symbol(".__exhausted__.")
 }
 #' @rdname iterator
 #' @param x An object.
 #' @export
 is_exhausted <- function(x) {
-  identical(x, quote(exhausted))
+  identical(x, exhausted())
 }
 
 #' Transform an object to an iterator

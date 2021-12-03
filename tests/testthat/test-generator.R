@@ -294,7 +294,7 @@ test_that("generators call as_iterator() method", {
           x <<- x + 1L
           x
         } else {
-          quote(exhausted)
+          exhausted()
         }
       }
     }
