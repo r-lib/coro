@@ -122,7 +122,7 @@ generator0 <- function(fn, type = "generator") {
 
   # Create the generator factory (returned by `generator()` and
   # entered by `async()`)
-  out <- new_function(fmls, quote({
+  factory <- new_function(fmls, quote({
     # Evaluate here so the formals of the generator factory do not
     # mask our variables
     `_private` <- rlang::env(`_parent`)
@@ -153,7 +153,7 @@ generator0 <- function(fn, type = "generator") {
 
       # Create the generator instance. This is a function that resumes
       # a state machine.
-      gen <- inject(function(arg) {
+      instance <- inject(function(arg) {
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
 
@@ -200,18 +200,18 @@ generator0 <- function(fn, type = "generator") {
         out
       })
 
-      env$.self <- gen
+      env$.self <- instance
 
       if (is_string(type, "async")) {
         # Step into the generator right away
-        gen(NULL)
+        instance(NULL)
       } else {
-        structure(gen, class = "coro_generator_instance")
+        structure(instance, class = "coro_generator_instance")
       }
     })
   }))
 
-  structure(out, class = c(paste0("coro_", type), "function"))
+  structure(factory, class = c(paste0("coro_", type), "function"))
 }
 
 # Creates a child of the coro namespace that holds all the variables
