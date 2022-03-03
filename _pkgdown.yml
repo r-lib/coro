@@ -1,5 +1,16 @@
 url: https://coro.r-lib.org/
 
+development:
+  mode: auto
+
+template:
+  package: tidytemplate
+  bootstrap: 5
+  
+  includes:
+    in_header: |
+      <script defer data-domain="coro.r-lib.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
+
 reference:
 - title: Generators
   contents:
