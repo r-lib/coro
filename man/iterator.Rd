@@ -25,20 +25,36 @@ exhaustion to the caller.
 \item Once an iterator has signalled exhaustion, all subsequent
 invokations must consistently return \code{coro::exhausted()} or
 \code{as.symbol(".__exhausted__.")}.
-}\if{html}{\out{<div class="sourceCode r">}}\preformatted{iterator <- as_iterator(1:3)
+}
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{iterator <- as_iterator(1:3)
 
 # Calling the iterator advances it
 iterator()
-}\if{html}{\out{</div>}}\preformatted{## [1] 1
-}\if{html}{\out{<div class="sourceCode r">}}\preformatted{iterator()
-}\if{html}{\out{</div>}}\preformatted{## [1] 2
-}\if{html}{\out{<div class="sourceCode r">}}\preformatted{# This is the last value
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] 1
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{iterator()
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] 2
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{# This is the last value
 iterator()
-}\if{html}{\out{</div>}}\preformatted{## [1] 3
-}\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Subsequent invokations return the exhaustion sentinel
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] 3
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Subsequent invokations return the exhaustion sentinel
 iterator()
-}\if{html}{\out{</div>}}\preformatted{## .__exhausted__.
-}
+}\if{html}{\out{</div>}}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{## .__exhausted__.
+}\if{html}{\out{</div>}}
 
 Because iteration is defined by a protocol, creating iterators is
 free of dependency. However, it is often simpler to create

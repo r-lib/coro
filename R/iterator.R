@@ -136,12 +136,16 @@ as_iterator.default <- function(x) {
   }
 }
 
-on_load(on_package_load("reticulate", {
-  if (!s3_has_method("coro::as_iterator", "python.builtin.iterator")) {
-    s3_register("coro::as_iterator", "python.builtin.iterator", function(x) {
-      function() {
-        reticulate::iter_next(x, completed = exhausted())
-      }
-    })
-  }
-}))
+
+
+#' @exportS3Method
+as_iterator.python.builtin.object <- function(x) {
+  x <- reticulate::as_iterator(x)
+  function() reticulate::iter_next(x, quote(.__exhausted__.))
+}
+
+#' @exportS3Method
+as_iterator.python.builtin.iterator <- function(x) {
+  force(x)
+  function() reticulate::iter_next(x, completed = quote(.__exhausted__.))
+}
