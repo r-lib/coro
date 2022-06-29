@@ -15,8 +15,8 @@
 <title>Coroutines for R • coro</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="deps/_Source%20Sans%20Pro-0.4.0/font.css" rel="stylesheet">
-<link href="deps/_Source%20Code%20Pro-0.4.0/font.css" rel="stylesheet">
+<script src="deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><link href="deps/_Source%20Sans%20Pro-0.4.1/font.css" rel="stylesheet">
+<link href="deps/_Source%20Code%20Pro-0.4.1/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Coroutines for R">
@@ -85,7 +85,6 @@
 <div class="page-header"><h1 id="coro">coro<a class="anchor" aria-label="anchor" href="#coro"></a>
 </h1></div>
 <!-- badges: start -->
-
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -113,50 +112,50 @@
 </ul>
 <p>Attach the package to follow the examples:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/coro" class="external-link">coro</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/coro" class="external-link">coro</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="asyncawait-functions">Async/await functions<a class="anchor" aria-label="anchor" href="#asyncawait-functions"></a>
 </h3>
 <p>Concurrent programming is made straightforward by async-await functions. Whenever you are waiting for a result that may take a while (downloading a file, computing a value in an external process), use <code><a href="reference/async.html">await()</a></code>. The argument to <code><a href="reference/async.html">await()</a></code> must return a promise from the <a href="https://github.com/rstudio/promises/" class="external-link">promises</a> package.</p>
 <p>Concurrent code based on promises can quickly become hard to write and follow. In the following artificial example, we wait for a download to complete, then decide to launch a computation in an external process depending on a property of the downloaded data. We also handle some errors specifically.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">my_async</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu">async_download</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
-    <span class="fu">then</span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span>
-        <span class="fu">then</span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu">future</span><span class="op">(</span><span class="fu">fib</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">fib</span><span class="op">)</span> <span class="op">{</span>
-          <span class="va">data</span> <span class="op">/</span> <span class="va">fib</span>
-        <span class="op">}</span><span class="op">)</span>
-      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-        <span class="va">data</span>
-      <span class="op">}</span>
-    <span class="op">}</span>, onRejected <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">err</span><span class="op">)</span> <span class="op">{</span>
-      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">err</span>, <span class="st">"download_error"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-        <span class="cn">NULL</span>
-      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span>
-        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span>
-      <span class="op">}</span>
-    <span class="op">}</span><span class="op">)</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">my_async</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">async_download</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">then</span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="fu">then</span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu">future</span><span class="op">(</span><span class="fu">fib</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">fib</span><span class="op">)</span> <span class="op">{</span></span>
+<span>          <span class="va">data</span> <span class="op">/</span> <span class="va">fib</span></span>
+<span>        <span class="op">}</span><span class="op">)</span></span>
+<span>      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>        <span class="va">data</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span>, onRejected <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">err</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">inherits</a></span><span class="op">(</span><span class="va">err</span>, <span class="st">"download_error"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="cn">NULL</span></span>
+<span>      <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>        <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="va">err</span><span class="op">)</span></span>
+<span>      <span class="op">}</span></span>
+<span>    <span class="op">}</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>Rewriting this function with async/await greatly simplifies the code:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">my_async</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">data</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span>
-    <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">async_download</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,
-    download_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">err</span><span class="op">)</span> <span class="cn">NULL</span>
-  <span class="op">)</span>
-
-  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>
-  <span class="op">}</span>
-
-  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">fib</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu">future</span><span class="op">(</span><span class="fu">fib</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-    <span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">/</span><span class="va">fib</span>
-  <span class="op">}</span>
-
-  <span class="va">data</span>
-<span class="op">}</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">my_async</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">async_download</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    download_error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">err</span><span class="op">)</span> <span class="cn">NULL</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">fib</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="fu">future</span><span class="op">(</span><span class="fu">fib</span><span class="op">(</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">/</span><span class="va">fib</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">data</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="generators">Generators<a class="anchor" aria-label="anchor" href="#generators"></a>
@@ -169,43 +168,43 @@
 </ul>
 <p>The <code><a href="reference/generator.html">generator()</a></code> function creates a generator factory which returns generator instances:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Create a generator factory</span>
-<span class="va">generate_abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-  <span class="op">}</span>
-<span class="op">}</span><span class="op">)</span>
-
-<span class="co"># Create a generator instance</span>
-<span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Create a generator factory</span></span>
+<span><span class="va">generate_abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create a generator instance</span></span>
+<span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>A generator instance is an iterator function which yields values:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">abc</span>
-<span class="co">#&gt; &lt;generator/instance&gt;</span>
-<span class="co">#&gt; function() {</span>
-<span class="co">#&gt;   for (x in letters[1:3]) {</span>
-<span class="co">#&gt;     yield(x)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt; }</span>
-
-<span class="fu">abc</span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; [1] "a"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">abc</span></span>
+<span><span class="co">#&gt; &lt;generator/instance&gt;</span></span>
+<span><span class="co">#&gt; function() {</span></span>
+<span><span class="co">#&gt;   for (x in letters[1:3]) {</span></span>
+<span><span class="co">#&gt;     yield(x)</span></span>
+<span><span class="co">#&gt;   }</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span></span>
+<span><span class="fu">abc</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "a"</span></span></code></pre></div>
 <p>Collect all remaining values from an iterator with <code><a href="reference/collect.html">collect()</a></code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/collect.html">collect</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span>
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; [1] "b"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; [1] "c"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/collect.html">collect</a></span><span class="op">(</span><span class="va">abc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; [1] "b"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; [1] "c"</span></span></code></pre></div>
 <p>Iterate over an iterator with <code><a href="reference/collect.html">loop()</a></code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/collect.html">loop</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span>
-<span class="co">#&gt; [1] "A"</span>
-<span class="co">#&gt; [1] "B"</span>
-<span class="co">#&gt; [1] "C"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/collect.html">loop</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "A"</span></span>
+<span><span class="co">#&gt; [1] "B"</span></span>
+<span><span class="co">#&gt; [1] "C"</span></span></code></pre></div>
 <p>See <code><a href="articles/generator.html">vignette("generator")</a></code> for more information.</p>
 </div>
 <div class="section level3">
@@ -213,37 +212,37 @@
 </h3>
 <p>Python iterators imported with the <a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a> package are compatible with <code><a href="reference/collect.html">loop()</a></code> and <code><a href="reference/collect.html">collect()</a></code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">"
-def first_n(n):
-    num = 1
-    while num &lt;= n:
-        yield num
-        num += 1
-"</span><span class="op">)</span>
-
-<span class="fu"><a href="reference/collect.html">loop</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">py</span><span class="op">$</span><span class="fu">first_n</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span>
-<span class="co">#&gt; [1] 2</span>
-<span class="co">#&gt; [1] 4</span>
-<span class="co">#&gt; [1] 6</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">"</span></span>
+<span><span class="st">def first_n(n):</span></span>
+<span><span class="st">    num = 1</span></span>
+<span><span class="st">    while num &lt;= n:</span></span>
+<span><span class="st">        yield num</span></span>
+<span><span class="st">        num += 1</span></span>
+<span><span class="st">"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/collect.html">loop</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">py</span><span class="op">$</span><span class="fu">first_n</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="co">#&gt; [1] 4</span></span>
+<span><span class="co">#&gt; [1] 6</span></span></code></pre></div>
 <p>They can also be composed with coro generators:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">times</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">it</span>, <span class="va">n</span><span class="op">)</span> <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">it</span><span class="op">)</span> <span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">composed</span> <span class="op">&lt;-</span> <span class="fu">times</span><span class="op">(</span><span class="va">py</span><span class="op">$</span><span class="fu">first_n</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span>
-
-<span class="fu"><a href="reference/collect.html">collect</a></span><span class="op">(</span><span class="va">composed</span><span class="op">)</span>
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; [1] 10</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; [1] 20</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[3]]</span>
-<span class="co">#&gt; [1] 30</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">times</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">it</span>, <span class="va">n</span><span class="op">)</span> <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">it</span><span class="op">)</span> <span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">composed</span> <span class="op">&lt;-</span> <span class="fu">times</span><span class="op">(</span><span class="va">py</span><span class="op">$</span><span class="fu">first_n</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/collect.html">collect</a></span><span class="op">(</span><span class="va">composed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; [1] 10</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; [1] 20</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[3]]</span></span>
+<span><span class="co">#&gt; [1] 30</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -251,79 +250,79 @@ def first_n(n):
 </h2>
 <p><code><a href="reference/yield.html">yield()</a></code> and <code><a href="reference/async.html">await()</a></code> can be used in loops, if/else branches, <code><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch()</a></code> expressions, or any combinations of these. However they can’t be used as function arguments. These will cause errors:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="st">"foo"</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span>
-
-<span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="st">"foo"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p>Fortunately it is easy to rewrite the code to work around this limitation:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="st">"foo"</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span>
-
-<span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>
-<span class="op">}</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/yield.html">yield</a></span><span class="op">(</span><span class="st">"foo"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/async.html">async</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/async.html">await</a></span><span class="op">(</span><span class="fu">foo</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="how-does-it-work">How does it work<a class="anchor" aria-label="anchor" href="#how-does-it-work"></a>
 </h2>
 <p>Coroutines are an <a href="https://eli.thegreenplace.net/2009/08/29/co-routines-as-an-alternative-to-state-machines" class="external-link">abstraction for state machines</a> in languages that support them. Conversely, you can implement coroutines by rewriting the code source provided by the user as a state machine. Pass <code>internals = TRUE</code> to the print methods of coroutines to reveal the state machine that is running under the hood:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">generate_abc</span>, internals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#&gt; &lt;generator&gt;</span>
-<span class="co">#&gt; function() {</span>
-<span class="co">#&gt;   for (x in letters[1:3]) {</span>
-<span class="co">#&gt;     yield(x)</span>
-<span class="co">#&gt;   }</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; State machine:</span>
-<span class="co">#&gt; {</span>
-<span class="co">#&gt;     if (exhausted) {</span>
-<span class="co">#&gt;         return(invisible(exhausted()))</span>
-<span class="co">#&gt;     }</span>
-<span class="co">#&gt;     repeat switch(state[[1L]], `1` = {</span>
-<span class="co">#&gt;         iterators[[2L]] &lt;- as_iterator(user(letters[1:3]))</span>
-<span class="co">#&gt;         state[[1L]] &lt;- 2L</span>
-<span class="co">#&gt;         state[[2L]] &lt;- 1L</span>
-<span class="co">#&gt;     }, `2` = {</span>
-<span class="co">#&gt;         repeat switch(state[[2L]], `1` = {</span>
-<span class="co">#&gt;             if ({</span>
-<span class="co">#&gt;                 iterator &lt;- iterators[[2L]]</span>
-<span class="co">#&gt;                 if (is_exhausted(elt &lt;- iterator())) {</span>
-<span class="co">#&gt;                   FALSE</span>
-<span class="co">#&gt;                 } else {</span>
-<span class="co">#&gt;                   user_env[["x"]] &lt;- elt</span>
-<span class="co">#&gt;                   TRUE</span>
-<span class="co">#&gt;                 }</span>
-<span class="co">#&gt;             }) {</span>
-<span class="co">#&gt;                 state[[2L]] &lt;- 2L</span>
-<span class="co">#&gt;             } else {</span>
-<span class="co">#&gt;                 break</span>
-<span class="co">#&gt;             }</span>
-<span class="co">#&gt;         }, `2` = {</span>
-<span class="co">#&gt;             user({</span>
-<span class="co">#&gt;                 x</span>
-<span class="co">#&gt;             })</span>
-<span class="co">#&gt;             state[[2L]] &lt;- 3L</span>
-<span class="co">#&gt;             suspend()</span>
-<span class="co">#&gt;             return(last_value())</span>
-<span class="co">#&gt;         }, `3` = {</span>
-<span class="co">#&gt;             .last_value &lt;- if (missing(arg)) NULL else arg</span>
-<span class="co">#&gt;             state[[2L]] &lt;- 1L</span>
-<span class="co">#&gt;         })</span>
-<span class="co">#&gt;         iterators[[2L]] &lt;- NULL</span>
-<span class="co">#&gt;         length(state) &lt;- 1L</span>
-<span class="co">#&gt;         break</span>
-<span class="co">#&gt;     })</span>
-<span class="co">#&gt;     exhausted &lt;- TRUE</span>
-<span class="co">#&gt;     invisible(exhausted())</span>
-<span class="co">#&gt; }</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">generate_abc</span>, internals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;generator&gt;</span></span>
+<span><span class="co">#&gt; function() {</span></span>
+<span><span class="co">#&gt;   for (x in letters[1:3]) {</span></span>
+<span><span class="co">#&gt;     yield(x)</span></span>
+<span><span class="co">#&gt;   }</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; State machine:</span></span>
+<span><span class="co">#&gt; {</span></span>
+<span><span class="co">#&gt;     if (exhausted) {</span></span>
+<span><span class="co">#&gt;         return(invisible(exhausted()))</span></span>
+<span><span class="co">#&gt;     }</span></span>
+<span><span class="co">#&gt;     repeat switch(state[[1L]], `1` = {</span></span>
+<span><span class="co">#&gt;         iterators[[2L]] &lt;- as_iterator(user(letters[1:3]))</span></span>
+<span><span class="co">#&gt;         state[[1L]] &lt;- 2L</span></span>
+<span><span class="co">#&gt;         state[[2L]] &lt;- 1L</span></span>
+<span><span class="co">#&gt;     }, `2` = {</span></span>
+<span><span class="co">#&gt;         repeat switch(state[[2L]], `1` = {</span></span>
+<span><span class="co">#&gt;             if ({</span></span>
+<span><span class="co">#&gt;                 iterator &lt;- iterators[[2L]]</span></span>
+<span><span class="co">#&gt;                 if (is_exhausted(elt &lt;- iterator())) {</span></span>
+<span><span class="co">#&gt;                   FALSE</span></span>
+<span><span class="co">#&gt;                 } else {</span></span>
+<span><span class="co">#&gt;                   user_env[["x"]] &lt;- elt</span></span>
+<span><span class="co">#&gt;                   TRUE</span></span>
+<span><span class="co">#&gt;                 }</span></span>
+<span><span class="co">#&gt;             }) {</span></span>
+<span><span class="co">#&gt;                 state[[2L]] &lt;- 2L</span></span>
+<span><span class="co">#&gt;             } else {</span></span>
+<span><span class="co">#&gt;                 break</span></span>
+<span><span class="co">#&gt;             }</span></span>
+<span><span class="co">#&gt;         }, `2` = {</span></span>
+<span><span class="co">#&gt;             user({</span></span>
+<span><span class="co">#&gt;                 x</span></span>
+<span><span class="co">#&gt;             })</span></span>
+<span><span class="co">#&gt;             state[[2L]] &lt;- 3L</span></span>
+<span><span class="co">#&gt;             suspend()</span></span>
+<span><span class="co">#&gt;             return(last_value())</span></span>
+<span><span class="co">#&gt;         }, `3` = {</span></span>
+<span><span class="co">#&gt;             .last_value &lt;- if (missing(arg)) NULL else arg</span></span>
+<span><span class="co">#&gt;             state[[2L]] &lt;- 1L</span></span>
+<span><span class="co">#&gt;         })</span></span>
+<span><span class="co">#&gt;         iterators[[2L]] &lt;- NULL</span></span>
+<span><span class="co">#&gt;         length(state) &lt;- 1L</span></span>
+<span><span class="co">#&gt;         break</span></span>
+<span><span class="co">#&gt;     })</span></span>
+<span><span class="co">#&gt;     exhausted &lt;- TRUE</span></span>
+<span><span class="co">#&gt;     invisible(exhausted())</span></span>
+<span><span class="co">#&gt; }</span></span></code></pre></div>
 <p>Despite this transformation of source code, <code><a href="https://rdrr.io/r/base/browser.html" class="external-link">browser()</a></code> and step-debugging still work as you would expect. This is because coro keeps track of the source references from the original code.</p>
 </div>
 <div class="section level2">
@@ -339,8 +338,8 @@ def first_n(n):
 </h2>
 <p>Install the development version from github with:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"r-lib/coro"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"r-lib/coro"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -405,7 +404,7 @@ def first_n(n):
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
   </div></footer>
