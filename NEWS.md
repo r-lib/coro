@@ -1,5 +1,8 @@
 # coro (development version)
 
+* `coro::as_iterator()` method added for reticulate Python objects, enabling
+  usage like: `coro::loop(for (elem in my_py_object) ...)` (#37, @t-kalinowski)
+
 # coro 1.0.2
 
 * The exhaustion sentinel is now `as.symbol(".__exhausted__.")`
