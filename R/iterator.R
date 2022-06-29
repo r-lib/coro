@@ -138,14 +138,14 @@ as_iterator.default <- function(x) {
 
 
 
-#' @exportS3Method
+#' @export
 as_iterator.python.builtin.object <- function(x) {
   x <- reticulate::as_iterator(x)
-  function() reticulate::iter_next(x, quote(.__exhausted__.))
+  function() reticulate::iter_next(x, exhausted())
 }
 
-#' @exportS3Method
+#' @export
 as_iterator.python.builtin.iterator <- function(x) {
   force(x)
-  function() reticulate::iter_next(x, completed = quote(.__exhausted__.))
+  function() reticulate::iter_next(x, exhausted())
 }
