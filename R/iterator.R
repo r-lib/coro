@@ -143,9 +143,3 @@ as_iterator.python.builtin.object <- function(x) {
   x <- reticulate::as_iterator(x)
   function() reticulate::iter_next(x, exhausted())
 }
-
-#' @export
-as_iterator.python.builtin.iterator <- function(x) {
-  force(x)
-  function() reticulate::iter_next(x, exhausted())
-}
