@@ -1,7 +1,9 @@
-# coro (development version)
+# coro 1.0.3
 
-* `coro::as_iterator()` method added for reticulate Python objects, enabling
-  usage like: `coro::loop(for (elem in my_py_object) ...)` (#37, @t-kalinowski)
+* `coro::as_iterator()` method added for reticulate Python objects,
+  enabling usage like: `coro::loop(for (elem in my_py_object) ...)`
+  (#37, @t-kalinowski).
+
 
 # coro 1.0.2
 
