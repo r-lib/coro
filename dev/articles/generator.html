@@ -8,12 +8,12 @@
 <meta name="description" content="coro">
 <title>Generators • coro</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.2/font.css" rel="stylesheet">
-<link href="../deps/Source_Code_Pro-0.4.2/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.5/font.css" rel="stylesheet">
+<link href="../deps/Source_Code_Pro-0.4.5/font.css" rel="stylesheet">
 <!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Generators">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Generators">
 <meta property="og:description" content="coro">
 <meta name="robots" content="noindex">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -75,9 +75,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Generators</h1>
-                        <h4 data-toc-skip class="author">Lionel Henry</h4>
+                        <h4 data-toc-skip class="author">Lionel
+Henry</h4>
             
-            <h4 data-toc-skip class="date">2022-07-20</h4>
+            <h4 data-toc-skip class="date">2023-03-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/r-lib/coro/blob/HEAD/vignettes/generator.Rmd" class="external-link"><code>vignettes/generator.Rmd</code></a></small>
       <div class="d-none name"><code>generator.Rmd</code></div>
@@ -88,7 +89,11 @@
 <div class="section level2">
 <h2 id="iterators">Iterators<a class="anchor" aria-label="anchor" href="#iterators"></a>
 </h2>
-<p>Generators are a simple way of creating <strong>iterator functions</strong>, i.e. functions that you can call to return a new value. The iteration protocol is described in <code><a href="../reference/iterator.html">?iterator</a></code>. Here is a simple iterator that iterates over the elements of <code>1:3</code>:</p>
+<p>Generators are a simple way of creating <strong>iterator
+functions</strong>, i.e. functions that you can call to return a new
+value. The iteration protocol is described in <code><a href="../reference/iterator.html">?iterator</a></code>.
+Here is a simple iterator that iterates over the elements of
+<code>1:3</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-lib/coro" class="external-link">coro</a></span><span class="op">)</span></span>
 <span></span>
@@ -100,7 +105,8 @@
 <span></span>
 <span><span class="fu"><a href="../reference/iterator.html">iterator</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2</span></span></code></pre></div>
-<p>Once the iterator is exhausted, it returns a sentinel value that signals to its caller that there are no more values available:</p>
+<p>Once the iterator is exhausted, it returns a sentinel value that
+signals to its caller that there are no more values available:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This is the last value</span></span>
 <span><span class="fu"><a href="../reference/iterator.html">iterator</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -109,24 +115,39 @@
 <span><span class="co"># This is the exhaustion sentinel</span></span>
 <span><span class="fu"><a href="../reference/iterator.html">iterator</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; .__exhausted__.</span></span></code></pre></div>
-<p>In R we normally don’t use this sort of iteration to work with vectors. Instead, we use the idiomatic techniques of vectorised programming. Iterator functions are useful for very specific tasks:</p>
+<p>In R we normally don’t use this sort of iteration to work with
+vectors. Instead, we use the idiomatic techniques of vectorised
+programming. Iterator functions are useful for very specific tasks:</p>
 <ul>
-<li><p>Iterating over <strong>chunks</strong> of data when the whole data doesn’t fit in memory.</p></li>
-<li><p>Generating <strong>sequences</strong> when you don’t know in advance how many elements you will need. These sequences may be complex and even infinite.</p></li>
+<li><p>Iterating over <strong>chunks</strong> of data when the whole
+data doesn’t fit in memory.</p></li>
+<li><p>Generating <strong>sequences</strong> when you don’t know in
+advance how many elements you will need. These sequences may be complex
+and even infinite.</p></li>
 </ul>
-<p>The iterator protocol is designed to be free of dependency. However, the easiest way to create an iterator is by using the generator factories provided in this package.</p>
+<p>The iterator protocol is designed to be free of dependency. However,
+the easiest way to create an iterator is by using the generator
+factories provided in this package.</p>
 </div>
 <div class="section level2">
 <h2 id="generators">Generators<a class="anchor" aria-label="anchor" href="#generators"></a>
 </h2>
-<p>Generators create functions that can <strong>yield</strong>, i.e. suspend themselves. When a generator reaches a <code>yield(value)</code> statement it returns the value as if you called <code>return(value)</code>. However, calling the generator again resumes the function right where it left off. Because they preserve their state between invokations, generators are ideal for creating iterator functions.</p>
+<p>Generators create functions that can <strong>yield</strong>,
+i.e. suspend themselves. When a generator reaches a
+<code>yield(value)</code> statement it returns the value as if you
+called <code>return(value)</code>. However, calling the generator again
+resumes the function right where it left off. Because they preserve
+their state between invokations, generators are ideal for creating
+iterator functions.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">generate_abc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu"><a href="../reference/yield.html">yield</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="../reference/generator.html">generator()</a></code> creates an <strong>iterator factory</strong>. This is a function that returns fresh iterator functions:</p>
+<p><code><a href="../reference/generator.html">generator()</a></code> creates an <strong>iterator
+factory</strong>. This is a function that returns fresh iterator
+functions:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create the iterator</span></span>
 <span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></span>
@@ -137,7 +158,8 @@
 <span></span>
 <span><span class="fu">abc</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "b"</span></span></code></pre></div>
-<p>Once the last loop in a generator has finished iterating (here there is only one), it returns the exhaustion sentinel:</p>
+<p>Once the last loop in a generator has finished iterating (here there
+is only one), it returns the exhaustion sentinel:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Last value</span></span>
 <span><span class="fu">abc</span><span class="op">(</span><span class="op">)</span></span>
@@ -171,7 +193,8 @@
 <div class="section level2">
 <h2 id="iterating">Iterating<a class="anchor" aria-label="anchor" href="#iterating"></a>
 </h2>
-<p>Iterating manually over an iterator function is a bit tricky because you have to watch out for the exhaustion sentinel:</p>
+<p>Iterating manually over an iterator function is a bit tricky because
+you have to watch out for the exhaustion sentinel:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -181,7 +204,9 @@
 <span><span class="co">#&gt; [1] "a"</span></span>
 <span><span class="co">#&gt; [1] "b"</span></span>
 <span><span class="co">#&gt; [1] "c"</span></span></code></pre></div>
-<p>A simpler way is to iterate with a <code>for</code> loop using the <code><a href="https://rstudio.github.io/reticulate/reference/iterate.html" class="external-link">iterate()</a></code> helper. Within <code><a href="https://rstudio.github.io/reticulate/reference/iterate.html" class="external-link">iterate()</a></code>, <code>for</code> understands the iterator protocol:</p>
+<p>A simpler way is to iterate with a <code>for</code> loop using the
+<code><a href="https://rstudio.github.io/reticulate/reference/iterate.html" class="external-link">iterate()</a></code> helper. Within <code><a href="https://rstudio.github.io/reticulate/reference/iterate.html" class="external-link">iterate()</a></code>,
+<code>for</code> understands the iterator protocol:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -191,7 +216,8 @@
 <span><span class="co">#&gt; [1] "a"</span></span>
 <span><span class="co">#&gt; [1] "b"</span></span>
 <span><span class="co">#&gt; [1] "c"</span></span></code></pre></div>
-<p>You can also collect all remaning values of an iterator in a list with <code><a href="../reference/collect.html">collect()</a></code>:</p>
+<p>You can also collect all remaning values of an iterator in a list
+with <code><a href="../reference/collect.html">collect()</a></code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -204,7 +230,10 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; [1] "c"</span></span></code></pre></div>
-<p>Beware that trying to exhaust an infinite iterator is a programming error. This causes an infinite loop that never returns, forcing the user to interrupt R with <code>ctrl-c</code>. Make sure that you iterate over an infinite iterator only a finite amount of time:</p>
+<p>Beware that trying to exhaust an infinite iterator is a programming
+error. This causes an infinite loop that never returns, forcing the user
+to interrupt R with <code>ctrl-c</code>. Make sure that you iterate over
+an infinite iterator only a finite amount of time:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu">natural_numbers</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
@@ -226,7 +255,8 @@
 <div class="section level2">
 <h2 id="adapting-generators">Adapting generators<a class="anchor" aria-label="anchor" href="#adapting-generators"></a>
 </h2>
-<p>A generator factory can take another iterator as argument to modify its values. This pattern is called <strong>adapting</strong>:</p>
+<p>A generator factory can take another iterator as argument to modify
+its values. This pattern is called <strong>adapting</strong>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span>
 <span></span>
@@ -243,14 +273,18 @@
 <span></span>
 <span><span class="fu">ABC</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "B"</span></span></code></pre></div>
-<p>Once the modified iterator is exhausted, the adaptor automatically closes as well:</p>
+<p>Once the modified iterator is exhausted, the adaptor automatically
+closes as well:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">ABC</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "C"</span></span>
 <span></span>
 <span><span class="fu">ABC</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; .__exhausted__.</span></span></code></pre></div>
-<p>As a user, you might not want to create an iterator factory for a one-off adaptor. In this case you can use <code><a href="../reference/generator.html">gen()</a></code> instead of <code><a href="../reference/generator.html">generator()</a></code>. This enables a more pythonic style of working with iterators:</p>
+<p>As a user, you might not want to create an iterator factory for a
+one-off adaptor. In this case you can use <code><a href="../reference/generator.html">gen()</a></code> instead of
+<code><a href="../reference/generator.html">generator()</a></code>. This enables a more pythonic style of working
+with iterators:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">ABC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">gen</a></span><span class="op">(</span><span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">abc</span><span class="op">)</span> <span class="fu"><a href="../reference/yield.html">yield</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -264,7 +298,8 @@
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; [[3]]</span></span>
 <span><span class="co">#&gt; [1] "C"</span></span></code></pre></div>
-<p>Or you can use the general purpose adaptor <code>adapt_map()</code>. It maps a function over each value of an iterator:</p>
+<p>Or you can use the general purpose adaptor <code>adapt_map()</code>.
+It maps a function over each value of an iterator:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">adapt_map</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generator.html">generator</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">.i</span>, <span class="va">.fn</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">.i</span><span class="op">)</span> <span class="op">{</span></span>
@@ -287,12 +322,12 @@
   <footer><div class="container">
   <div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by <a href="https://github.com/lionel-" class="external-link">Lionel Henry</a>, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
+<p>Developed by <a href="https://github.com/lionel-" class="external-link">Lionel Henry</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
   </div></footer>
