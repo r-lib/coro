@@ -13,7 +13,7 @@ Description: Provides 'coroutines' for R, a family of functions that can
     in 'coro' and are compatible with iterators from the 'reticulate'
     package.
 License: MIT + file LICENSE
-URL: https://github.com/r-lib/coro
+URL: https://github.com/r-lib/coro, https://coro.r-lib.org/
 BugReports: https://github.com/r-lib/coro/issues
 Depends:
     R (>= 3.5.0)
