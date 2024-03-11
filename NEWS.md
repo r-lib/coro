@@ -1,4 +1,7 @@
-# coro (development version)
+# coro 1.0.4
+
+* Internal fix for R-devel.
+
 
 # coro 1.0.3
 
