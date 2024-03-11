@@ -12,7 +12,7 @@ unstructure <- function(x) {
 }
 
 compose <- function(...) {
-  fs <- lapply(dots_splice(...), match.fun)
+  fs <- lapply(list2(...), match.fun)
   n <- length(fs)
 
   last <- fs[[n]]
