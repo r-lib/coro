@@ -31,29 +31,17 @@ invokations must consistently return \code{coro::exhausted()} or
 
 # Calling the iterator advances it
 iterator()
-}\if{html}{\out{</div>}}
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] 1
-}\if{html}{\out{</div>}}
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{iterator()
-}\if{html}{\out{</div>}}
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] 2
-}\if{html}{\out{</div>}}
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{# This is the last value
+#> [1] 1
 iterator()
-}\if{html}{\out{</div>}}
+#> [1] 2
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{## [1] 3
-}\if{html}{\out{</div>}}
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Subsequent invokations return the exhaustion sentinel
+# This is the last value
 iterator()
-}\if{html}{\out{</div>}}
+#> [1] 3
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{## .__exhausted__.
+# Subsequent invokations return the exhaustion sentinel
+iterator()
+#> .__exhausted__.
 }\if{html}{\out{</div>}}
 
 Because iteration is defined by a protocol, creating iterators is
