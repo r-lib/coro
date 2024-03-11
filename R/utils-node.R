@@ -24,7 +24,7 @@ node_list_poke_cdr <- function(node, new_cdr) {
 
 # Unlike `[[` this returns `NULL` when OOB
 node_get <- function(node, i) {
-  if (node < 1L) {
+  if (i <= 0L) {
     abort("`i` must be an integer greater than 0.")
   }
   while (i > 1L) {
