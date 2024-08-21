@@ -1,4 +1,5 @@
 expect_snapshot0 <- function(expr, cran = TRUE) {
+  skip_on_covr()
   inject(expect_snapshot(!!enquo0(expr), cran = cran))
 }
 
