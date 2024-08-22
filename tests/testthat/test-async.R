@@ -276,3 +276,14 @@ test_that("can await-assign with `=` (#29)", {
   })
   expect_equal(wait_for(fn()), 2)
 })
+
+test_that("async function returns invisibly (#46)", {
+  out <- NULL
+  fn <- async(function() {
+    for (i in 1:3) {
+      out <<- c(out, i)
+      await(i)
+    }
+  })
+  expect_invisible(fn())
+})

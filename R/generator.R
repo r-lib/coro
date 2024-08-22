@@ -208,7 +208,7 @@ generator0 <- function(fn, type = "generator") {
 
       if (is_string(type, "async")) {
         # Step into the generator right away
-        instance(NULL)
+        invisible(instance(NULL))
       } else {
         structure(instance, class = "coro_generator_instance")
       }
