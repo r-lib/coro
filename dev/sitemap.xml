@@ -1,66 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://coro.r-lib.org/dev/CODE_OF_CONDUCT.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/articles/generator.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/index.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/as_iterator.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/async.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/async_collect.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/async_generator.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/async_ops.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/async_sleep.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/collect.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/coro-package.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/coro_debug.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/generator.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/iterator.html</loc>
-  </url>
-  <url>
-    <loc>https://coro.r-lib.org/dev/reference/yield.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://coro.r-lib.org/dev/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/LICENSE-text.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/LICENSE.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/articles/generator.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/articles/index.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/authors.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/index.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/news/index.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/as_iterator.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/async.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/async_collect.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/async_generator.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/async_ops.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/async_sleep.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/collect.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/coro-package.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/coro_debug.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/generator.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/index.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/iterator.html</loc></url>
+<url><loc>https://coro.r-lib.org/dev/reference/yield.html</loc></url>
 </urlset>
+
