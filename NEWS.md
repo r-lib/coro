@@ -1,5 +1,8 @@
 # coro (development version)
 
+* Async functions created by `coro::async()` now return their
+  `promises::promise()` invisibly (#46, @shikokuchuo).
+
 # coro 1.0.4
 
 * Internal fix for R-devel.
