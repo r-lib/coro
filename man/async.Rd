@@ -16,7 +16,7 @@ allowed.}
 \item{x}{An awaitable value, i.e. a \link[promises:promise]{promise}.}
 }
 \value{
-A function that returns a \code{\link[promises:promise]{promises::promise()}}.
+A function that returns a \code{\link[promises:promise]{promises::promise()}} invisibly.
 }
 \description{
 \code{async()} functions are building blocks for cooperative

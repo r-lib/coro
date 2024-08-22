@@ -316,3 +316,16 @@ test_that("can yield-assign with `=` (#29)", {
   i()
   expect_equal(i("bar"), "bar")
 })
+
+test_that("stepping into generators returns visibly (#46)", {
+  generate_abc <- generator(function() {
+    yield("a")
+    yield("b")
+    "c"
+  })
+  abc <- generate_abc()
+  expect_visible(abc())
+  expect_visible(abc())
+  expect_visible(abc())
+  expect_visible(abc())
+})

@@ -27,7 +27,7 @@
 #'
 #' @param fn An anonymous function within which `await()` calls are
 #'   allowed.
-#' @return A function that returns a [promises::promise()].
+#' @return A function that returns a [promises::promise()] invisibly.
 #'
 #' @seealso [async_generator()] and [await_each()];
 #'   [coro_debug()] for step-debugging.
