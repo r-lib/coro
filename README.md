@@ -7,8 +7,7 @@
 
 [![CRAN
 status](https://www.r-pkg.org/badges/version/coro)](https://cran.r-project.org/package=coro)
-[![R build
-status](https://github.com/r-lib/coro/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/coro/actions)
+[![R-CMD-check](https://github.com/r-lib/coro/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/coro/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Overview
@@ -16,27 +15,27 @@ status](https://github.com/r-lib/coro/workflows/R-CMD-check/badge.svg)](https://
 coro implements **coroutines** for R, i.e. functions that can be
 suspended and resumed later on. There are two kinds:
 
-  - **Async** functions, which make it straightforward to program
-    concurrently
-  - **Generators** for iterating over complex sequences
+- **Async** functions, which make it straightforward to program
+  concurrently
+- **Generators** for iterating over complex sequences
 
 Supported features:
 
-  - Suspending within loops and if/else branches
-  - Suspending within `tryCatch()`
-  - `on.exit()` expressions and stack-based cleanup such as provided by
-    `local_` functions in the [withr](https://github.com/r-lib/withr/)
-    package
-  - Step-debugging and `browser()` within coroutines
+- Suspending within loops and if/else branches
+- Suspending within `tryCatch()`
+- `on.exit()` expressions and stack-based cleanup such as provided by
+  `local_` functions in the [withr](https://github.com/r-lib/withr/)
+  package
+- Step-debugging and `browser()` within coroutines
 
 Compatibility with:
 
-  - Python iterators from the
-    [reticulate](https://rstudio.github.io/reticulate/) package
-  - Async operations from the
-    [promises](https://github.com/rstudio/promises/) package
-  - Parallel computations from the
-    [future](https://github.com/HenrikBengtsson/future) package
+- Python iterators from the
+  [reticulate](https://rstudio.github.io/reticulate/) package
+- Async operations from the
+  [promises](https://github.com/rstudio/promises/) package
+- Parallel computations from the
+  [future](https://github.com/HenrikBengtsson/future) package
 
 Attach the package to follow the examples:
 
@@ -105,10 +104,10 @@ my_async <- async(function() {
 
 Generators are based on a simple iteration protocol:
 
-  - Iterators are functions.
-  - They can be advanced by calling the function. The new value is
-    returned.
-  - An exhausted iterator returns the sentinel symbol `exhausted`.
+- Iterators are functions.
+- They can be advanced by calling the function. The new value is
+  returned.
+- An exhausted iterator returns the sentinel symbol `exhausted`.
 
 The `generator()` function creates a generator factory which returns
 generator instances:
@@ -130,11 +129,13 @@ A generator instance is an iterator function which yields values:
 ``` r
 abc
 #> <generator/instance>
-#> function() {
-#>   for (x in letters[1:3]) {
-#>     yield(x)
-#>   }
+#> function () 
+#> {
+#>     for (x in letters[1:3]) {
+#>         yield(x)
+#>     }
 #> }
+#> <environment: 0x1258e3818>
 
 abc()
 #> [1] "a"
@@ -250,11 +251,13 @@ state machine that is running under the hood:
 ``` r
 print(generate_abc, internals = TRUE)
 #> <generator>
-#> function() {
-#>   for (x in letters[1:3]) {
-#>     yield(x)
-#>   }
+#> function () 
+#> {
+#>     for (x in letters[1:3]) {
+#>         yield(x)
+#>     }
 #> }
+#> <environment: 0x1258e3818>
 #> State machine:
 #> {
 #>     if (exhausted) {
@@ -305,12 +308,12 @@ keeps track of the source references from the original code.
 
 ## Acknowledgements
 
-  - The [regenerator](https://facebook.github.io/regenerator/)
-    Javascript package which uses a similar transformation to implement
-    generators and async functions in older versions of Javascript.
+- The [regenerator](https://facebook.github.io/regenerator/) Javascript
+  package which uses a similar transformation to implement generators
+  and async functions in older versions of Javascript.
 
-  - Gabor Csardi for many interesting discussions about concurrency and
-    the design of coro.
+- Gabor Csardi for many interesting discussions about concurrency and
+  the design of coro.
 
 ## Installation
 
@@ -320,3 +323,9 @@ Install the development version from github with:
 # install.packages("devtools")
 devtools::install_github("r-lib/coro", build_vignettes = TRUE)
 ```
+
+## Code of Conduct
+
+Please note that the coro project is released with a [Contributor Code
+of Conduct](https://coro.r-lib.org/CODE_OF_CONDUCT.html). By
+contributing to this project, you agree to abide by its terms.
