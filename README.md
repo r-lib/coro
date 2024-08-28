@@ -8,8 +8,6 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/coro)](https://cran.r-project.org/package=coro)
 [![R-CMD-check](https://github.com/r-lib/coro/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/r-lib/coro/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/r-lib/coro/graph/badge.svg)](https://app.codecov.io/gh/r-lib/coro)
 <!-- badges: end -->
 
 ## Overview
