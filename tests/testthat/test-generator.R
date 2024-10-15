@@ -1,6 +1,6 @@
 test_that("can create non-yielding generator functions", {
   gen <- generator(function() "foo")
-  expect_identical(collect(gen()), list("foo"))
+  expect_identical(collect(gen()), list())
 })
 
 test_that("can yield `NULL` without terminating iteration", {
@@ -71,7 +71,7 @@ test_that("generator factories can take dots", {
 })
 
 test_that("generators can take missing arguments", {
-  new_gen <- generator(function(arg) missing(arg))
+  new_gen <- generator(function(arg) yield(missing(arg)))
   expect_true(new_gen()())
   expect_false(new_gen(1)())
 })
@@ -87,7 +87,7 @@ test_that("yield within if within for loops properly", {
       }
     }
   })
-  expect_identical(collect(new_gen()), list(1L, 2L, 3L, 4L, 100L))
+  expect_identical(collect(new_gen()), list(1L, 2L, 3L, 4L))
 })
 
 test_that("unexpected exits disable generators", {
@@ -104,43 +104,47 @@ test_that("unexpected exits disable generators", {
 })
 
 test_that("can use tryCatch()", {
-  out <- gen({
-    tryCatch(
+  out <- collect(gen({
+    x <- tryCatch(
       error = function(...) "handled", {
         stop("error")
         yield("yield")
       }
     )
-  })()
-  expect_equal(out, "handled")
+    yield(x)
+  }))
+  expect_equal(out, list("handled"))
 
-  out <- gen({
-    tryCatch(
+  out <- collect(gen({
+    x <- tryCatch(
       error = function(...) "handled", {
         stop("error")
         yield("yield")
       }
     )
-    "value"
-  })()
-  expect_equal(out, "value")
+    yield(x)
+    yield("value")
+  }))
+  expect_equal(out, list("handled", "value"))
 
-  out <- gen({
+  out <- collect(gen({
     if (TRUE) {
-      tryCatch(
+      x <- tryCatch(
         error = function(...) "handled", {
           repeat if (TRUE) stop("error")
           yield("yield")
         }
       )
     }
-    "value"
-  })()
-  expect_equal(out, "value")
+    yield(x)
+    yield("value")
+  }))
+  expect_equal(out, list("handled", "value"))
 
   out <- gen(tryCatch({ stop("foo"); yield("value") }, error = function(...) "handled"))()
-  expect_equal(out, "handled")
+  expect_equal(out, exhausted())
 
+  # Handlers are matched to the condition class
   expect_error(
     gen({
       tryCatch(
@@ -149,7 +153,7 @@ test_that("can use tryCatch()", {
           yield("yield")
         }
       )
-      "value"
+      yield("value")
     })(),
     regexp = "error"
   )
@@ -173,10 +177,12 @@ test_that("tryCatch(finally = ) is handled", {
 
 test_that("can yield within tryCatch()", {
   g <- gen({
-    tryCatch(error = function(...) "handled", {
+    x <- tryCatch(error = function(...) "handled", {
       yield("value")
       stop("error")
     })
+    yield(x)
+    yield("value")
   })
   expect_equal(g(), "value")
   expect_equal(g(), "handled")
@@ -188,21 +194,9 @@ test_that("can assign tryCatch()", {
       yield("value")
       stop("error")
     })
-    value
+    yield(value)
   })
   expect_equal(collect(g), list("value", "handled"))
-
-  # Last expression
-  fn <- NULL
-  g <- gen({
-    fn <<- function() value
-    value <- tryCatch(error = function(...) "handled", {
-      yield("value")
-      stop("error")
-    })
-  })
-  expect_equal(collect(g), list("value", "handled"))
-  expect_equal(fn(), "handled")
 })
 
 test_that("can't await() within a generator", {
@@ -219,10 +213,11 @@ test_that("reentering the generator forces argument in proper context", {
   expect_error(g(stop("error")), "error")
 
   g <- generator(function() {
-    tryCatch(error = function(...) "handled", {
+    x <- tryCatch(error = function(...) "handled", {
       yield("value")
       return("wrong")
     })
+    yield(x)
   })()
   g()
   expect_equal(g(stop("error")), "handled")
@@ -234,13 +229,16 @@ test_that("exit expressions are suspended and resumed", {
   g <- generator(function() {
     on.exit(unwound <<- TRUE)
     yield(1)
-    2
+    yield(2)
   })()
 
   expect_equal(g(), 1)
   expect_false(unwound)
 
   expect_equal(g(), 2)
+  expect_false(unwound)
+
+  expect_exhausted(g())
   expect_true(unwound)
 
   unwound <- FALSE
@@ -249,7 +247,7 @@ test_that("exit expressions are suspended and resumed", {
 })
 
 test_that("formals of generator factory do not mask private variables", {
-  generate <- generator(function(fn = "arg", env = "arg") c(fn, env))
+  generate <- generator(function(fn = "arg", env = "arg") yield(c(fn, env)))
   expect_equal(
     generate()(),
     c("arg", "arg")
@@ -257,32 +255,17 @@ test_that("formals of generator factory do not mask private variables", {
 })
 
 test_that("yield-assign returns default `NULL`", {
-  g <- generator(function() x <- yield("foo"))()
+  g <- generator(function() {
+    x <- yield("foo")
+    yield(x)
+  })()
   expect_equal(collect(g), list("foo", NULL))
-
-  g <- generator(function() x <- tryCatch(yield("foo")))()
-  expect_equal(collect(g), list("foo", NULL))
-})
-
-test_that("trailing yield-assign returns argument", {
-  g <- generator(function() x <- yield("foo"))()
-  g()
-  expect_equal(g("bar"), "bar")
-
-  g <- generator(function() x <- tryCatch(yield("foo")))()
-  g()
-  expect_equal(g("bar"), "bar")
-
-  g <- generator(function() x <- tryCatch(if (TRUE) yield("foo")))()
-  g()
-  expect_equal(g("bar"), "bar")
 
   g <- generator(function() {
-    x <- tryCatch(if (TRUE) yield("foo"))
-    x
+    x <- tryCatch(yield("foo"))
+    yield(x)
   })()
-  g()
-  expect_equal(g("bar"), "bar")
+  expect_equal(collect(g), list("foo", NULL))
 })
 
 test_that("generators call as_iterator() method", {
@@ -309,7 +292,10 @@ test_that("generators call as_iterator() method", {
 })
 
 test_that("can yield-assign with `=` (#29)", {
-  g <- generator(function() x = yield("foo"))
+  g <- generator(function() {
+    x = yield("foo")
+    yield(x)
+  })
   expect_equal(collect(g()), list("foo", NULL))
 
   i <- g()
@@ -496,4 +482,17 @@ test_that("generators only clean up once", {
 
   expect_equal(g(close = TRUE), exhausted())
   expect_equal(called, TRUE)
+})
+
+test_that("returning early doesn't yield values (#51)", {
+  g <- generator(function(items) NULL)
+  expect_equal(collect(g()), list())
+
+  g <- generator(function(items) {
+    if (TRUE) {
+      return()
+    }
+    yield("value")
+  })
+  expect_equal(collect(g()), list())
 })

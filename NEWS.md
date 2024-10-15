@@ -11,6 +11,10 @@
   are now cleaned up when terminated early, either because of an
   error or because of a `break` (#52).
 
+* Implicit and explicit return values of generators are no longer
+  yielded. This is consistent with Javascript and Python and simplifies
+  certain idioms (#51).
+
 * Generators and async functions assigned in namespaces no
   longer produce R CMD check notes about visible bindings (#40).
 
