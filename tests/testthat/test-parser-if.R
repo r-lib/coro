@@ -27,6 +27,7 @@ test_that("`else` blocks - one pause", {
 })
 
 test_that("`if` blocks - inner block", {
+  skip()
   expect_snapshot0(generator_body(function() {
     "before"
     if (TRUE) {

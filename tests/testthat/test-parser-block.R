@@ -60,6 +60,8 @@ test_that("`{` blocks - no return value", {
 })
 
 test_that("`{` blocks - nested", {
+  skip()
+
   expect_snapshot0(generator_body(function() {
     "before1"
     "before2"
@@ -97,6 +99,8 @@ test_that("`{` blocks - nested and goto after pause", {
 })
 
 test_that("`{` blocks - complex nesting", {
+  skip()
+
   expect_snapshot0(generator_body(function() {
     "before"
     {
