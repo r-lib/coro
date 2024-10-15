@@ -83,7 +83,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -174,7 +174,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -271,7 +271,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -347,7 +347,7 @@
                       "if-after"
                   })
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `4` = {
                   break
               })
@@ -367,7 +367,7 @@
                       "foo"
                   })
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `2` = {
                   break
               })
@@ -441,7 +441,7 @@
                       state[[3L]] <- 3L
                   }, `3` = {
                       exhausted <- TRUE
-                      return(last_value())
+                      return(exhausted())
                   }, `4` = {
                       break
                   })
@@ -476,7 +476,7 @@
                       "foo"
                   })
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `2` = {
                   break
               })
@@ -589,7 +589,7 @@
                         "if-2-after"
                       })
                       exhausted <- TRUE
-                      return(last_value())
+                      return(exhausted())
                   }, `4` = {
                       break
                   })
@@ -624,7 +624,7 @@
                       FALSE
                   })
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `2` = {
                   break
               })
@@ -694,7 +694,7 @@
                       "if-after"
                   })
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `4` = {
                   break
               })
@@ -725,7 +725,7 @@
                       "else-after"
                   })
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `4` = {
                   break
               })
@@ -844,7 +844,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -932,7 +932,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1026,7 +1026,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1120,7 +1120,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1209,7 +1209,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1430,7 +1430,7 @@
                   "after"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())

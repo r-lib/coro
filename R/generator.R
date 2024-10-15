@@ -29,16 +29,18 @@
 #' @export
 #' @examples
 #' # A generator statement creates a generator factory. The
-#' # following generator yields two times and then returns `"c"`:
+#' # following generator yields three times and then returns `"d"`.
+#' # Only the yielded values are visible to the callers.
 #' generate_abc <- generator(function() {
 #'   yield("a")
 #'   yield("b")
-#'   "c"
+#'   yield("c")
+#'   "d"
 #' })
 #'
-#' # Or equivalently:
+#' # Equivalently:
 #' generate_abc <- generator(function() {
-#'   for (x in letters[1:3]) {
+#'   for (x in c("a", "b", "c")) {
 #'     yield(x)
 #'   }
 #' })
@@ -103,6 +105,7 @@ generator <- function(fn) {
   assert_lambda(substitute(fn))
   generator0(fn)
 }
+
 #' @rdname generator
 #' @param expr A yielding expression.
 #' @export
@@ -110,6 +113,7 @@ gen <- function(expr) {
   fn <- new_function(NULL, substitute(expr), caller_env())
   generator0(fn)()
 }
+
 generator0 <- function(fn, type = "generator") {
   state_machine <- NULL
   fmls <- formals(fn)

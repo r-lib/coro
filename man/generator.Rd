@@ -38,16 +38,18 @@ protocol such as \code{\link[=loop]{loop()}} and \code{\link[=collect]{collect()
 }
 \examples{
 # A generator statement creates a generator factory. The
-# following generator yields two times and then returns `"c"`:
+# following generator yields three times and then returns `"d"`.
+# Only the yielded values are visible to the callers.
 generate_abc <- generator(function() {
   yield("a")
   yield("b")
-  "c"
+  yield("c")
+  "d"
 })
 
-# Or equivalently:
+# Equivalently:
 generate_abc <- generator(function() {
-  for (x in letters[1:3]) {
+  for (x in c("a", "b", "c")) {
     yield(x)
   }
 })

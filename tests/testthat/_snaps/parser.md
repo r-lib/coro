@@ -10,7 +10,7 @@
           repeat switch(state[[1L]], `1` = {
               user("foo")
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -28,7 +28,7 @@
           repeat switch(state[[1L]], `1` = {
               user("foo")
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -53,7 +53,7 @@
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -78,7 +78,7 @@
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -102,7 +102,7 @@
                   "bar"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -133,7 +133,7 @@
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -157,7 +157,7 @@
                   "value"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -192,7 +192,7 @@
                   "bar"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -227,7 +227,7 @@
                   "bar"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -314,7 +314,7 @@
                   body2()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -369,7 +369,7 @@
                   body4()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -447,7 +447,7 @@
                   body4()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -844,7 +844,7 @@
                   body2()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -932,7 +932,7 @@
                   body2()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1036,7 +1036,7 @@
                   body2()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1079,7 +1079,7 @@
                   state[[2L]] <- 3L
               }, `3` = {
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `4` = {
                   break
               })
@@ -1099,7 +1099,7 @@
                       "else"
                   })
                   exhausted <- TRUE
-                  return(last_value())
+                  return(exhausted())
               }, `2` = {
                   break
               })
@@ -1323,7 +1323,7 @@
                   body2()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1482,7 +1482,7 @@
                   body3()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1601,7 +1601,7 @@
                   body4()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1772,7 +1772,7 @@
                   body2()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1795,7 +1795,7 @@
           }, `2` = {
               .last_value <- user_env[["x"]] <- if (missing(arg)) NULL else arg
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1822,7 +1822,7 @@
           }, `2` = {
               .last_value <- user_env[["x"]] <- if (missing(arg)) NULL else arg
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1840,7 +1840,7 @@
           repeat switch(state[[1L]], `1` = {
               user(tryCatch(foo()))
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1883,7 +1883,7 @@
                         state[[2L]] <- 3L
                       }, `3` = {
                         exhausted <- TRUE
-                        return(last_value())
+                        return(exhausted())
                       }, `4` = {
                         break
                       })
@@ -1901,7 +1901,7 @@
                   last_value()
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1965,7 +1965,7 @@
                   "value"
               })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -1983,7 +1983,7 @@
           repeat switch(state[[1L]], `1` = {
               user(withCallingHandlers(expr))
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -2042,7 +2042,7 @@
                       last_value()
                   })
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
