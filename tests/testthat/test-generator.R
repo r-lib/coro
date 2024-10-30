@@ -370,3 +370,32 @@ test_that("on.exit is called when loop breaks early (#52)", {
   iter(close = TRUE)
   expect_false(called)
 })
+
+test_that("for loops in generators close their iterators (#52)", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- TRUE)
+    yield(1)
+    yield(2)
+  })
+  h <- coro::generator(function() {
+    for (i in g()) {
+      yield(i)
+      # break
+      stop("foo")
+    }
+  })
+
+  called <- FALSE
+  expect_error(
+    collect(h())
+  )
+  # FIXME
+  # expect_true(called)
+
+  called <- FALSE
+  expect_error(loop(for (i in h()) {
+    print(i)
+  }))
+  expect_true(called)
+})

@@ -64,9 +64,7 @@ loop <- function(loop) {
   iterator <- as_iterator(eval_bare(node_cadr(args), env))
   body <- node_cadr(node_cdr(args))
 
-  if (has_close(iterator)) {
-    defer(iterator(close = TRUE))
-  }
+  defer(iter_close(iterator))
 
   elt <- NULL
   advance <- function() !is_exhausted(elt <<- iterator())

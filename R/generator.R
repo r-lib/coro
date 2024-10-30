@@ -177,23 +177,18 @@ generator0 <- function(fn, type = "generator") {
           }, add = TRUE)
         }
 
-        # Disable generator on error, interrupt, debugger quit, etc.
-        # There is no safe way of resuming a generator that didn't
-        # suspend normally.
-        if (is_true(env$jumped)) {
-          # In case a scheduler calls back the generator for error
-          # handling or cleanup
-          if (!missing(arg)) {
-            force(arg)
-          }
-          abort("This function has been disabled because of an unexpected exit.")
-        }
-
         if (is_true(env$exhausted)) {
           return(exhausted())
         }
 
         if (close) {
+          # Close all active iterators
+          for (iter in rev(env$iterators)) {
+            if (!is_null(iter)) {
+              iter_close(iter)
+            }
+          }
+
           # Run in environment where user exits are installed. Unlike in the
           # state machine path, we don't disable them before exiting so they
           # will run.
@@ -206,6 +201,18 @@ generator0 <- function(fn, type = "generator") {
           # Prevent returning here as closing should be idempotent
           env$exhausted <- TRUE
           return(exhausted())
+        }
+
+        # Disable generator on error, interrupt, debugger quit, etc.
+        # There is no safe way of resuming a generator that didn't
+        # suspend normally.
+        if (is_true(env$jumped)) {
+          # In case a scheduler calls back the generator for error
+          # handling or cleanup
+          if (!missing(arg)) {
+            force(arg)
+          }
+          abort("This function has been disabled because of an unexpected exit.")
         }
 
         # Resume state machine. Set up an execution env in the user
