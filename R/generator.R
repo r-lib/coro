@@ -159,6 +159,16 @@ generator0 <- function(fn, type = "generator") {
       # Flipped when `f` is pressed in the browser
       undebugged <- FALSE
 
+      # Called on cleanup to close all iterators active in
+      # ongoing `for` loops
+      close_active_iterators <- function() {
+        for (iter in rev(env$iterators)) {
+          if (!is_null(iter)) {
+            iter_close(iter)
+          }
+        }
+      }
+
       # Create the generator instance. This is a function that resumes
       # a state machine.
       instance <- inject(function(arg, close = FALSE) {
@@ -182,13 +192,6 @@ generator0 <- function(fn, type = "generator") {
         }
 
         if (close) {
-          # Close all active iterators
-          for (iter in rev(env$iterators)) {
-            if (!is_null(iter)) {
-              iter_close(iter)
-            }
-          }
-
           # Run in environment where user exits are installed. Unlike in the
           # state machine path, we don't disable them before exiting so they
           # will run.
@@ -197,6 +200,8 @@ generator0 <- function(fn, type = "generator") {
               env_poke_exits(user_env, exits)
             })
           )
+
+          close_active_iterators()
 
           # Prevent returning here as closing should be idempotent
           env$exhausted <- TRUE
@@ -222,7 +227,15 @@ generator0 <- function(fn, type = "generator") {
         env$jumped <- TRUE
         out <- evalq(envir = user_env,
           base::evalq(envir = rlang::wref_key(!!weak_env), {
-            env_poke_exits(user_env, exits)
+            env_poke_exits(
+              user_env,
+              c(
+                # Thunk scoped in this environment
+                !!list(call2(function() close_active_iterators())),
+                # User expressions scoped in the user environment
+                exits
+              )
+            )
             !!state_machine
           })
         )

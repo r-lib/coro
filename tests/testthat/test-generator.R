@@ -389,8 +389,7 @@ test_that("for loops in generators close their iterators (#52)", {
   expect_error(
     collect(h())
   )
-  # FIXME
-  # expect_true(called)
+  expect_true(called)
 
   called <- FALSE
   expect_error(loop(for (i in h()) {}))
