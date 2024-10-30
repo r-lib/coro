@@ -882,9 +882,10 @@ for_states <- function(preamble,
     nested_states <- condition_state(condition, nested_counter)
   }
 
-  cleanup <- expr(
+  cleanup <- expr({
+    iter_close(iterators[[!!loop_depth]])
     iterators[[!!loop_depth]] <- NULL
-  )
+  })
 
   loop_states(
     preamble = preamble,

@@ -381,7 +381,6 @@ test_that("for loops in generators close their iterators (#52)", {
   h <- coro::generator(function() {
     for (i in g()) {
       yield(i)
-      # break
       stop("foo")
     }
   })
@@ -394,8 +393,29 @@ test_that("for loops in generators close their iterators (#52)", {
   # expect_true(called)
 
   called <- FALSE
-  expect_error(loop(for (i in h()) {
-    print(i)
-  }))
+  expect_error(loop(for (i in h()) {}))
+  expect_true(called)
+})
+
+test_that("for loops in generators close their iterators - break (#52)", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- TRUE)
+    yield(1)
+    yield(2)
+  })
+  h <- coro::generator(function() {
+    for (i in g()) {
+      yield(i)
+      break
+    }
+  })
+
+  called <- FALSE
+  collect(h())
+  expect_true(called)
+
+  called <- FALSE
+  loop(for (i in h()) {})
   expect_true(called)
 })
