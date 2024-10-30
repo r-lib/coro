@@ -161,9 +161,10 @@ generator0 <- function(fn, type = "generator") {
 
       # Create the generator instance. This is a function that resumes
       # a state machine.
-      instance <- inject(function(arg) {
+      instance <- inject(function(arg, close = FALSE) {
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
+        delayedAssign("close", close, assign.env = env)
 
         if (!undebugged && (debugged || is_true(peek_option("coro_debug")))) {
           env_browse(user_env)
@@ -189,6 +190,21 @@ generator0 <- function(fn, type = "generator") {
         }
 
         if (is_true(env$exhausted)) {
+          return(exhausted())
+        }
+
+        if (close) {
+          # Run in environment where user exits are installed. Unlike in the
+          # state machine path, we don't disable them before exiting so they
+          # will run.
+          evalq(envir = user_env,
+            base::evalq(envir = rlang::wref_key(!!weak_env), {
+              env_poke_exits(user_env, exits)
+            })
+          )
+
+          # Prevent returning here as closing should be idempotent
+          env$exhausted <- TRUE
           return(exhausted())
         }
 

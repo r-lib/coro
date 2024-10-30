@@ -143,3 +143,7 @@ as_iterator.python.builtin.object <- function(x) {
   x <- reticulate::as_iterator(x)
   function() reticulate::iter_next(x, exhausted())
 }
+
+has_close <- function(iter) {
+  "close" %in% names(formals(iter))
+}

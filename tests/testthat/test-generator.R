@@ -339,3 +339,34 @@ test_that("generators do not cause CMD check notes (#40)", {
     ))
   )
 })
+
+test_that("on.exit is called when loop breaks early (#52)", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- TRUE)
+    yield(1)
+    yield(2)
+  })
+
+  called <- FALSE
+  expect_error(
+    coro::loop(for (i in g()) {
+      stop("boom!")
+    })
+  )
+  expect_true(called)
+
+  called <- FALSE
+  iter <- g()
+  iter()
+  expect_false(called)
+
+  iter(close = TRUE)
+  expect_true(called)
+
+  # Only called once
+  called <- FALSE
+  iter()
+  iter(close = TRUE)
+  expect_false(called)
+})
