@@ -1,3 +1,5 @@
+# coro (development version)
+
 # coro 1.0.5
 
 * Async functions created by `coro::async()` now return their
