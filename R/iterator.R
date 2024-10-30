@@ -16,6 +16,17 @@
 #'   invokations must consistently return `coro::exhausted()` or
 #'   `as.symbol(".__exhausted__.")`.
 #'
+#' - The iterator function may have a `close` argument taking boolean
+#'   values. When passed a `TRUE` value, it indicates early termination
+#'   and the iterator is given the opportunity to clean up resources.
+#'
+#'   Cleanup must only be performed once, even if the iterator is called
+#'   multiple times with `close = TRUE`.
+#'
+#'   An iterator is allowed to not have any `close` argument. Iterator
+#'   drivers must check for the presence of the argument. If not present,
+#'   the iterator can be dropped without cleanup.
+#'
 #' ```{r}
 #' iterator <- as_iterator(1:3)
 #'
