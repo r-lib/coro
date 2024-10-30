@@ -130,6 +130,10 @@ generator0 <- function(fn, type = "generator") {
     `_private`$caller_env <- base::parent.frame()
 
     base::local(envir = `_private`, {
+      generator_env <- environment()$generator_env
+      caller_env <- environment()$caller_env
+      exits <- NULL
+
       info <- machine_info(type, env = caller_env)
 
       # Generate the state machine lazily at runtime

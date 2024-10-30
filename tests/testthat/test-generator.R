@@ -329,3 +329,13 @@ test_that("stepping into generators returns visibly (#46)", {
   expect_visible(abc())
   expect_visible(abc())
 })
+
+test_that("generators do not cause CMD check notes (#40)", {
+  skip_on_cran()
+  expect_silent(
+    invisible(compiler::cmpfun(
+      generator(function() NULL),
+      options = list(suppressAll = FALSE)
+    ))
+  )
+})

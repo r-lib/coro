@@ -1,5 +1,8 @@
 # coro (development version)
 
+* Generators and async functions assigned in namespaces no
+  longer produce R CMD check notes about visible bindings (#40).
+
 # coro 1.0.5
 
 * Async functions created by `coro::async()` now return their

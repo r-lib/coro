@@ -12,6 +12,7 @@ Provides 'coroutines' for R, a family of functions that can be suspended and res
 Useful links:
 \itemize{
   \item \url{https://github.com/r-lib/coro}
+  \item \url{https://coro.r-lib.org/}
   \item Report bugs at \url{https://github.com/r-lib/coro/issues}
 }
 
