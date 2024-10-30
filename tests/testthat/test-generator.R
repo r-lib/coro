@@ -418,3 +418,32 @@ test_that("for loops in generators close their iterators - break (#52)", {
   loop(for (i in h()) {})
   expect_true(called)
 })
+
+test_that("Iterators are cleaned up from most nested to least nested", {
+  called <- NULL
+
+  g1 <- coro::generator(function() {
+    on.exit(called <<- c(called, "g1"))
+    yield(1)
+    yield(2)
+  })
+  g2 <- coro::generator(function() {
+    on.exit(called <<- c(called, "g2"))
+    yield(1)
+    yield(2)
+  })
+
+  h <- coro::generator(function() {
+    for (i in g1()) {
+      for (j in g2()) {
+        yield(c(i, j))
+      }
+      stop("foo")
+    }
+  })
+
+  expect_error(
+    collect(h())
+  )
+  expect_equal(called, c("g2", "g1"))
+})
