@@ -339,3 +339,112 @@ test_that("generators do not cause CMD check notes (#40)", {
     ))
   )
 })
+
+test_that("on.exit is called when loop breaks early (#52)", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- TRUE)
+    yield(1)
+    yield(2)
+  })
+
+  called <- FALSE
+  expect_error(
+    coro::loop(for (i in g()) {
+      stop("boom!")
+    })
+  )
+  expect_true(called)
+
+  called <- FALSE
+  iter <- g()
+  iter()
+  expect_false(called)
+
+  iter(close = TRUE)
+  expect_true(called)
+
+  # Only called once
+  called <- FALSE
+  iter()
+  iter(close = TRUE)
+  expect_false(called)
+})
+
+test_that("for loops in generators close their iterators (#52)", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- TRUE)
+    yield(1)
+    yield(2)
+  })
+  h <- coro::generator(function() {
+    for (i in g()) {
+      yield(i)
+      stop("foo")
+    }
+  })
+
+  called <- FALSE
+  expect_error(
+    collect(h())
+  )
+  expect_true(called)
+
+  called <- FALSE
+  expect_error(loop(for (i in h()) {}))
+  expect_true(called)
+})
+
+test_that("for loops in generators close their iterators - break (#52)", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- TRUE)
+    yield(1)
+    yield(2)
+  })
+  h <- coro::generator(function() {
+    for (i in g()) {
+      yield(i)
+      break
+    }
+  })
+
+  called <- FALSE
+  collect(h())
+  expect_true(called)
+
+  called <- FALSE
+  loop(for (i in h()) {})
+  expect_true(called)
+})
+
+test_that("Iterators are cleaned up from most nested to least nested", {
+  called <- NULL
+
+  g1 <- coro::generator(function() {
+    on.exit(called <<- c(called, "g1"))
+    yield(1)
+    yield(2)
+  })
+  g2 <- coro::generator(function() {
+    on.exit(called <<- c(called, "g2"))
+    yield(1)
+    yield(2)
+  })
+
+  h <- coro::generator(function() {
+    on.exit(called <<- c(called, "h"))
+    for (i in g1()) {
+      for (j in g2()) {
+        yield(c(i, j))
+      }
+      stop("foo")
+    }
+  })
+
+  expect_error(
+    collect(h())
+  )
+  expect_equal(called, c("g2", "g1", "h"))
+})

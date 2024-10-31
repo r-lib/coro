@@ -1644,7 +1644,10 @@
                   .last_value <- if (missing(arg)) NULL else arg
                   state[[2L]] <- 1L
               })
-              iterators[[2L]] <- NULL
+              {
+                  iter_close(iterators[[2L]])
+                  iterators[[2L]] <- NULL
+              }
               length(state) <- 1L
               break
           })
@@ -1708,11 +1711,17 @@
                       .last_value <- if (missing(arg)) NULL else arg
                       state[[3L]] <- 1L
                   })
-                  iterators[[3L]] <- NULL
+                  {
+                      iter_close(iterators[[3L]])
+                      iterators[[3L]] <- NULL
+                  }
                   length(state) <- 2L
                   state[[2L]] <- 1L
               })
-              iterators[[2L]] <- NULL
+              {
+                  iter_close(iterators[[2L]])
+                  iterators[[2L]] <- NULL
+              }
               length(state) <- 1L
               break
           })
@@ -1764,7 +1773,10 @@
                   .last_value <- if (missing(arg)) NULL else arg
                   state[[2L]] <- 1L
               })
-              iterators[[2L]] <- NULL
+              {
+                  iter_close(iterators[[2L]])
+                  iterators[[2L]] <- NULL
+              }
               length(state) <- 1L
               state[[1L]] <- 3L
           }, `3` = {
@@ -2197,7 +2209,10 @@
                   .last_value <- if (missing(arg)) NULL else arg
                   state[[2L]] <- 1L
               })
-              iterators[[2L]] <- NULL
+              {
+                  iter_close(iterators[[2L]])
+                  iterators[[2L]] <- NULL
+              }
               length(state) <- 1L
               break
           })

@@ -159,11 +159,24 @@ generator0 <- function(fn, type = "generator") {
       # Flipped when `f` is pressed in the browser
       undebugged <- FALSE
 
+      # Called on cleanup to close all iterators active in
+      # ongoing `for` loops
+      close_active_iterators <- function() {
+        # The list is ordered from outermost to innermost for loops. Close them
+        # in reverse order, from most nested to least nested.
+        for (iter in rev(env$iterators)) {
+          if (!is_null(iter)) {
+            iter_close(iter)
+          }
+        }
+      }
+
       # Create the generator instance. This is a function that resumes
       # a state machine.
-      instance <- inject(function(arg) {
+      instance <- inject(function(arg, close = FALSE) {
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
+        delayedAssign("close", close, assign.env = env)
 
         if (!undebugged && (debugged || is_true(peek_option("coro_debug")))) {
           env_browse(user_env)
@@ -174,6 +187,36 @@ generator0 <- function(fn, type = "generator") {
               undebugged <<- TRUE
             }
           }, add = TRUE)
+        }
+
+        if (is_true(env$exhausted)) {
+          return(exhausted())
+        }
+
+        if (close) {
+          # Prevent returning here as closing should be idempotent. We set
+          # ourselves as exhausted _before_ running any cleanup in case of
+          # failures. An exit handler shouldn't fail and it's expected that any
+          # failure prevents other handlers from running, including when an
+          # attempt is made at resuming the closed generator.
+          env$exhausted <- TRUE
+
+          # First close active iterators. Should be first since they might be
+          # relying on resources set by the user.
+          close_active_iterators()
+
+          # Now run the user's exit expressions. Achieved by running restoring
+          # user exits in the user environment and running an empty eval there.
+          # Unlike in the state machine path, where these expressions are meant
+          # to only run in case of unexpected exits, we don't disable them
+          # before exiting so they will actually run here.
+          evalq(envir = user_env,
+            base::evalq(envir = rlang::wref_key(!!weak_env), {
+              env_poke_exits(user_env, exits)
+            })
+          )
+
+          return(exhausted())
         }
 
         # Disable generator on error, interrupt, debugger quit, etc.
@@ -188,10 +231,6 @@ generator0 <- function(fn, type = "generator") {
           abort("This function has been disabled because of an unexpected exit.")
         }
 
-        if (is_true(env$exhausted)) {
-          return(exhausted())
-        }
-
         # Resume state machine. Set up an execution env in the user
         # environment first to serve as a target for on.exit()
         # expressions. Then evaluate state machine in its private
@@ -199,7 +238,15 @@ generator0 <- function(fn, type = "generator") {
         env$jumped <- TRUE
         out <- evalq(envir = user_env,
           base::evalq(envir = rlang::wref_key(!!weak_env), {
-            env_poke_exits(user_env, exits)
+            env_poke_exits(
+              user_env,
+              c(
+                # Thunk scoped in this environment
+                !!list(call2(function() close_active_iterators())),
+                # User expressions scoped in the user environment
+                exits
+              )
+            )
             !!state_machine
           })
         )

@@ -106,3 +106,8 @@ zap_env <- function(x) {
   env_poke(env, lhs, value, inherit = TRUE, create = FALSE)
   invisible(value)
 }
+
+defer <- function(expr, env = caller_env(), after = FALSE) {
+  thunk <- as.call(list(function() expr))
+  do.call(on.exit, list(thunk, TRUE, after), envir = env)
+}
