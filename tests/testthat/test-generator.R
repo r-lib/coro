@@ -434,6 +434,7 @@ test_that("Iterators are cleaned up from most nested to least nested", {
   })
 
   h <- coro::generator(function() {
+    on.exit(called <<- c(called, "h"))
     for (i in g1()) {
       for (j in g2()) {
         yield(c(i, j))
@@ -445,5 +446,5 @@ test_that("Iterators are cleaned up from most nested to least nested", {
   expect_error(
     collect(h())
   )
-  expect_equal(called, c("g2", "g1"))
+  expect_equal(called, c("g2", "g1", "h"))
 })

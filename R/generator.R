@@ -162,6 +162,8 @@ generator0 <- function(fn, type = "generator") {
       # Called on cleanup to close all iterators active in
       # ongoing `for` loops
       close_active_iterators <- function() {
+        # The list is ordered from outermost to innermost for loops. Close them
+        # in reverse order, from most nested to least nested.
         for (iter in rev(env$iterators)) {
           if (!is_null(iter)) {
             iter_close(iter)
@@ -192,20 +194,28 @@ generator0 <- function(fn, type = "generator") {
         }
 
         if (close) {
-          # Run in environment where user exits are installed. Unlike in the
-          # state machine path, where these expressions are meant to only run in
-          # case of unexpected exits, we don't disable them before exiting so
-          # they will actually run here.
+          # Prevent returning here as closing should be idempotent. We set
+          # ourselves as exhausted _before_ running any cleanup in case of
+          # failures. An exit handler shouldn't fail and it's expected that any
+          # failure prevents other handlers from running, including when an
+          # attempt is made at resuming the closed generator.
+          env$exhausted <- TRUE
+
+          # First close active iterators. Should be first since they might be
+          # relying on resources set by the user.
+          close_active_iterators()
+
+          # Now run the user's exit expressions. Achieved by running restoring
+          # user exits in the user environment and running an empty eval there.
+          # Unlike in the state machine path, where these expressions are meant
+          # to only run in case of unexpected exits, we don't disable them
+          # before exiting so they will actually run here.
           evalq(envir = user_env,
             base::evalq(envir = rlang::wref_key(!!weak_env), {
               env_poke_exits(user_env, exits)
             })
           )
 
-          close_active_iterators()
-
-          # Prevent returning here as closing should be idempotent
-          env$exhausted <- TRUE
           return(exhausted())
         }
 
