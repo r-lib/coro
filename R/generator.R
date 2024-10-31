@@ -193,8 +193,9 @@ generator0 <- function(fn, type = "generator") {
 
         if (close) {
           # Run in environment where user exits are installed. Unlike in the
-          # state machine path, we don't disable them before exiting so they
-          # will run.
+          # state machine path, where these expressions are meant to only run in
+          # case of unexpected exits, we don't disable them before exiting so
+          # they will actually run here.
           evalq(envir = user_env,
             base::evalq(envir = rlang::wref_key(!!weak_env), {
               env_poke_exits(user_env, exits)
