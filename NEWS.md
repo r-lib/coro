@@ -1,5 +1,9 @@
 # coro (development version)
 
+* Implicit and explicit return values of generators are no longer
+  yielded. This is consistent with Javascript and Python and simplifies
+  certain idioms (#51).
+
 * Generators and async functions assigned in namespaces no
   longer produce R CMD check notes about visible bindings (#40).
 
