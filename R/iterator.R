@@ -27,6 +27,10 @@
 #'   drivers must check for the presence of the argument. If not present,
 #'   the iterator can be dropped without cleanup.
 #'
+#'   An iterator passed `close = TRUE` must return `coro::exhausted()` and
+#'   once closed, an iterator must return `coro::exhausted()` when called
+#'   again.
+#'
 #' ```{r}
 #' iterator <- as_iterator(1:3)
 #'
