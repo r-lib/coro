@@ -438,8 +438,8 @@ test_that("Iterators are cleaned up from most nested to least nested", {
     for (i in g1()) {
       for (j in g2()) {
         yield(c(i, j))
+        stop("foo")
       }
-      stop("foo")
     }
   })
 
@@ -447,4 +447,51 @@ test_that("Iterators are cleaned up from most nested to least nested", {
     collect(h())
   )
   expect_equal(called, c("g2", "g1", "h"))
+})
+
+test_that("disabled generators only clean up once", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- c(called, TRUE))
+    stop("foo")
+    yield(1)
+  })()
+
+  expect_error(g(), "foo")
+  expect_equal(called, TRUE)
+
+  expect_error(g(), "disabled because of an unexpected exit")
+  expect_equal(called, TRUE)
+
+  expect_equal(g(close = TRUE), exhausted())
+  expect_equal(called, TRUE)
+
+  expect_equal(g(), exhausted())
+  expect_equal(called, TRUE)
+
+  expect_equal(g(close = TRUE), exhausted())
+  expect_equal(called, TRUE)
+})
+
+test_that("generators only clean up once", {
+  called <- NULL
+  g <- coro::generator(function() {
+    on.exit(called <<- c(called, TRUE))
+    yield(1)
+  })()
+
+  expect_equal(g(), 1)
+  expect_null(called)
+
+  expect_equal(g(), exhausted())
+  expect_equal(called, TRUE)
+
+  expect_equal(g(close = TRUE), exhausted())
+  expect_equal(called, TRUE)
+
+  expect_equal(g(), exhausted())
+  expect_equal(called, TRUE)
+
+  expect_equal(g(close = TRUE), exhausted())
+  expect_equal(called, TRUE)
 })

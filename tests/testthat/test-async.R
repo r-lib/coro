@@ -181,8 +181,8 @@ test_that("Iterators are cleaned up from most nested to least nested", {
     for (i in await_each(g1())) {
       for (j in await_each(g2())) {
         yield(c(i, j))
+        stop("foo")
       }
-      stop("foo")
     }
   })
 
