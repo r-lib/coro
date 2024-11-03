@@ -320,6 +320,10 @@ test_that("async function returns invisibly (#46)", {
 
 test_that("async functions do not cause CMD check notes (#40)", {
   skip_on_cran()
+    invisible(compiler::cmpfun(
+      async(function() NULL),
+      options = list(suppressAll = FALSE)
+    ))
   expect_silent(
     invisible(compiler::cmpfun(
       async(function() NULL),

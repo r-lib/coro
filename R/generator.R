@@ -132,7 +132,12 @@ generator0 <- function(fn, type = "generator") {
     base::local(envir = `_private`, {
       generator_env <- environment()$generator_env
       caller_env <- environment()$caller_env
+
+      # Prevent lints about unknown bindings
       exits <- NULL
+      exited <- NULL
+      cleanup <- NULL
+      close_active_iterators <- NULL
 
       info <- machine_info(type, env = caller_env)
 
@@ -149,8 +154,10 @@ generator0 <- function(fn, type = "generator") {
       env <- new_generator_env(env, info)
       user_env <- env$user_env
 
-      # The compiler caches function bodies, so inline a weak
-      # reference to avoid leaks (#36)
+      # The compiler caches function bodies, so inline a weak reference to avoid
+      # leaks (#36). This weak reference is injected inside the body of the
+      # generator instance to work around a scoping issue. See where we install
+      # the user's exit handlers.
       weak_env <- new_weakref(env)
 
       # Forward arguments inside the user space of the state machine
@@ -171,6 +178,16 @@ generator0 <- function(fn, type = "generator") {
         }
       }
 
+      env$close_active_iterators <- close_active_iterators
+
+      env$cleanup <- function() {
+        env$close_active_iterators()
+
+        # Prevent user exit handlers from running again
+        env$exits <- NULL
+      }
+
+
       # Create the generator instance. This is a function that resumes
       # a state machine.
       instance <- inject(function(arg, close = FALSE) {
@@ -181,12 +198,12 @@ generator0 <- function(fn, type = "generator") {
         if (!undebugged && (debugged || is_true(peek_option("coro_debug")))) {
           env_browse(user_env)
 
-          on.exit({
+          defer({
             # `f` was pressed, disable debugging for this generator
             if (!env_is_browsed(user_env)) {
               undebugged <<- TRUE
             }
-          }, add = TRUE)
+          })
         }
 
         if (is_true(env$exhausted)) {
@@ -236,20 +253,15 @@ generator0 <- function(fn, type = "generator") {
         # expressions. Then evaluate state machine in its private
         # environment.
         env$jumped <- TRUE
-        out <- evalq(envir = user_env,
+        env$exited <- TRUE
+
+        out <- evalq(envir = user_env, {
           base::evalq(envir = rlang::wref_key(!!weak_env), {
-            env_poke_exits(
-              user_env,
-              c(
-                # Thunk scoped in this environment
-                !!list(call2(function() close_active_iterators())),
-                # User expressions scoped in the user environment
-                exits
-              )
-            )
+            defer(if (exited) cleanup())
+            env_poke_exits(user_env, exits)
             !!state_machine
           })
-        )
+        })
         env$jumped <- FALSE
 
         out
@@ -281,6 +293,7 @@ new_generator_env <- function(parent, info) {
   env$iterators <- list()
   env$handlers <- list()
   env$exits <- NULL
+  env$exited <- TRUE
   env$.last_value <- NULL
 
   with(env, {
@@ -292,6 +305,7 @@ new_generator_env <- function(parent, info) {
     }
 
     suspend <- function() {
+      exited <<- FALSE
       exits <<- env_poke_exits(user_env, NULL)
     }
   })

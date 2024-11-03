@@ -453,9 +453,11 @@ test_that("disabled generators only clean up once", {
   called <- NULL
   g <- coro::generator(function() {
     on.exit(called <<- c(called, TRUE))
-    stop("foo")
     yield(1)
+    stop("foo")
   })()
+
+  expect_equal(g(), 1)
 
   expect_error(g(), "foo")
   expect_equal(called, TRUE)

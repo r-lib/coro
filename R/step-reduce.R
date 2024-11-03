@@ -317,6 +317,9 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
     abort("Can't right-reduce with an iterator.")
   }
 
+  # TODO: How do we close transducers?
+  defer(iter_close(.x))
+
   .f <- as_function(.f)
 
   out <- NULL
