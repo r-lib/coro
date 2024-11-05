@@ -1,4 +1,4 @@
-# coro (development version)
+# coro 1.1.0
 
 * Iterator functions are now allowed to have a `close` argument.
   If they do, they will be called with a `close = TRUE` value
