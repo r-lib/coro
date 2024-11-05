@@ -568,7 +568,7 @@ strip_explicit_return <- function(expr) {
 }
 return_call <- function(info) {
   if (is_null(info$async_ops)) {
-    quote(return(last_value()))
+    quote(return(exhausted()))
   } else {
     quote(return(as_promise(last_value())))
   }
@@ -996,8 +996,8 @@ try_catch_states <- function(preamble,
   depth <- machine_depth(counter)
   try_catch_depth <- depth + 1L
 
-  # Handlers can't be evaluated until runtime. We store them in a list
-  # dynamically.
+  # Handlers can't be evaluated until runtime. We store their expressions in a
+  # list. They are evaluated when the user enters the `tryCatch()` state.
   handler_body <- expr({
     !!!preamble %&&% list(user_call(preamble))
     handlers[[!!try_catch_depth]] <- user(base::list(!!!handlers_exprs))

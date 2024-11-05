@@ -28,7 +28,7 @@
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
@@ -64,7 +64,7 @@
               state[[1L]] <- 3L
           }, `3` = {
               exhausted <- TRUE
-              return(last_value())
+              return(exhausted())
           })
           exhausted <- TRUE
           invisible(exhausted())
