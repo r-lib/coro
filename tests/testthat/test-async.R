@@ -162,6 +162,36 @@ test_that("for loops support await_each()", {
   }))
 })
 
+test_that("Iterators are cleaned up from most nested to least nested", {
+  called <- NULL
+
+  g1 <- coro::async_generator(function() {
+    on.exit(called <<- c(called, "g1"))
+    yield(1)
+    yield(2)
+  })
+  g2 <- coro::async_generator(function() {
+    on.exit(called <<- c(called, "g2"))
+    yield(1)
+    yield(2)
+  })
+
+  h <- coro::async_generator(function() {
+    on.exit(called <<- c(called, "h"))
+    for (i in await_each(g1())) {
+      for (j in await_each(g2())) {
+        yield(c(i, j))
+        stop("foo")
+      }
+    }
+  })
+
+  expect_error(
+    wait_for(async_collect(h()))
+  )
+  expect_equal(called, c("g2", "g1", "h"))
+})
+
 test_that("await_each() can't be used in generators", {
   expect_error(generator(function() for (x in await_each(i)) NULL)()(), "non-async generator")
 })
@@ -290,6 +320,10 @@ test_that("async function returns invisibly (#46)", {
 
 test_that("async functions do not cause CMD check notes (#40)", {
   skip_on_cran()
+    invisible(compiler::cmpfun(
+      async(function() NULL),
+      options = list(suppressAll = FALSE)
+    ))
   expect_silent(
     invisible(compiler::cmpfun(
       async(function() NULL),
