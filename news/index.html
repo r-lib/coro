@@ -33,11 +33,11 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/r-lib/coro/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/r-lib/coro/blob/v1.1.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.0" id="coro-110">coro 1.1.0<a class="anchor" aria-label="anchor" href="#coro-110"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.1.0" id="coro-110">coro 1.1.0<a class="anchor" aria-label="anchor" href="#coro-110"></a></h2><p class="text-muted">CRAN release: 2024-11-05</p>
 <ul><li><p>Iterator functions are now allowed to have a <code>close</code> argument. If they do, they will be called with a <code>close = TRUE</code> value when iteration is terminated early. This gives the opportunity to clean up resources.</p></li>
 <li><p>Generators now run <code><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit()</a></code> expressions when they are closed.</p></li>
 <li><p>Iterators managed by <code><a href="../reference/collect.html">coro::loop()</a></code> and by generator <code>for</code> loops are now cleaned up when terminated early, either because of an error or because of a <code><a href="https://rdrr.io/r/base/Control.html" class="external-link">break</a></code> (<a href="https://github.com/r-lib/coro/issues/52" class="external-link">#52</a>).</p></li>
