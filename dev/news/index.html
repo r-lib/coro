@@ -41,6 +41,7 @@
 <ul><li><p>Iterator functions are now allowed to have a <code>close</code> argument. If they do, they will be called with a <code>close = TRUE</code> value when iteration is terminated early. This gives the opportunity to clean up resources.</p></li>
 <li><p>Generators now run <code><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit()</a></code> expressions when they are closed.</p></li>
 <li><p>Iterators managed by <code><a href="../reference/collect.html">coro::loop()</a></code> and by generator <code>for</code> loops are now cleaned up when terminated early, either because of an error or because of a <code><a href="https://rdrr.io/r/base/Control.html" class="external-link">break</a></code> (<a href="https://github.com/r-lib/coro/issues/52" class="external-link">#52</a>).</p></li>
+<li><p>Implicit and explicit return values of generators are no longer yielded. This is consistent with Javascript and Python and simplifies certain idioms (<a href="https://github.com/r-lib/coro/issues/51" class="external-link">#51</a>).</p></li>
 <li><p>Generators and async functions assigned in namespaces no longer produce R CMD check notes about visible bindings (<a href="https://github.com/r-lib/coro/issues/40" class="external-link">#40</a>).</p></li>
 </ul></div>
     <div class="section level2">
