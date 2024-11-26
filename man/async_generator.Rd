@@ -2,16 +2,21 @@
 % Please edit documentation in R/async.R
 \name{async_generator}
 \alias{async_generator}
+\alias{async_gen}
 \alias{await_each}
 \title{Construct an async generator}
 \usage{
 async_generator(fn)
+
+async_gen(expr)
 
 await_each(x)
 }
 \arguments{
 \item{fn}{An anonymous function describing an async generator
 within which \code{await()} calls are allowed.}
+
+\item{expr}{A yielding expression.}
 
 \item{x}{An awaitable value, i.e. a \link[promises:promise]{promise}.}
 }
@@ -44,7 +49,19 @@ async_map <- async_generator(function(.i, .fn, ...) {
 # Example usage:
 if (interactive()) {
   library(magrittr)
-  generate_stream(1:3) \%>\% async_map(`*`, 2) \%>\% async_collect()
+  generate_stream(1:3) \%>\%
+    async_map(`*`, 2) \%>\%
+    async_collect()
+}
+
+# coro provides a short syntax `async_gen()` for creating one-off
+# generator _instances_. It is handy to adapt existing iterators:
+numbers <- generate_stream(1:10)
+odds <- async_gen(for (x in await_each(numbers)) if (x \%\% 2 != 0) yield(x))
+squares <- async_gen(for (x in await_each(odds)) yield(x^2))
+greetings <- async_gen(for (x in await_each(squares)) yield(paste("Hey", x)))
+if (interactive()) {
+  async_collect(greetings) \%>\% promises::then(print)
 }
 }
 \seealso{
