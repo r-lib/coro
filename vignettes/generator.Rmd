@@ -122,7 +122,7 @@ while (!is_exhausted(x <- abc())) {
 }
 ```
 
-A simpler way is to iterate with a `for` loop using the `iterate()` helper. Within `iterate()`, `for` understands the iterator protocol:
+A simpler way is to iterate with a `for` loop using the `loop()` helper. Within `loop()`, `for` understands the iterator protocol:
 
 ```{r}
 abc <- generate_abc()
