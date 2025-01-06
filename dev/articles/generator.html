@@ -10,8 +10,8 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.9/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.9/font.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Generators">
 <meta name="robots" content="noindex">
 <script defer data-domain="coro.r-lib.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>
@@ -64,7 +64,7 @@
                         <h4 data-toc-skip class="author">Lionel
 Henry</h4>
             
-            <h4 data-toc-skip class="date">2024-11-05</h4>
+            <h4 data-toc-skip class="date">2025-01-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/r-lib/coro/blob/main/vignettes/generator.Rmd" class="external-link"><code>vignettes/generator.Rmd</code></a></small>
       <div class="d-none name"><code>generator.Rmd</code></div>
@@ -191,8 +191,8 @@ you have to watch out for the exhaustion sentinel:</p>
 <span><span class="co">#&gt; [1] "b"</span></span>
 <span><span class="co">#&gt; [1] "c"</span></span></code></pre></div>
 <p>A simpler way is to iterate with a <code>for</code> loop using the
-<code><a href="https://rstudio.github.io/reticulate/reference/iterate.html" class="external-link">iterate()</a></code> helper. Within <code><a href="https://rstudio.github.io/reticulate/reference/iterate.html" class="external-link">iterate()</a></code>,
-<code>for</code> understands the iterator protocol:</p>
+<code><a href="../reference/collect.html">loop()</a></code> helper. Within <code><a href="../reference/collect.html">loop()</a></code>, <code>for</code>
+understands the iterator protocol:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abc</span> <span class="op">&lt;-</span> <span class="fu">generate_abc</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
