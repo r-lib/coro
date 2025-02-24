@@ -8,9 +8,9 @@
 #' - Calling the function advances the iterator. The new value is
 #'   returned.
 #'
-#' - When the iterator is exhausted and there are no more elements to
-#'   return, the symbol `quote(exhausted)` is returned. This signals
-#'   exhaustion to the caller.
+#' - When the iterator is exhausted and there are no more elements to return,
+#'   `coro::exhausted()` or (equivalently) `as.symbol(".__exhausted__.")` is
+#'   returned. This signals exhaustion to the caller.
 #'
 #' - Once an iterator has signalled exhaustion, all subsequent
 #'   invokations must consistently return `coro::exhausted()` or

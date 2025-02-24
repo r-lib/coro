@@ -19,9 +19,9 @@ protocol:
 \itemize{
 \item Calling the function advances the iterator. The new value is
 returned.
-\item When the iterator is exhausted and there are no more elements to
-return, the symbol \code{quote(exhausted)} is returned. This signals
-exhaustion to the caller.
+\item When the iterator is exhausted and there are no more elements to return,
+\code{coro::exhausted()} or (equivalently) \code{as.symbol(".__exhausted__.")} is
+returned. This signals exhaustion to the caller.
 \item Once an iterator has signalled exhaustion, all subsequent
 invokations must consistently return \code{coro::exhausted()} or
 \code{as.symbol(".__exhausted__.")}.
