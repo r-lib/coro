@@ -3,9 +3,9 @@
 protocol:
 Calling the function advances the iterator. The new value is
 returned.
-When the iterator is exhausted and there are no more elements to
-return, the symbol quote(exhausted) is returned. This signals
-exhaustion to the caller.
+When the iterator is exhausted and there are no more elements to return,
+coro::exhausted() or (equivalently) as.symbol(".__exhausted__.") is
+returned. This signals exhaustion to the caller.
 Once an iterator has signalled exhaustion, all subsequent
 invokations must consistently return coro::exhausted() or
 as.symbol(".__exhausted__.").
@@ -47,9 +47,9 @@ package.'><meta property="og:description" content='An iterator is a function tha
 protocol:
 Calling the function advances the iterator. The new value is
 returned.
-When the iterator is exhausted and there are no more elements to
-return, the symbol quote(exhausted) is returned. This signals
-exhaustion to the caller.
+When the iterator is exhausted and there are no more elements to return,
+coro::exhausted() or (equivalently) as.symbol(".__exhausted__.") is
+returned. This signals exhaustion to the caller.
 Once an iterator has signalled exhaustion, all subsequent
 invokations must consistently return coro::exhausted() or
 as.symbol(".__exhausted__.").
@@ -129,9 +129,9 @@ package.'><meta name="robots" content="noindex"><script defer data-domain="coro.
     <p>An <strong>iterator</strong> is a function that implements the following
 protocol:</p><ul><li><p>Calling the function advances the iterator. The new value is
 returned.</p></li>
-<li><p>When the iterator is exhausted and there are no more elements to
-return, the symbol <code>quote(exhausted)</code> is returned. This signals
-exhaustion to the caller.</p></li>
+<li><p>When the iterator is exhausted and there are no more elements to return,
+<code>coro::exhausted()</code> or (equivalently) <code>as.symbol(".__exhausted__.")</code> is
+returned. This signals exhaustion to the caller.</p></li>
 <li><p>Once an iterator has signalled exhaustion, all subsequent
 invokations must consistently return <code>coro::exhausted()</code> or
 <code>as.symbol(".__exhausted__.")</code>.</p></li>
