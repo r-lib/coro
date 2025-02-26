@@ -124,12 +124,15 @@ generator0 <- function(fn, type = "generator") {
 
   `_parent` <- environment()
 
-  # Create the generator factory (returned by `generator()` and
-  # entered by `async()`)
+  # FIX: Inject the captured _parent into the function’s formals as a default argument.
+  # This ensures that the environment is stored in the generated function and survives
+  # any environment replacement (e.g. when used as an R6 method).
+  fmls[[".__coro_env_parent__"]] <- `_parent`
+
+  # Create the generator factory (returned by `generator()` and entered by `async()`)
   factory <- new_function(fmls, quote({
-    # Evaluate here so the formals of the generator factory do not
-    # mask our variables
-    `_private` <- rlang::env(`_parent`)
+    # Evaluate here so the formals of the generator factory do not mask our variables
+    `_private` <- rlang::env(.__coro_env_parent__)
     `_private`$generator_env <- base::environment()
     `_private`$caller_env <- base::parent.frame()
 
@@ -280,7 +283,8 @@ generator0 <- function(fn, type = "generator") {
         structure(instance, class = "coro_generator_instance")
       }
     })
-  }))
+  # added call to caller_env() to ensure that the generator_env is created in the correct environment
+  }), env = caller_env())
 
   structure(factory, class = c(paste0("coro_", type), "function"))
 }
