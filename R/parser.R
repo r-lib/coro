@@ -16,7 +16,9 @@ walk_states <- function(expr, info) {
     if (exhausted) {
       return(invisible(exhausted()))
     }
-    repeat switch(state[[1L]], !!!states)
+    repeat {
+      switch(state[[1L]], !!!states)
+    }
 
     exhausted <- TRUE
     invisible(exhausted())
@@ -40,16 +42,22 @@ walk_loop_states <- function(body, states, counter, info) {
   )
   states <- node_list_poke_cdr(states, nested_states)
 
-  expr(repeat switch(state[[!!loop_depth]], !!!states))
+  expr(
+    repeat {
+      switch(state[[!!loop_depth]], !!!states)
+    }
+  )
 }
-walk_branch_states <- function(body,
-                               offset,
-                               counter,
-                               continue,
-                               last,
-                               return,
-                               info,
-                               new_machine = machine_call) {
+walk_branch_states <- function(
+  body,
+  offset,
+  counter,
+  continue,
+  last,
+  return,
+  info,
+  new_machine = machine_call
+) {
   nested_continue <- function(counter, last) {
     counter() + 1L
   }
@@ -68,7 +76,13 @@ walk_branch_states <- function(body,
     info = info
   )
 
-  breaking_state <- new_state(quote({ break }), NULL, nested_counter())
+  breaking_state <- new_state(
+    quote({
+      break
+    }),
+    NULL,
+    nested_counter()
+  )
   states <- node_list_poke_cdr(states, breaking_state)
   nested_counter(inc = 1L)
 
@@ -82,7 +96,9 @@ walk_branch_states <- function(body,
 }
 machine_call <- function(states, depth, prev_depth, next_i) {
   expr({
-    repeat switch(state[[!!depth]], !!!states)
+    repeat {
+      switch(state[[!!depth]], !!!states)
+    }
     n <- length(state)
     if (n < !!prev_depth) {
       !!break_call()
@@ -102,7 +118,8 @@ expr_states <- function(expr, counter, continue, last, return, info) {
   type <- expr_info$type
   assign <- expr_info$assign
 
-  switch(type,
+  switch(
+    type,
     `{` = block_states(
       block = expr,
       counter = counter,
@@ -204,7 +221,9 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info,
       assign = assign
     ),
-    `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`"),
+    `withCallingHandlers` = stop_unimplemented(
+      "Support for `withCallingHandlers()`"
+    ),
     stop_internal("expr_states", sprintf("Unexpected operation `%s`", type))
   )
 }
@@ -253,7 +272,8 @@ expr_type_impl <- function(expr) {
   }
   head <- as_string(head)
 
-  switch(head,
+  switch(
+    head,
     `{` = ,
     `yield` = ,
     `await` = ,
@@ -274,7 +294,8 @@ expr_type_impl <- function(expr) {
 # expressions unless the argument is a potentially yielding control
 # flow expression
 with_handlers_type <- function(expr, fn_name) {
-  fn <- switch(fn_name,
+  fn <- switch(
+    fn_name,
     tryCatch = tryCatch,
     withCallingHandlers = withCallingHandlers,
     stop_internal("Unexpected state in `handler_type()`.")
@@ -382,7 +403,8 @@ block_states <- function(block, counter, continue, last, return, info) {
     type <- expr_info$type
     assign <- expr_info$assign
 
-    switch(type,
+    switch(
+      type,
       # Collect as many user expressions as possible
       `expr` = {
         accum()
@@ -519,7 +541,9 @@ block_states <- function(block, counter, continue, last, return, info) {
         ))
         next
       },
-      `withCallingHandlers` = stop_unimplemented("Support for `withCallingHandlers()`")
+      `withCallingHandlers` = stop_unimplemented(
+        "Support for `withCallingHandlers()`"
+      )
     )
 
     stop_internal("block_states", sprintf("Unexpected operation `%s`", type))
@@ -592,13 +616,15 @@ continue_state <- function(expr, counter, continue, last, return, info) {
   state
 }
 
-yield_state <- function(expr,
-                        counter,
-                        continue,
-                        last,
-                        return,
-                        info,
-                        assign_var = NULL) {
+yield_state <- function(
+  expr,
+  counter,
+  continue,
+  last,
+  return,
+  info,
+  assign_var = NULL
+) {
   if (is_string(info$type, "async")) {
     abort("Can't use `yield()` within an async function.")
   }
@@ -618,13 +644,15 @@ yield_state <- function(expr,
   )
 }
 
-await_state <- function(expr,
-                        counter,
-                        continue,
-                        last,
-                        return,
-                        info,
-                        assign_var = NULL) {
+await_state <- function(
+  expr,
+  counter,
+  continue,
+  last,
+  return,
+  info,
+  assign_var = NULL
+) {
   if (is_string(info$type, "generator")) {
     stop_non_async_generator("await")
   }
@@ -642,13 +670,15 @@ await_state <- function(expr,
   )
 }
 
-suspend_state <- function(expr,
-                          counter,
-                          continue,
-                          last,
-                          return,
-                          info,
-                          assign_var) {
+suspend_state <- function(
+  expr,
+  counter,
+  continue,
+  last,
+  return,
+  info,
+  assign_var
+) {
   assign <- !is_null(assign_var)
 
   return_last <- last && return && !assign
@@ -696,7 +726,10 @@ suspend_state <- function(expr,
     # proper context. This is how generators can be cancelled and cleaned up.
     force_block <- expr({
       .last_value <- !!arg_expr
-      !!continue_call(continue(counter, saved_last && !return_last), machine_depth(counter))
+      !!continue_call(
+        continue(counter, saved_last && !return_last),
+        machine_depth(counter)
+      )
     })
     force_state <- new_state(force_block, NULL, counter())
     node_list_poke_cdr(states, force_state)
@@ -711,15 +744,17 @@ suspend_state <- function(expr,
   states
 }
 
-if_states <- function(preamble,
-                      condition,
-                      then_body,
-                      else_body,
-                      counter,
-                      continue,
-                      last,
-                      return,
-                      info) {
+if_states <- function(
+  preamble,
+  condition,
+  then_body,
+  else_body,
+  counter,
+  continue,
+  last,
+  return,
+  info
+) {
   i <- counter()
   i_then <- i + 1L
   i_else <- i_then + 1L
@@ -739,13 +774,29 @@ if_states <- function(preamble,
   counter(inc = 1L)
 
   offset <- if (is_null(else_body)) 0L else 1L
-  then_machine <- walk_branch_states(then_body, offset, counter, continue, last, return, info)
+  then_machine <- walk_branch_states(
+    then_body,
+    offset,
+    counter,
+    continue,
+    last,
+    return,
+    info
+  )
   then_state <- new_state(then_machine, NULL, i_then)
   states <- node_list_poke_cdr(states, then_state)
   counter(inc = 1L)
 
   if (!is_null(else_body)) {
-    else_machine <- walk_branch_states(else_body, 0L, counter, continue, last, return, info)
+    else_machine <- walk_branch_states(
+      else_body,
+      0L,
+      counter,
+      continue,
+      last,
+      return,
+      info
+    )
     else_state <- new_state(else_machine, NULL, i_else)
     states <- node_list_poke_cdr(states, else_state)
     counter(inc = 1L)
@@ -761,16 +812,18 @@ if_states <- function(preamble,
   states
 }
 
-loop_states <- function(preamble,
-                        init,
-                        body,
-                        cleanup,
-                        counter,
-                        nested_counter,
-                        nested_states,
-                        continue,
-                        last,
-                        info) {
+loop_states <- function(
+  preamble,
+  init,
+  body,
+  cleanup,
+  counter,
+  nested_counter,
+  nested_states,
+  continue,
+  last,
+  info
+) {
   states <- NULL
   i <- counter()
   next_i <- i + 1L
@@ -789,7 +842,8 @@ loop_states <- function(preamble,
   next_i <- continue(counter, last)
 
   loop_depth <- depth + 1L
-  nested_counter <- nested_counter %||% new_counter(loop_depth, loop_depth = loop_depth)
+  nested_counter <- nested_counter %||%
+    new_counter(loop_depth, loop_depth = loop_depth)
 
   nested_machine_block <- expr({
     !!walk_loop_states(body, nested_states, nested_counter, info = info)
@@ -804,13 +858,15 @@ loop_states <- function(preamble,
   states
 }
 
-while_states <- function(preamble,
-                         condition,
-                         body,
-                         counter,
-                         continue,
-                         last,
-                         info) {
+while_states <- function(
+  preamble,
+  condition,
+  body,
+  counter,
+  continue,
+  last,
+  info
+) {
   nested_counter <- new_loop_counter(counter)
   nested_states <- condition_state(condition, nested_counter)
 
@@ -828,14 +884,16 @@ while_states <- function(preamble,
   )
 }
 
-for_states <- function(preamble,
-                       var,
-                       iterator,
-                       body,
-                       counter,
-                       continue,
-                       last,
-                       info) {
+for_states <- function(
+  preamble,
+  var,
+  iterator,
+  body,
+  counter,
+  continue,
+  last,
+  info
+) {
   loop_depth <- machine_depth(counter) + 1L
 
   async <- is_call(iterator, "await_each", ns = c("", "coro"))
@@ -857,7 +915,14 @@ for_states <- function(preamble,
       iterator <- iterators[[!!loop_depth]]
       iterator()
     })
-    nested_states <- await_state(await_block, nested_counter, continue, FALSE, FALSE, info)
+    nested_states <- await_state(
+      await_block,
+      nested_counter,
+      continue,
+      FALSE,
+      FALSE,
+      info
+    )
 
     condition <- expr({
       if (is_exhausted(arg)) {
@@ -967,14 +1032,16 @@ next_state <- function(preamble, counter, info) {
   state
 }
 
-try_catch_states <- function(preamble,
-                             expr,
-                             counter,
-                             continue,
-                             last,
-                             return,
-                             info,
-                             assign = FALSE) {
+try_catch_states <- function(
+  preamble,
+  expr,
+  counter,
+  continue,
+  last,
+  return,
+  info,
+  assign = FALSE
+) {
   if (assign) {
     var <- call_lhs(expr)
     expr <- call_rhs(expr)

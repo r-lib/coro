@@ -76,7 +76,7 @@ await <- function(x) {
 #' @export
 async_sleep <- function(seconds) {
   promises::promise(function(resolve, reject) {
-    later::later(~ resolve(NULL) , delay = seconds)
+    later::later(~ resolve(NULL), delay = seconds)
   })
 }
 
@@ -127,7 +127,9 @@ async_generator <- function(fn) {
 #' @inheritParams await
 #' @export
 await_each <- function(x) {
-  abort("`await_each()` must be called within a `for` loop of an async function.")
+  abort(
+    "`await_each()` must be called within a `for` loop of an async function."
+  )
 }
 
 #' @export

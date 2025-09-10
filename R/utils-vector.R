@@ -11,7 +11,8 @@ as_vector_fn <- function(type) {
   if (!type %in% vec_types) {
     abort("`type` must be a vector type")
   }
-  switch(type,
+  switch(
+    type,
     logical = as.logical,
     integer = as.integer,
     double = as.double,
@@ -32,7 +33,8 @@ new_vector_fn <- function(type) {
   if (!type %in% vec_types) {
     abort("`type` must be a vector type")
   }
-  switch(type,
+  switch(
+    type,
     logical = new_logical,
     integer = new_integer,
     double = new_double,
