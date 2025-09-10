@@ -152,7 +152,6 @@ as_iterator.default <- function(x) {
 }
 
 
-
 #' @export
 as_iterator.python.builtin.object <- function(x) {
   x <- reticulate::as_iterator(x)

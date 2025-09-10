@@ -13,13 +13,19 @@ test_that("`repeat` - one pause", {
 test_that("`repeat` - no continuation", {
   expect_snapshot0(generator_body(function() {
     "before"
-    repeat yield(1L)
+    repeat {
+      yield(1L)
+    }
     "after"
   }))
 
   expect_snapshot0(generator_body(function() {
     "before"
-    repeat {{ yield(1L) }}
+    repeat {
+      {
+        yield(1L)
+      }
+    }
     "after"
   }))
 })
@@ -29,7 +35,9 @@ test_that("`repeat` - pause within `if`", {
     "before"
     repeat {
       "loop-before"
-      if (TRUE) yield(1L)
+      if (TRUE) {
+        yield(1L)
+      }
       "loop-after"
     }
     "after"
@@ -41,7 +49,9 @@ test_that("`repeat` - nested loop", {
     "before"
     repeat {
       "loop-before"
-      repeat yield(1L)
+      repeat {
+        yield(1L)
+      }
       "loop-after"
     }
     "after"
@@ -51,7 +61,9 @@ test_that("`repeat` - nested loop", {
 test_that("`repeat` - non-yielding", {
   expect_snapshot0(generator_body(function() {
     "before"
-    repeat NULL
+    repeat {
+      NULL
+    }
     yield(1L)
     "after"
   }))
@@ -61,7 +73,9 @@ test_that("`repeat` - non-yielding but other control flow constructs", {
   # FIXME
   expect_snapshot0(generator_body(function() {
     "before"
-    repeat if (TRUE) break else next
+    repeat {
+      if (TRUE) break else next
+    }
     yield(1L)
     "after"
   }))
@@ -103,8 +117,11 @@ test_that("loops - `next` and `break` within `if`-`else`", {
   expect_snapshot0(generator_body(function() {
     repeat {
       "loop-after"
-      if (TRUE) break
-      else next
+      if (TRUE) {
+        break
+      } else {
+        next
+      }
       "next-after"
     }
   }))
@@ -128,17 +145,23 @@ test_that("loops - `break` and `next` with past and future", {
 
 test_that("loops - goto loop start after `if` or `else`", {
   expect_snapshot0(generator_body(function() {
-    repeat if (TRUE) yield()
+    repeat {
+      if (TRUE) yield()
+    }
   }))
 
   expect_snapshot0(generator_body(function() {
-    repeat if (TRUE) yield(1L) else FALSE
+    repeat {
+      if (TRUE) yield(1L) else FALSE
+    }
   }))
 })
 
 test_that("`while` - single pause no past or future", {
   expect_snapshot0(generator_body(function() {
-    while (TRUE) yield(1L)
+    while (TRUE) {
+      yield(1L)
+    }
   }))
 })
 
@@ -185,7 +208,9 @@ test_that("`while` - pause after loop", {
 test_that("`while` - complex control flow", {
   expect_snapshot0(generator_body(function() {
     "before"
-    while (TRUE) break
+    while (TRUE) {
+      break
+    }
     while (TRUE) {
       "loop-before"
       yield(1L)
@@ -218,13 +243,17 @@ test_that("`while` - top level break", {
 
 test_that("`for` - top level break (#7)", {
   expect_snapshot0(generator_body(function() {
-    for (i in x) break
+    for (i in x) {
+      break
+    }
   }))
 })
 
 test_that("`for` - one pause with no past or future", {
   expect_snapshot0(generator_body(function() {
-    for (i in x) yield(1L)
+    for (i in x) {
+      yield(1L)
+    }
   }))
 })
 
@@ -244,8 +273,11 @@ test_that("`for` - one pause within `if` and one `break` within `else`", {
   expect_snapshot0(generator_body(function() {
     for (i in x) {
       "for-before"
-      if (TRUE) yield(1L)
-      else break
+      if (TRUE) {
+        yield(1L)
+      } else {
+        break
+      }
       "if-after"
       next
       "for-after"
@@ -254,7 +286,11 @@ test_that("`for` - one pause within `if` and one `break` within `else`", {
 })
 
 test_that("`return()` deep in control flow", {
-  expect_snapshot0(generator_body(function() { while (TRUE) if (TRUE) return(1L) else yield(2L) }))
+  expect_snapshot0(generator_body(function() {
+    while (TRUE) {
+      if (TRUE) return(1L) else yield(2L)
+    }
+  }))
 })
 
 test_that("nested loops break to outer loops", {
@@ -285,7 +321,6 @@ test_that("nested loops break to outer loops", {
       "after"
     }
   ))
-
 
   expect_snapshot0(generator_body(
     function() {

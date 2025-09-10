@@ -39,7 +39,9 @@ test_that("generators support blocks", {
 
 test_that("generators support repeat loops", {
   expect_snapshot0(generator_body(function() {
-    repeat yield("value")
+    repeat {
+      yield("value")
+    }
   }))
 
   expect_snapshot0(generator_body(function() {
@@ -62,7 +64,9 @@ test_that("generators support repeat loops", {
   }))
 
   expect_snapshot0(generator_body(function() {
-    repeat next
+    repeat {
+      next
+    }
   }))
 
   expect_snapshot0(generator_body(function() {
@@ -88,34 +92,52 @@ test_that("generators support while loops", {
 
 test_that("generators support nested loops", {
   expect_snapshot0(generator_body(function() {
-    repeat { repeat yield("foo") }
+    repeat {
+      repeat {
+        yield("foo")
+      }
+    }
   }))
 
   # No srcrefs for inner loops
   expect_snapshot0(generator_body(function() {
-    repeat repeat yield("foo")
+    repeat {
+      repeat {
+        yield("foo")
+      }
+    }
   }))
   expect_snapshot0(generator_body(function() {
-    repeat while (TRUE) yield("foo")
+    repeat {
+      while (TRUE) {
+        yield("foo")
+      }
+    }
   }))
 
   expect_snapshot0(generator_body(function() {
     repeat {
-      repeat yield("foo")
+      repeat {
+        yield("foo")
+      }
       "after"
     }
   }))
 
   expect_snapshot0(generator_body(function() {
     repeat {
-      repeat yield("foo")
+      repeat {
+        yield("foo")
+      }
       break
     }
   }))
 
   expect_snapshot0(generator_body(function() {
     repeat {
-      repeat break
+      repeat {
+        break
+      }
       break
     }
   }))
@@ -185,7 +207,9 @@ test_that("break within if", {
 
   expect_snapshot0(generator_body(function() {
     body1()
-    if (truth1) if (truth2) yield("value")
+    if (truth1) {
+      if (truth2) yield("value")
+    }
     body2()
   }))
 })
@@ -235,7 +259,11 @@ test_that("next and break within two layers of if-else", {
     repeat {
       body1()
       if (TRUE) {
-        if (TRUE) next else break
+        if (TRUE) {
+          next
+        } else {
+          break
+        }
         body2()
       }
       body3()
@@ -245,19 +273,33 @@ test_that("next and break within two layers of if-else", {
 })
 
 test_that("handle for loops", {
-  expect_snapshot0(generator_body(function() for (x in 1:3) yield(x)))
-  expect_snapshot0(generator_body(function() for (x in 1:3) for (y in 2:4) yield(list(x, y))))
+  expect_snapshot0(generator_body(function() {
+    for (x in 1:3) {
+      yield(x)
+    }
+  }))
+  expect_snapshot0(generator_body(function() {
+    for (x in 1:3) {
+      for (y in 2:4) {
+        yield(list(x, y))
+      }
+    }
+  }))
 
   expect_snapshot0(generator_body(function() {
     body1()
-    for (x in 1:3) yield(x)
+    for (x in 1:3) {
+      yield(x)
+    }
     body2()
   }))
 })
 
 test_that("handle yield-assign", {
   expect_snapshot0(generator_body(function(x) x <- yield(x)))
-  expect_snapshot0(generator_body(function(x) { x <- yield(x) }))
+  expect_snapshot0(generator_body(function(x) {
+    x <- yield(x)
+  }))
 })
 
 test_that("can parse generators without source references", {
@@ -276,9 +318,23 @@ test_that("can parse generators without source references", {
 })
 
 test_that("tryCatch() expressions are treated as normal expressions if possible", {
-  expect_equal(with_handlers_type(quote(tryCatch(error = hnd, foo())), "tryCatch"), "expr")
-  expect_equal(with_handlers_type(quote(tryCatch(error = hnd, yield())), "tryCatch"), "tryCatch")
-  expect_equal(with_handlers_type(quote(tryCatch(error = hnd, { foo() })), "tryCatch"), "tryCatch")
+  expect_equal(
+    with_handlers_type(quote(tryCatch(error = hnd, foo())), "tryCatch"),
+    "expr"
+  )
+  expect_equal(
+    with_handlers_type(quote(tryCatch(error = hnd, yield())), "tryCatch"),
+    "tryCatch"
+  )
+  expect_equal(
+    with_handlers_type(
+      quote(tryCatch(error = hnd, {
+        foo()
+      })),
+      "tryCatch"
+    ),
+    "tryCatch"
+  )
 
   expect_snapshot0(generator_body(function() tryCatch(foo())))
 })
@@ -286,7 +342,8 @@ test_that("tryCatch() expressions are treated as normal expressions if possible"
 test_that("tryCatch() expressions are parsed", {
   expect_snapshot0(generator_body(function() {
     tryCatch(
-      error = function(...) "handled", {
+      error = function(...) "handled",
+      {
         stop("error")
         yield("yield")
       }
@@ -295,7 +352,8 @@ test_that("tryCatch() expressions are parsed", {
 
   expect_snapshot0(generator_body(function() {
     tryCatch(
-      error = function(...) "handled", {
+      error = function(...) "handled",
+      {
         stop("error")
         yield("yield")
       }
@@ -311,7 +369,9 @@ test_that("withCallingHandlers() expressions are parsed", {
     "not implemented yet"
   )
   expect_error(
-    generator_body(function() { withCallingHandlers(yield("value")) }),
+    generator_body(function() {
+      withCallingHandlers(yield("value"))
+    }),
     "not implemented yet"
   )
 })
@@ -319,7 +379,8 @@ test_that("withCallingHandlers() expressions are parsed", {
 test_that("tryCatch() can be assigned", {
   expect_snapshot0(generator_body(function() {
     value <- tryCatch(
-      error = function(...) "handled", {
+      error = function(...) "handled",
+      {
         stop("error")
         yield("yield")
       }
@@ -331,9 +392,21 @@ test_that("trailing `await()` returns the awaited value wrapped in a promise", {
   expect_snapshot0(async_body(function() await(x)))
 
   # Non-returning cases
-  expect_snapshot0(async_body(function() repeat await(x)))
-  expect_snapshot0(async_body(function() while (x) if (y) await(z)))
-  expect_snapshot0(async_body(function() for (x in y) await(z)))
+  expect_snapshot0(async_body(function() {
+    repeat {
+      await(x)
+    }
+  }))
+  expect_snapshot0(async_body(function() {
+    while (x) {
+      if (y) await(z)
+    }
+  }))
+  expect_snapshot0(async_body(function() {
+    for (x in y) {
+      await(z)
+    }
+  }))
 
   # Assignment case
   expect_snapshot0(async_body(function() x <- await(async_foo())))

@@ -106,29 +106,53 @@ test_that("collect() calls `as_iterator()`", {
 
 test_that("collect() preserves type (#32)", {
   expect_equal(
-    collect(gen(for (i in 1:3) yield(i))),
+    collect(gen(
+      for (i in 1:3) {
+        yield(i)
+      }
+    )),
     as.list(1:3)
   )
   expect_equal(
-    wait_for(async_collect(async_generator(function() for (i in 1:3) yield(i))())),
+    wait_for(async_collect(async_generator(function() {
+      for (i in 1:3) {
+        yield(i)
+      }
+    })())),
     as.list(1:3)
   )
 
   expect_equal(
-    collect(gen(for (i in 1:3) yield(list(i)))),
+    collect(gen(
+      for (i in 1:3) {
+        yield(list(i))
+      }
+    )),
     lapply(1:3, list)
   )
   expect_equal(
-    wait_for(async_collect(async_generator(function() for (i in 1:3) yield(list(i)))())),
+    wait_for(async_collect(async_generator(function() {
+      for (i in 1:3) {
+        yield(list(i))
+      }
+    })())),
     lapply(1:3, list)
   )
 
   expect_equal(
-    collect(gen(for (i in 1:3) yield(mtcars[i, 1:3]))),
+    collect(gen(
+      for (i in 1:3) {
+        yield(mtcars[i, 1:3])
+      }
+    )),
     lapply(1:3, function(i) mtcars[i, 1:3])
   )
   expect_equal(
-    wait_for(async_collect(async_generator(function() for (i in 1:3) yield(mtcars[i, 1:3]))())),
+    wait_for(async_collect(async_generator(function() {
+      for (i in 1:3) {
+        yield(mtcars[i, 1:3])
+      }
+    })())),
     lapply(1:3, function(i) mtcars[i, 1:3])
   )
 })

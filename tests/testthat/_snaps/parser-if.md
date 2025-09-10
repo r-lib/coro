@@ -17,74 +17,80 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
-                      1L
+                      "before"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "if-before"
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "if-after"
+                        })
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  user({
-                      "if-after"
-                  })
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          FALSE
+                        })
+                        state[[2L]] <- 2L
+                      }, `2` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `4` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
                   user({
-                      FALSE
+                      "after"
                   })
-                  state[[2L]] <- 2L
-              }, `2` = {
-                  break
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -108,74 +114,80 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  FALSE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
+                      "before"
+                  })
+                  if (user({
                       FALSE
-                  })
-                  state[[2L]] <- 2L
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
-                  user({
-                      "else-before"
-                      1L
-                  })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
-              }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          FALSE
+                        })
+                        state[[2L]] <- 2L
+                      }, `2` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  user({
-                      "else-after"
-                  })
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "else-before"
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "else-after"
+                        })
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `4` = {
-                  break
+                  user({
+                      "after"
+                  })
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -203,76 +215,82 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
-                      "inner-before"
-                      1L
+                      "before"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "if-before"
+                          "inner-before"
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "inner-after"
+                          "if-after"
+                        })
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  user({
-                      "inner-after"
-                      "if-after"
-                  })
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          FALSE
+                        })
+                        state[[2L]] <- 2L
+                      }, `2` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `4` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
                   user({
-                      FALSE
+                      "after"
                   })
-                  state[[2L]] <- 2L
-              }, `2` = {
-                  break
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -284,7 +302,9 @@
         "before"
         if (TRUE) {
           "if-before"
-          if (FALSE) yield(1L)
+          if (FALSE) {
+            yield(1L)
+          }
           "if-after"
         } else {
           "foo"
@@ -295,95 +315,105 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
+                      "before"
                   })
                   if (user({
-                      FALSE
+                      TRUE
                   })) {
-                      state[[2L]] <- 2L
+                      state[[1L]] <- 2L
                   } else {
-                      state[[2L]] <- 3L
+                      state[[1L]] <- 3L
                   }
-                  state[[3L]] <- 1L
+                  state[[2L]] <- 1L
               }, `2` = {
-                  repeat switch(state[[3L]], `1` = {
-                      user(1L)
-                      state[[3L]] <- 2L
-                      suspend()
-                      return(last_value())
-                  }, `2` = {
-                      .last_value <- if (missing(arg)) NULL else arg
-                      state[[3L]] <- 3L
-                  }, `3` = {
-                      break
-                  })
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "if-before"
+                        })
+                        if (user({
+                          FALSE
+                        })) {
+                          state[[2L]] <- 2L
+                        } else {
+                          state[[2L]] <- 3L
+                        }
+                        state[[3L]] <- 1L
+                      }, `2` = {
+                        repeat {
+                          switch(state[[3L]], `1` = {
+                            user({
+                              1L
+                            })
+                            state[[3L]] <- 2L
+                            suspend()
+                            return(last_value())
+                          }, `2` = {
+                            .last_value <- if (missing(arg)) NULL else arg
+                            state[[3L]] <- 3L
+                          }, `3` = {
+                            break
+                          })
+                        }
+                        n <- length(state)
+                        if (n < 2L) {
+                          break
+                        }
+                        if (n == 2L) {
+                          state[[2L]] <- 1L
+                          next
+                        }
+                        length(state) <- 2L
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "if-after"
+                        })
+                        exhausted <- TRUE
+                        return(exhausted())
+                      }, `4` = {
+                        break
+                      })
+                  }
                   n <- length(state)
-                  if (n < 2L) {
+                  if (n < 1L) {
                       break
                   }
-                  if (n == 2L) {
-                      state[[2L]] <- 1L
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
                       next
                   }
-                  length(state) <- 2L
-                  state[[2L]] <- 3L
+                  length(state) <- 1L
+                  break
               }, `3` = {
-                  user({
-                      "if-after"
-                  })
-                  exhausted <- TRUE
-                  return(exhausted())
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "foo"
+                        })
+                        exhausted <- TRUE
+                        return(exhausted())
+                      }, `2` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  break
               }, `4` = {
                   break
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
-                  user({
-                      "foo"
-                  })
-                  exhausted <- TRUE
-                  return(exhausted())
-              }, `2` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `4` = {
-              break
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -405,94 +435,102 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
+                      "before"
                   })
                   if (user({
-                      FALSE
+                      TRUE
                   })) {
-                      state[[2L]] <- 2L
+                      state[[1L]] <- 2L
                   } else {
-                      state[[2L]] <- 3L
+                      state[[1L]] <- 3L
                   }
-                  state[[3L]] <- 1L
+                  state[[2L]] <- 1L
               }, `2` = {
-                  repeat switch(state[[3L]], `1` = {
-                      user(1L)
-                      state[[3L]] <- 2L
-                      suspend()
-                      return(last_value())
-                  }, `2` = {
-                      .last_value <- if (missing(arg)) exhausted() else arg
-                      state[[3L]] <- 3L
-                  }, `3` = {
-                      exhausted <- TRUE
-                      return(exhausted())
-                  }, `4` = {
-                      break
-                  })
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "if-before"
+                        })
+                        if (user({
+                          FALSE
+                        })) {
+                          state[[2L]] <- 2L
+                        } else {
+                          state[[2L]] <- 3L
+                        }
+                        state[[3L]] <- 1L
+                      }, `2` = {
+                        repeat {
+                          switch(state[[3L]], `1` = {
+                            user(1L)
+                            state[[3L]] <- 2L
+                            suspend()
+                            return(last_value())
+                          }, `2` = {
+                            .last_value <- if (missing(arg)) exhausted() else arg
+                            state[[3L]] <- 3L
+                          }, `3` = {
+                            exhausted <- TRUE
+                            return(exhausted())
+                          }, `4` = {
+                            break
+                          })
+                        }
+                        n <- length(state)
+                        if (n < 2L) {
+                          break
+                        }
+                        if (n == 2L) {
+                          state[[2L]] <- 1L
+                          next
+                        }
+                        length(state) <- 2L
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
                   n <- length(state)
-                  if (n < 2L) {
+                  if (n < 1L) {
                       break
                   }
-                  if (n == 2L) {
-                      state[[2L]] <- 1L
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
                       next
                   }
-                  length(state) <- 2L
-                  state[[2L]] <- 3L
+                  length(state) <- 1L
+                  break
               }, `3` = {
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "foo"
+                        })
+                        exhausted <- TRUE
+                        return(exhausted())
+                      }, `2` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  break
               }, `4` = {
                   break
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
-                  user({
-                      "foo"
-                  })
-                  exhausted <- TRUE
-                  return(exhausted())
-              }, `2` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `4` = {
-              break
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -520,127 +558,137 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
+                      "before"
                   })
                   if (user({
-                      FALSE
+                      TRUE
                   })) {
-                      state[[2L]] <- 2L
+                      state[[1L]] <- 2L
                   } else {
-                      state[[2L]] <- 3L
+                      state[[1L]] <- 3L
                   }
-                  state[[3L]] <- 1L
+                  state[[2L]] <- 1L
               }, `2` = {
-                  repeat switch(state[[3L]], `1` = {
-                      if (user({
-                        FALSE
-                      })) {
-                        state[[3L]] <- 2L
-                      } else {
-                        state[[3L]] <- 3L
-                      }
-                      state[[4L]] <- 1L
-                  }, `2` = {
-                      repeat switch(state[[4L]], `1` = {
+                  repeat {
+                      switch(state[[2L]], `1` = {
                         user({
-                          1L
+                          "if-before"
                         })
-                        state[[4L]] <- 2L
-                        suspend()
-                        return(last_value())
+                        if (user({
+                          FALSE
+                        })) {
+                          state[[2L]] <- 2L
+                        } else {
+                          state[[2L]] <- 3L
+                        }
+                        state[[3L]] <- 1L
                       }, `2` = {
-                        .last_value <- if (missing(arg)) NULL else arg
-                        state[[4L]] <- 3L
+                        repeat {
+                          switch(state[[3L]], `1` = {
+                            if (user({
+                              FALSE
+                            })) {
+                              state[[3L]] <- 2L
+                            } else {
+                              state[[3L]] <- 3L
+                            }
+                            state[[4L]] <- 1L
+                          }, `2` = {
+                            repeat {
+                              switch(state[[4L]], `1` = {
+                                user({
+                                  1L
+                                })
+                                state[[4L]] <- 2L
+                                suspend()
+                                return(last_value())
+                              }, `2` = {
+                                .last_value <- if (missing(arg)) NULL else arg
+                                state[[4L]] <- 3L
+                              }, `3` = {
+                                user({
+                                  "if-3-after"
+                                })
+                                state[[4L]] <- 4L
+                              }, `4` = {
+                                break
+                              })
+                            }
+                            n <- length(state)
+                            if (n < 3L) {
+                              break
+                            }
+                            if (n == 3L) {
+                              state[[3L]] <- 1L
+                              next
+                            }
+                            length(state) <- 3L
+                            state[[3L]] <- 3L
+                          }, `3` = {
+                            user({
+                              "if-2-after"
+                            })
+                            exhausted <- TRUE
+                            return(exhausted())
+                          }, `4` = {
+                            break
+                          })
+                        }
+                        n <- length(state)
+                        if (n < 2L) {
+                          break
+                        }
+                        if (n == 2L) {
+                          state[[2L]] <- 1L
+                          next
+                        }
+                        length(state) <- 2L
+                        state[[2L]] <- 3L
                       }, `3` = {
-                        user({
-                          "if-3-after"
-                        })
-                        state[[4L]] <- 4L
+                        state[[2L]] <- 4L
                       }, `4` = {
                         break
                       })
-                      n <- length(state)
-                      if (n < 3L) {
-                        break
-                      }
-                      if (n == 3L) {
-                        state[[3L]] <- 1L
-                        next
-                      }
-                      length(state) <- 3L
-                      state[[3L]] <- 3L
-                  }, `3` = {
-                      user({
-                        "if-2-after"
-                      })
-                      exhausted <- TRUE
-                      return(exhausted())
-                  }, `4` = {
-                      break
-                  })
+                  }
                   n <- length(state)
-                  if (n < 2L) {
+                  if (n < 1L) {
                       break
                   }
-                  if (n == 2L) {
-                      state[[2L]] <- 1L
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
                       next
                   }
-                  length(state) <- 2L
-                  state[[2L]] <- 3L
+                  length(state) <- 1L
+                  break
               }, `3` = {
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          FALSE
+                        })
+                        exhausted <- TRUE
+                        return(exhausted())
+                      }, `2` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  break
               }, `4` = {
                   break
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
-                  user({
-                      FALSE
-                  })
-                  exhausted <- TRUE
-                  return(exhausted())
-              }, `2` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `4` = {
-              break
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -665,83 +713,89 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
-                      1L
+                      "before"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "if-before"
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "if-after"
+                        })
+                        exhausted <- TRUE
+                        return(exhausted())
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  break
               }, `3` = {
-                  user({
-                      "if-after"
-                  })
-                  exhausted <- TRUE
-                  return(exhausted())
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "else-before"
+                          2L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "else-after"
+                        })
+                        exhausted <- TRUE
+                        return(exhausted())
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  break
               }, `4` = {
                   break
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
-                  user({
-                      "else-before"
-                      2L
-                  })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
-              }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
-              }, `3` = {
-                  user({
-                      "else-after"
-                  })
-                  exhausted <- TRUE
-                  return(exhausted())
-              }, `4` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              break
-          }, `4` = {
-              break
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -767,85 +821,91 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
-                      1L
+                      "before"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "if-before"
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "if-after"
+                        })
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  user({
-                      "if-after"
-                  })
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          "else-before"
+                          2L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "else-after"
+                        })
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `4` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
                   user({
-                      "else-before"
-                      2L
+                      "after"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
-              }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
-              }, `3` = {
-                  user({
-                      "else-after"
-                  })
-                  state[[2L]] <- 4L
-              }, `4` = {
-                  break
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -867,73 +927,79 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      1L
+                      "before"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          2L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
+              }, `4` = {
                   user({
-                      2L
+                      "after"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
-              }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
-              }, `3` = {
-                  break
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -956,78 +1022,84 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      1L
+                      "before"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "if-after"
+                        })
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  user({
-                      "if-after"
-                  })
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          2L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `4` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
                   user({
-                      2L
+                      "after"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
-              }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
-              }, `3` = {
-                  break
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -1050,78 +1122,84 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      1L
+                      "before"
                   })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
+                  if (user({
+                      TRUE
+                  })) {
+                      state[[1L]] <- 2L
+                  } else {
+                      state[[1L]] <- 3L
+                  }
+                  state[[2L]] <- 1L
               }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          1L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
-                  user({
-                      2L
-                  })
-                  state[[2L]] <- 2L
-                  suspend()
-                  return(last_value())
-              }, `2` = {
-                  .last_value <- if (missing(arg)) NULL else arg
-                  state[[2L]] <- 3L
-              }, `3` = {
-                  user({
-                      "else-after"
-                  })
-                  state[[2L]] <- 4L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        user({
+                          2L
+                        })
+                        state[[2L]] <- 2L
+                        suspend()
+                        return(last_value())
+                      }, `2` = {
+                        .last_value <- if (missing(arg)) NULL else arg
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        user({
+                          "else-after"
+                        })
+                        state[[2L]] <- 4L
+                      }, `4` = {
+                        break
+                      })
+                  }
+                  n <- length(state)
+                  if (n < 1L) {
+                      break
+                  }
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
+                      next
+                  }
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `4` = {
-                  break
+                  user({
+                      "after"
+                  })
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -1143,74 +1221,80 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   if (user({
                       TRUE
                   })) {
-                      state[[2L]] <- 2L
+                      state[[1L]] <- 2L
                   } else {
-                      state[[2L]] <- 3L
+                      state[[1L]] <- 3L
                   }
-                  state[[3L]] <- 1L
+                  state[[2L]] <- 1L
               }, `2` = {
-                  repeat switch(state[[3L]], `1` = {
-                      user({
-                        1L
+                  repeat {
+                      switch(state[[2L]], `1` = {
+                        if (user({
+                          TRUE
+                        })) {
+                          state[[2L]] <- 2L
+                        } else {
+                          state[[2L]] <- 3L
+                        }
+                        state[[3L]] <- 1L
+                      }, `2` = {
+                        repeat {
+                          switch(state[[3L]], `1` = {
+                            user({
+                              1L
+                            })
+                            state[[3L]] <- 2L
+                            suspend()
+                            return(last_value())
+                          }, `2` = {
+                            .last_value <- if (missing(arg)) NULL else arg
+                            state[[3L]] <- 3L
+                          }, `3` = {
+                            user({
+                              "if-3-after"
+                            })
+                            state[[3L]] <- 4L
+                          }, `4` = {
+                            break
+                          })
+                        }
+                        n <- length(state)
+                        if (n < 2L) {
+                          break
+                        }
+                        if (n == 2L) {
+                          state[[2L]] <- 1L
+                          next
+                        }
+                        length(state) <- 2L
+                        state[[2L]] <- 3L
+                      }, `3` = {
+                        break
                       })
-                      state[[3L]] <- 2L
-                      suspend()
-                      return(last_value())
-                  }, `2` = {
-                      .last_value <- if (missing(arg)) NULL else arg
-                      state[[3L]] <- 3L
-                  }, `3` = {
-                      user({
-                        "if-3-after"
-                      })
-                      state[[3L]] <- 4L
-                  }, `4` = {
-                      break
-                  })
+                  }
                   n <- length(state)
-                  if (n < 2L) {
+                  if (n < 1L) {
                       break
                   }
-                  if (n == 2L) {
-                      state[[2L]] <- 1L
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
                       next
                   }
-                  length(state) <- 2L
-                  state[[2L]] <- 3L
+                  length(state) <- 1L
+                  state[[1L]] <- 3L
               }, `3` = {
-                  break
+                  user({
+                      "after"
+                  })
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 3L
-          }, `3` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -1245,193 +1329,209 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user({
-                  "before"
-              })
-              if (user({
-                  TRUE
-              })) {
-                  state[[1L]] <- 2L
-              } else {
-                  state[[1L]] <- 3L
-              }
-              state[[2L]] <- 1L
-          }, `2` = {
-              repeat switch(state[[2L]], `1` = {
+          repeat {
+              switch(state[[1L]], `1` = {
                   user({
-                      "if-before"
+                      "before"
                   })
                   if (user({
                       TRUE
                   })) {
-                      state[[2L]] <- 2L
+                      state[[1L]] <- 2L
                   } else {
-                      state[[2L]] <- 3L
+                      state[[1L]] <- 3L
                   }
-                  state[[3L]] <- 1L
+                  state[[2L]] <- 1L
               }, `2` = {
-                  repeat switch(state[[3L]], `1` = {
-                      if (user({
-                        TRUE
-                      })) {
-                        state[[3L]] <- 2L
-                      } else {
-                        state[[3L]] <- 3L
-                      }
-                      state[[4L]] <- 1L
-                  }, `2` = {
-                      repeat switch(state[[4L]], `1` = {
+                  repeat {
+                      switch(state[[2L]], `1` = {
                         user({
-                          1L
+                          "if-before"
                         })
-                        state[[4L]] <- 2L
-                        suspend()
-                        return(last_value())
+                        if (user({
+                          TRUE
+                        })) {
+                          state[[2L]] <- 2L
+                        } else {
+                          state[[2L]] <- 3L
+                        }
+                        state[[3L]] <- 1L
                       }, `2` = {
-                        .last_value <- if (missing(arg)) NULL else arg
-                        state[[4L]] <- 3L
+                        repeat {
+                          switch(state[[3L]], `1` = {
+                            if (user({
+                              TRUE
+                            })) {
+                              state[[3L]] <- 2L
+                            } else {
+                              state[[3L]] <- 3L
+                            }
+                            state[[4L]] <- 1L
+                          }, `2` = {
+                            repeat {
+                              switch(state[[4L]], `1` = {
+                                user({
+                                  1L
+                                })
+                                state[[4L]] <- 2L
+                                suspend()
+                                return(last_value())
+                              }, `2` = {
+                                .last_value <- if (missing(arg)) NULL else arg
+                                state[[4L]] <- 3L
+                              }, `3` = {
+                                user({
+                                  "if-3-after"
+                                })
+                                state[[4L]] <- 4L
+                              }, `4` = {
+                                break
+                              })
+                            }
+                            n <- length(state)
+                            if (n < 3L) {
+                              break
+                            }
+                            if (n == 3L) {
+                              state[[3L]] <- 1L
+                              next
+                            }
+                            length(state) <- 3L
+                            state[[3L]] <- 3L
+                          }, `3` = {
+                            user({
+                              "if-2-after"
+                            })
+                            state[[3L]] <- 4L
+                          }, `4` = {
+                            break
+                          })
+                        }
+                        n <- length(state)
+                        if (n < 2L) {
+                          break
+                        }
+                        if (n == 2L) {
+                          state[[2L]] <- 1L
+                          next
+                        }
+                        length(state) <- 2L
+                        state[[2L]] <- 4L
                       }, `3` = {
-                        user({
-                          "if-3-after"
-                        })
-                        state[[4L]] <- 4L
+                        repeat {
+                          switch(state[[3L]], `1` = {
+                            if (user({
+                              FALSE
+                            })) {
+                              state[[3L]] <- 2L
+                            } else {
+                              state[[3L]] <- 3L
+                            }
+                            state[[4L]] <- 1L
+                          }, `2` = {
+                            repeat {
+                              switch(state[[4L]], `1` = {
+                                user({
+                                  FALSE
+                                })
+                                state[[4L]] <- 2L
+                              }, `2` = {
+                                break
+                              })
+                            }
+                            n <- length(state)
+                            if (n < 3L) {
+                              break
+                            }
+                            if (n == 3L) {
+                              state[[3L]] <- 1L
+                              next
+                            }
+                            length(state) <- 3L
+                            state[[3L]] <- 4L
+                          }, `3` = {
+                            repeat {
+                              switch(state[[4L]], `1` = {
+                                user({
+                                  2L
+                                })
+                                state[[4L]] <- 2L
+                                suspend()
+                                return(last_value())
+                              }, `2` = {
+                                .last_value <- if (missing(arg)) NULL else arg
+                                state[[4L]] <- 3L
+                              }, `3` = {
+                                break
+                              })
+                            }
+                            n <- length(state)
+                            if (n < 3L) {
+                              break
+                            }
+                            if (n == 3L) {
+                              state[[3L]] <- 1L
+                              next
+                            }
+                            length(state) <- 3L
+                            state[[3L]] <- 4L
+                          }, `4` = {
+                            break
+                          })
+                        }
+                        n <- length(state)
+                        if (n < 2L) {
+                          break
+                        }
+                        if (n == 2L) {
+                          state[[2L]] <- 1L
+                          next
+                        }
+                        length(state) <- 2L
+                        state[[2L]] <- 4L
                       }, `4` = {
                         break
                       })
-                      n <- length(state)
-                      if (n < 3L) {
-                        break
-                      }
-                      if (n == 3L) {
-                        state[[3L]] <- 1L
-                        next
-                      }
-                      length(state) <- 3L
-                      state[[3L]] <- 3L
-                  }, `3` = {
-                      user({
-                        "if-2-after"
-                      })
-                      state[[3L]] <- 4L
-                  }, `4` = {
-                      break
-                  })
+                  }
                   n <- length(state)
-                  if (n < 2L) {
+                  if (n < 1L) {
                       break
                   }
-                  if (n == 2L) {
-                      state[[2L]] <- 1L
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
                       next
                   }
-                  length(state) <- 2L
-                  state[[2L]] <- 4L
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `3` = {
-                  repeat switch(state[[3L]], `1` = {
-                      if (user({
-                        FALSE
-                      })) {
-                        state[[3L]] <- 2L
-                      } else {
-                        state[[3L]] <- 3L
-                      }
-                      state[[4L]] <- 1L
-                  }, `2` = {
-                      repeat switch(state[[4L]], `1` = {
+                  repeat {
+                      switch(state[[2L]], `1` = {
                         user({
                           FALSE
                         })
-                        state[[4L]] <- 2L
+                        state[[2L]] <- 2L
                       }, `2` = {
                         break
                       })
-                      n <- length(state)
-                      if (n < 3L) {
-                        break
-                      }
-                      if (n == 3L) {
-                        state[[3L]] <- 1L
-                        next
-                      }
-                      length(state) <- 3L
-                      state[[3L]] <- 4L
-                  }, `3` = {
-                      repeat switch(state[[4L]], `1` = {
-                        user({
-                          2L
-                        })
-                        state[[4L]] <- 2L
-                        suspend()
-                        return(last_value())
-                      }, `2` = {
-                        .last_value <- if (missing(arg)) NULL else arg
-                        state[[4L]] <- 3L
-                      }, `3` = {
-                        break
-                      })
-                      n <- length(state)
-                      if (n < 3L) {
-                        break
-                      }
-                      if (n == 3L) {
-                        state[[3L]] <- 1L
-                        next
-                      }
-                      length(state) <- 3L
-                      state[[3L]] <- 4L
-                  }, `4` = {
-                      break
-                  })
+                  }
                   n <- length(state)
-                  if (n < 2L) {
+                  if (n < 1L) {
                       break
                   }
-                  if (n == 2L) {
-                      state[[2L]] <- 1L
+                  if (n == 1L) {
+                      state[[1L]] <- 1L
                       next
                   }
-                  length(state) <- 2L
-                  state[[2L]] <- 4L
+                  length(state) <- 1L
+                  state[[1L]] <- 4L
               }, `4` = {
-                  break
-              })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `3` = {
-              repeat switch(state[[2L]], `1` = {
                   user({
-                      FALSE
+                      "after"
                   })
-                  state[[2L]] <- 2L
-              }, `2` = {
-                  break
+                  exhausted <- TRUE
+                  return(exhausted())
               })
-              n <- length(state)
-              if (n < 1L) {
-                  break
-              }
-              if (n == 1L) {
-                  state[[1L]] <- 1L
-                  next
-              }
-              length(state) <- 1L
-              state[[1L]] <- 4L
-          }, `4` = {
-              user({
-                  "after"
-              })
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }

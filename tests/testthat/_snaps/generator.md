@@ -18,18 +18,20 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user(NULL)
-              state[[1L]] <- 2L
-              suspend()
-              return(last_value())
-          }, `2` = {
-              .last_value <- if (missing(arg)) exhausted() else arg
-              state[[1L]] <- 3L
-          }, `3` = {
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          repeat {
+              switch(state[[1L]], `1` = {
+                  user(NULL)
+                  state[[1L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  .last_value <- if (missing(arg)) exhausted() else arg
+                  state[[1L]] <- 3L
+              }, `3` = {
+                  exhausted <- TRUE
+                  return(exhausted())
+              })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }
@@ -54,18 +56,20 @@
           if (exhausted) {
               return(invisible(exhausted()))
           }
-          repeat switch(state[[1L]], `1` = {
-              user(NULL)
-              state[[1L]] <- 2L
-              suspend()
-              return(last_value())
-          }, `2` = {
-              .last_value <- if (missing(arg)) exhausted() else arg
-              state[[1L]] <- 3L
-          }, `3` = {
-              exhausted <- TRUE
-              return(exhausted())
-          })
+          repeat {
+              switch(state[[1L]], `1` = {
+                  user(NULL)
+                  state[[1L]] <- 2L
+                  suspend()
+                  return(last_value())
+              }, `2` = {
+                  .last_value <- if (missing(arg)) exhausted() else arg
+                  state[[1L]] <- 3L
+              }, `3` = {
+                  exhausted <- TRUE
+                  return(exhausted())
+              })
+          }
           exhausted <- TRUE
           invisible(exhausted())
       }

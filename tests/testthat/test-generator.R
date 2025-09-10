@@ -11,13 +11,23 @@ test_that("can yield `NULL` without terminating iteration", {
 
 test_that("short syntax and for loop support", {
   numbers <- 1:6
-  odds <- gen(for (x in numbers) if (x %% 2 != 0) yield(x))
-  squares <- gen(for (x in odds) yield(x^2))
+  odds <- gen(
+    for (x in numbers) {
+      if (x %% 2 != 0) yield(x)
+    }
+  )
+  squares <- gen(
+    for (x in odds) {
+      yield(x^2)
+    }
+  )
 
   out <- dbl()
-  loop(for (x in squares) {
-    out <- c(out, x)
-  })
+  loop(
+    for (x in squares) {
+      out <- c(out, x)
+    }
+  )
 
   expect_identical(out, dbl(1, 9, 25))
 })
@@ -36,7 +46,11 @@ test_that("generator instances prints nicely", {
 })
 
 test_that("can send values to generators", {
-  g <- generator(function(x) repeat x <- yield(x))
+  g <- generator(function(x) {
+    repeat {
+      x <- yield(x)
+    }
+  })
   expect_identical(g(1)(), 1)
   expect_identical(g(2)(), 2)
 })
@@ -106,7 +120,8 @@ test_that("unexpected exits disable generators", {
 test_that("can use tryCatch()", {
   out <- collect(gen({
     x <- tryCatch(
-      error = function(...) "handled", {
+      error = function(...) "handled",
+      {
         stop("error")
         yield("yield")
       }
@@ -117,7 +132,8 @@ test_that("can use tryCatch()", {
 
   out <- collect(gen({
     x <- tryCatch(
-      error = function(...) "handled", {
+      error = function(...) "handled",
+      {
         stop("error")
         yield("yield")
       }
@@ -130,8 +146,11 @@ test_that("can use tryCatch()", {
   out <- collect(gen({
     if (TRUE) {
       x <- tryCatch(
-        error = function(...) "handled", {
-          repeat if (TRUE) stop("error")
+        error = function(...) "handled",
+        {
+          repeat {
+            if (TRUE) stop("error")
+          }
           yield("yield")
         }
       )
@@ -141,14 +160,21 @@ test_that("can use tryCatch()", {
   }))
   expect_equal(out, list("handled", "value"))
 
-  out <- gen(tryCatch({ stop("foo"); yield("value") }, error = function(...) "handled"))()
+  out <- gen(tryCatch(
+    {
+      stop("foo")
+      yield("value")
+    },
+    error = function(...) "handled"
+  ))()
   expect_equal(out, exhausted())
 
   # Handlers are matched to the condition class
   expect_error(
     gen({
       tryCatch(
-        foo = function(...) "handled", {
+        foo = function(...) "handled",
+        {
           stop("error")
           yield("yield")
         }
@@ -163,7 +189,8 @@ test_that("tryCatch(finally = ) is handled", {
   expect_error(
     gen({
       tryCatch(
-        error = function(...) "handled", {
+        error = function(...) "handled",
+        {
           stop("error")
           yield("yield")
         },
@@ -201,7 +228,14 @@ test_that("can assign tryCatch()", {
 
 test_that("can't await() within a generator", {
   expect_error(generator(function() await(foo))(), "non-async")
-  expect_error(generator(function() for (x in await_each(foo)) NULL)(), "non-async")
+  expect_error(
+    generator(function() {
+      for (x in await_each(foo)) {
+        NULL
+      }
+    })(),
+    "non-async"
+  )
 })
 
 test_that("reentering the generator forces argument in proper context", {
@@ -286,7 +320,11 @@ test_that("generators call as_iterator() method", {
   i <- structure(list(), class = "coro_iterator")
 
   out <- NULL
-  loop(for (x in i) out <- c(out, x))
+  loop(
+    for (x in i) {
+      out <- c(out, x)
+    }
+  )
 
   expect_equal(out, 1:3)
 })
@@ -336,9 +374,11 @@ test_that("on.exit is called when loop breaks early (#52)", {
 
   called <- FALSE
   expect_error(
-    coro::loop(for (i in g()) {
-      stop("boom!")
-    })
+    coro::loop(
+      for (i in g()) {
+        stop("boom!")
+      }
+    )
   )
   expect_true(called)
 

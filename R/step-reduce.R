@@ -336,44 +336,50 @@ iter_reduce_impl <- function(.x, .f, ..., .init, .left = TRUE) {
   out
 }
 
-on_load(async_reduce_steps %<~% async(function(x, steps, builder, init) {
-  builder <- as_closure(builder)
+on_load(delayedAssign(
+  "async_reduce_steps",
+  async(function(x, steps, builder, init) {
+    builder <- as_closure(builder)
 
-  if (is_null(steps)) {
-    reducer <- builder
-  } else {
-    reducer <- steps(builder)
-  }
-  stopifnot(is_closure(reducer))
+    if (is_null(steps)) {
+      reducer <- builder
+    } else {
+      reducer <- steps(builder)
+    }
+    stopifnot(is_closure(reducer))
 
-  if (missing(init)) {
-    identity <- reducer()
-  } else {
-    identity <- init
-  }
-
-  result <- await(async_reduce(x, reducer))
-
-  reducer(result)
-}))
-
-on_load(async_reduce %<~% async(function(.x, .f, ...) {
-  out <- NULL
-
-  while (TRUE) {
-    new <- await(.x())
-
-    if (is_exhausted(new)) {
-      break
+    if (missing(init)) {
+      identity <- reducer()
+    } else {
+      identity <- init
     }
 
-    out <- .f(out, new, ...)
+    result <- await(async_reduce(x, reducer))
 
-    # Return early if we get a reduced result
-    if (is_done_box(out)) {
-      return(unbox(out))
+    reducer(result)
+  })
+))
+
+on_load(delayedAssign(
+  "async_reduce",
+  async(function(.x, .f, ...) {
+    out <- NULL
+
+    while (TRUE) {
+      new <- await(.x())
+
+      if (is_exhausted(new)) {
+        break
+      }
+
+      out <- .f(out, new, ...)
+
+      # Return early if we get a reduced result
+      if (is_done_box(out)) {
+        return(unbox(out))
+      }
     }
-  }
 
-  out
-}))
+    out
+  })
+))

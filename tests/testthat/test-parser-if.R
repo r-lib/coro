@@ -49,7 +49,9 @@ test_that("`if` blocks - nested", {
     "before"
     if (TRUE) {
       "if-before"
-      if (FALSE) yield(1L)
+      if (FALSE) {
+        yield(1L)
+      }
       "if-after"
     } else {
       "foo"
