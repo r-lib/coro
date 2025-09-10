@@ -122,8 +122,6 @@ generator0 <- function(fn, type = "generator") {
   debugged <- FALSE
 
   fmls <- formals(fn)
-  env <- environment(fn)
-
   static <- environment()
 
   body <- quote({
@@ -140,6 +138,7 @@ generator0 <- function(fn, type = "generator") {
     `_private` <- rlang::env(`_static`)
     `_private`$generator_env <- base::environment()
     `_private`$caller_env <- base::parent.frame()
+    `_private`$env <- base::parent.env(base::environment())
 
     base::local(envir = `_private`, {
       generator_env <- environment()$generator_env
@@ -310,7 +309,7 @@ generator0 <- function(fn, type = "generator") {
 
   # Create the generator factory (returned by `generator()` and
   # entered by `async()`)
-  factory <- new_function(fmls, body)
+  factory <- new_function(fmls, body, env = environment(fn))
   structure(factory, class = c(paste0("coro_", type), "function"))
 }
 
@@ -380,7 +379,7 @@ print.coro_generator <- function(x, ..., internals = FALSE) {
 }
 #' @export
 print.coro_generator_instance <- function(x, ..., internals = FALSE) {
-  type <- env_get(fn_env(x), "type", inherit = TRUE)
+  type <- env_get(static_env(x), "type", inherit = TRUE)
 
   if (is_string(type, "async_generator")) {
     writeLines("<async/generator/instance>")
@@ -392,7 +391,7 @@ print.coro_generator_instance <- function(x, ..., internals = FALSE) {
 }
 
 print_generator <- function(x, ..., internals = FALSE, reproducible = FALSE) {
-  fn <- env_get(fn_env(x), "fn", inherit = TRUE)
+  fn <- env_get(static_env(x), "fn", inherit = TRUE)
 
   if (reproducible) {
     fn <- zap_env(fn)
