@@ -79,36 +79,36 @@ iter_builder <- function(result, input) {
 #' @rdname iter_adapt
 #' @name async_adapt
 #' @usage async_adapt(iter, steps)
-on_load(
-  async_adapt %<~%
-    async_generator(function(iter, steps) {
-      force(iter)
+on_load(delayedAssign(
+  "async_adapt",
+  async_generator(function(iter, steps) {
+    force(iter)
 
-      reducer <- steps(iter_builder)
+    reducer <- steps(iter_builder)
 
-      # Initialise the adaptors
-      reducer()
+    # Initialise the adaptors
+    reducer()
 
-      flag <- "_coro_iter_adapt_result"
+    flag <- "_coro_iter_adapt_result"
 
-      while (TRUE) {
-        out <- await(iter())
+    while (TRUE) {
+      out <- await(iter())
 
-        if (is_exhausted(out)) {
-          # Finalise adaptors and signal exhaustion
-          reducer(NULL)
-          return(exhausted())
-        }
-
-        last <- reducer(flag, out)
-
-        # If we get `flag` back, it means a transducer has skipped this
-        # input. Continue until we get an actual result.
-        if (identical(last, flag)) {
-          next
-        }
-
-        yield(last)
+      if (is_exhausted(out)) {
+        # Finalise adaptors and signal exhaustion
+        reducer(NULL)
+        return(exhausted())
       }
-    })
-)
+
+      last <- reducer(flag, out)
+
+      # If we get `flag` back, it means a transducer has skipped this
+      # input. Continue until we get an actual result.
+      if (identical(last, flag)) {
+        next
+      }
+
+      yield(last)
+    }
+  })
+))
