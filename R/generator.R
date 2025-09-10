@@ -115,22 +115,26 @@ gen <- function(expr) {
 }
 
 generator0 <- function(fn, type = "generator") {
-  # Declarations for R CMD check, unused
+  # Generated at runtime
   state_machine <- NULL
-  debugged <- NULL
+
+  # Flipped when `coro_debug()` is applied on a generator factory
+  debugged <- FALSE
 
   fmls <- formals(fn)
   env <- environment(fn)
 
-  static <- env(
-    state_machine = NULL,
-    fmls = fmls,
-    env = env,
-    # Flipped when `coro_debug()` is applied on a generator factory
-    debugged = FALSE,
-  )
+  static <- environment()
 
   body <- quote({
+    # This is to prevent the compiler from JIT-compiling the generator factory,
+    # which would cause the injected static environment to leak via the constant
+    # pool. See https://github.com/r-lib/coro/issues/36. Functions that may call
+    # `browser()` are never compiled.
+    if (FALSE) {
+      browser()
+    }
+
     # Evaluate here so the formals of the generator factory do not
     # mask our variables. To see how `_static` is defined, see below.
     `_private` <- rlang::env(`_static`)
@@ -200,6 +204,15 @@ generator0 <- function(fn, type = "generator") {
       # Create the generator instance. This is a function that resumes
       # a state machine.
       instance <- inject(function(arg, close = FALSE) {
+        # This is to prevent the compiler from JIT-compiling the generator factory,
+        # which would cause the injected static environment to leak via the constant
+        # pool. See https://github.com/r-lib/coro/issues/36. Functions that may call
+        # `browser()` are never compiled. Note that the compiler will repeatedly
+        # attempt to compile the function.
+        if (FALSE) {
+          browser()
+        }
+
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
         delayedAssign("close", close, assign.env = env)
