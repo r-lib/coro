@@ -364,3 +364,24 @@ test_that("async functions do not cause CMD check notes (#40)", {
     ))
   )
 })
+
+test_that("async methods in R6 classes", {
+  testthat::skip_if_not_installed("R6")
+
+  AsyncClass <- R6::R6Class(
+    classname = "AsyncClass",
+    public = list(
+      async_resolved = async(function() "value"),
+      async_pending = async(function() await("value"))
+    )
+  )
+  class <- AsyncClass$new()
+
+  later::with_temp_loop({
+    out <- class$async_resolved()
+    expect_promise(out, "value", "fulfilled")
+
+    out <- class$async_pending()
+    expect_promise(out, status = "pending")
+  })
+})

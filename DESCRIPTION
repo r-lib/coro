@@ -24,6 +24,7 @@ Suggests:
     later (>= 1.1.0),
     magrittr (>= 2.0.0),
     promises,
+    R6,
     reticulate,
     rmarkdown,
     testthat (>= 3.0.0)
