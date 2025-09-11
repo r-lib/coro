@@ -141,14 +141,21 @@ generator0 <- function(fn, type = "generator") {
     `_private`$env <- base::parent.env(base::environment())
 
     base::local(envir = `_private`, {
+      # Prevent lints about unknown bindings
+      if (FALSE) {
+        state_machine <- NULL
+        type <- NULL
+        fn <- NULL
+        fmls <- NULL
+        debugged <- NULL
+        exits <- NULL
+        exited <- NULL
+        cleanup <- NULL
+        close_active_iterators <- NULL
+      }
+
       generator_env <- environment()$generator_env
       caller_env <- environment()$caller_env
-
-      # Prevent lints about unknown bindings
-      exits <- NULL
-      exited <- NULL
-      cleanup <- NULL
-      close_active_iterators <- NULL
 
       info <- machine_info(type, env = caller_env)
 
