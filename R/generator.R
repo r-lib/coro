@@ -309,10 +309,14 @@ generator0 <- function(fn, type = "generator") {
     })
   })
 
-  body <- expr({
-    `_static` <- !!static
-    !!!body
-  })
+  # Don't use `expr({ !!!body })` because that causes R CMD check issues due to
+  # `length(body)` not matching the length of srcrefs of `{`
+  # https://github.com/r-lib/rlang/issues/1821
+  body <- call2(
+    "{",
+    expr(`_static` <- !!static),
+    !!!as.list(body[-1])
+  )
 
   # Create the generator factory (returned by `generator()` and
   # entered by `async()`)
