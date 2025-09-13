@@ -536,3 +536,24 @@ test_that("returning early doesn't yield values (#51)", {
   })
   expect_equal(collect(g()), list())
 })
+
+test_that("generator methods in R6 classes", {
+  testthat::skip_if_not_installed("R6")
+
+  GenClass <- R6::R6Class(
+    "GenClass",
+    public = list(
+      gen_method = generator(function() {
+        yield(1)
+        yield(2)
+      })
+    )
+  )
+
+  obj <- GenClass$new()
+  g <- obj$gen_method()
+
+  expect_equal(g(), 1)
+  expect_equal(g(), 2)
+  expect_exhausted(g())
+})

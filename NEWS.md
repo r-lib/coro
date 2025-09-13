@@ -1,5 +1,10 @@
 # coro (development version)
 
+* Async functions and generators can now be R6 methods (#63).
+
+* A memory leak that crept back in (see #36) was fixed with a more robust approach.
+
+
 # coro 1.1.0
 
 * Iterator functions are now allowed to have a `close` argument.
