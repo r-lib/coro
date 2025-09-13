@@ -38,7 +38,9 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="coro-development-version">coro (development version)<a class="anchor" aria-label="anchor" href="#coro-development-version"></a></h2>
-</div>
+<ul><li><p>Async functions and generators can now be R6 methods (<a href="https://github.com/r-lib/coro/issues/63" class="external-link">#63</a>).</p></li>
+<li><p>A memory leak that crept back in (see <a href="https://github.com/r-lib/coro/issues/36" class="external-link">#36</a>) was fixed with a more robust approach.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="coro-110">coro 1.1.0<a class="anchor" aria-label="anchor" href="#coro-110"></a></h2><p class="text-muted">CRAN release: 2024-11-05</p>
 <ul><li><p>Iterator functions are now allowed to have a <code>close</code> argument. If they do, they will be called with a <code>close = TRUE</code> value when iteration is terminated early. This gives the opportunity to clean up resources.</p></li>
