@@ -39,7 +39,7 @@ test_that("setup() teardown is restored around await() (issue #68 reprex)", {
   skip_on_cran()
   the <- new.env()
   the$x <- 0
-  seen <- list()
+  seen <- new.env()
 
   f <- async(function(x) {
     setup({
@@ -47,9 +47,9 @@ test_that("setup() teardown is restored around await() (issue #68 reprex)", {
       the$x <- x
       withr::defer(the$x <- old_x)
     })
-    seen$before <<- c(seen$before, the$x)
+    seen$before <- c(seen$before, the$x)
     await(async_sleep(0))
-    seen$after <<- c(seen$after, the$x)
+    seen$after <- c(seen$after, the$x)
     the$x
   })
 
