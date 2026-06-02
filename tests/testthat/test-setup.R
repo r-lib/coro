@@ -59,3 +59,18 @@ test_that("setup() teardown is restored around await() (issue #68 reprex)", {
   expect_equal(seen$after, 1)
   expect_equal(the$x, 0)
 })
+
+test_that("multiple setup() calls stack; teardowns fire in reverse order", {
+  log <- character()
+
+  gen <- generator(function() {
+    setup(withr::defer(log <<- c(log, "teardown-A")))
+    setup(withr::defer(log <<- c(log, "teardown-B")))
+    log <<- c(log, "body")
+    yield(1)
+  })
+  g <- gen()
+
+  expect_equal(g(), 1)
+  expect_equal(log, c("body", "teardown-B", "teardown-A"))
+})
