@@ -152,6 +152,8 @@ generator0 <- function(fn, type = "generator") {
         exited <- NULL
         cleanup <- NULL
         close_active_iterators <- NULL
+        run_setups <- NULL
+        run_step_teardowns <- NULL
       }
 
       generator_env <- environment()$generator_env
@@ -561,5 +563,6 @@ utils::globalVariables(c(
   "user",
   "exits",
   "suspend",
-  "generator_env"
+  "generator_env",
+  "do_setup"
 ))
