@@ -92,7 +92,9 @@ test_that("a failing teardown does not block other teardowns; first error re-rai
   expect_equal(log, c("B", "A-1"))
 })
 
-test_that("setup() rejects suspension and assignment at compile time", {
+test_that("setup() rejects suspension and assignment when the coroutine is compiled", {
+  # The state machine is compiled lazily on the first instance call, so these
+  # errors surface at `f()` (the trailing `()`), not at factory definition.
   expect_error(generator(function() setup(yield(1)))(), "within `setup\\(\\)`")
   expect_error(async(function() setup(await(1)))(), "within `setup\\(\\)`")
   expect_error(
@@ -153,14 +155,18 @@ test_that("KNOWN LIMITATION: a setup() after a suspend is not retroactive", {
 test_that("KNOWN LIMITATION: setup() in a loop is per-step, not per-iteration", {
   runs <- 0L
   gen <- generator(function() {
-    for (i in 1:3) {
+    for (i in 1:2) {
       setup(runs <<- runs + 1L)
-      yield(i)
+      yield(i)        # 2 iterations x 2 yields = 4 steps total
+      yield(i * 10L)
     }
   })
   g <- gen()
-  g(); g(); g()
-  expect_equal(runs, 3L)
+  g(); g(); g(); g()
+  # Runs once per *step* (4), not once per *iteration* (which would be 2):
+  # registered on the first encounter, re-running at the start of every step;
+  # the re-encounter of setup() on iteration 2 is a dedup no-op.
+  expect_equal(runs, 4L)
 })
 
 test_that("KNOWN LIMITATION: setup() registration is sticky across branches", {
