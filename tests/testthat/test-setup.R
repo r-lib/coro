@@ -34,3 +34,28 @@ test_that("setup() runs before every step; teardown fires at each step end", {
   expect_equal(the$x, 0)
   expect_equal(log, c("before1:9", "before2:9"))
 })
+
+test_that("setup() teardown is restored around await() (issue #68 reprex)", {
+  skip_on_cran()
+  the <- new.env()
+  the$x <- 0
+  seen <- list()
+
+  f <- async(function(x) {
+    setup({
+      old_x <- the$x
+      the$x <- x
+      withr::defer(the$x <- old_x)
+    })
+    seen$before <<- c(seen$before, the$x)
+    await(async_sleep(0))
+    seen$after <<- c(seen$after, the$x)
+    the$x
+  })
+
+  out <- wait_for(f(1))
+  expect_equal(out, 1)
+  expect_equal(seen$before, 1)
+  expect_equal(seen$after, 1)
+  expect_equal(the$x, 0)
+})
