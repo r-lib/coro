@@ -290,10 +290,9 @@ generator0 <- function(fn, type = "generator") {
 
         out <- evalq(envir = user_env, {
           base::evalq(envir = rlang::wref_key(!!weak_env), {
+            # LIFO, independent execution
             defer(if (exited) cleanup())
             # `setup()` teardowns fire at every step end (suspend/return/error).
-            # Registered as a separate, later `defer()` so they run before
-            # `cleanup()` (LIFO) yet can't prevent `cleanup()` if one errors.
             defer(run_step_teardowns())
             env_poke_exits(user_env, exits)
             run_setups()
