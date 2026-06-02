@@ -91,3 +91,32 @@ test_that("a failing teardown does not block other teardowns; first error re-rai
   expect_error(g(), "boom in A")
   expect_equal(log, c("B", "A-1"))
 })
+
+test_that("setup() rejects suspension and assignment at compile time", {
+  expect_error(generator(function() setup(yield(1)))(), "within `setup\\(\\)`")
+  expect_error(async(function() setup(await(1)))(), "within `setup\\(\\)`")
+  expect_error(
+    generator(function() {
+      setup(await_each(1))
+      yield(1)
+    })(),
+    "within `setup\\(\\)`"
+  )
+  expect_error(
+    generator(function() {
+      x <- setup(1)
+      yield(x)
+    })(),
+    "Can't assign the result of a `setup` expression"
+  )
+})
+
+test_that("setup() allows a nested coroutine in its body", {
+  gen <- generator(function() {
+    setup({
+      g2 <- generator(function() yield(1))
+    })
+    yield("ok")
+  })
+  expect_equal(gen()(), "ok")
+})
