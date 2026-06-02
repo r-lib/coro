@@ -372,19 +372,25 @@ new_generator_env <- function(parent, info) {
     }
 
     run_one_setup <- function(expr) {
-      e <- new.env(parent = user_env)
+      # Run the setup body in a throwaway closure whose frame is an isolated
+      # child of `user_env`. Capture its `on.exit()`/`withr::defer()`
+      # registrations (without firing them) plus the frame itself, so the
+      # teardowns can be replayed at step end in the same environment where the
+      # body's locals live (a bare `on.exit(x <- old)` references those locals).
       harvester <- new_function(
         pairlist2(),
         block(
           expr,
-          quote(`.__coro_setup_exits__` <- sys.on.exit()),
+          quote(`.__coro_setup_td__` <- list(
+            env = environment(),
+            exits = sys.on.exit()
+          )),
           quote(on.exit()),
-          quote(`.__coro_setup_exits__`)
+          quote(`.__coro_setup_td__`)
         ),
-        env = e
+        env = new.env(parent = user_env)
       )
-      td <- list(env = e, exits = harvester())
-      step_teardowns <<- c(step_teardowns, list(td))
+      step_teardowns <<- c(step_teardowns, list(harvester()))
     }
 
     do_setup <- function(id, expr) {

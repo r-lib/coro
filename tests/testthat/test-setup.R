@@ -17,7 +17,7 @@ test_that("setup() runs before every step; teardown fires at each step end", {
     setup({
       old <- the$x
       the$x <- 9
-      withr::defer(the$x <- old)
+      on.exit(the$x <- old, add = TRUE)
     })
     log <<- c(log, paste0("before1:", the$x))
     yield(1)
@@ -45,7 +45,7 @@ test_that("setup() teardown is restored around await() (issue #68 reprex)", {
     setup({
       old_x <- the$x
       the$x <- x
-      withr::defer(the$x <- old_x)
+      on.exit(the$x <- old_x, add = TRUE)
     })
     seen$before <- c(seen$before, the$x)
     await(async_sleep(0))
@@ -64,8 +64,8 @@ test_that("multiple setup() calls stack; teardowns fire in reverse order", {
   log <- character()
 
   gen <- generator(function() {
-    setup(withr::defer(log <<- c(log, "teardown-A")))
-    setup(withr::defer(log <<- c(log, "teardown-B")))
+    setup(on.exit(log <<- c(log, "teardown-A"), add = TRUE))
+    setup(on.exit(log <<- c(log, "teardown-B"), add = TRUE))
     log <<- c(log, "body")
     yield(1)
   })
@@ -80,10 +80,10 @@ test_that("a failing teardown does not block other teardowns; first error re-rai
 
   gen <- generator(function() {
     setup({
-      withr::defer(log <<- c(log, "A-1"))
-      withr::defer(stop("boom in A"))   # registered 2nd -> runs 1st within A
+      on.exit(log <<- c(log, "A-1"), add = TRUE)
+      on.exit(stop("boom in A"), add = TRUE)   # both teardowns run; first error re-raised
     })
-    setup(withr::defer(log <<- c(log, "B")))
+    setup(on.exit(log <<- c(log, "B"), add = TRUE))
     yield(1)
   })
   g <- gen()
@@ -186,7 +186,7 @@ test_that("KNOWN LIMITATION: setup() registration is sticky across branches", {
 
 test_that("KNOWN LIMITATION: a teardown error disables the generator", {
   gen <- generator(function() {
-    setup(withr::defer(stop("teardown boom")))
+    setup(on.exit(stop("teardown boom"), add = TRUE))
     yield(1)
     yield(2)
   })
@@ -203,7 +203,7 @@ test_that("KNOWN LIMITATION: an abandoned async promise leaves no final step", {
     setup({
       old <- the$x
       the$x <- 1
-      withr::defer(the$x <- old)
+      on.exit(the$x <- old, add = TRUE)
     })
     await(promises::promise(function(resolve, reject) NULL))
     the$x <- 999
@@ -216,7 +216,7 @@ test_that("setup() compiles to a do_setup() state", {
   expect_snapshot0(generator_body(function() {
     setup({
       old <- the$x
-      withr::defer(the$x <- old)
+      on.exit(the$x <- old, add = TRUE)
     })
     yield(1)
   }))

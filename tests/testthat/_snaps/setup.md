@@ -4,7 +4,7 @@
       generator_body(function() {
         setup({
           old <- the$x
-          withr::defer(the$x <- old)
+          on.exit(the$x <- old, add = TRUE)
         })
         yield(1)
       })
@@ -17,7 +17,7 @@
               switch(state[[1L]], `1` = {
                   do_setup(1L, quote({
                       old <- the$x
-                      withr::defer(the$x <- old)
+                      on.exit(the$x <- old, add = TRUE)
                   }))
                   state[[1L]] <- 2L
               }, `2` = {

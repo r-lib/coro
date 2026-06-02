@@ -40,7 +40,7 @@
 #'   setup({
 #'     old_x <- the$x
 #'     the$x <- 1
-#'     withr::defer(the$x <- old_x)
+#'     on.exit(the$x <- old_x, add = TRUE)
 #'   })
 #'   yield(the$x)   # 1 while the step runs
 #'   yield(the$x)   # 1 again: setup re-ran for this step
