@@ -74,3 +74,20 @@ test_that("multiple setup() calls stack; teardowns fire in reverse order", {
   expect_equal(g(), 1)
   expect_equal(log, c("body", "teardown-B", "teardown-A"))
 })
+
+test_that("a failing teardown does not block other teardowns; first error re-raised", {
+  log <- character()
+
+  gen <- generator(function() {
+    setup({
+      withr::defer(log <<- c(log, "A-1"))
+      withr::defer(stop("boom in A"))   # registered 2nd -> runs 1st within A
+    })
+    setup(withr::defer(log <<- c(log, "B")))
+    yield(1)
+  })
+  g <- gen()
+
+  expect_error(g(), "boom in A")
+  expect_equal(log, c("B", "A-1"))
+})
