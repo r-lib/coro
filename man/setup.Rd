@@ -40,6 +40,26 @@ Like \code{\link[=yield]{yield()}} and \code{\link[=await]{await()}}, \code{setu
 the coroutine compiler. Calling it directly (outside a coroutine body) is an
 error.
 }
+\examples{
+the <- new.env()
+the$x <- 0
+
+gen <- generator(function() {
+  setup({
+    old_x <- the$x
+    the$x <- 1
+    withr::defer(the$x <- old_x)
+  })
+  yield(the$x)   # 1 while the step runs
+  yield(the$x)   # 1 again: setup re-ran for this step
+})
+
+g <- gen()
+g()        # 1
+the$x      # 0 — restored at the end of the step
+g()        # 1
+the$x      # 0
+}
 \seealso{
 \code{\link[=generator]{generator()}}, \code{\link[=async]{async()}}, \code{\link[=yield]{yield()}}, \code{\link[=await]{await()}}.
 }

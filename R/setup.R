@@ -32,6 +32,25 @@
 #' @param expr An expression to run at the start of each step.
 #'
 #' @seealso [generator()], [async()], [yield()], [await()].
+#' @examples
+#' the <- new.env()
+#' the$x <- 0
+#'
+#' gen <- generator(function() {
+#'   setup({
+#'     old_x <- the$x
+#'     the$x <- 1
+#'     withr::defer(the$x <- old_x)
+#'   })
+#'   yield(the$x)   # 1 while the step runs
+#'   yield(the$x)   # 1 again: setup re-ran for this step
+#' })
+#'
+#' g <- gen()
+#' g()        # 1
+#' the$x      # 0 — restored at the end of the step
+#' g()        # 1
+#' the$x      # 0
 #' @export
 setup <- function(expr) {
   abort("`setup()` can't be called directly or within function arguments.")

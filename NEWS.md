@@ -1,5 +1,10 @@
 # coro (development version)
 
+* New `setup()` registers an expression that runs at the start of every step of
+  a generator or async function, with any `withr::defer()`/`on.exit()` it
+  registers torn down at the end of that step. This gives per-step setup/teardown
+  parity, including around `await()`/`yield()` (#68).
+
 * Async functions and generators can now be R6 methods (#63).
 
 * A memory leak that crept back in (see #36) was fixed with a more robust approach.
