@@ -120,3 +120,88 @@ test_that("setup() allows a nested coroutine in its body", {
   })
   expect_equal(gen()(), "ok")
 })
+
+# Known shortcomings ----
+# These tests document *deliberate* limitations / surprising-but-correct
+# behaviors of setup(). They assert the current behavior on purpose.
+
+test_that("KNOWN LIMITATION: plain assignments in setup() are not visible to the body", {
+  gen <- generator(function() {
+    setup({
+      y <- 99
+    })
+    yield(exists("y", inherits = FALSE))
+  })
+  expect_false(gen()())
+})
+
+test_that("KNOWN LIMITATION: a setup() after a suspend is not retroactive", {
+  log <- character()
+  gen <- generator(function() {
+    log <<- c(log, "step1")
+    yield(1)
+    setup(log <<- c(log, "setup-registered"))
+    yield(2)
+  })
+  g <- gen()
+  g()
+  expect_false("setup-registered" %in% log)
+  g()
+  expect_true("setup-registered" %in% log)
+})
+
+test_that("KNOWN LIMITATION: setup() in a loop is per-step, not per-iteration", {
+  runs <- 0L
+  gen <- generator(function() {
+    for (i in 1:3) {
+      setup(runs <<- runs + 1L)
+      yield(i)
+    }
+  })
+  g <- gen()
+  g(); g(); g()
+  expect_equal(runs, 3L)
+})
+
+test_that("KNOWN LIMITATION: setup() registration is sticky across branches", {
+  runs <- 0L
+  gen <- generator(function() {
+    for (i in 1:3) {
+      if (i == 1) {
+        setup(runs <<- runs + 1L)
+      }
+      yield(i)
+    }
+  })
+  g <- gen()
+  g(); g(); g()
+  expect_equal(runs, 3L)
+})
+
+test_that("KNOWN LIMITATION: a teardown error disables the generator", {
+  gen <- generator(function() {
+    setup(withr::defer(stop("teardown boom")))
+    yield(1)
+    yield(2)
+  })
+  g <- gen()
+  expect_error(g(), "teardown boom")
+  expect_error(g(), "disabled")
+})
+
+test_that("KNOWN LIMITATION: an abandoned async promise leaves no final step", {
+  skip_on_cran()
+  the <- new.env()
+  the$x <- 0
+  f <- async(function() {
+    setup({
+      old <- the$x
+      the$x <- 1
+      withr::defer(the$x <- old)
+    })
+    await(promises::promise(function(resolve, reject) NULL))
+    the$x <- 999
+  })
+  prom <- f()
+  expect_equal(the$x, 0)
+})
