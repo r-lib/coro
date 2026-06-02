@@ -205,3 +205,13 @@ test_that("KNOWN LIMITATION: an abandoned async promise leaves no final step", {
   prom <- f()
   expect_equal(the$x, 0)
 })
+
+test_that("setup() compiles to a do_setup() state", {
+  expect_snapshot0(generator_body(function() {
+    setup({
+      old <- the$x
+      withr::defer(the$x <- old)
+    })
+    yield(1)
+  }))
+})
