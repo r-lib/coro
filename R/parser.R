@@ -154,6 +154,15 @@ expr_states <- function(expr, counter, continue, last, return, info) {
       info = info,
       assign_var = yield_lhs(expr, assign)
     ),
+    `setup` = setup_state(
+      preamble = NULL,
+      expr = node_cadr(expr),
+      counter = counter,
+      continue = continue,
+      last = last,
+      return = return,
+      info = info
+    ),
     `return` = return_state(
       expr = user_call(strip_explicit_return(expr)),
       counter = counter,
@@ -262,7 +271,7 @@ expr_type_impl <- function(expr) {
   head <- node_car(expr)
   if (is_call(head, "::") && identical(head[[2]], quote(coro))) {
     head <- head[[3]]
-    if (!as_string(head) %in% c("yield", "await", "await_each")) {
+    if (!as_string(head) %in% c("yield", "await", "await_each", "setup")) {
       return(default)
     }
   }
@@ -277,6 +286,7 @@ expr_type_impl <- function(expr) {
     `{` = ,
     `yield` = ,
     `await` = ,
+    `setup` = ,
     `return` = ,
     `if` = ,
     `repeat` = ,
@@ -458,6 +468,19 @@ block_states <- function(block, counter, continue, last, return, info) {
           condition = user_call(refd_block(node_cadr(expr), ref)),
           then_body = node_cadr(node_cdr(expr)),
           else_body = node_cadr(node_cddr(expr)),
+          counter = counter,
+          continue = continue,
+          last = last,
+          return = return,
+          info = info
+        ))
+        next
+      },
+      `setup` = {
+        skip()
+        push_states(setup_state(
+          preamble = collect(),
+          expr = node_cadr(expr),
           counter = counter,
           continue = continue,
           last = last,
@@ -1030,6 +1053,42 @@ next_state <- function(preamble, counter, info) {
   counter(inc = 1L)
 
   state
+}
+
+setup_state <- function(preamble, expr, counter, continue, last, return, info) {
+  check_setup_body(expr)
+
+  i <- counter()
+  next_i <- continue(counter, last)
+  depth <- machine_depth(counter)
+
+  block <- expr({
+    !!!preamble %&&% list(user_call(preamble))
+    do_setup(!!i, !!call2("quote", expr))
+    !!continue_call(next_i, depth)
+  })
+  state <- new_state(block, NULL, tag = i)
+  counter(inc = 1L)
+
+  state
+}
+
+# `setup()` bodies run as plain code outside the state machine, so they can't
+# suspend. Reject `yield()`/`await()`/`await_each()` at compile time. Don't
+# descend into nested `function` definitions (a nested generator/async is fine).
+check_setup_body <- function(expr) {
+  if (!is_call(expr) || is_call(expr, "function")) {
+    return(invisible())
+  }
+  for (nm in c("yield", "await", "await_each")) {
+    if (is_call(expr, nm, ns = c("", "coro"))) {
+      abort(sprintf("Can't use `%s()` within `setup()`.", nm))
+    }
+  }
+  for (arg in as.list(expr)[-1]) {
+    check_setup_body(arg)
+  }
+  invisible()
 }
 
 try_catch_states <- function(

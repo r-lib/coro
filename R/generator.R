@@ -289,7 +289,9 @@ generator0 <- function(fn, type = "generator") {
         out <- evalq(envir = user_env, {
           base::evalq(envir = rlang::wref_key(!!weak_env), {
             defer(if (exited) cleanup())
+            defer(run_step_teardowns())
             env_poke_exits(user_env, exits)
+            run_setups()
             !!state_machine
           })
         })
@@ -347,6 +349,9 @@ new_generator_env <- function(parent, info) {
   env$exits <- NULL
   env$exited <- TRUE
   env$.last_value <- NULL
+  env$setups <- list()
+  env$setup_ids <- integer()
+  env$step_teardowns <- list()
 
   with(env, {
     user <- function(expr) {
@@ -359,6 +364,58 @@ new_generator_env <- function(parent, info) {
     suspend <- function() {
       exited <<- FALSE
       exits <<- env_poke_exits(user_env, NULL)
+    }
+
+    run_one_setup <- function(expr) {
+      e <- new.env(parent = user_env)
+      harvester <- new_function(
+        pairlist2(),
+        block(
+          expr,
+          quote(`.__coro_setup_exits__` <- sys.on.exit()),
+          quote(on.exit()),
+          quote(`.__coro_setup_exits__`)
+        ),
+        env = e
+      )
+      td <- list(env = e, exits = harvester())
+      step_teardowns <<- c(step_teardowns, list(td))
+    }
+
+    do_setup <- function(id, expr) {
+      if (id %in% setup_ids) {
+        return(invisible(NULL))
+      }
+      setup_ids <<- c(setup_ids, id)
+      setups <<- c(setups, list(expr))
+      run_one_setup(expr)
+    }
+
+    run_setups <- function() {
+      step_teardowns <<- list()
+      for (expr in setups) {
+        run_one_setup(expr)
+      }
+    }
+
+    run_step_teardowns <- function() {
+      err <- NULL
+      for (td in rev(step_teardowns)) {
+        if (is_null(td$exits)) {
+          next
+        }
+        exprs <- if (is_call(td$exits, "{")) as.list(td$exits)[-1] else list(td$exits)
+        for (ex in exprs) {
+          tryCatch(
+            eval_bare(ex, td$env),
+            error = function(cnd) if (is_null(err)) err <<- cnd
+          )
+        }
+      }
+      step_teardowns <<- list()
+      if (!is_null(err)) {
+        cnd_signal(err)
+      }
     }
   })
 
