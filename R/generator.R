@@ -353,9 +353,6 @@ new_generator_env <- function(parent, info) {
   env$exits <- NULL
   env$exited <- TRUE
   env$.last_value <- NULL
-  env$setups <- list()
-  env$setup_ids <- integer()
-  env$step_teardowns <- list()
 
   with(env, {
     user <- function(expr) {
@@ -369,7 +366,30 @@ new_generator_env <- function(parent, info) {
       exited <<- FALSE
       exits <<- env_poke_exits(user_env, NULL)
     }
+  })
 
+  init_setup_runtime(env)
+
+  if (!is_null(info$async_ops)) {
+    env$then <- info$async_ops$then
+    env$as_promise <- info$async_ops$as_promise
+  }
+
+  env
+}
+
+# Installs the `setup()` lifecycle into the generator's runtime `env`:
+# registration + per-call-site deduping (`do_setup()`), the capture-and-clear
+# harvest of each setup body's teardowns (`run_one_setup()`), re-running the
+# registered setups at the start of each step (`run_setups()`), and replaying
+# the harvested teardowns at step end (`run_step_teardowns()`). Kept separate so
+# `new_generator_env()` stays focused on env construction.
+init_setup_runtime <- function(env) {
+  env$setups <- list()
+  env$setup_ids <- integer()
+  env$step_teardowns <- list()
+
+  with(env, {
     run_one_setup <- function(expr) {
       # Run the setup body in a throwaway closure whose frame is an isolated
       # child of `user_env`. Capture its `on.exit()`/`withr::defer()`
@@ -429,12 +449,7 @@ new_generator_env <- function(parent, info) {
     }
   })
 
-  if (!is_null(info$async_ops)) {
-    env$then <- info$async_ops$then
-    env$as_promise <- info$async_ops$as_promise
-  }
-
-  env
+  invisible(env)
 }
 
 env_bind_arg <- function(env, arg, frame = caller_env()) {
