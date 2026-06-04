@@ -221,3 +221,34 @@ test_that("setup() compiles to a do_setup() state", {
     yield(1)
   }))
 })
+
+test_that("setup() supports withr::defer() and withr::local_*() per step", {
+  # The documented contract: withr teardown registered in a setup() body is
+  # scoped to the step (set up before each step, restored at its end).
+  skip_if_not_installed("withr")
+
+  the <- new.env()
+  the$x <- 0
+  seen <- new.env()
+
+  gen <- generator(function() {
+    setup({
+      the$x <- 1
+      withr::defer(the$x <- 0)
+      withr::local_options(coro.setup.flag = "on")
+    })
+    seen$flag <- c(seen$flag, getOption("coro.setup.flag", "off"))
+    yield(the$x)
+    seen$flag <- c(seen$flag, getOption("coro.setup.flag", "off"))
+    yield(the$x)
+  })
+  g <- gen()
+
+  expect_equal(g(), 1)                         # withr::defer set the$x to 1
+  expect_equal(the$x, 0)                        # ...and restored it at step end
+  expect_null(getOption("coro.setup.flag"))     # withr::local_options restored too
+  expect_equal(g(), 1)
+  expect_equal(the$x, 0)
+  expect_null(getOption("coro.setup.flag"))
+  expect_equal(seen$flag, c("on", "on"))        # option was set during each step
+})
