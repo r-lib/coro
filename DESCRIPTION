@@ -20,6 +20,7 @@ Depends:
 Imports:
     rlang (>= 0.4.12)
 Suggests:
+    codetools,
     knitr,
     later (>= 1.1.0),
     magrittr (>= 2.0.0),
