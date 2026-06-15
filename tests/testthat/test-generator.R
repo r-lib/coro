@@ -362,6 +362,23 @@ test_that("generators do not cause CMD check notes (#40)", {
       options = list(suppressAll = FALSE)
     ))
   )
+
+  # `cmpfun()` does not descend into the instance closure embedded in the
+  # factory body, but `R CMD check` runs `codetools` on it (via
+  # `checkUsagePackage()`), and it does. A free variable there would produce a
+  # "no visible binding" note in any downstream package that stores a factory,
+  # without that package being able to do anything about it. Check the way
+  # `R CMD check` does (#40, #71).
+  # `all = FALSE` matches what `R CMD check` runs: it still reports "no visible
+  # binding" notes (the ones that would hit downstream) but not the stricter
+  # `all = TRUE` pedantry that `R CMD check` ignores.
+  reports <- character()
+  codetools::checkUsage(
+    generator(function() NULL),
+    all = FALSE,
+    report = function(x) reports <<- c(reports, x)
+  )
+  expect_equal(reports, character())
 })
 
 test_that("on.exit is called when loop breaks early (#52)", {
@@ -556,4 +573,39 @@ test_that("generator methods in R6 classes", {
   expect_equal(g(), 1)
   expect_equal(g(), 2)
   expect_exhausted(g())
+})
+
+test_that("instances from a factory share an identical body (#71)", {
+  # R's bytecode JIT caches compiled bodies keyed on a structural hash. If
+  # instances of the same factory have differing bodies, the cache always
+  # misses and the state machine is recompiled on every call (~14 ms at the
+  # default JIT level). Keeping the body constant lets the cache hit.
+  gf <- generator(function() for (i in 1:3) yield(i))
+  expect_identical(body(gf()), body(gf()))
+})
+
+test_that("compiled instances do not pin their environment (#36)", {
+  # When the JIT compiles a function it caches the bytecode in a global hash
+  # table for the process lifetime. If the generator environment is inlined in
+  # the instance body, it ends up in the bytecode constant pool and leaks
+  # through that cache, surviving even after the generator is dropped. We track
+  # an object living in the instance's user environment with a weak reference:
+  # once the generator is gone, a `gc()` must collect it.
+  jit <- compiler::enableJIT(3)
+  on.exit(compiler::enableJIT(jit))
+
+  ref <- NULL
+  local({
+    gf <- generator(function() {
+      tracked <- new.env()
+      ref <<- new_weakref(tracked)
+      for (i in 1:10) yield(i)
+    })
+    g <- gf()
+    # The second call onward triggers JIT compilation of the instance.
+    for (i in 1:5) g()
+  })
+  gc()
+
+  expect_null(wref_key(ref))
 })

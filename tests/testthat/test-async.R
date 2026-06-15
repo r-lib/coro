@@ -363,6 +363,26 @@ test_that("async functions do not cause CMD check notes (#40)", {
       options = list(suppressAll = FALSE)
     ))
   )
+
+  # `cmpfun()` does not descend into the instance closure embedded in the
+  # factory body, but `R CMD check` runs `codetools` on it (via
+  # `checkUsagePackage()`), and it does. A free variable there would produce a
+  # "no visible binding" note in any downstream package that stores a factory.
+  # `all = FALSE` matches what `R CMD check` runs (#40, #71).
+  check_usage <- function(fn) {
+    reports <- character()
+    codetools::checkUsage(
+      fn,
+      all = FALSE,
+      report = function(x) reports <<- c(reports, x)
+    )
+    reports
+  }
+  expect_equal(check_usage(async(function() NULL)), character())
+  expect_equal(
+    check_usage(async_generator(function() yield(NULL))),
+    character()
+  )
 })
 
 test_that("async methods in R6 classes", {
