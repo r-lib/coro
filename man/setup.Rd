@@ -59,8 +59,8 @@ the$x <- 0
 
 step <- generator(function(i) \{
   setup(\{
-    the$x <- i                       # set up before every step...
-    on.exit(the$x <- 0, add = TRUE)  # ...and torn down at the end of each
+    the$x <- i                 # set up before every step...
+    withr::defer(the$x <- 0)   # ...and torn down at the end of each
   \})
   yield(the$x)   # the$x is i here
   yield(the$x)   # still i: reset to 0 at the last step end, then setup() re-ran
@@ -85,7 +85,7 @@ gen <- generator(function() {
   setup({
     old_x <- the$x
     the$x <- 1
-    on.exit(the$x <- old_x, add = TRUE)
+    withr::defer(the$x <- old_x)
   })
   yield(the$x)   # 1 while the step runs
   yield(the$x)   # 1 again: setup re-ran for this step
