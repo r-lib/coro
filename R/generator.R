@@ -152,6 +152,8 @@ generator0 <- function(fn, type = "generator") {
         exited <- NULL
         cleanup <- NULL
         close_active_iterators <- NULL
+        run_setups <- NULL
+        run_step_teardowns <- NULL
         `.__generator_env__.` <- NULL
       }
 
@@ -274,8 +276,12 @@ generator0 <- function(fn, type = "generator") {
 
         out <- evalq(envir = user_env, {
           base::evalq(envir = .__generator_env__., {
+            # LIFO, independent execution
             defer(if (exited) cleanup())
+            # `setup()` teardowns fire at every step end (suspend/return/error).
+            defer(run_step_teardowns())
             env_poke_exits(user_env, exits)
+            run_setups()
             !!state_machine
           })
         })
@@ -353,12 +359,88 @@ new_generator_env <- function(parent, info) {
     }
   })
 
+  init_setup_runtime(env)
+
   if (!is_null(info$async_ops)) {
     env$then <- info$async_ops$then
     env$as_promise <- info$async_ops$as_promise
   }
 
   env
+}
+
+# Installs the `setup()` lifecycle into the generator's runtime `env`:
+# registration + per-call-site deduping (`do_setup()`), the capture-and-clear
+# harvest of each setup body's teardowns (`run_one_setup()`), re-running the
+# registered setups at the start of each step (`run_setups()`), and replaying
+# the harvested teardowns at step end (`run_step_teardowns()`). Kept separate so
+# `new_generator_env()` stays focused on env construction.
+init_setup_runtime <- function(env) {
+  env$setups <- list()
+  env$setup_ids <- integer()
+  env$step_teardowns <- list()
+
+  with(env, {
+    run_one_setup <- function(expr) {
+      # Run the setup body in a throwaway closure whose frame is an isolated
+      # child of `user_env`. Capture its `on.exit()`/`withr::defer()`
+      # registrations (without firing them) plus the frame itself, so the
+      # teardowns can be replayed at step end in the same environment where the
+      # body's locals live (a bare `on.exit(x <- old)` references those locals).
+      harvester <- new_function(
+        pairlist2(),
+        block(
+          expr,
+          quote(`.__coro_setup_td__` <- list(
+            env = environment(),
+            exits = sys.on.exit()
+          )),
+          quote(on.exit()),
+          quote(`.__coro_setup_td__`)
+        ),
+        env = new.env(parent = user_env)
+      )
+      step_teardowns <<- c(step_teardowns, list(harvester()))
+    }
+
+    do_setup <- function(id, expr) {
+      if (id %in% setup_ids) {
+        return(invisible(NULL))
+      }
+      setup_ids <<- c(setup_ids, id)
+      setups <<- c(setups, list(expr))
+      run_one_setup(expr)
+    }
+
+    run_setups <- function() {
+      step_teardowns <<- list()
+      for (expr in setups) {
+        run_one_setup(expr)
+      }
+    }
+
+    run_step_teardowns <- function() {
+      err <- NULL
+      for (teardown in rev(step_teardowns)) {
+        if (is_null(teardown$exits)) {
+          next
+        }
+        exprs <- if (is_call(teardown$exits, "{")) as.list(teardown$exits)[-1] else list(teardown$exits)
+        for (expr in exprs) {
+          tryCatch(
+            eval_bare(expr, teardown$env),
+            error = function(cnd) if (is_null(err)) err <<- cnd
+          )
+        }
+      }
+      step_teardowns <<- list()
+      if (!is_null(err)) {
+        cnd_signal(err)
+      }
+    }
+  })
+
+  invisible(env)
 }
 
 env_bind_arg <- function(env, arg, frame = caller_env()) {
@@ -492,5 +574,6 @@ utils::globalVariables(c(
   "user",
   "exits",
   "suspend",
-  "generator_env"
+  "generator_env",
+  "do_setup"
 ))

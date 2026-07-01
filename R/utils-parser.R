@@ -39,6 +39,9 @@ is_yield_call <- function(x) {
 is_await_call <- function(x) {
   is_call(x, "await", ns = c("", "coro"))
 }
+is_setup_call <- function(x) {
+  is_call(x, "setup", ns = c("", "coro"))
+}
 
 # Useful to circumvent notes emitted by the bytecode compiler
 next_call <- function() call("next")
