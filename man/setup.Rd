@@ -31,19 +31,52 @@ current step. A \code{setup()} inside an \code{if} branch registers only if and 
 reached.
 \item Multiple \code{setup()} calls stack and run in registration order each step; their
 teardowns fire in reverse order.
-\item \code{setup()} cannot be used inside a loop (\code{for}/\code{while}/\code{repeat}), cannot
-contain \code{yield()}/\code{await()}, and its result cannot be assigned.
+\item \code{setup()} cannot contain \code{yield()}/\code{await()} and its result cannot be
+assigned.
 }
-
-For per-iteration setup and teardown, factor the loop body into its own
-generator and delegate to it with a \code{for} loop (see examples). Each
-sub-generator instance has its own \code{setup()} lifecycle, scoped to that
-iteration.
 
 Like \code{\link[=yield]{yield()}} and \code{\link[=await]{await()}}, \code{setup()} is a syntactic construct recognised by
 the coroutine compiler. Calling it directly (outside a coroutine body) is an
 error.
 }
+\section{Using setup() in a loop}{
+
+
+\code{setup()} cannot be used inside a loop (\code{for}, \code{while}, or \code{repeat}); doing so
+is an error. Per-step registration interacts poorly with iteration: a loop
+body may branch and yield, so it is ambiguous when the setup should be
+registered, re-run, and torn down relative to each iteration.
+
+When you need per-iteration setup and teardown, factor the loop body into its
+own generator and delegate to it with a \code{for} loop. Each sub-generator
+instance has its own \code{setup()} lifecycle, scoped to its steps. The second
+\code{yield()} below shows the effect: after the first yield the step ends and
+\code{the$x} is reset to \code{0}, then \code{setup()} re-runs before the next step, so the
+second yield again sees \code{i}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{the <- new.env()
+the$x <- 0
+
+step <- generator(function(i) \{
+  setup(\{
+    the$x <- i                       # set up before every step...
+    on.exit(the$x <- 0, add = TRUE)  # ...and torn down at the end of each
+  \})
+  yield(the$x)   # the$x is i here
+  yield(the$x)   # still i: reset to 0 at the last step end, then setup() re-ran
+\})
+
+gen <- generator(function() \{
+  for (i in 1:3) \{
+    for (x in step(i)) yield(x)
+  \}
+\})
+
+collect(gen())   # 1, 1, 2, 2, 3, 3
+the$x            # 0
+}\if{html}{\out{</div>}}
+}
+
 \examples{
 the <- new.env()
 the$x <- 0
@@ -63,29 +96,6 @@ g()        # 1
 the$x      # 0 — restored at the end of the step
 g()        # 1
 the$x      # 0
-
-# `setup()` can't be used inside a loop. For per-iteration setup and
-# teardown, move the loop body into a sub-generator and delegate to it with a
-# `for` loop; the sub-generator's `setup()` runs afresh for each step:
-the$x <- 0
-step <- generator(function(i) {
-  setup({
-    the$x <- i                       # set up before every step...
-    on.exit(the$x <- 0, add = TRUE)  # ...and torn down at the end of each
-  })
-  yield(the$x)   # the$x is i here
-  yield(the$x)   # still i: the$x was reset to 0 at the previous step end,
-                 # then setup() re-ran before this step
-})
-
-gen <- generator(function() {
-  for (i in 1:3) {
-    for (x in step(i)) yield(x)
-  }
-})
-
-collect(gen())   # 1, 1, 2, 2, 3, 3
-the$x            # 0 — restored after every step
 }
 \seealso{
 \code{\link[=generator]{generator()}}, \code{\link[=async]{async()}}, \code{\link[=yield]{yield()}}, \code{\link[=await]{await()}}.
