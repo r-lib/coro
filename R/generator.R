@@ -154,6 +154,7 @@ generator0 <- function(fn, type = "generator") {
         close_active_iterators <- NULL
         run_setups <- NULL
         run_step_teardowns <- NULL
+        `.__generator_env__.` <- NULL
       }
 
       generator_env <- environment()$generator_env
@@ -173,12 +174,6 @@ generator0 <- function(fn, type = "generator") {
 
       env <- new_generator_env(env, info)
       user_env <- env$user_env
-
-      # The compiler caches function bodies, so inline a weak reference to avoid
-      # leaks (#36). This weak reference is injected inside the body of the
-      # generator instance to work around a scoping issue. See where we install
-      # the user's exit handlers.
-      weak_env <- new_weakref(env)
 
       # Forward arguments inside the user space of the state machine
       lapply(names(fmls), function(arg) {
@@ -212,15 +207,6 @@ generator0 <- function(fn, type = "generator") {
       # Create the generator instance. This is a function that resumes
       # a state machine.
       instance <- inject(function(arg, close = FALSE) {
-        # This is to prevent the compiler from JIT-compiling the generator factory,
-        # which would cause the injected static environment to leak via the constant
-        # pool. See https://github.com/r-lib/coro/issues/36. Functions that may call
-        # `browser()` are never compiled. Note that the compiler will repeatedly
-        # attempt to compile the function.
-        if (FALSE) {
-          browser()
-        }
-
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
         delayedAssign("close", close, assign.env = env)
@@ -259,7 +245,7 @@ generator0 <- function(fn, type = "generator") {
           # before exiting so they will actually run here.
           evalq(
             envir = user_env,
-            base::evalq(envir = rlang::wref_key(!!weak_env), {
+            base::evalq(envir = .__generator_env__., {
               env_poke_exits(user_env, exits)
             })
           )
@@ -289,7 +275,7 @@ generator0 <- function(fn, type = "generator") {
         env$exited <- TRUE
 
         out <- evalq(envir = user_env, {
-          base::evalq(envir = rlang::wref_key(!!weak_env), {
+          base::evalq(envir = .__generator_env__., {
             # LIFO, independent execution
             defer(if (exited) cleanup())
             # `setup()` teardowns fire at every step end (suspend/return/error).
@@ -346,6 +332,11 @@ new_generator_env <- function(parent, info) {
   user_env <- env(parent, .__generator_instance__. = TRUE)
 
   env$user_env <- user_env
+
+  # Reverse link so the instance can reach the private environment by name from
+  # within `user_env`. We bind it instead of injecting it into the instance body
+  # so the body stays constant and the bytecode JIT cache can hit (#71).
+  user_env$.__generator_env__. <- env
   env$exhausted <- FALSE
   env$state <- 1L
   env$iterators <- list()

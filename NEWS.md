@@ -5,6 +5,8 @@
   registers torn down at the end of that step. This gives per-step setup/teardown
   parity, including around `await()`/`yield()` (#68).
 
+* Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
+
 * Async functions and generators can now be R6 methods (#63).
 
 * A memory leak that crept back in (see #36) was fixed with a more robust approach.
