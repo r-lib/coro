@@ -25,9 +25,7 @@ top-level \code{on.exit()} which only fires once when the whole function exits.
 \item \code{expr} runs in a child of the coroutine's environment: it can read the
 function's arguments, locals, and lexical scope, and mutate external state
 (\code{the$x <- 1}, \verb{<<-}), but \strong{plain assignments stay local to \code{expr}} and are
-not visible to the function body. This matters because \code{setup()} re-runs
-before every step: were plain assignments visible, each step would reset the
-body's state.
+not visible to the function body (see the "Assignments and scope" section).
 \item When execution reaches a \code{setup()} call it is registered and runs for the
 current step. A \code{setup()} inside an \code{if} branch registers only if and when
 reached.
@@ -41,6 +39,38 @@ Like \code{\link[=yield]{yield()}} and \code{\link[=await]{await()}}, \code{setu
 the coroutine compiler. Calling it directly (outside a coroutine body) is an
 error.
 }
+\section{Assignments and scope}{
+
+
+\code{setup()} runs its body in a child of the coroutine's environment. It can read
+the function's variables and lexical scope, but a plain assignment (\code{x <- 1})
+creates a \emph{local} binding that the function body does not see.
+
+This is deliberate. Unlike \code{\link[=on.exit]{on.exit()}} and \code{withr::defer()}, which register
+once and run at exit, \code{setup()} re-runs its body before \emph{every} step. If plain
+assignments were visible to the body, each step would silently overwrite
+whatever the body had accumulated. In the generator below, \code{setup()}'s local
+\code{n} does not touch the body's \code{n}, so it yields the expected \code{5} then \code{6}; were
+the assignment visible, the second step would reset \code{n} to \code{100} and yield
+\code{101}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{generator(function() \{
+  setup(\{ n <- 100 \})  # local to setup; does not touch the body's `n`
+  n <- 5
+  yield(n)             # 5
+  n <- n + 1
+  yield(n)             # 6
+\})
+}\if{html}{\out{</div>}}
+
+To change state that the body (or the outside world) can see, mutate an
+existing object instead of creating a local binding: assign into an
+environment (\code{the$x <- 1}) or use \verb{<<-} to update an enclosing binding, and
+pair the change with \code{withr::defer()}/\code{\link[=on.exit]{on.exit()}} to restore it at the end of
+each step. If you need a value computed per step \emph{and} visible to the body,
+use the sub-generator pattern shown in "Using setup() in a loop".
+}
+
 \section{Using setup() in a loop}{
 
 

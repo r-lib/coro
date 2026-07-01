@@ -15,9 +15,7 @@
 #' - `expr` runs in a child of the coroutine's environment: it can read the
 #'   function's arguments, locals, and lexical scope, and mutate external state
 #'   (`the$x <- 1`, `<<-`), but **plain assignments stay local to `expr`** and are
-#'   not visible to the function body. This matters because `setup()` re-runs
-#'   before every step: were plain assignments visible, each step would reset the
-#'   body's state.
+#'   not visible to the function body (see the "Assignments and scope" section).
 #' - When execution reaches a `setup()` call it is registered and runs for the
 #'   current step. A `setup()` inside an `if` branch registers only if and when
 #'   reached.
@@ -29,6 +27,37 @@
 #' Like [yield()] and [await()], `setup()` is a syntactic construct recognised by
 #' the coroutine compiler. Calling it directly (outside a coroutine body) is an
 #' error.
+#'
+#' @section Assignments and scope:
+#'
+#' `setup()` runs its body in a child of the coroutine's environment. It can read
+#' the function's variables and lexical scope, but a plain assignment (`x <- 1`)
+#' creates a *local* binding that the function body does not see.
+#'
+#' This is deliberate. Unlike [on.exit()] and `withr::defer()`, which register
+#' once and run at exit, `setup()` re-runs its body before *every* step. If plain
+#' assignments were visible to the body, each step would silently overwrite
+#' whatever the body had accumulated. In the generator below, `setup()`'s local
+#' `n` does not touch the body's `n`, so it yields the expected `5` then `6`; were
+#' the assignment visible, the second step would reset `n` to `100` and yield
+#' `101`:
+#'
+#' ```r
+#' generator(function() {
+#'   setup({ n <- 100 })  # local to setup; does not touch the body's `n`
+#'   n <- 5
+#'   yield(n)             # 5
+#'   n <- n + 1
+#'   yield(n)             # 6
+#' })
+#' ```
+#'
+#' To change state that the body (or the outside world) can see, mutate an
+#' existing object instead of creating a local binding: assign into an
+#' environment (`the$x <- 1`) or use `<<-` to update an enclosing binding, and
+#' pair the change with `withr::defer()`/[on.exit()] to restore it at the end of
+#' each step. If you need a value computed per step *and* visible to the body,
+#' use the sub-generator pattern shown in "Using setup() in a loop".
 #'
 #' @section Using setup() in a loop:
 #'
