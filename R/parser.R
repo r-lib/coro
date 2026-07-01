@@ -1,4 +1,6 @@
 walk_states <- function(expr, info) {
+  check_setup_calls(expr)
+
   continue <- function(counter, last) {
     # Break if last
     if (last) 0L else counter() + 1L
@@ -24,6 +26,33 @@ walk_states <- function(expr, info) {
     invisible(exhausted())
   })
 }
+
+# `setup()` may not appear inside a loop. Mixing per-step registration with
+# iteration (and the branching/yields a loop body may contain) has opaque
+# semantics. For per-iteration setup and teardown, factor the loop body into
+# its own generator and delegate to it, e.g. `for (x in step(i)) yield(x)`.
+# Nested `function` definitions are their own coroutines and are not descended
+# into. Setup bodies are user code, not a nested `setup()`, so we stop there too.
+check_setup_calls <- function(expr, in_loop = FALSE) {
+  if (!is_call(expr) || is_call(expr, "function")) {
+    return(invisible())
+  }
+  if (is_setup_call(expr)) {
+    if (in_loop) {
+      abort(c(
+        "Can't use `setup()` within a loop.",
+        i = "For per-iteration setup and teardown, move the loop body into its own generator and delegate to it with `for (x in step(i)) yield(x)`."
+      ))
+    }
+    return(invisible())
+  }
+  in_loop <- in_loop || is_call(expr, c("for", "while", "repeat"))
+  for (arg in as.list(expr)[-1]) {
+    check_setup_calls(arg, in_loop)
+  }
+  invisible()
+}
+
 walk_loop_states <- function(body, states, counter, info) {
   continue <- function(counter, last) {
     # Go back to state 1 of loop body if last

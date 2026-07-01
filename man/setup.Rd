@@ -27,14 +27,30 @@ arguments, locals, and lexical scope, and mutate external state
 (\code{the$x <- 1}, \verb{<<-}), but \strong{plain assignments stay local to \code{expr}} and are
 not visible to the function body.
 \item When execution reaches a \code{setup()} call it is registered and runs for the
-current step; re-encountering the \emph{same} \code{setup()} call (e.g. on a later loop
-iteration) is a no-op. A \code{setup()} inside an \code{if}/loop registers only if and
-when reached.
+current step. A \code{setup()} inside an \code{if} branch registers only if and when
+reached.
 \item Multiple \code{setup()} calls stack and run in registration order each step; their
 teardowns fire in reverse order.
-\item \code{setup()} cannot contain \code{yield()}/\code{await()} and its result cannot be
-assigned.
+\item \code{setup()} cannot be used inside a loop (\code{for}/\code{while}/\code{repeat}), cannot
+contain \code{yield()}/\code{await()}, and its result cannot be assigned.
 }
+
+For per-iteration setup and teardown, factor the loop body into its own
+generator and delegate to it. The sub-generator's \code{setup()} is scoped to its
+own steps:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{step <- generator(function(i) \{
+  setup(\{
+    # per-iteration setup and teardown
+  \})
+  yield(i)
+\})
+gen <- generator(function() \{
+  for (i in 1:3) \{
+    for (x in step(i)) yield(x)
+  \}
+\})
+}\if{html}{\out{</div>}}
 
 Like \code{\link[=yield]{yield()}} and \code{\link[=await]{await()}}, \code{setup()} is a syntactic construct recognised by
 the coroutine compiler. Calling it directly (outside a coroutine body) is an

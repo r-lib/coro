@@ -152,36 +152,55 @@ test_that("KNOWN LIMITATION: a setup() after a suspend is not retroactive", {
   expect_true("setup-registered" %in% log)
 })
 
-test_that("KNOWN LIMITATION: setup() in a loop is per-step, not per-iteration", {
-  runs <- 0L
-  gen <- generator(function() {
-    for (i in 1:2) {
-      setup(runs <<- runs + 1L)
-      yield(i)        # 2 iterations x 2 yields = 4 steps total
-      yield(i * 10L)
-    }
-  })
-  g <- gen()
-  g(); g(); g(); g()
-  # Runs once per *step* (4), not once per *iteration* (which would be 2):
-  # registered on the first encounter, re-running at the start of every step;
-  # the re-encounter of setup() on iteration 2 is a dedup no-op.
-  expect_equal(runs, 4L)
+test_that("setup() within a loop is an error", {
+  # Mixing per-step registration with iteration has opaque semantics, so it is
+  # rejected. See the sub-generator workaround in the following test.
+  expect_error(
+    generator(function() for (i in 1:2) { setup(NULL); yield(i) })(),
+    "within a loop"
+  )
+  expect_error(
+    generator(function() while (TRUE) { setup(NULL); yield(1) })(),
+    "within a loop"
+  )
+  expect_error(
+    generator(function() repeat { setup(NULL); yield(1) })(),
+    "within a loop"
+  )
+  # Also caught when nested in a branch inside the loop.
+  expect_error(
+    generator(function() for (i in 1:2) { if (i == 1) setup(NULL); yield(i) })(),
+    "within a loop"
+  )
 })
 
-test_that("KNOWN LIMITATION: setup() registration is sticky across branches", {
-  runs <- 0L
+test_that("per-iteration setup/teardown works by delegating to a sub-generator", {
+  the <- new.env()
+  the$x <- 0
+  seen <- new.env()
+
+  # Factor the per-iteration body into its own generator: its setup() is scoped
+  # to the sub-generator's steps, giving per-iteration setup/teardown.
+  step <- generator(function(i) {
+    setup({
+      the$x <- i
+      on.exit(the$x <- 0, add = TRUE)
+    })
+    seen$during <- c(seen$during, the$x)
+    yield(i)
+  })
+
   gen <- generator(function() {
     for (i in 1:3) {
-      if (i == 1) {
-        setup(runs <<- runs + 1L)
+      for (x in step(i)) {
+        yield(x)
       }
-      yield(i)
     }
   })
-  g <- gen()
-  g(); g(); g()
-  expect_equal(runs, 3L)
+
+  expect_equal(collect(gen()), list(1L, 2L, 3L))
+  expect_equal(seen$during, c(1L, 2L, 3L))   # setup ran with the$x set per iteration
+  expect_equal(the$x, 0)                       # ...and restored after each iteration
 })
 
 test_that("KNOWN LIMITATION: a teardown error disables the generator", {
