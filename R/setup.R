@@ -58,14 +58,16 @@
 #'
 #' # `setup()` can't be used inside a loop. For per-iteration setup and
 #' # teardown, move the loop body into a sub-generator and delegate to it with a
-#' # `for` loop; the sub-generator's `setup()` runs afresh for each iteration:
+#' # `for` loop; the sub-generator's `setup()` runs afresh for each step:
 #' the$x <- 0
 #' step <- generator(function(i) {
 #'   setup({
-#'     the$x <- i                       # set up for this iteration...
-#'     on.exit(the$x <- 0, add = TRUE)  # ...and torn down at the end of it
+#'     the$x <- i                       # set up before every step...
+#'     on.exit(the$x <- 0, add = TRUE)  # ...and torn down at the end of each
 #'   })
-#'   yield(the$x)
+#'   yield(the$x)   # the$x is i here
+#'   yield(the$x)   # still i: the$x was reset to 0 at the previous step end,
+#'                  # then setup() re-ran before this step
 #' })
 #'
 #' gen <- generator(function() {
@@ -74,8 +76,8 @@
 #'   }
 #' })
 #'
-#' collect(gen())   # 1, 2, 3 — each produced with the$x set for that iteration
-#' the$x            # 0 — restored after every iteration
+#' collect(gen())   # 1, 1, 2, 2, 3, 3
+#' the$x            # 0 — restored after every step
 #' @export
 setup <- function(expr) {
   abort("`setup()` can't be called directly or within function arguments.")
