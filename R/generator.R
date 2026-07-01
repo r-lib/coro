@@ -421,14 +421,14 @@ init_setup_runtime <- function(env) {
 
     run_step_teardowns <- function() {
       err <- NULL
-      for (td in rev(step_teardowns)) {
-        if (is_null(td$exits)) {
+      for (teardown in rev(step_teardowns)) {
+        if (is_null(teardown$exits)) {
           next
         }
-        exprs <- if (is_call(td$exits, "{")) as.list(td$exits)[-1] else list(td$exits)
-        for (ex in exprs) {
+        exprs <- if (is_call(teardown$exits, "{")) as.list(teardown$exits)[-1] else list(teardown$exits)
+        for (expr in exprs) {
           tryCatch(
-            eval_bare(ex, td$env),
+            eval_bare(expr, teardown$env),
             error = function(cnd) if (is_null(err)) err <<- cnd
           )
         }
