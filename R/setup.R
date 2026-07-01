@@ -12,10 +12,12 @@
 #' top-level `on.exit()` which only fires once when the whole function exits.
 #'
 #' @details
-#' - `expr` runs in an isolated environment: it can read the function's
-#'   arguments, locals, and lexical scope, and mutate external state
+#' - `expr` runs in a child of the coroutine's environment: it can read the
+#'   function's arguments, locals, and lexical scope, and mutate external state
 #'   (`the$x <- 1`, `<<-`), but **plain assignments stay local to `expr`** and are
-#'   not visible to the function body.
+#'   not visible to the function body. This matters because `setup()` re-runs
+#'   before every step: were plain assignments visible, each step would reset the
+#'   body's state.
 #' - When execution reaches a `setup()` call it is registered and runs for the
 #'   current step. A `setup()` inside an `if` branch registers only if and when
 #'   reached.
