@@ -4,7 +4,7 @@
 #' @description
 #'
 #' Transformation steps can be chained together to modify the
-#' behaviour of an iterator (see [iter_adapt()]).
+#' behaviour of an iterator (see `iter_adapt()`).
 #'
 #' * `iter_map()` applies a function `.f` over all inputs.
 #'

@@ -16,8 +16,8 @@
 #' abstract and it takes some time understand how they work and how to
 #' write one. However most of the time you shouldn't have to use
 #' `reduce_steps()` or write your own transformation step. You will
-#' typically use existing steps provided in coro (like [iter_map()]
-#' and [iter_discard()]) with user-friendly wrappers such as
+#' typically use existing steps provided in coro (like `iter_map()`
+#' and `iter_discard()`) with user-friendly wrappers such as
 #' `iter_adapt()`.
 #'
 #' `reduce_steps()` and thus all functions based on it support coro
@@ -120,7 +120,7 @@
 #'   builder function is called without argument to get an initial
 #'   value.
 #'
-#' @seealso [steps], [along_builder()]
+#' @seealso transformation steps, `along_builder()`
 #' @examples
 #' # Let's create a chain of transformation. Let's start with the very
 #' # last step, the builder function.

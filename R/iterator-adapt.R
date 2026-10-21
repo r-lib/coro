@@ -7,14 +7,14 @@
 #' commit to the transducer approach. Feedback welcome._
 #'
 #' `iter_adapt()` takes an iterator `iter` and a list of
-#' [Transformation steps][steps]. It returns an iterator that returns
+#' transformation steps. It returns an iterator that returns
 #' transformed values.
 #'
 #' `async_adapt()` does the same for async iterators, i.e. functions
 #' that returns an awaitable value.
 #'
 #' @param iter An [iterator].
-#' @param steps,... [Transformation steps][steps]. These dots are taken with
+#' @param steps,... Transformation steps. These dots are taken with
 #'   implicit splicing of lists and passed to `compose()`.
 #'
 #' @seealso [loop()] for looping over iterator values with a `for`
