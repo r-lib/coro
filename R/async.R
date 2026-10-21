@@ -116,13 +116,48 @@ async_sleep <- function(seconds) {
 #' # Example usage:
 #' if (interactive()) {
 #'   library(magrittr)
-#'   generate_stream(1:3) %>% async_map(`*`, 2) %>% async_collect()
+#'   generate_stream(1:3) %>%
+#'     async_map(`*`, 2) %>%
+#'     async_collect() %>%
+#'     promises::then(str)
+#'   #> List of 3
+#'   #>  $ : num 2
+#'   #>  $ : num 4
+#'   #>  $ : num 6
+#' }
+#'
+#' # coro provides a short syntax `async_gen()` for creating one-off
+#' # generator _instances_. It is handy to adapt existing iterators:
+#' numbers <- generate_stream(1:10)
+#' odds <- async_gen(for (x in await_each(numbers)) if (x %% 2 != 0) yield(x))
+#' squares <- async_gen(for (x in await_each(odds)) yield(x^2))
+#' greetings <- async_gen(for (x in await_each(squares)) yield(paste("Hey", x)))
+#' if (interactive()) {
+#'   greetings %>%
+#'     async_collect() %>%
+#'     promises::then(str)
+#'   #> List of 5
+#'   #>  $ : chr "Hey 1"
+#'   #>  $ : chr "Hey 9"
+#'   #>  $ : chr "Hey 25"
+#'   #>  $ : chr "Hey 49"
+#'   #>  $ : chr "Hey 81"
 #' }
 #' @export
 async_generator <- function(fn) {
   assert_lambda(substitute(fn))
   generator0(fn, type = "async_generator")
 }
+
+#' @rdname async_generator
+#' @param expr A yielding expression within which `await()` calls
+#'   are allowed.
+#' @export
+async_gen <- function(expr) {
+  fn <- new_function(NULL, substitute(expr), caller_env())
+  generator0(fn, type = "async_generator")()
+}
+
 #' @rdname async_generator
 #' @inheritParams await
 #' @export

@@ -148,6 +148,49 @@ test_that("async_collect() collects", {
   expect_equal(out, as.list(1:3 * 3))
 })
 
+test_that("async_gen() creates async generator instances", {
+  g <- async_gen({
+    await(async_sleep(0))
+    yield(1)
+  })
+  # The promise must be created inside `wait_for()`'s event loop
+  out <- wait_for({
+    p <- g()
+    p
+  })
+  expect_promise(p)
+  expect_equal(out, 1)
+  expect_true(is_exhausted(wait_for(g())))
+})
+
+test_that("async_gen() can adapt async streams", {
+  new_stream <- async_generator(function(x) for (elt in x) yield(elt))
+  numbers <- new_stream(1:6)
+
+  odds <- async_gen(for (x in await_each(numbers)) if (x %% 2 != 0) yield(x))
+  squares <- async_gen(for (x in await_each(odds)) yield(x^2))
+
+  expect_equal(wait_for(async_collect(squares)), list(1, 9, 25))
+})
+
+test_that("async_gen() captures the caller env", {
+  n <- 2
+  g <- async_gen(yield(n * 3))
+  expect_equal(wait_for(g()), 6)
+})
+
+# Known shortcomings ----
+
+test_that("async_gen() yields its final value, unlike gen() (known shortcoming)", {
+  # Async generators yield their return value, so `NULL` is collected.
+  # `gen(NULL)` collects to `list()`.
+  expect_equal(wait_for(async_collect(async_gen(NULL))), list(NULL))
+})
+
+test_that("async_gen() requires an expression, unlike gen() (known shortcoming)", {
+  expect_error(wait_for(async_collect(async_gen())), "missing")
+})
+
 test_that("for loops support await_each()", {
   new_stream <- async_generator(function(x) {
     for (elt in x) {

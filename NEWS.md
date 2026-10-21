@@ -1,5 +1,7 @@
 # coro (development version)
 
+* New `async_gen()` creates one-off async generator instances. It is the async version of `gen()` (#60).
+
 * Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
 
 * Async functions and generators can now be R6 methods (#63).
