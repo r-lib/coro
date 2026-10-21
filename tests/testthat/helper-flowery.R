@@ -10,3 +10,10 @@ expect_exhausted <- function(x) {
 local_methods <- function(..., .frame = caller_env()) {
   local_bindings(..., .env = global_env(), .frame = .frame)
 }
+
+# Turns an infinite loop into an error so a hang fails the test
+with_time_limit <- function(expr, seconds = 5) {
+  setTimeLimit(elapsed = seconds, transient = TRUE)
+  on.exit(setTimeLimit(elapsed = Inf))
+  expr
+}

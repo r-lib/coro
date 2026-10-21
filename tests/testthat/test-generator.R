@@ -609,3 +609,12 @@ test_that("compiled instances do not pin their environment (#36)", {
 
   expect_null(wref_key(ref))
 })
+
+test_that("empty `{}` blocks behave like `NULL` (#75)", {
+  with_time_limit({
+    expect_exhausted(generator(function() {})()())
+    expect_equal(collect(generator(function() { yield(1); {} })()), list(1))
+    expect_equal(collect(generator(function() { {}; yield(1) })()), list(1))
+    expect_equal(collect(generator(function() { {}; yield(1); {} })()), list(1))
+  })
+})

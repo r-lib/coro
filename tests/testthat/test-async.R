@@ -405,3 +405,10 @@ test_that("async methods in R6 classes", {
     expect_promise(out, status = "pending")
   })
 })
+
+test_that("empty `{}` blocks behave like `NULL` (#75)", {
+  with_time_limit({
+    expect_null(wait_for(async(function() {})()))
+    expect_null(wait_for(async_generator(function() {})()()))
+  })
+})

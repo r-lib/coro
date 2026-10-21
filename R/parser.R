@@ -314,6 +314,11 @@ block_states <- function(block, counter, continue, last, return, info) {
   saved_last <- last
   last <- FALSE
 
+  # An empty block has no states, which would loop forever (#75)
+  if (is_null(node_cdr(block))) {
+    block <- quote({ NULL })
+  }
+
   block <- duplicate(block, shallow = TRUE)
   refs <- block_refs(block)
   states <- NULL
@@ -412,6 +417,12 @@ block_states <- function(block, counter, continue, last, return, info) {
       },
       `{` = {
         nested_node <- node_cdr(expr)
+        # Splicing an empty block adds nothing and can drop the final
+        # state, so treat it as `NULL` (#75)
+        if (is_null(nested_node)) {
+          node_poke_car(node, NULL)
+          next
+        }
         nested_refs <- block_refs(expr)
         splice(nested_node, nested_refs)
         next

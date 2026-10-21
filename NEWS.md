@@ -1,5 +1,7 @@
 # coro (development version)
 
+* Generators and async functions no longer hang when their body contains an empty `{}` block, such as `generator(function() {})`. Empty blocks now behave like `NULL` (#75).
+
 * Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
 
 * Async functions and generators can now be R6 methods (#63).
