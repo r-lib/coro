@@ -15,7 +15,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -42,7 +42,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -115,7 +115,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -188,7 +188,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -235,7 +235,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 # for loops support await_each()
@@ -342,7 +342,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 # async functions and async generator factories print nicely
@@ -380,7 +380,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -436,7 +436,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(exhausted()))
       }
 
 ---
@@ -492,6 +492,6 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(exhausted()))
       }
 

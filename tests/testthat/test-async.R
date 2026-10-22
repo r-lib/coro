@@ -50,6 +50,47 @@ test_that("async functions wrap return and yielded values", {
   })
 })
 
+test_that("loops and missing else branches resolve to NULL (#33)", {
+  later::with_temp_loop({
+    expect_promise(async(function() while (FALSE) NULL)(), NULL, "fulfilled")
+    expect_promise(async(function() if (FALSE) 1)(), NULL, "fulfilled")
+  })
+
+  fn <- async(function() {
+    await(1)
+    while (FALSE) NULL
+  })
+  expect_null(wait_for(fn()))
+})
+
+test_that("async generators resolve to the exhaustion sentinel after loops and missing else branches (#33)", {
+  gen <- async_generator(function() while (FALSE) yield(1))()
+  out <- gen()
+  expect_promise(out)
+  expect_exhausted(wait_for(out))
+
+  gen <- async_generator(function() if (FALSE) yield(1))()
+  out <- gen()
+  expect_promise(out)
+  expect_exhausted(wait_for(out))
+
+  gen <- async_generator(function() {
+    for (x in 1:2) yield(x)
+  })
+  expect_equal(wait_for(async_collect(gen())), list(1L, 2L))
+
+  # Calling an exhausted async generator again still returns a promise
+  gen <- async_generator(function() yield(1))()
+  expect_equal(wait_for(gen()), 1)
+  expect_exhausted(wait_for(gen()))
+  out <- gen()
+  expect_promise(out)
+  expect_exhausted(wait_for(out))
+
+  # Closing an exhausted async generator returns the raw sentinel
+  expect_exhausted(gen(close = TRUE))
+})
+
 test_that("await() yields", {
   out <- NULL
   fn <- async(function() {

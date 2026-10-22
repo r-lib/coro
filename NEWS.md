@@ -1,5 +1,7 @@
 # coro (development version)
 
+* Async functions that end with a loop or an `if` without `else` now resolve to `NULL` instead of returning the exhaustion sentinel (#33). Async generators in the same situation, or called again once exhausted, now return a promise that resolves to the exhaustion sentinel.
+
 * Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
 
 * Async functions and generators can now be R6 methods (#63).

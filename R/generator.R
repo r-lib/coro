@@ -221,6 +221,10 @@ generator0 <- function(fn, type = "generator") {
         }
 
         if (is_true(env$exhausted)) {
+          # Async generators always return a promise
+          if (is_string(type, "async_generator") && !close) {
+            return(ops$as_promise(exhausted()))
+          }
           return(exhausted())
         }
 

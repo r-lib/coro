@@ -21,8 +21,19 @@ walk_states <- function(expr, info) {
     }
 
     exhausted <- TRUE
-    invisible(exhausted())
+    invisible(!!fallthrough_value(info))
   })
+}
+fallthrough_value <- function(info) {
+  # Async functions that fall off the end (e.g. after a loop or a
+  # missing `else` branch) resolve to `NULL` like regular functions.
+  # Async generators resolve to the exhaustion sentinel.
+  switch(
+    info$type,
+    async = quote(as_promise(NULL)),
+    async_generator = quote(as_promise(exhausted())),
+    quote(exhausted())
+  )
 }
 walk_loop_states <- function(body, states, counter, info) {
   continue <- function(counter, last) {

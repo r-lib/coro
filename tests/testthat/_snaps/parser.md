@@ -2335,7 +2335,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -2377,7 +2377,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -2450,7 +2450,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -2508,7 +2508,7 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
 ---
@@ -2534,6 +2534,6 @@
               })
           }
           exhausted <- TRUE
-          invisible(exhausted())
+          invisible(as_promise(NULL))
       }
 
