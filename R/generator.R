@@ -491,7 +491,7 @@ coro_debug <- function(fn, value = TRUE) {
 #' rlang::fn_body(coro_fn(f))
 #' @export
 coro_fn <- function(fn) {
-  if (!is_generator_factory(fn) && !inherits(fn, "coro_generator_instance")) {
+  if (!(is_generator_factory(fn) || inherits(fn, "coro_generator_instance"))) {
     abort(
       "`fn` must be a `generator()`, `async()`, or `async_generator()` function, or a generator instance."
     )
