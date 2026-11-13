@@ -609,3 +609,79 @@ test_that("compiled instances do not pin their environment (#36)", {
 
   expect_null(wref_key(ref))
 })
+
+test_that("coro_fn() returns the original function", {
+  af <- async(function(x) {
+    y <- await(x)
+    y + 1
+  })
+  expect_identical(fn_body(coro_fn(af)), quote({ y <- await(x); y + 1 }))
+  expect_identical(fn_fmls_names(coro_fn(af)), "x")
+  expect_identical(fn_env(coro_fn(af)), current_env())
+
+  gf <- generator(function(n) yield(n))
+  expect_identical(fn_body(coro_fn(gf)), quote({ yield(n) }))
+  expect_identical(fn_fmls_names(coro_fn(gf)), "n")
+  expect_identical(fn_env(coro_fn(gf)), current_env())
+
+  # Instances give back the same function as their factory
+  expect_identical(coro_fn(gf(1)), coro_fn(gf))
+
+  agf <- async_generator(function() yield(1))
+  expect_identical(fn_body(coro_fn(agf)), quote({ yield(1) }))
+  expect_identical(coro_fn(agf()), coro_fn(agf))
+
+  expect_identical(fn_body(coro_fn(gen(yield(1)))), quote({ yield(1) }))
+})
+
+test_that("coro_fn() uses the R6 object env, not the class definition env", {
+  testthat::skip_if_not_installed("R6")
+
+  GenClass <- R6::R6Class(
+    "GenClass",
+    public = list(
+      x = 1,
+      gen_method = generator(function() yield(self$x))
+    )
+  )
+  obj <- GenClass$new()
+
+  expect_identical(fn_env(coro_fn(obj$gen_method)), fn_env(obj$gen_method))
+  expect_identical(fn_env(coro_fn(obj$gen_method)), obj$.__enclos_env__)
+  expect_identical(coro_fn(obj$gen_method()), coro_fn(obj$gen_method))
+})
+
+test_that("coro_fn() uses the R6 object env for async methods", {
+  testthat::skip_if_not_installed("R6")
+
+  AsyncClass <- R6::R6Class(
+    "AsyncClass",
+    public = list(
+      base = NULL,
+      initialize = function(base) self$base <- base,
+      fetch = async(function(x) {
+        y <- await(x)
+        self$base + y
+      })
+    )
+  )
+  a <- AsyncClass$new(10)
+  b <- AsyncClass$new(50)
+
+  expect_identical(fn_env(coro_fn(a$fetch)), a$.__enclos_env__)
+  expect_identical(fn_env(coro_fn(b$fetch)), b$.__enclos_env__)
+  expect_identical(fn_env(coro_fn(a$fetch))$self$base, 10)
+  expect_identical(
+    fn_body(coro_fn(a$fetch)),
+    quote({ y <- await(x); self$base + y })
+  )
+
+  # Running the method still uses the right object
+  expect_identical(wait_for(a$fetch(1)), 11)
+  expect_identical(wait_for(b$fetch(1)), 51)
+})
+
+test_that("coro_fn() errors on non-coro functions", {
+  expect_error(coro_fn(function() 1), "must be a")
+  expect_error(coro_fn(1), "must be a")
+})
