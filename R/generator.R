@@ -434,7 +434,6 @@ yield <- function(x) {
 #'
 #' @param fn,value Ignored.
 #'
-#' @keywords internal
 #' @export
 coro_debug <- function(fn, value = TRUE) {
   abort(c(

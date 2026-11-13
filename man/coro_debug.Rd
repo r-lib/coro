@@ -14,4 +14,3 @@ coro_debug(fn, value = TRUE)
 \code{browser()} inside the body of the generator or async function
 instead.
 }
-\keyword{internal}
