@@ -10,7 +10,7 @@ coro_debug(fn, value = TRUE)
 \item{fn, value}{Ignored.}
 }
 \description{
-\code{coro_debug()} is defunct because R no longer supports it. Call
+\code{coro_debug()} is defunct because \code{rlang::env_browse()} is defunct. Call
 \code{browser()} inside the body of the generator or async function
 instead.
 }

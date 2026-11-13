@@ -428,7 +428,7 @@ yield <- function(x) {
 #' Debug a generator or async function
 #'
 #' @description
-#' `coro_debug()` is defunct because R no longer supports it. Call
+#' `coro_debug()` is defunct because `rlang::env_browse()` is defunct. Call
 #' `browser()` inside the body of the generator or async function
 #' instead.
 #'
@@ -438,7 +438,7 @@ yield <- function(x) {
 #' @export
 coro_debug <- function(fn, value = TRUE) {
   abort(c(
-    "`coro_debug()` is defunct because R no longer supports it.",
+    "`coro_debug()` is defunct because `rlang::env_browse()` is defunct.",
     i = "Call `browser()` inside the generator or async function instead."
   ))
 }

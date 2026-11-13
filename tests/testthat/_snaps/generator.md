@@ -80,6 +80,6 @@
       coro_debug(generator(function() yield(1)))
     Condition
       Error in `coro_debug()`:
-      ! `coro_debug()` is defunct because R no longer supports it.
+      ! `coro_debug()` is defunct because `rlang::env_browse()` is defunct.
       i Call `browser()` inside the generator or async function instead.
 
