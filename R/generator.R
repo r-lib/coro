@@ -25,7 +25,7 @@
 #'   [yield()] values. Within a generator, `for` loops have
 #'   [iterator] support.
 #'
-#' @seealso [yield()], [coro_debug()] for step-debugging.
+#' @seealso [yield()].
 #' @export
 #' @examples
 #' # A generator statement creates a generator factory. The
@@ -118,9 +118,6 @@ generator0 <- function(fn, type = "generator") {
   # Generated at runtime
   state_machine <- NULL
 
-  # Flipped when `coro_debug()` is applied on a generator factory
-  debugged <- FALSE
-
   fmls <- formals(fn)
   static <- environment()
 
@@ -147,7 +144,6 @@ generator0 <- function(fn, type = "generator") {
         type <- NULL
         fn <- NULL
         fmls <- NULL
-        debugged <- NULL
         exits <- NULL
         exited <- NULL
         cleanup <- NULL
@@ -178,9 +174,6 @@ generator0 <- function(fn, type = "generator") {
         env_bind_arg(user_env, arg, frame = generator_env)
       })
 
-      # Flipped when `f` is pressed in the browser
-      undebugged <- FALSE
-
       # Called on cleanup to close all iterators active in
       # ongoing `for` loops
       close_active_iterators <- function() {
@@ -208,17 +201,6 @@ generator0 <- function(fn, type = "generator") {
         # Forward generator argument inside the state machine environment
         delayedAssign("arg", arg, assign.env = env)
         delayedAssign("close", close, assign.env = env)
-
-        if (!undebugged && (debugged || is_true(peek_option("coro_debug")))) {
-          env_browse(user_env)
-
-          defer({
-            # `f` was pressed, disable debugging for this generator
-            if (!env_is_browsed(user_env)) {
-              undebugged <<- TRUE
-            }
-          })
-        }
 
         if (is_true(env$exhausted)) {
           return(exhausted())
@@ -446,25 +428,19 @@ yield <- function(x) {
 #' Debug a generator or async function
 #'
 #' @description
+#' `coro_debug()` is defunct because R no longer supports it. Call
+#' `browser()` inside the body of the generator or async function
+#' instead.
 #'
-#' * Call `coro_debug()` on a [generator()], [async()], or
-#'   [async_generator()] function to enable step-debugging.
+#' @param fn,value Ignored.
 #'
-#' * Alternatively, set `options(coro_debug = TRUE)` for
-#' step-debugging through all functions created with coro.
-#'
-#' @param fn A generator factory or an async function.
-#' @param value Whether to debug the function.
-#'
+#' @keywords internal
 #' @export
 coro_debug <- function(fn, value = TRUE) {
-  if (!is_generator_factory(fn)) {
-    abort(
-      "`fn` must be a `generator()`, `async()`, or `async_generator()` function."
-    )
-  }
-
-  env_poke(fn_env(fn), "debugged", value, create = FALSE)
+  abort(c(
+    "`coro_debug()` is defunct because R no longer supports it.",
+    i = "Call `browser()` inside the generator or async function instead."
+  ))
 }
 
 is_generator_factory <- function(x) {

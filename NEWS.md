@@ -1,5 +1,7 @@
 # coro (development version)
 
+* `coro_debug()` is now defunct and `options(coro_debug = TRUE)` is ignored. Both relied on `rlang::env_browse()`, which is defunct because R no longer supports it. Call `browser()` inside the generator or async function instead (r-lib/coro#45).
+
 * Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
 
 * Async functions and generators can now be R6 methods (#63).

@@ -49,6 +49,5 @@ if (interactive()) {
 }
 \seealso{
 \code{\link[=async]{async()}} for creating awaitable functions;
-\code{\link[=async_collect]{async_collect()}} for collecting the values of an async iterator;
-\code{\link[=coro_debug]{coro_debug()}} for step-debugging.
+\code{\link[=async_collect]{async_collect()}} for collecting the values of an async iterator.
 }

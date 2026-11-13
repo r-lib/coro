@@ -35,4 +35,3 @@ reference:
   - as_iterator
   - exhausted
   - is_exhausted
-  - coro_debug
