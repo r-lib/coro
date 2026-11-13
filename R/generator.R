@@ -476,12 +476,15 @@ coro_debug <- function(fn, value = TRUE) {
 #' inspect the original code, for instance with [rlang::fn_body()],
 #' which on a coro function returns coro's setup code instead.
 #'
-#' The returned function is for inspection only. Calling it fails
-#' because [yield()] and [await()] can't be called outside coro.
+#' The returned function is meant for inspection. Calling it does not
+#' run it as a generator: [yield()] and [await()] raise errors, and code
+#' without them runs as a plain function.
 #'
 #' @param fn A generator factory, an async function, or a generator
 #'   instance.
-#' @return The original function.
+#' @return The original function, with the environment of the coro
+#'   function. For an R6 method this is the object's environment, not
+#'   the one where the class was defined.
 #'
 #' @examples
 #' f <- async(function(x) {
@@ -491,13 +494,23 @@ coro_debug <- function(fn, value = TRUE) {
 #' rlang::fn_body(coro_fn(f))
 #' @export
 coro_fn <- function(fn) {
-  if (!(is_generator_factory(fn) || inherits(fn, "coro_generator_instance"))) {
+  # Use the factory's own env rather than the env `fn` was defined in.
+  # They differ when R6 rebinds the factory's env to the object.
+  if (is_generator_factory(fn)) {
+    env <- fn_env(fn)
+  } else if (inherits(fn, "coro_generator_instance")) {
+    # `generator_env` is the factory's call frame, so its parent is the
+    # factory's own env
+    env <- env_parent(env_get(fn_env(fn), "generator_env"))
+  } else {
     abort(
       "`fn` must be a `generator()`, `async()`, or `async_generator()` function, or a generator instance."
     )
   }
 
-  env_get(static_env(fn), "fn", inherit = TRUE)
+  out <- env_get(static_env(fn), "fn", inherit = TRUE)
+  fn_env(out) <- env
+  out
 }
 
 is_generator_factory <- function(x) {

@@ -1,6 +1,6 @@
 # coro (development version)
 
-* New `coro_fn()` returns the original function that a `generator()`, `async()`, or `async_generator()` was built from. Use it with `rlang::fn_body()` to get the original code instead of coro's setup code.
+* New `coro_fn()` returns the original function that a `generator()`, `async()`, or `async_generator()` was built from. Use it with `rlang::fn_body()` to get the original code instead of coro's setup code (#78).
 
 * Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
 

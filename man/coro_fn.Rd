@@ -11,7 +11,9 @@ coro_fn(fn)
 instance.}
 }
 \value{
-The original function.
+The original function, with the environment of the coro
+function. For an R6 method this is the object's environment, not
+the one where the class was defined.
 }
 \description{
 \code{coro_fn()} returns the plain function that a \code{\link[=generator]{generator()}},
@@ -19,8 +21,9 @@ The original function.
 inspect the original code, for instance with \code{\link[rlang:fn_body]{rlang::fn_body()}},
 which on a coro function returns coro's setup code instead.
 
-The returned function is for inspection only. Calling it fails
-because \code{\link[=yield]{yield()}} and \code{\link[=await]{await()}} can't be called outside coro.
+The returned function is meant for inspection. Calling it does not
+run it as a generator: \code{\link[=yield]{yield()}} and \code{\link[=await]{await()}} raise errors, and code
+without them runs as a plain function.
 }
 \examples{
 f <- async(function(x) {
