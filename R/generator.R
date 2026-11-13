@@ -286,6 +286,27 @@ generator0 <- function(fn, type = "generator") {
 
       env$.self <- instance
 
+      # Errors thrown before the first `await()` would otherwise escape
+      # synchronously. Turn them into rejected promises so callers can
+      # always handle them with `catch()`. Steps resumed by `then()`
+      # (via `.self`) are already covered by the async framework.
+      if (!is_null(ops)) {
+        step <- instance
+        instance <- function(arg, close = FALSE) {
+          tryCatch(
+            step(arg, close),
+            error = function(cnd) {
+              if (identical(ops$package, "promises")) {
+                promises::promise_reject(cnd)
+              } else {
+                # Generic ops have no reject operation
+                ops$then(ops$as_promise(NULL), function(...) stop(cnd))
+              }
+            }
+          )
+        }
+      }
+
       if (is_string(type, "async")) {
         # Step into the generator right away
         invisible(instance(NULL))

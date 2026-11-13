@@ -1,5 +1,7 @@
 # coro (development version)
 
+* Errors thrown in an async function or async generator before the first `await()` now reject the returned promise instead of being thrown at the call site. All errors can now be handled with `promises::catch()`, as with `promises::promise()`.
+
 * Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
 
 * Async functions and generators can now be R6 methods (#63).

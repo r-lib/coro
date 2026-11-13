@@ -23,7 +23,7 @@ test_that("await() can't be called directly or out of place", {
   expect_error(await(1), "called directly")
 
   f <- async(function() list(await(1)))
-  expect_error(f(), "within function arguments")
+  expect_error(wait_for(f()), "within function arguments")
 })
 
 
@@ -257,6 +257,35 @@ test_that("async functions handle errors", {
     wait_for(g()),
     "value"
   )
+})
+
+test_that("errors before the first await() reject the promise", {
+  inner <- function() stop("early")
+
+  # Error before any `await()`
+  fn <- async(function() {
+    inner()
+    await(async_sleep(0))
+  })
+  p <- expect_no_error(fn())
+  expect_true(promises::is.promise(p))
+  out <- wait_for(promises::catch(p, identity))
+  expect_equal(conditionMessage(out), "early")
+  expect_equal(conditionCall(out), quote(inner()))
+
+  # Async function without any `await()`
+  fn <- async(function() stop("no await"))
+  p <- expect_no_error(fn())
+  expect_error(wait_for(p), "no await")
+
+  # Async generator, first step
+  gen <- async_generator(function() {
+    stop("gen early")
+    yield(1)
+  })
+  it <- gen()
+  p <- expect_no_error(it())
+  expect_error(wait_for(p), "gen early")
 })
 
 test_that("async functions and async generator factories print nicely", {
