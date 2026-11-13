@@ -36,3 +36,4 @@ reference:
   - exhausted
   - is_exhausted
   - coro_debug
+  - coro_fn

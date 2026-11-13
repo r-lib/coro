@@ -467,6 +467,39 @@ coro_debug <- function(fn, value = TRUE) {
   env_poke(fn_env(fn), "debugged", value, create = FALSE)
 }
 
+#' Get the original function of a coro function
+#'
+#' @description
+#'
+#' `coro_fn()` returns the plain function that a [generator()],
+#' [async()], or [async_generator()] function was built from. Use it to
+#' inspect the original code, for instance with [rlang::fn_body()],
+#' which on a coro function returns coro's setup code instead.
+#'
+#' The returned function is for inspection only. Calling it fails
+#' because [yield()] and [await()] can't be called outside coro.
+#'
+#' @param fn A generator factory, an async function, or a generator
+#'   instance.
+#' @return The original function.
+#'
+#' @examples
+#' f <- async(function(x) {
+#'   y <- await(x)
+#'   y + 1
+#' })
+#' rlang::fn_body(coro_fn(f))
+#' @export
+coro_fn <- function(fn) {
+  if (!is_generator_factory(fn) && !inherits(fn, "coro_generator_instance")) {
+    abort(
+      "`fn` must be a `generator()`, `async()`, or `async_generator()` function, or a generator instance."
+    )
+  }
+
+  env_get(static_env(fn), "fn", inherit = TRUE)
+}
+
 is_generator_factory <- function(x) {
   inherits_any(
     x,
