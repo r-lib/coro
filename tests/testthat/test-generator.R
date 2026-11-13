@@ -611,6 +611,8 @@ test_that("compiled instances do not pin their environment (#36)", {
 })
 
 test_that("`coro_debug()` toggles debugging on coro functions", {
+  # We can't test that the browser opens, as `rlang::env_browse()` is
+  # defunct as of rlang 1.2.0 (#45).
   fns <- list(
     generator(function() yield(1)),
     async(function() 1),
@@ -626,17 +628,4 @@ test_that("`coro_debug()` toggles debugging on coro functions", {
 
 test_that("`coro_debug()` rejects non-coro functions", {
   expect_error(coro_debug(function() 1), "must be a `generator()`", fixed = TRUE)
-})
-
-# Known shortcomings ----
-
-test_that("known shortcoming: debugged generators error with rlang >= 1.2.0 (#45)", {
-  # Step-debugging relies on `rlang::env_browse()`, which is defunct as of
-  # rlang 1.2.0. Until an alternative is found, stepping a debugged
-  # generator errors instead of opening the browser.
-  skip_if_not(utils::packageVersion("rlang") >= "1.2.0")
-
-  g <- generator(function() yield(1))
-  coro_debug(g)
-  expect_error(g()(), "defunct")
 })
