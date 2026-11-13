@@ -609,3 +609,23 @@ test_that("compiled instances do not pin their environment (#36)", {
 
   expect_null(wref_key(ref))
 })
+
+test_that("`coro_debug()` toggles debugging on coro functions", {
+  # We can't test that the browser opens, as `rlang::env_browse()` is
+  # defunct as of rlang 1.2.0 (#45).
+  fns <- list(
+    generator(function() yield(1)),
+    async(function() 1),
+    async_generator(function() yield(1))
+  )
+  for (fn in fns) {
+    coro_debug(fn)
+    expect_true(env_get(static_env(fn), "debugged"))
+    coro_debug(fn, FALSE)
+    expect_false(env_get(static_env(fn), "debugged"))
+  }
+})
+
+test_that("`coro_debug()` rejects non-coro functions", {
+  expect_error(coro_debug(function() 1), "must be a `generator()`", fixed = TRUE)
+})

@@ -464,7 +464,7 @@ coro_debug <- function(fn, value = TRUE) {
     )
   }
 
-  env_poke(fn_env(fn), "debugged", value, create = FALSE)
+  env_poke(static_env(fn), "debugged", value, create = FALSE)
 }
 
 is_generator_factory <- function(x) {
