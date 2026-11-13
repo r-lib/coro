@@ -393,7 +393,7 @@ print.coro_generator_instance <- function(x, ..., internals = FALSE) {
 }
 
 print_generator <- function(x, ..., internals = FALSE, reproducible = FALSE) {
-  fn <- env_get(static_env(x), "fn", inherit = TRUE)
+  fn <- coro_fn(x)
 
   if (reproducible) {
     fn <- zap_env(fn)
