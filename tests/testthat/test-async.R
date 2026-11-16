@@ -273,6 +273,12 @@ test_that("errors before the first await() reject the promise", {
   expect_equal(conditionMessage(out), "early")
   expect_equal(conditionCall(out), quote(inner()))
 
+  # Known limitation: calling handlers outside the call don't see the error,
+  # as the inner `tryCatch()` handles it first. Same as `promises::promise()`.
+  seen <- NULL
+  p <- withCallingHandlers(fn(), error = function(e) seen <<- e)
+  expect_null(seen)
+
   # Async function without any `await()`
   fn <- async(function() stop("no await"))
   p <- expect_no_error(fn())
@@ -358,6 +364,34 @@ test_that("async ops are picked up from caller env", {
       "then",
       class = "found"
     )
+  })
+})
+
+test_that("custom async ops reject errors before the first await() via then()", {
+  fn <- async(function() {
+    stop("boom")
+    await(TRUE)
+  })
+
+  local({
+    # Minimal synchronous framework: a "promise" is a list holding either a
+    # value or an error
+    .__coro_async_ops__. <- coro::async_ops(
+      package = "coro",
+      then = function(x, callback) {
+        # Force `x` outside `tryCatch()`, like promises does. Code before the
+        # first `await()` is evaluated lazily as this argument.
+        force(x)
+        tryCatch(
+          list(value = callback(x$value)),
+          error = function(e) list(error = e)
+        )
+      },
+      as_promise = function(x) list(value = x)
+    )
+
+    out <- expect_no_error(fn())
+    expect_equal(conditionMessage(out$error), "boom")
   })
 })
 
