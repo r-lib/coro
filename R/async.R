@@ -43,6 +43,26 @@
 #' })
 #' ```
 #'
+#' @section Values can change across an `await()`:
+#'
+#' The code after an `await()` runs later in time. Values that the
+#' function has not read yet may have changed by then. This applies to
+#' arguments too, because R evaluates them lazily: an argument that is
+#' first used after an `await()` is evaluated at that later time.
+#'
+#' To avoid surprises, capture the values you need before the first
+#' `await()`, with `x <- force(x)` for an argument or
+#' `y <- force(some_val)` for any other value:
+#'
+#' ```r
+#' fn <- async(function(x) {
+#'   x <- force(x)
+#'   y <- force(some_val)
+#'   await(async_sleep(0.1))
+#'   list(x, y)
+#' })
+#' ```
+#'
 #' @param fn An anonymous function within which `await()` calls are
 #'   allowed.
 #' @return A function that returns a [promises::promise()] invisibly.

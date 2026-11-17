@@ -242,12 +242,57 @@ test_that("errors before the first await() are thrown by the call", {
   })
   expect_error(fn(), "before")
 
-  # Starting with `await(NULL)` turns all errors into rejections
+  # Same code as the example in the "Errors" section of `?async`.
+  # Starting with `await(NULL)` turns all errors into rejections.
   fn <- async(function() {
     await(NULL)
-    stop("after")
+    stop("Rejects the promise")
   })
-  expect_error(wait_for(fn()), "after")
+  expect_error(
+    wait_for({
+      # The call itself does not throw
+      expect_no_error(prom <- fn())
+      prom
+    }),
+    "Rejects the promise"
+  )
+})
+
+test_that("values read after await() see later changes unless captured", {
+  # Same code as the example in the "Values can change across an
+  # `await()`" section of `?async`
+  fn <- async(function(x) {
+    x <- force(x)
+    y <- force(some_val)
+    await(async_sleep(0.1))
+    list(x, y)
+  })
+
+  arg <- "old"
+  some_val <- "old"
+  out <- wait_for({
+    prom <- fn(arg)
+    arg <- "new"
+    some_val <- "new"
+    prom
+  })
+  expect_equal(out, list("old", "old"))
+
+  # Without capturing, the values are read after the `await()`
+  fn <- async(function(x) {
+    await(async_sleep(0.1))
+    list(x, some_val)
+  })
+
+  arg <- "old"
+  some_val <- "old"
+  out <- wait_for({
+    prom <- fn(arg)
+    arg <- "new"
+    some_val <- "new"
+    prom
+  })
+  expect_equal(out, list("new", "new"))
 })
 
 test_that("async functions handle errors", {
