@@ -42,6 +42,25 @@ the \href{https://github.com/HenrikBengtsson/future}{future} package
 because they are coercible to promises.
 }
 }
+\section{Errors}{
+
+
+The code before the first \code{await()} runs right away, when the async
+function is called. An error there is thrown directly by the call,
+like in a regular function. Once the function has reached an
+\code{await()}, the rest runs later from the event loop and errors reject
+the returned promise instead.
+
+To have all errors reject the promise, start the function with
+\code{await(NULL)}. Everything after it runs from the event loop:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{fn <- async(function() \{
+  await(NULL)
+  stop("Rejects the promise")
+\})
+}\if{html}{\out{</div>}}
+}
+
 \examples{
 # This async function counts down from `n`, sleeping for 2 seconds
 # at each iteration:

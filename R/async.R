@@ -25,6 +25,24 @@
 #'   the [future](https://github.com/HenrikBengtsson/future) package
 #'   because they are coercible to promises.
 #'
+#' @section Errors:
+#'
+#' The code before the first `await()` runs right away, when the async
+#' function is called. An error there is thrown directly by the call,
+#' like in a regular function. Once the function has reached an
+#' `await()`, the rest runs later from the event loop and errors reject
+#' the returned promise instead.
+#'
+#' To have all errors reject the promise, start the function with
+#' `await(NULL)`. Everything after it runs from the event loop:
+#'
+#' ```r
+#' fn <- async(function() {
+#'   await(NULL)
+#'   stop("Rejects the promise")
+#' })
+#' ```
+#'
 #' @param fn An anonymous function within which `await()` calls are
 #'   allowed.
 #' @return A function that returns a [promises::promise()] invisibly.

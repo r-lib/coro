@@ -235,6 +235,21 @@ test_that("yield() inside `async_generator()` returns a promise", {
   expect_true(inherits(new_g()(), "promise"))
 })
 
+test_that("errors before the first await() are thrown by the call", {
+  fn <- async(function() {
+    stop("before")
+    await(NULL)
+  })
+  expect_error(fn(), "before")
+
+  # Starting with `await(NULL)` turns all errors into rejections
+  fn <- async(function() {
+    await(NULL)
+    stop("after")
+  })
+  expect_error(wait_for(fn()), "after")
+})
+
 test_that("async functions handle errors", {
   async_fail <- async(function() {
     await(async_sleep(0))
