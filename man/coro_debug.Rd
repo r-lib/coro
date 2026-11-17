@@ -7,15 +7,10 @@
 coro_debug(fn, value = TRUE)
 }
 \arguments{
-\item{fn}{A generator factory or an async function.}
-
-\item{value}{Whether to debug the function.}
+\item{fn, value}{Ignored.}
 }
 \description{
-\itemize{
-\item Call \code{coro_debug()} on a \code{\link[=generator]{generator()}}, \code{\link[=async]{async()}}, or
-\code{\link[=async_generator]{async_generator()}} function to enable step-debugging.
-\item Alternatively, set \code{options(coro_debug = TRUE)} for
-step-debugging through all functions created with coro.
-}
+\code{coro_debug()} is defunct because \code{rlang::env_browse()} is defunct. Call
+\code{browser()} inside the body of the generator or async function
+instead.
 }

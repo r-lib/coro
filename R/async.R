@@ -29,8 +29,7 @@
 #'   allowed.
 #' @return A function that returns a [promises::promise()] invisibly.
 #'
-#' @seealso [async_generator()] and [await_each()];
-#'   [coro_debug()] for step-debugging.
+#' @seealso [async_generator()] and [await_each()].
 #'
 #' @examples
 #' # This async function counts down from `n`, sleeping for 2 seconds
@@ -100,8 +99,7 @@ async_sleep <- function(seconds) {
 #'   factory always return [promises::promise()].
 #'
 #' @seealso [async()] for creating awaitable functions;
-#'   [async_collect()] for collecting the values of an async iterator;
-#'   [coro_debug()] for step-debugging.
+#'   [async_collect()] for collecting the values of an async iterator.
 #' @examples
 #' # Creates awaitable functions that transform their inputs into a stream
 #' generate_stream <- async_generator(function(x) for (elt in x) yield(elt))

@@ -112,5 +112,5 @@ tally(2)
 tally(10)
 }
 \seealso{
-\code{\link[=yield]{yield()}}, \code{\link[=coro_debug]{coro_debug()}} for step-debugging.
+\code{\link[=yield]{yield()}}.
 }
