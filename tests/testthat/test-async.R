@@ -23,7 +23,7 @@ test_that("await() can't be called directly or out of place", {
   expect_error(await(1), "called directly")
 
   f <- async(function() list(await(1)))
-  expect_error(f(), "within function arguments")
+  expect_error(wait_for(f()), "within function arguments")
 })
 
 
@@ -235,6 +235,43 @@ test_that("yield() inside `async_generator()` returns a promise", {
   expect_true(inherits(new_g()(), "promise"))
 })
 
+test_that("values read after await() see later changes unless captured", {
+  # Same code as the example in the "Values can change across an
+  # `await()`" section of `?async`
+  fn <- async(function(x) {
+    x <- force(x)
+    y <- force(some_val)
+    await(async_sleep(0.1))
+    list(x, y)
+  })
+
+  arg <- "old"
+  some_val <- "old"
+  out <- wait_for({
+    prom <- fn(arg)
+    arg <- "new"
+    some_val <- "new"
+    prom
+  })
+  expect_equal(out, list("old", "old"))
+
+  # Without capturing, the values are read after the `await()`
+  fn <- async(function(x) {
+    await(async_sleep(0.1))
+    list(x, some_val)
+  })
+
+  arg <- "old"
+  some_val <- "old"
+  out <- wait_for({
+    prom <- fn(arg)
+    arg <- "new"
+    some_val <- "new"
+    prom
+  })
+  expect_equal(out, list("new", "new"))
+})
+
 test_that("async functions handle errors", {
   async_fail <- async(function() {
     await(async_sleep(0))
@@ -257,6 +294,41 @@ test_that("async functions handle errors", {
     wait_for(g()),
     "value"
   )
+})
+
+test_that("errors before the first await() reject the promise", {
+  inner <- function() stop("early")
+
+  # Error before any `await()`
+  fn <- async(function() {
+    inner()
+    await(async_sleep(0))
+  })
+  p <- expect_no_error(fn())
+  expect_true(promises::is.promise(p))
+  out <- wait_for(promises::catch(p, identity))
+  expect_equal(conditionMessage(out), "early")
+  expect_equal(conditionCall(out), quote(inner()))
+
+  # Known limitation: calling handlers outside the call don't see the error,
+  # as the inner `tryCatch()` handles it first. Same as `promises::promise()`.
+  seen <- NULL
+  p <- withCallingHandlers(fn(), error = function(e) seen <<- e)
+  expect_null(seen)
+
+  # Async function without any `await()`
+  fn <- async(function() stop("no await"))
+  p <- expect_no_error(fn())
+  expect_error(wait_for(p), "no await")
+
+  # Async generator, first step
+  gen <- async_generator(function() {
+    stop("gen early")
+    yield(1)
+  })
+  it <- gen()
+  p <- expect_no_error(it())
+  expect_error(wait_for(p), "gen early")
 })
 
 test_that("async functions and async generator factories print nicely", {
@@ -329,6 +401,34 @@ test_that("async ops are picked up from caller env", {
       "then",
       class = "found"
     )
+  })
+})
+
+test_that("custom async ops reject errors before the first await() via then()", {
+  fn <- async(function() {
+    stop("boom")
+    await(TRUE)
+  })
+
+  local({
+    # Minimal synchronous framework: a "promise" is a list holding either a
+    # value or an error
+    .__coro_async_ops__. <- coro::async_ops(
+      package = "coro",
+      then = function(x, callback) {
+        # Force `x` outside `tryCatch()`, like promises does. Code before the
+        # first `await()` is evaluated lazily as this argument.
+        force(x)
+        tryCatch(
+          list(value = callback(x$value)),
+          error = function(e) list(error = e)
+        )
+      },
+      as_promise = function(x) list(value = x)
+    )
+
+    out <- expect_no_error(fn())
+    expect_equal(conditionMessage(out$error), "boom")
   })
 })
 

@@ -25,6 +25,46 @@
 #'   the [future](https://github.com/HenrikBengtsson/future) package
 #'   because they are coercible to promises.
 #'
+#' @section Errors:
+#'
+#' The code before the first `await()` runs right away, when the async
+#' function is called. The rest runs later from the event loop. In
+#' both cases, an error rejects the returned promise. The call itself
+#' never throws, like [promises::promise()]. Handle errors with
+#' [promises::catch()] or the `onRejected` argument of
+#' [promises::then()]:
+#'
+#' ```r
+#' fn <- async(function() {
+#'   stop("Rejects the promise")
+#' })
+#' promises::catch(fn(), function(e) message("Caught: ", conditionMessage(e)))
+#' ```
+#'
+#' Because the error is caught inside the async function, calling
+#' handlers set up around the call (for instance
+#' `withCallingHandlers(fn(), error = )`) do not see it.
+#'
+#' @section Values can change across an `await()`:
+#'
+#' The code after an `await()` runs later in time. Values that the
+#' function has not read yet may have changed by then. This applies to
+#' arguments too, because R evaluates them lazily: an argument that is
+#' first used after an `await()` is evaluated at that later time.
+#'
+#' To avoid surprises, capture the values you need before the first
+#' `await()`, with `x <- force(x)` for an argument or
+#' `y <- force(some_val)` for any other value:
+#'
+#' ```r
+#' fn <- async(function(x) {
+#'   x <- force(x)
+#'   y <- force(some_val)
+#'   await(async_sleep(0.1))
+#'   list(x, y)
+#' })
+#' ```
+#'
 #' @param fn An anonymous function within which `await()` calls are
 #'   allowed.
 #' @return A function that returns a [promises::promise()] invisibly.
