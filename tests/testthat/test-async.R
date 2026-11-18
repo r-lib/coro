@@ -235,6 +235,43 @@ test_that("yield() inside `async_generator()` returns a promise", {
   expect_true(inherits(new_g()(), "promise"))
 })
 
+test_that("values read after await() see later changes unless captured", {
+  # Same code as the example in the "Values can change across an
+  # `await()`" section of `?async`
+  fn <- async(function(x) {
+    x <- force(x)
+    y <- force(some_val)
+    await(async_sleep(0.1))
+    list(x, y)
+  })
+
+  arg <- "old"
+  some_val <- "old"
+  out <- wait_for({
+    prom <- fn(arg)
+    arg <- "new"
+    some_val <- "new"
+    prom
+  })
+  expect_equal(out, list("old", "old"))
+
+  # Without capturing, the values are read after the `await()`
+  fn <- async(function(x) {
+    await(async_sleep(0.1))
+    list(x, some_val)
+  })
+
+  arg <- "old"
+  some_val <- "old"
+  out <- wait_for({
+    prom <- fn(arg)
+    arg <- "new"
+    some_val <- "new"
+    prom
+  })
+  expect_equal(out, list("new", "new"))
+})
+
 test_that("async functions handle errors", {
   async_fail <- async(function() {
     await(async_sleep(0))

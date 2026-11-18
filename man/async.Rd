@@ -42,6 +42,48 @@ the \href{https://github.com/HenrikBengtsson/future}{future} package
 because they are coercible to promises.
 }
 }
+\section{Errors}{
+
+
+The code before the first \code{await()} runs right away, when the async
+function is called. The rest runs later from the event loop. In
+both cases, an error rejects the returned promise. The call itself
+never throws, like \code{\link[promises:promise]{promises::promise()}}. Handle errors with
+\code{\link[promises:catch]{promises::catch()}} or the \code{onRejected} argument of
+\code{\link[promises:then]{promises::then()}}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{fn <- async(function() \{
+  stop("Rejects the promise")
+\})
+promises::catch(fn(), function(e) message("Caught: ", conditionMessage(e)))
+}\if{html}{\out{</div>}}
+
+Because the error is caught inside the async function, calling
+handlers set up around the call (for instance
+\code{withCallingHandlers(fn(), error = )}) do not see it.
+}
+
+\section{Values can change across an \code{await()}}{
+
+
+The code after an \code{await()} runs later in time. Values that the
+function has not read yet may have changed by then. This applies to
+arguments too, because R evaluates them lazily: an argument that is
+first used after an \code{await()} is evaluated at that later time.
+
+To avoid surprises, capture the values you need before the first
+\code{await()}, with \code{x <- force(x)} for an argument or
+\code{y <- force(some_val)} for any other value:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{fn <- async(function(x) \{
+  x <- force(x)
+  y <- force(some_val)
+  await(async_sleep(0.1))
+  list(x, y)
+\})
+}\if{html}{\out{</div>}}
+}
+
 \examples{
 # This async function counts down from `n`, sleeping for 2 seconds
 # at each iteration:
