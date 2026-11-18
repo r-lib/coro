@@ -10,8 +10,9 @@ async_generator(fn)
 await_each(x)
 }
 \arguments{
-\item{fn}{An anonymous function describing an async generator
-within which \code{await()} calls are allowed.}
+\item{fn}{A function describing an async generator within which
+\code{await()} calls are allowed. It can be written inline or be an
+existing function.}
 
 \item{x}{An awaitable value, i.e. a \link[promises:promise]{promise}.}
 }

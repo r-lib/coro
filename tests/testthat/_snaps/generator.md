@@ -74,3 +74,21 @@
           invisible(exhausted())
       }
 
+# generator() rejects non-functions and coro functions
+
+    Code
+      generator(1)
+    Condition
+      Error in `generator()`:
+      ! `fn` must be an R function.
+    Code
+      generator(sum)
+    Condition
+      Error in `generator()`:
+      ! `fn` must be an R function.
+    Code
+      generator(generator(function() yield(1)))
+    Condition
+      Error in `generator()`:
+      ! `fn` is already a coro function.
+

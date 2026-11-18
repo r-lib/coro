@@ -10,8 +10,9 @@ async(fn)
 await(x)
 }
 \arguments{
-\item{fn}{An anonymous function within which \code{await()} calls are
-allowed.}
+\item{fn}{A function within which \code{await()} calls are allowed. It
+can be written inline or be an existing function, for instance one
+built with \code{\link[rlang:new_function]{rlang::new_function()}}.}
 
 \item{x}{An awaitable value, i.e. a \link[promises:promise]{promise}.}
 }
