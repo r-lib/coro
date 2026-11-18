@@ -31,9 +31,15 @@ negate <- function(.p) {
   function(...) !.p(...)
 }
 
-assert_lambda <- function(call) {
-  if (!is_call(call, "function")) {
-    abort("`fn` must be an anonymous function.")
+check_coro_input <- function(fn, call = caller_env()) {
+  # Wrapping a coro function would compile coro's own setup code
+  if (is_generator_factory(fn)) {
+    # TODO: Once `coro_fn()` exists (r-lib/coro#78), add the hint
+    # `i = "Use `coro_fn()` to get the function it was built from."`
+    abort("`fn` is already a coro function.", call = call)
+  }
+  if (!is_closure(fn)) {
+    abort("`fn` must be an R function.", call = call)
   }
 }
 

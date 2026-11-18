@@ -21,6 +21,10 @@
 #' Generators are compatible with all features based on the iterator
 #' protocol such as [loop()] and [collect()].
 #'
+#' `fn` can be written inline, as in `generator(function() ...)`, or be
+#' an existing function. To build one from code, create the function
+#' with [rlang::new_function()] and pass it in.
+#'
 #' @param fn A function template for generators. The function can
 #'   [yield()] values. Within a generator, `for` loops have
 #'   [iterator] support.
@@ -102,7 +106,7 @@
 #' tally(2)
 #' tally(10)
 generator <- function(fn) {
-  assert_lambda(substitute(fn))
+  check_coro_input(fn)
   generator0(fn)
 }
 

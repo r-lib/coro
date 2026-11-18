@@ -25,8 +25,9 @@
 #'   the [future](https://github.com/HenrikBengtsson/future) package
 #'   because they are coercible to promises.
 #'
-#' @param fn An anonymous function within which `await()` calls are
-#'   allowed.
+#' @param fn A function within which `await()` calls are allowed. It
+#'   can be written inline or be an existing function, for instance one
+#'   built with [rlang::new_function()].
 #' @return A function that returns a [promises::promise()] invisibly.
 #'
 #' @seealso [async_generator()] and [await_each()];
@@ -60,7 +61,7 @@
 #' }
 #' @export
 async <- function(fn) {
-  assert_lambda(substitute(fn))
+  check_coro_input(fn)
   generator0(fn, type = "async")
 }
 #' @rdname async
@@ -94,8 +95,9 @@ async_sleep <- function(seconds) {
 #' promise. When the iterator is exhausted, it returns a resolved
 #' promise to the exhaustion sentinel.
 #'
-#' @param fn An anonymous function describing an async generator
-#'   within which `await()` calls are allowed.
+#' @param fn A function describing an async generator within which
+#'   `await()` calls are allowed. It can be written inline or be an
+#'   existing function.
 #' @return A generator factory. Generators constructed with this
 #'   factory always return [promises::promise()].
 #'
@@ -120,7 +122,7 @@ async_sleep <- function(seconds) {
 #' }
 #' @export
 async_generator <- function(fn) {
-  assert_lambda(substitute(fn))
+  check_coro_input(fn)
   generator0(fn, type = "async_generator")
 }
 #' @rdname async_generator

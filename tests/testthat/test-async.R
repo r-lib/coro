@@ -14,9 +14,52 @@ test_that("async functions construct a generator", {
   }))
 })
 
-test_that("async() takes anonymous functions", {
+test_that("async() takes existing functions", {
   fn <- function() await("value")
-  expect_error(async(fn), "anonymous")
+  expect_identical(wait_for(async(fn)()), "value")
+})
+
+test_that("async() takes functions built with new_function() (#43)", {
+  env <- env(offset = 100)
+  fn <- new_function(
+    pairlist2(x = , n = 1),
+    quote({
+      y <- await(x)
+      y + n + offset
+    }),
+    env
+  )
+  f <- async(fn)
+  expect_identical(wait_for(f(promises::promise_resolve(10))), 111)
+  expect_identical(wait_for(f(promises::promise_resolve(10), n = 5)), 115)
+  # `offset` is found in `env`, so the async function keeps the
+  # function's env.
+  # TODO: Once `coro_fn()` exists (r-lib/coro#78), also check
+  # `expect_identical(fn_env(coro_fn(f)), env)`
+})
+
+# TODO: Once `coro_fn()` exists (r-lib/coro#78), test that
+# `async(coro_fn(f))` gives a working copy of `f`
+
+test_that("async_generator() takes existing functions", {
+  fn <- function(n) {
+    for (i in seq_len(n)) {
+      x <- await(promises::promise_resolve(i))
+      yield(x)
+    }
+  }
+  g <- async_generator(fn)
+  expect_identical(wait_for(async_collect(g(2))), list(1L, 2L))
+})
+
+test_that("async() and async_generator() reject non-functions and coro functions", {
+  expect_snapshot(error = TRUE, {
+    async(1)
+    async(sum)
+    async(async(function() 1))
+    async_generator("foo")
+    async_generator(async_generator(function() yield(1)))
+  })
 })
 
 test_that("await() can't be called directly or out of place", {

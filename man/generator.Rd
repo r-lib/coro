@@ -35,6 +35,10 @@ sentinel.
 
 Generators are compatible with all features based on the iterator
 protocol such as \code{\link[=loop]{loop()}} and \code{\link[=collect]{collect()}}.
+
+\code{fn} can be written inline, as in \code{generator(function() ...)}, or be
+an existing function. To build one from code, create the function
+with \code{\link[rlang:new_function]{rlang::new_function()}} and pass it in.
 }
 \examples{
 # A generator statement creates a generator factory. The

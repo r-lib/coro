@@ -65,9 +65,41 @@ test_that("state is refreshed", {
   expect_identical(g("foo")(), "foo")
 })
 
-test_that("generator() takes anonymous functions", {
-  fn <- function() NULL
-  expect_error(generator(fn), "anonymous")
+test_that("generator() takes existing functions (#53)", {
+  fn <- function(n) for (i in seq_len(n)) yield(i)
+  expect_identical(collect(generator(fn)(3)), list(1L, 2L, 3L))
+
+  # Rebinding a function to its generator, as in `.onLoad()`
+  ns <- env(fn = fn)
+  local(fn <<- coro::generator(fn), ns)
+  expect_true(is_generator_factory(ns$fn))
+  expect_identical(collect(ns$fn(2)), list(1L, 2L))
+})
+
+test_that("generator() takes functions built with new_function() (#43)", {
+  env <- env(step = 10)
+  fn <- new_function(
+    pairlist2(n = , from = 0),
+    quote(for (i in seq_len(n)) yield(from + i * step)),
+    env
+  )
+  g <- generator(fn)
+  expect_identical(collect(g(2)), list(10, 20))
+  expect_identical(collect(g(2, from = 1)), list(11, 21))
+  # `step` is found in `env`, so the generator keeps the function's env.
+  # TODO: Once `coro_fn()` exists (r-lib/coro#78), also check
+  # `expect_identical(fn_env(coro_fn(g)), env)`
+})
+
+# TODO: Once `coro_fn()` exists (r-lib/coro#78), test that
+# `generator(coro_fn(g))` gives a working copy of `g`
+
+test_that("generator() rejects non-functions and coro functions", {
+  expect_snapshot(error = TRUE, {
+    generator(1)
+    generator(sum)
+    generator(generator(function() yield(1)))
+  })
 })
 
 test_that("generator functions inherit from `coro_generator`", {

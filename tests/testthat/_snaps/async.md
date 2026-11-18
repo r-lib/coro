@@ -238,6 +238,34 @@
           invisible(exhausted())
       }
 
+# async() and async_generator() reject non-functions and coro functions
+
+    Code
+      async(1)
+    Condition
+      Error in `async()`:
+      ! `fn` must be an R function.
+    Code
+      async(sum)
+    Condition
+      Error in `async()`:
+      ! `fn` must be an R function.
+    Code
+      async(async(function() 1))
+    Condition
+      Error in `async()`:
+      ! `fn` is already a coro function.
+    Code
+      async_generator("foo")
+    Condition
+      Error in `async_generator()`:
+      ! `fn` must be an R function.
+    Code
+      async_generator(async_generator(function() yield(1)))
+    Condition
+      Error in `async_generator()`:
+      ! `fn` is already a coro function.
+
 # for loops support await_each()
 
     Code

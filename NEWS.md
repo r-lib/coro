@@ -1,5 +1,7 @@
 # coro (development version)
 
+* `generator()`, `async()`, and `async_generator()` now take any R function, not only one written inline. This lets you rebind a function to its coro version, as in `f <<- generator(f)` in `.onLoad()` (#53), and build coro functions from code with `rlang::new_function()` (#43).
+
 * Fixed performance issue related to JIT compilation of generator/async instances (#71). The JIT compiler is now able to properly cache the instances, making repeated instantiations fast, and preventing the JIT from kicking in on every call.
 
 * Async functions and generators can now be R6 methods (#63).
